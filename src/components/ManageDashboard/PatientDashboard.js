@@ -1,9 +1,6 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
 
 const PatientDashboard = () => {
-  const dispatch = useDispatch();
-  const { userAuth } = useSelector((state) => state.authentication);
   return (
     <>
       {/* Page Heading */}
@@ -59,7 +56,7 @@ const PatientDashboard = () => {
                   style={{ backgroundColor: "#e0e1e3", color: "black" }}
                 >
                   Bloodwork <br />
-                  <a href="#">LabRequisition.pdf (download)</a>
+                  <a href="/">LabRequisition.pdf (download)</a>
                 </span>
               </form>
             </div>

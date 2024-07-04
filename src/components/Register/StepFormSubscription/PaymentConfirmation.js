@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "reactstrap";
 import Spinner from "react-bootstrap/Spinner";
-import StripeCheckOutButton from "./StripeCheckOutButton";
+// import StripeCheckOutButton from "./StripeCheckOutButton";
 
 const PaymentConfirmation = (props) => {
   // if (props.currentStep !== 3)

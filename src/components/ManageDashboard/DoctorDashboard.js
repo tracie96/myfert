@@ -1,10 +1,8 @@
-import { Button, Card, CardBody, Col, Row } from "react-bootstrap";
+import {  Card, CardBody, Col, Row } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import CustomButtons from "../global_component/CustomButtons";
-import DataTableComponent from "../global_component/DataTableComponent";
 import { patientList } from "../redux/doctorSlice";
 import { useEffect, useMemo, useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 
 const DoctorDashboard = () => {
   const dispatch = useDispatch();
@@ -137,7 +135,7 @@ const DoctorDashboard = () => {
       sortDirection,
       searchParam
     );
-  }, [currentPage, perPage, sortColumn, sortDirection, searchParam]);
+  }, [currentPage, perPage, sortColumn, sortDirection, searchParam,patientList]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);

@@ -4,9 +4,7 @@ import { NavLink } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import fertilityImage from "../../../assets/images/auth/fertilityImage.svg";
-import Spinner from "react-bootstrap/Spinner";
 import CustomModal from "../../global_component/CustomModal";
-import PasswordInput from "../../global_component/PasswordInput";
 import { postRegister } from "../../redux/AuthController";
 import { useDispatch } from "react-redux";
 import { Row, Col, Card } from "antd";
@@ -269,7 +267,7 @@ const states = {
     // });
 };
 
-  const { values, handleBlur, handleSubmit, errors, setValues } = useFormik({
+  const { values, errors, setValues } = useFormik({
     initialValues: initialValues,
     validationSchema: validateRegister,
     handleChange: handleChange,
@@ -307,12 +305,12 @@ const states = {
             <Col span={8} className="column-1" style={{backgroundColor:'#EFD0BD'}}>
               <div className="image-container">
                 <div style={{ padding: '15%' }}>
-                  <img src={image1} alt="Top Image" className="image-1" style={{ borderRadius: '50px', height: '662px' }} />
+                  <img src={image1} alt="Top" className="image-1" style={{ borderRadius: '50px', height: '662px' }} />
 
                 </div>
                 <div style={{ padding: '15%' }}>
 
-                  <img src={image2} alt="Bottom Image" className="image-2" style={{ borderRadius: '50px' }} />
+                  <img src={image2} alt="Bottom" className="image-2" style={{ borderRadius: '50px' }} />
                 </div>
               </div>
             </Col>
@@ -325,7 +323,7 @@ const states = {
                       <img
                         className="float-left"
                         src={fertilityImage}
-                        alt="loginImage"
+                        alt="login"
                         style={{ width: "150px" }}
                       />
                       <form className="d-flex" role="search">
@@ -385,7 +383,7 @@ const states = {
                                     name="userName"
                                     rules={[{ required: true, message: errors.userName }]}
                                   >
-                                    <Input placeholder="Enter User Name" />
+                                    <Input placeholder="Enter User Name" onChange={(e) => setUsername(e.target.value)} />
                                   </FormItem>
                                 </div>
                               </div>

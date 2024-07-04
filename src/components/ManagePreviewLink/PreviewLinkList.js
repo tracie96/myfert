@@ -27,7 +27,6 @@ const PreviewLink = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showSpinner, setShowSpinner] = useState(false);
-  const loggedInUser = useSelector((state) => state?.authentication?.userAuth);
 
   //#region Datatables
   const [totalRows, setTotalRows] = useState(0);
@@ -106,7 +105,7 @@ const PreviewLink = () => {
         cell: (row) => <CustomButtons buttons={buttons} row={row} />,
       },
     ],
-    []
+    [buttons]
   );
 
   const fetchPreviewLinkList = async (

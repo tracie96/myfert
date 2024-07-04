@@ -15,7 +15,6 @@ import defaultIconImage from "../../assets/images/users/user1.jpg";
 const LearnInfo = ({ tabInfo }) => {
   const dispatch = useDispatch();
   const { userAuth } = useSelector((state) => state.authentication);
-  const [showSpinner, setShowSpinner] = useState(false);
   const [previewLinkDto, setPreviewLinkDto] = useState([]);
 
   const fetchPreviewLinkListData = async () => {
@@ -38,7 +37,7 @@ const LearnInfo = ({ tabInfo }) => {
 
   useEffect(() => {
     fetchPreviewLinkListData();
-  }, []);
+  }, [userAuth]);
 
   return (
     <>

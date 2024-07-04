@@ -22,8 +22,6 @@ const UpdateProfile = () => {
   const [isDeleteDisabled, setIsDeleteDisabled] = useState(false);
   const [isUpdateDisabled, setIsUpdateDisabled] = useState(false);
   // #region Maps variables
-  const [isLoaded, setIsLoaded] = useState(true);
-  let defaultMarkers = [];
   // #endregion Maps variables
 
   const handleImageChange = (e) => {
@@ -109,7 +107,7 @@ const UpdateProfile = () => {
     if (loggedInUser.id) {
       handleDispatch(getLoggedInUser(loggedInUser.id));
     }
-  }, []);
+  }, [handleDispatch,loggedInUser.id]);
 
   const initialValues = {
     id: "",
@@ -157,7 +155,6 @@ const UpdateProfile = () => {
     handleBlur,
     handleChange,
     handleSubmit,
-    setValues,
     setFieldValue,
     errors,
   } = useFormik({

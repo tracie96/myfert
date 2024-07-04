@@ -1,12 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "./Learn.css";
-import Spinner from "react-bootstrap/Spinner";
-import { useDispatch, useSelector } from "react-redux";
 import LearnInfo from "./LearnInfo";
 
 const Learn = () => {
-  const dispatch = useDispatch();
-  const { userAuth } = useSelector((state) => state.authentication);
   const [learnInfoVisibility, setLearnInfoVisibility] = useState(false);
   const [tabInfoText, setTabInfoText] = useState("");
 
@@ -46,10 +42,10 @@ const Learn = () => {
     );
   };
 
-  const handleBackToLearn = () => {
-    setLearnInfoVisibility(false);
-    setTabInfoText("");
-  };
+  // const handleBackToLearn = () => {
+  //   setLearnInfoVisibility(false);
+  //   setTabInfoText("");
+  // };
 
   return (
     <>

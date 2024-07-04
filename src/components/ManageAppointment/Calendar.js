@@ -11,7 +11,7 @@ const Calendar = () => {
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
   const [currentEvent, setCurrentEvent] = useState();
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 600);
-
+console.log(currentEvents)
   let eventGuid = 0;
   let createEventId = eventGuid++;
   let todayStr = new Date().toISOString().replace(/T.*$/, ""); // YYYY-MM-DD of today
@@ -37,9 +37,9 @@ const Calendar = () => {
     },
   ];
 
-  const handleWeekendsToggle = () => {
-    setWeekendsVisible(!weekendsVisible);
-  };
+  // const handleWeekendsToggle = () => {
+  //   setWeekendsVisible(!weekendsVisible);
+  // };
 
   const handleDateSelect = (selectInfo) => {
     let title = prompt("Please enter a new title for your event");
@@ -67,9 +67,9 @@ const Calendar = () => {
     }
   };
 
-  const handleEventRightClick = (clickInfo) => {
-    window.alert(`Right clicked event '${clickInfo.event.title}'`);
-  };
+  // const handleEventRightClick = (clickInfo) => {
+  //   window.alert(`Right clicked event '${clickInfo.event.title}'`);
+  // };
 
   const handleMouseEnterOnEvent = (clickInfo) => {
     setCurrentEvent(clickInfo.event);

@@ -3,8 +3,8 @@ import { NavLink, Navigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
-import { postLogin, forgotPassword } from '../redux/AuthController'; // Ensure you import forgotPassword action
-import { Button, Input, Form, Row, Col, Divider, Typography, Modal, Spin } from 'antd'; // Import Modal, Spin from Ant Design
+import { postLogin } from '../redux/AuthController'; // Ensure you import forgotPassword action
+import { Button, Input, Form, Row, Col, Divider, Typography, Modal } from 'antd'; // Import Modal, Spin from Ant Design
 import fertilityImage from '../../assets/images/auth/fertilityImage.svg';
 import Login_one from '../../assets/images/auth/login_one.png';
 import Login_two from '../../assets/images/auth/login_two.png';

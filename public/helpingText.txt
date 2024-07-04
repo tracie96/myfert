@@ -1,0 +1,6 @@
+NOTE: After learning routes, I have implement route in this template.
+
+1) For applying validation on form we user Formik and YUP. Formik is used to handle the form and 
+YUP is used for form validation.
+2) Install package for both of these 
+run command on terminal  ===>  (npm i formik yup)

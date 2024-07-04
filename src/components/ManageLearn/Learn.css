@@ -1,0 +1,40 @@
+.learn-label .block-box {
+  color: #000000;
+  font-family: "Inter-Regular", Helvetica;
+  font-size: 14px;
+  height: 150px;
+  letter-spacing: 0;
+  /* line-height: normal; */
+  text-align: center;
+  border: 40px solid transparent;
+  background-color: #e9e9ec;
+  border-radius: 29px;
+}
+
+.learn-label .block-box:hover {
+  cursor: progress;
+}
+
+/* learn info */
+.block-learn-info {
+  color: #000000;
+  font-family: "Inter-Regular", Helvetica;
+  font-size: 16px;
+  letter-spacing: 0;
+  text-align: center;
+  border: 40px solid transparent;
+  background-color: #e9e9ec;
+  border-radius: 29px;
+}
+
+/* .block-learn-info:hover {
+  background-color: #e9e9ec;
+} */
+
+.color-blue-121 {
+  color: #01acee;
+}
+
+.bg-blue-121 {
+  background-color: #01acee;
+}

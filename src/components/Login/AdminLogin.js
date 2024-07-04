@@ -1,11 +1,10 @@
-import { NavLink, Navigate } from "react-router-dom";
+import {  Navigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { postLogin } from "../redux/AuthController";
 import Spinner from "react-bootstrap/Spinner";
 import { useState } from "react";
-import { Button } from "react-bootstrap";
 
 const initialValues = {
   email: "",
@@ -25,7 +24,7 @@ const validateLogin = Yup.object().shape({
 
 function AdminLogin() {
   const [showSpinner, setSpinner] = useState(false);
-
+  console.log(showSpinner)
   const dispatch = useDispatch();
   const { values, handleBlur, handleChange, handleSubmit, errors } = useFormik({
     initialValues: initialValues,

@@ -53,7 +53,7 @@ function ForgotPassword() {
               <div className="">
                 <div className="row">
                   <div className="col-lg-6 d-none d-lg-block">
-                    <img src={forgot_password}/>
+                    <img src={forgot_password} alt="forgotpass"/>
                   </div>
                   <div className="col-lg-6 mt-lg-5">
                     <div className="">

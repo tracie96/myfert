@@ -24,7 +24,8 @@ const PatientSignup = (userRole) => {
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
   const { Item: FormItem } = Form;
-
+  const [fileList,setFileList]=useState('')
+  console.log(fileList)
   const initialValues = {
     role: userRole?.userRole || "4",
     userName: "",

@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { patientList } from "../redux/doctorSlice";
 import { useEffect, useMemo, useState } from "react";
 import {  useNavigate } from "react-router-dom";
+import DataTableComponent from "../global_component/DataTableComponent";
 
 const DoctorDashboard = () => {
   const dispatch = useDispatch();

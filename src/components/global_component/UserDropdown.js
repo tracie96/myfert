@@ -2,7 +2,7 @@ import { useFormik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 import Spinner from "react-bootstrap/Spinner";
 import * as Yup from "yup";
-import { useEffect, useState } from "react";
+import { useEffect, useState,useCallback } from "react";
 import { userListDropdown } from "../redux/adminSlice";
 import { useNavigate } from "react-router";
 
@@ -14,7 +14,7 @@ function UserDropdown(onSuccessModal) {
   const [userData, setUserData] = useState([]);
   const loggedInUser = useSelector((state) => state?.authentication?.userAuth);
 
-  const fetchUsersList = async () => {
+  const fetchUsersList = useCallback(async () => {
     setShowUserSpinner(true);
     try {
       const response = await dispatch(userListDropdown());
@@ -22,18 +22,18 @@ function UserDropdown(onSuccessModal) {
       if (userListDropdown.fulfilled.match(response)) {
         setUserData(response?.payload);
       }
-      setShowUserSpinner(false);
     } catch (error) {
       console.error("Error fetching users:", error);
     } finally {
       setShowUserSpinner(false);
     }
-  };
+  }, [dispatch]);
 
   useEffect(() => {
-    fetchUsersList();
-  }, [loggedInUser?.role,fetchUsersList]);
-
+    if (loggedInUser?.role) {
+      fetchUsersList();
+    }
+  }, [loggedInUser?.role, fetchUsersList]);
   const initialValues = {
     userId: "",
     tabId: "",

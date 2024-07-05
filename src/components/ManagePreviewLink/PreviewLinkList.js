@@ -35,7 +35,8 @@ const PreviewLink = () => {
   const [sortColumn, setSortColumn] = useState("");
   const [sortDirection, setSortDirection] = useState("");
   const [searchParam, setSearchParam] = useState("");
-  const buttons = [
+  console.log(setCurrentPage)
+  const buttons = useMemo(() => [
     {
       id: 1,
       title: 'Delete',
@@ -50,50 +51,48 @@ const PreviewLink = () => {
       onClick: (row) => onUpdate(row),
       icon: 'bi bi-pencil-square',
     },
-  ];
-  
-  const columns = useMemo(
-    () => [
-      {
-        name: 'Title',
-        sortable: true,
-        selector: (row) => row.title,
-      },
-      {
-        name: 'Description',
-        sortable: true,
-        selector: (row) => row.description,
-      },
-      {
-        name: 'Link',
-        sortable: true,
-        selector: (row) => row.link,
-        cell: (row) =>
-          row.link ? (
-            <a href={row.link} target="_blank" rel="noreferrer" className="btn btn-sm btn-primary">
-              <span className="badge bg-primary">Link</span>
-            </a>
-          ) : (
-            'N/A'
-          ),
-      },
-      {
-        name: 'Preview Image',
-        sortable: true,
-        selector: (row) => row.primaryImage,
-        cell: (row) => (
-          <a href={row.primaryImage} target="_blank" rel="noreferrer">
-            <img alt="preview_image" src={row.primaryImage} style={{ width: '50px' }} />
+  ], [onDelete, onUpdate]);
+
+  const columns = useMemo(() => [
+    {
+      name: 'Title',
+      sortable: true,
+      selector: (row) => row.title,
+    },
+    {
+      name: 'Description',
+      sortable: true,
+      selector: (row) => row.description,
+    },
+    {
+      name: 'Link',
+      sortable: true,
+      selector: (row) => row.link,
+      cell: (row) =>
+        row.link ? (
+          <a href={row.link} target="_blank" rel="noreferrer" className="btn btn-sm btn-primary">
+            <span className="badge bg-primary">Link</span>
           </a>
+        ) : (
+          'N/A'
         ),
-      },
-      {
-        name: 'Actions',
-        sortable: false,
-        cell: (row) => <CustomButtons buttons={buttons} row={row} />,
-      },
-    ],
-  );
+    },
+    {
+      name: 'Preview Image',
+      sortable: true,
+      selector: (row) => row.primaryImage,
+      cell: (row) => (
+        <a href={row.primaryImage} target="_blank" rel="noreferrer">
+          <img alt="preview_image" src={row.primaryImage} style={{ width: '50px' }} />
+        </a>
+      ),
+    },
+    {
+      name: 'Actions',
+      sortable: false,
+      cell: (row) => <CustomButtons buttons={buttons} row={row} />,
+    },
+  ], [buttons]);
 
   const fetchPreviewLinkList = useCallback(
     async (

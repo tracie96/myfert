@@ -16,27 +16,19 @@ const UpdateProfile = () => {
   const dispatch = useDispatch();
   const [showSpinner, setShowSpinner] = useState(false);
   const loggedInUser = useSelector((state) => state?.authentication?.userAuth);
-
   const [selectedImage, setSelectedImage] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isDeleteDisabled, setIsDeleteDisabled] = useState(false);
   const [isUpdateDisabled, setIsUpdateDisabled] = useState(false);
-  // #region Maps variables
-  // #endregion Maps variables
 
   const handleImageChange = (e) => {
     const image = e.target.files[0];
-    if (image !== null && image !== undefined && image !== "") {
-      if (image && image.size <= 2 * 1024 * 1024) {
-        setSelectedImage(image);
-        setIsUpdateDisabled(false);
-      } else {
-        toast.warning("Image must be less than 2 MB.");
-        e.target.value = null; // Clear the file input className="form-control"
-      }
+    if (image && image.size <= 2 * 1024 * 1024) {
+      setSelectedImage(image);
+      setIsUpdateDisabled(false);
     } else {
-      setSelectedImage(false);
-      e.target.value = null;
+      toast.warning("Image must be less than 2 MB.");
+      e.target.value = null; // Clear the file input
     }
   };
 
@@ -58,7 +50,6 @@ const UpdateProfile = () => {
         setFieldValue("profile", response?.payload?.profile);
       }
     } catch (error) {
-      // Handle request error
       toast.error("Failed to update image");
     } finally {
       setIsUpdateDisabled(false);
@@ -124,6 +115,7 @@ const UpdateProfile = () => {
     latitude: 53.520611,
     longitude: -113.4627,
   };
+
   const validateUpdateProfile = Yup.object().shape({
     firstName: Yup.string()
       .min(3, "First Name must be at least 3 characters")
@@ -138,7 +130,6 @@ const UpdateProfile = () => {
     phoneNumber: Yup.string()
       .min(8, "Phone Number must be at least 8 characters")
       .required("Phone Number is required"),
-    // DOB: Yup.string().required("DOB is required"),
     DOB: Yup.date()
       .required("Please select your date of birth")
       .max(
@@ -146,8 +137,6 @@ const UpdateProfile = () => {
         "You must be 18 years or older"
       ),
     gender: Yup.string().required("Gender is required"),
-    // availabilityFrom: Yup.string().required("Avalaibility is required"),
-    // availabilityTo: Yup.string().required("Avalaibility is required"),
   });
 
   const {
@@ -235,13 +224,11 @@ const UpdateProfile = () => {
             <div className="card-body">
               <div className="row">
                 <div className="col-md-12">
-                  <>
-                    <Map
-                      latitude={values.latitude}
-                      longitude={values.longitude}
-                      setFieldValue={setFieldValue}
-                    />
-                  </>
+                  <Map
+                    latitude={values.latitude}
+                    longitude={values.longitude}
+                    setFieldValue={setFieldValue}
+                  />
                 </div>
               </div>
             </div>

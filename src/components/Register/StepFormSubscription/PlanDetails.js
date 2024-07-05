@@ -1,7 +1,7 @@
 import { Card } from "antd";
 import React, { useState } from "react";
 import { Row } from "react-bootstrap";
-import { CardFooter, CardHeader } from "reactstrap";
+import { CardFooter, CardHeader, CardBody } from "reactstrap";
 
 const PlanDetails = (props) => {
 

@@ -346,7 +346,7 @@ const PreviewLink = () => {
                   paginationTotalRows={totalRows}
                   paginationDefaultPage={currentPage}
                   onChangeRowsPerPage={handlePerRowsChange}
-                  onChangePage={handlePageChange}
+                  // onChangePage={handlePageChange}
                   onSort={handleSort}
                 />
               </div>

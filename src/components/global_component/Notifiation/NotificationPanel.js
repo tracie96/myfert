@@ -17,46 +17,48 @@ const NotificationPanel = ({
   const [isDisabled, setDisabled] = useState(false);
   const { userAuth } = useSelector((state) => state?.authentication);
   const dispatch = useDispatch();
-console.log(hubConnection)
-  useEffect(() => {
+  console.log(hubConnection)
+  const initializeSignalR = useCallback(async () => {
     const URL = `${notificationURL}notificationHub`;
+    const connection = new signalR.HubConnectionBuilder().withUrl(URL).build();
 
-    const initializeSignalR = async () => {
-      const connection = new signalR.HubConnectionBuilder().withUrl(URL).build();
-
-      connection.on("ReceiveMessage", (message, userId) => {
-        try {
-          if (userId) {
-            const userIdsArray = JSON.parse(userId);
-            userIdsArray.forEach((item) => {
-              if (item === userAuth.id) {
-                setMessages((prevMessages) => [...prevMessages, message]);
-                toast.info(message.description);
-                setUnReadCount((prevCount) => prevCount + 1);
-              }
-            });
-          }
-        } catch (error) {
-          console.log("error", error);
-        }
-      });
-
+    connection.on("ReceiveMessage", (message, userId) => {
       try {
-        await connection.start();
-        setHubConnection(connection);
-      } catch (err) {
-        console.error(err.toString());
+        if (userId) {
+          const userIdsArray = JSON.parse(userId);
+          userIdsArray.forEach((item) => {
+            if (item === userAuth.id) {
+              setMessages((prevMessages) => [...prevMessages, message]);
+              toast.info(message.description);
+              setUnReadCount((prevCount) => prevCount + 1);
+            }
+          });
+        }
+      } catch (error) {
+        console.log("error", error);
       }
-    };
+    });
 
-    initializeSignalR();
+    try {
+      await connection.start();
+      setHubConnection(connection);
+    } catch (err) {
+      console.error(err.toString());
+    }
+  }, [userAuth.id, setUnReadCount]);
 
+  const setMessagesFromNotifications = useCallback(() => {
     if (messages.length === 0 && notifications) {
       if (notifications?.getRecord?.length > 0) {
         setMessages(notifications.getRecord);
       }
     }
-  }, [userAuth.id, notifications, setUnReadCount]);
+  }, [messages.length, notifications]);
+
+  useEffect(() => {
+    initializeSignalR();
+    setMessagesFromNotifications();
+  }, [initializeSignalR, setMessagesFromNotifications]);
 
   const markAsRead = async (values) => {
     setDisabled(true);
@@ -97,12 +99,12 @@ console.log(hubConnection)
           style={
             message.isRead === 0
               ? {
-                  backgroundColor: "rgb(226 248 255)",
-                  borderBottom: "1px solid #999",
-                }
+                backgroundColor: "rgb(226 248 255)",
+                borderBottom: "1px solid #999",
+              }
               : {
-                  borderBottom: "1px solid rgb(227 227 227)",
-                }
+                borderBottom: "1px solid rgb(227 227 227)",
+              }
           }
         >
           <Col md={10}>

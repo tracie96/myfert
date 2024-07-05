@@ -8,6 +8,7 @@ const AdminDashboard = () => {
   const { userAuth } = useSelector((state) => state.authentication);
   const [showSpinner, setShowSpinner] = useState(false);
   const [userCountDto, setUserCountDto] = useState(null);
+  console.log(userAuth)
 
   const fetchDashboardGraphData = useCallback(async () => {
     setShowSpinner(true);

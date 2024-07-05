@@ -19,7 +19,7 @@ console.log(setLogout,isUpdate)
   const { userAuth } = useSelector((state) => state.authentication);
   const dispatch = useDispatch();
 
-  const fetchNotificationsList = async () => {
+  const fetchNotificationsList = useCallback(async () => {
     try {
       const response = await dispatch(getNotifications());
       if (getNotifications.fulfilled.match(response)) {
@@ -32,11 +32,11 @@ console.log(setLogout,isUpdate)
     } finally {
       setUpdate(false);
     }
-  };
-  
+  }, [dispatch, setUnReadCount]);
+
   useEffect(() => {
     fetchNotificationsList();
-  }, []);
+  }, [fetchNotificationsList]);
   
 
   const handleNotificationPanel = async () => {

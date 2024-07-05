@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useCallback, useRef, useState } from "react";
 import CustomButtons from "../global_component/CustomButtons";
 import { useDispatch } from "react-redux";
 import DataTableComponent from "../global_component/DataTableComponent";
@@ -93,43 +93,45 @@ const PreviewLink = () => {
         cell: (row) => <CustomButtons buttons={buttons} row={row} />,
       },
     ],
-    [buttons]
   );
 
-  const fetchPreviewLinkList = async (
-    page = 1,
-    size = 10,
-    sortColumn = "",
-    sortDirection = "",
-    searchParam = ""
-  ) => {
-    setLoading(true);
-    const params = {
-      page: page,
-      size: size,
-      sortColumn: sortColumn,
-      sortDirection: sortDirection,
-      searchParam: searchParam,
-    };
-    try {
-      const response = await dispatch(previewLinkList(params));
+  const fetchPreviewLinkList = useCallback(
+    async (
+      page = 1,
+      size = 10,
+      sortColumn = "",
+      sortDirection = "",
+      searchParam = ""
+    ) => {
+      setLoading(true);
+      const params = {
+        page: page,
+        size: size,
+        sortColumn: sortColumn,
+        sortDirection: sortDirection,
+        searchParam: searchParam,
+      };
+      try {
+        const response = await dispatch(previewLinkList(params));
 
-      if (previewLinkList.fulfilled.match(response)) {
-        const updatedList = response?.payload?.list?.map((item) => {
-          if (item && !item.primaryImage) {
-            item.primaryImage = defaultIconImage;
-          }
-          return item;
-        });
-        setData(updatedList);
-        setTotalRows(response?.payload?.totalRecords);
+        if (previewLinkList.fulfilled.match(response)) {
+          const updatedList = response?.payload?.list?.map((item) => {
+            if (item && !item.primaryImage) {
+              item.primaryImage = defaultIconImage;
+            }
+            return item;
+          });
+          setData(updatedList);
+          setTotalRows(response?.payload?.totalRecords);
+        }
+
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching preview link records:", error);
       }
-
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching preview link records:", error);
-    }
-  };
+    },
+    [dispatch]
+  );
 
   useEffect(() => {
     fetchPreviewLinkList(
@@ -139,11 +141,7 @@ const PreviewLink = () => {
       sortDirection,
       searchParam
     );
-  }, [currentPage, perPage, sortColumn, sortDirection, searchParam]);
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
+  }, [currentPage, perPage, sortColumn, sortDirection, searchParam, fetchPreviewLinkList]);
 
   const handlePerRowsChange = async (newPerPage, page) => {
     setPerPage(newPerPage);

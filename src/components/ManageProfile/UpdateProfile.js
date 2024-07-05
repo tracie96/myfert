@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import userIcon from "../../assets/images/users/user1.jpg";
 import Spinner from "react-bootstrap/Spinner";
 import { useDispatch, useSelector } from "react-redux";
@@ -75,39 +75,39 @@ const UpdateProfile = () => {
     handleDeleteAndUpdateImage("udpated");
   };
 
-  const handleDispatch = async (action) => {
-    try {
-      const resultAction = await dispatch(action);
-      const response = resultAction.payload;
-      setFieldValue("id", response.id || "");
-      setFieldValue("firstName", response.firstName || "");
-      setFieldValue("lastName", response.lastName || "");
-      setFieldValue("email", response.email || "");
-      setFieldValue("address", response.address || "");
-      setFieldValue("phoneNumber", response.phoneNumber || "");
-      setFieldValue("DOB", response.dob || "");
-      setFieldValue("gender", response.gender || "");
-      setFieldValue("profile", response.profile || "");
-      setFieldValue("latitude", response.latitude || 53.520611);
-      setFieldValue("longitude", response.longitude || -113.4627);
-      setFieldValue("availabilityFrom", response.availabilityFrom || "");
-      setFieldValue("availabilityTo", response.availabilityTo || "");
+  const handleDispatch = useCallback(
+    async (action) => {
+      try {
+        const resultAction = await dispatch(action);
+        const response = resultAction.payload;
 
-      if (response.profile != null && response.profile) {
-        setIsDeleteDisabled(false);
-      } else {
-        setIsDeleteDisabled(true);
+        setFieldValue("id", response.id || "");
+        setFieldValue("firstName", response.firstName || "");
+        setFieldValue("lastName", response.lastName || "");
+        setFieldValue("email", response.email || "");
+        setFieldValue("address", response.address || "");
+        setFieldValue("phoneNumber", response.phoneNumber || "");
+        setFieldValue("DOB", response.dob || "");
+        setFieldValue("gender", response.gender || "");
+        setFieldValue("profile", response.profile || "");
+        setFieldValue("latitude", response.latitude || 53.520611);
+        setFieldValue("longitude", response.longitude || -113.4627);
+        setFieldValue("availabilityFrom", response.availabilityFrom || "");
+        setFieldValue("availabilityTo", response.availabilityTo || "");
+
+        setIsDeleteDisabled(response.profile == null || !response.profile);
+      } catch (error) {
+        console.error(error);
       }
-    } catch (error) {
-      console.error(error);
-    }
-  };
+    },
+    [dispatch, setFieldValue, setIsDeleteDisabled]
+  );
 
   useEffect(() => {
     if (loggedInUser.id) {
       handleDispatch(getLoggedInUser(loggedInUser.id));
     }
-  }, [loggedInUser.id,handleDispatch]);
+  }, [loggedInUser.id, handleDispatch]);
 
   const initialValues = {
     id: "",

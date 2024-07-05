@@ -12,6 +12,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import Map from "./Map";
 
+
 const UpdateProfile = () => {
   const dispatch = useDispatch();
   const [showSpinner, setShowSpinner] = useState(false);
@@ -20,6 +21,64 @@ const UpdateProfile = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [isDeleteDisabled, setIsDeleteDisabled] = useState(false);
   const [isUpdateDisabled, setIsUpdateDisabled] = useState(false);
+
+  const initialValues = {
+    id: "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    DOB: "",
+    phoneNumber: "",
+    address: "",
+    gender: "",
+    profile: "",
+    availabilityFrom: "",
+    availabilityTo: "",
+    latitude: 53.520611,
+    longitude: -113.4627,
+  };
+
+  const validateUpdateProfile = Yup.object().shape({
+    firstName: Yup.string()
+      .min(3, "First Name must be at least 3 characters")
+      .required("First Name is required"),
+    lastName: Yup.string()
+      .min(3, "Last Name must be at least 3 characters")
+      .required("Last Name is required"),
+    email: Yup.string().required("Email is required"),
+    address: Yup.string()
+      .min(8, "Address must be at least 8 characters")
+      .required("Address is required"),
+    phoneNumber: Yup.string()
+      .min(8, "Phone Number must be at least 8 characters")
+      .required("Phone Number is required"),
+    DOB: Yup.date()
+      .required("Please select your date of birth")
+      .max(
+        new Date(new Date().setFullYear(new Date().getFullYear() - 18)),
+        "You must be 18 years or older"
+      ),
+    gender: Yup.string().required("Gender is required"),
+  });
+
+  const formik = useFormik({
+    initialValues: initialValues,
+    validationSchema: validateUpdateProfile,
+    onSubmit: async (values) => {
+      try {
+        setShowSpinner(true);
+        const action = dispatch(updateProfile(values));
+        const resultAction = await action;
+        console.log(resultAction);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setShowSpinner(false);
+      }
+    },
+  });
+
+  const { setFieldValue, values, handleBlur, handleChange, handleSubmit, errors } = formik;
 
   const handleImageChange = (e) => {
     const image = e.target.files[0];
@@ -63,7 +122,7 @@ const UpdateProfile = () => {
   };
 
   const handleUpdateImage = () => {
-    handleDeleteAndUpdateImage("udpated");
+    handleDeleteAndUpdateImage("updated");
   };
 
   const handleDispatch = useCallback(
@@ -91,7 +150,7 @@ const UpdateProfile = () => {
         console.error(error);
       }
     },
-    [dispatch, setFieldValue, setIsDeleteDisabled]
+    [dispatch, setFieldValue]
   );
 
   useEffect(() => {
@@ -99,69 +158,6 @@ const UpdateProfile = () => {
       handleDispatch(getLoggedInUser(loggedInUser.id));
     }
   }, [loggedInUser.id, handleDispatch]);
-
-  const initialValues = {
-    id: "",
-    firstName: "",
-    lastName: "",
-    email: "",
-    DOB: "",
-    phoneNumber: "",
-    address: "",
-    gender: "",
-    profile: "",
-    availabilityFrom: "",
-    availabilityTo: "",
-    latitude: 53.520611,
-    longitude: -113.4627,
-  };
-
-  const validateUpdateProfile = Yup.object().shape({
-    firstName: Yup.string()
-      .min(3, "First Name must be at least 3 characters")
-      .required("First Name is required"),
-    lastName: Yup.string()
-      .min(3, "Last Name must be at least 3 characters")
-      .required("Last Name is required"),
-    email: Yup.string().required("Email is required"),
-    address: Yup.string()
-      .min(8, "Address must be at least 8 characters")
-      .required("Address is required"),
-    phoneNumber: Yup.string()
-      .min(8, "Phone Number must be at least 8 characters")
-      .required("Phone Number is required"),
-    DOB: Yup.date()
-      .required("Please select your date of birth")
-      .max(
-        new Date(new Date().setFullYear(new Date().getFullYear() - 18)),
-        "You must be 18 years or older"
-      ),
-    gender: Yup.string().required("Gender is required"),
-  });
-
-  const {
-    values,
-    handleBlur,
-    handleChange,
-    handleSubmit,
-    setFieldValue,
-    errors,
-  } = useFormik({
-    initialValues: initialValues,
-    validationSchema: validateUpdateProfile,
-    onSubmit: async (values) => {
-      try {
-        setShowSpinner(true);
-        const action = dispatch(updateProfile(values));
-        const resultAction = await action;
-        console.log(resultAction);
-      } catch (error) {
-      } finally {
-        setShowSpinner(false);
-      }
-    },
-  });
-
   return (
     <>
       <div className="row px-5 pb-5">

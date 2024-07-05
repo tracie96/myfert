@@ -1,0 +1,30 @@
+{
+  "files": {
+    "main.css": "/static/css/main.fe25dd61.css",
+    "main.js": "/static/js/main.4045af80.js",
+    "static/js/787.28637dfb.chunk.js": "/static/js/787.28637dfb.chunk.js",
+    "static/media/patient2_bg.png": "/static/media/patient2_bg.b89ae79e512924f370e5.png",
+    "static/media/patient_bg.jpeg": "/static/media/patient_bg.55843aa892ca78560f5f.jpeg",
+    "static/media/fertilityImage.svg": "/static/media/fertilityImage.e0b4c2e1fd3a68caf54d9eb8ff560447.svg",
+    "static/media/forgotPassword.svg": "/static/media/forgotPassword.97507445564c3aeefbb5827e0a19f238.svg",
+    "static/media/patients.png": "/static/media/patients.907d8aff953df9c361f2.png",
+    "static/media/bootstrap-icons.woff?": "/static/media/bootstrap-icons.66b7720f4a230f1b0341.woff",
+    "static/media/clinicians.png": "/static/media/clinicians.6b731f3fc2fc4c8348d2.png",
+    "static/media/bootstrap-icons.woff2?": "/static/media/bootstrap-icons.64ed46b247405068ca60.woff2",
+    "static/media/login_three.png": "/static/media/login_three.28a69483862c5d61455f.png",
+    "static/media/login_one.png": "/static/media/login_one.58c75fff09362b80b53f.png",
+    "static/media/login_four.png": "/static/media/login_four.b5c00b51176b6dd5b9c1.png",
+    "static/media/login_two.png": "/static/media/login_two.866c85d5ff0f0195f3c2.png",
+    "static/media/crossImage.png": "/static/media/crossImage.104333be04f61604ce2e.png",
+    "static/media/tickImage.png": "/static/media/tickImage.4798a7bc5cf35affdcd3.png",
+    "static/media/user1.jpg": "/static/media/user1.f3714f3391c9a5903799.jpg",
+    "index.html": "/index.html",
+    "main.fe25dd61.css.map": "/static/css/main.fe25dd61.css.map",
+    "main.4045af80.js.map": "/static/js/main.4045af80.js.map",
+    "787.28637dfb.chunk.js.map": "/static/js/787.28637dfb.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.fe25dd61.css",
+    "static/js/main.4045af80.js"
+  ]
+}

@@ -5,7 +5,6 @@ import {
   getUpdatedSubscriptionDetail,
   logoutAction,
   setReduxUserAuthValuesUndefined,
-  updateReduxUserAuth,
 } from "../../redux/AuthController";
 import fertilityImage from "../../../assets/images/auth/fertilityImage.svg";
 import { useNavigate } from "react-router";
@@ -80,7 +79,7 @@ const SubscriptionSuccessPage = () => {
     if (!loggedInUser) {
       navigate("/");
     }
-  }, [loggedInUser]);
+  }, [loggedInUser,navigate]);
 
   if (!paymentTicksCorrect) {
     if (paymentTimeTicks && loggedInUser?.paymentTimeTicks) {

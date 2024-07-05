@@ -35,72 +35,60 @@ const PreviewLink = () => {
   const [sortColumn, setSortColumn] = useState("");
   const [sortDirection, setSortDirection] = useState("");
   const [searchParam, setSearchParam] = useState("");
-
   const buttons = [
     {
       id: 1,
-      title: "Delete",
+      title: 'Delete',
       onClick: (row) => onDelete(row),
-      className: "btn btn-sm btn-danger me-1",
-      icon: "bi bi-trash",
+      className: 'btn btn-sm btn-danger me-1',
+      icon: 'bi bi-trash',
     },
     {
       id: 2,
-      title: "Update",
-      className: "btn btn-sm btn-success me-1",
+      title: 'Update',
+      className: 'btn btn-sm btn-success me-1',
       onClick: (row) => onUpdate(row),
-      icon: "bi bi-pencil-square",
+      icon: 'bi bi-pencil-square',
     },
   ];
-
+  
   const columns = useMemo(
     () => [
       {
-        name: "Title",
+        name: 'Title',
         sortable: true,
-        selector: (row, i) => row.title,
-        sortFunction: () => [],
+        selector: (row) => row.title,
       },
       {
-        name: "Description",
+        name: 'Description',
         sortable: true,
-        selector: (row, i) => row.description,
-        sortFunction: () => [],
+        selector: (row) => row.description,
       },
       {
-        name: "Link",
+        name: 'Link',
         sortable: true,
-        selector: (row, i) => row.link,
+        selector: (row) => row.link,
         cell: (row) =>
           row.link ? (
-            <a
-              href={row.link}
-              target="_blank"
-              rel="noreferrer"
-              className="btn btn-sm btn-primary"
-            >
+            <a href={row.link} target="_blank" rel="noreferrer" className="btn btn-sm btn-primary">
               <span className="badge bg-primary">Link</span>
             </a>
           ) : (
-            "N/A"
+            'N/A'
           ),
       },
       {
-        name: "Preview Image",
+        name: 'Preview Image',
         sortable: true,
-        selector: (row, i) => row.primaryImage,
+        selector: (row) => row.primaryImage,
         cell: (row) => (
           <a href={row.primaryImage} target="_blank" rel="noreferrer">
-            <img
-              alt="preview_image"
-              src={row.primaryImage}
-              style={{ width: "50px" }}
-            />
+            <img alt="preview_image" src={row.primaryImage} style={{ width: '50px' }} />
           </a>
         ),
       },
       {
-        name: "Actions",
+        name: 'Actions',
         sortable: false,
         cell: (row) => <CustomButtons buttons={buttons} row={row} />,
       },

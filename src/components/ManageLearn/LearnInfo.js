@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import "./Learn.css";
 import {
   Card,
@@ -15,26 +15,28 @@ import defaultIconImage from "../../assets/images/users/user1.jpg";
 const LearnInfo = ({ tabInfo }) => {
   const dispatch = useDispatch();
   const { userAuth } = useSelector((state) => state.authentication);
-  const [showSpinner, setShowSpinner] = useState(false);
-  const [previewLinkDto, setPreviewLinkDto] = useState([]);
-console.log(showSpinner,userAuth)
-  const fetchPreviewLinkListData = async () => {
-    setShowSpinner(true);
+  const [state, setState] = useState({
+    showSpinner: false,
+    previewLinkDto: [],
+  });
+console.log(userAuth)
+  const fetchPreviewLinkListData = useCallback(async () => {
+    setState((prevState) => ({ ...prevState, showSpinner: true }));
     try {
       const response = await dispatch(getPreviewLinkList());
 
       if (getPreviewLinkList.fulfilled.match(response)) {
-        console.log("preview link list data : ", response);
-        console.log("preview link list data pay : ", response?.payload);
-        setPreviewLinkDto(response?.payload);
-        console.log("set preview link Dto : ", previewLinkDto);
+        setState((prevState) => ({
+          ...prevState,
+          previewLinkDto: response.payload,
+        }));
       }
     } catch (error) {
       console.error("Error fetching graph data:", error);
     } finally {
-      setShowSpinner(false);
+      setState((prevState) => ({ ...prevState, showSpinner: false }));
     }
-  };
+  }, [dispatch]);
 
   useEffect(() => {
     fetchPreviewLinkListData();
@@ -54,8 +56,8 @@ console.log(showSpinner,userAuth)
       <Row>
         <Col md={12}>
           <Row>
-            {previewLinkDto &&
-              previewLinkDto.map((item, index) => (
+            {state.previewLinkDto &&
+              state.previewLinkDto.map((item, index) => (
                 <div key={index} className="col-lg-4 mb-2">
                   <form className="user">
                     <Card className="rounded-3">
@@ -81,7 +83,6 @@ console.log(showSpinner,userAuth)
                       <CardFooter className="text-center border-0 mt-2 bg-white">
                         <a
                           className="btn btn-block btn-user text-white font-weight-bold"
-                          // style={{ backgroundColor: "#10a997" }}
                           style={{ backgroundColor: "blue" }}
                           href={item.link}
                           target="_blank"

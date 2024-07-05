@@ -18,26 +18,23 @@ const NotificationPanel = ({
   const { userAuth } = useSelector((state) => state?.authentication);
   const dispatch = useDispatch();
 console.log(hubConnection)
-
   useEffect(() => {
     const URL = `${notificationURL}notificationHub`;
 
     const initializeSignalR = async () => {
-      const connection = new signalR.HubConnectionBuilder()
-        .withUrl(URL)
-        .build();
+      const connection = new signalR.HubConnectionBuilder().withUrl(URL).build();
 
-      connection.on("RecieveMessage", (message, userId) => {
+      connection.on("ReceiveMessage", (message, userId) => {
         try {
           if (userId) {
             const userIdsArray = JSON.parse(userId);
-            for (var item = 0; item <= userIdsArray.length; item++) {
-              if (userIdsArray[item] === userAuth.id) {
+            userIdsArray.forEach((item) => {
+              if (item === userAuth.id) {
                 setMessages((prevMessages) => [...prevMessages, message]);
                 toast.info(message.description);
                 setUnReadCount((prevCount) => prevCount + 1);
               }
-            }
+            });
           }
         } catch (error) {
           console.log("error", error);
@@ -59,12 +56,11 @@ console.log(hubConnection)
         setMessages(notifications.getRecord);
       }
     }
-  }, []);
+  }, [userAuth.id, notifications, setUnReadCount]);
 
   const markAsRead = async (values) => {
     setDisabled(true);
     try {
-      console.log(values.id);
       const payload = {
         notiOrUser: "Noti",
         id: values, // assuming values is an object with an 'id' property
@@ -83,7 +79,6 @@ console.log(hubConnection)
   const deleteNoti = async (id) => {
     setDisabled(true);
     try {
-      console.log(id);
       const endPoint = `Notification/DeleteNoti?id=${id}`;
       await dispatch(deleteRecord(endPoint));
       setUnReadCount((prevCount) => (prevCount > 0 ? prevCount - 1 : 0));
@@ -113,7 +108,6 @@ console.log(hubConnection)
           <Col md={10}>
             <a
               href="##"
-              key={index}
               className="dropdown-item align-items-center py-3 pe-1"
               style={{
                 border: "1px solid transparent",
@@ -129,19 +123,15 @@ console.log(hubConnection)
           </Col>
           <Col md={2} className="my-3">
             {message.isRead === 0 ? (
-              <>
-                <a
-                  href="##"
-                  title="Mark as read"
-                  disabled={isDisabled}
-                  onClick={() => markAsRead(message.id)}
-                >
-                  <i className="fa fa-circle fa-solid fa-sm text-primary"></i>
-                </a>
-              </>
-            ) : (
-              <></>
-            )}
+              <a
+                href="##"
+                title="Mark as read"
+                disabled={isDisabled}
+                onClick={() => markAsRead(message.id)}
+              >
+                <i className="fa fa-circle fa-solid fa-sm text-primary"></i>
+              </a>
+            ) : null}
             <a
               href="##"
               title="Delete"
@@ -160,3 +150,4 @@ console.log(hubConnection)
 };
 
 export default NotificationPanel;
+s

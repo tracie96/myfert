@@ -33,10 +33,11 @@ console.log(setLogout,isUpdate)
       setUpdate(false);
     }
   };
-
+  
   useEffect(() => {
     fetchNotificationsList();
-  }, [dispatch,fetchNotificationsList]);
+  }, []);
+  
 
   const handleNotificationPanel = async () => {
     await fetchNotificationsList();

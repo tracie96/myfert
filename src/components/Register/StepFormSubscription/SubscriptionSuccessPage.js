@@ -7,7 +7,6 @@ import {
   setReduxUserAuthValuesUndefined,
   updateReduxUserAuth,
 } from "../../redux/AuthController";
-import { Button, NavLink } from "react-bootstrap";
 import fertilityImage from "../../../assets/images/auth/fertilityImage.svg";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
@@ -68,20 +67,20 @@ const SubscriptionSuccessPage = () => {
   const setUserAuthUndefined = async () => {
     dispatch(setReduxUserAuthValuesUndefined()); // values to undefined
   };
-  const updateUserAuthReduxValues = async () => {
-    const updateUserAuth = {
-      ...loggedInUser,
-      isPaymentComplete: true,
-    };
-    delete updateUserAuth.paymentTimeTicks;
-    dispatch(updateReduxUserAuth(updateUserAuth));
-  };
+  // const updateUserAuthReduxValues = async () => {
+  //   const updateUserAuth = {
+  //     ...loggedInUser,
+  //     isPaymentComplete: true,
+  //   };
+  //   delete updateUserAuth.paymentTimeTicks;
+  //   dispatch(updateReduxUserAuth(updateUserAuth));
+  // };
 
   useEffect(() => {
     if (!loggedInUser) {
       navigate("/");
     }
-  }, []);
+  }, [loggedInUser]);
 
   if (!paymentTicksCorrect) {
     if (paymentTimeTicks && loggedInUser?.paymentTimeTicks) {

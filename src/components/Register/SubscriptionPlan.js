@@ -8,7 +8,7 @@ import tickImage from "../../assets/images/auth/tickImage.png";
 import crossImage from "../../assets/images/auth/crossImage.png";
 import MultiStepProgressBar from "./StepFormSubscription/MultiStepProgressBar";
 import PlanDetails from "./StepFormSubscription/PlanDetails";
-import PaymentDetails from "./StepFormSubscription/PaymentDetails";
+// import PaymentDetails from "./StepFormSubscription/PaymentDetails";
 import PaymentConfirmation from "./StepFormSubscription/PaymentConfirmation";
 import { Button, Card, CardHeader, CardBody, CardFooter } from "reactstrap";
 import { Col, Row } from "react-bootstrap";
@@ -16,7 +16,6 @@ import CustomModal from "../global_component/CustomModal";
 import {
   createCheckoutSession,
   logoutAction,
-  postSubscriptionPayment,
 } from "../redux/AuthController";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
@@ -125,25 +124,25 @@ const SubscriptionPlan = () => {
     // setCurrentStep((prevStep) => prevStep - 1);
   };
 
-  const renderButtons = () => (
-    <>
-      {currentStep !== 1 && (
-        <Button color="secondary float-left" onClick={prevStep}>
-          Previous
-        </Button>
-      )}
-      {currentStep < 4 && (
-        <Button color="primary float-right" onClick={nextStep}>
-          Next
-        </Button>
-      )}
-      {currentStep === 4 && <Button color="primary float-right">Submit</Button>}
-    </>
-  );
+  // const renderButtons = () => (
+  //   <>
+  //     {currentStep !== 1 && (
+  //       <Button color="secondary float-left" onClick={prevStep}>
+  //         Previous
+  //       </Button>
+  //     )}
+  //     {currentStep < 4 && (
+  //       <Button color="primary float-right" onClick={nextStep}>
+  //         Next
+  //       </Button>
+  //     )}
+  //     {currentStep === 4 && <Button color="primary float-right">Submit</Button>}
+  //   </>
+  // );
 
-  const confirmSubscriptionButton = () => {
-    setShowSpinner(true);
-  };
+  // const confirmSubscriptionButton = () => {
+  //   setShowSpinner(true);
+  // };
 
   //#region Modal show
   const handleShowModal = (checkSubscription) => {

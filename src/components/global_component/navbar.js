@@ -1,4 +1,4 @@
-import { Component, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import CustomModal from "./CustomModal";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutAction } from "../redux/AuthController";
@@ -15,6 +15,7 @@ function Navbar() {
   const [isUpdate, setUpdate] = useState(false);
   const [unReadCount, setUnReadCount] = useState(0);
 
+console.log(setLogout,isUpdate)
   const { userAuth } = useSelector((state) => state.authentication);
   const dispatch = useDispatch();
 
@@ -35,7 +36,7 @@ function Navbar() {
 
   useEffect(() => {
     fetchNotificationsList();
-  }, [dispatch]);
+  }, [dispatch,fetchNotificationsList]);
 
   const handleNotificationPanel = async () => {
     await fetchNotificationsList();

@@ -1,13 +1,11 @@
-import {  Card, CardBody, Col, Row } from "react-bootstrap";
+import {  Card, CardBody } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { patientList } from "../redux/doctorSlice";
 import { useEffect, useMemo, useState } from "react";
-import {  useNavigate } from "react-router-dom";
 import DataTableComponent from "../global_component/DataTableComponent";
 
 const DoctorDashboard = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const loggedInUser = useSelector((state) => state?.authentication?.userAuth);
@@ -20,22 +18,22 @@ const DoctorDashboard = () => {
   const [sortDirection, setSortDirection] = useState("");
   const [searchParam, setSearchParam] = useState("");
 
-  const buttons = [
-    {
-      id: 1,
-      title: "Delete",
-      className: "btn btn-sm btn-danger me-1",
-      icon: "bi bi-trash",
-      label: "",
-    },
-    {
-      id: 2,
-      title: "Update",
-      className: "btn btn-sm btn-success me-1",
-      icon: "bi bi-pencil-square",
-      label: "",
-    },
-  ];
+  // const buttons = [
+  //   {
+  //     id: 1,
+  //     title: "Delete",
+  //     className: "btn btn-sm btn-danger me-1",
+  //     icon: "bi bi-trash",
+  //     label: "",
+  //   },
+  //   {
+  //     id: 2,
+  //     title: "Update",
+  //     className: "btn btn-sm btn-success me-1",
+  //     icon: "bi bi-pencil-square",
+  //     label: "",
+  //   },
+  // ];
 
   const columns = useMemo(
     () => [
@@ -136,7 +134,7 @@ const DoctorDashboard = () => {
       sortDirection,
       searchParam
     );
-  }, [currentPage, perPage, sortColumn, sortDirection, searchParam,patientList]);
+  }, [currentPage, perPage, sortColumn, sortDirection, searchParam,fetchPatientList]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);

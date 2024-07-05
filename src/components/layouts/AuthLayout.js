@@ -1,8 +1,6 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
 
-import Footer from "../global_component/footer";
-
 function AuthLayout() {
   return (
     <>

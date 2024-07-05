@@ -107,7 +107,7 @@ const UpdateProfile = () => {
     if (loggedInUser.id) {
       handleDispatch(getLoggedInUser(loggedInUser.id));
     }
-  }, [handleDispatch,loggedInUser.id]);
+  }, [loggedInUser.id]);
 
   const initialValues = {
     id: "",

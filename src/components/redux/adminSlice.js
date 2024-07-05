@@ -273,6 +273,7 @@ export const addDepartment = createAsyncThunk(
       if (response?.data?.status) {
         toast.success(response?.data?.message);
       }
+      console.log(responseBack)
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, user);
     }

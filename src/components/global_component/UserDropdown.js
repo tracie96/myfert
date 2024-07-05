@@ -32,7 +32,7 @@ function UserDropdown(onSuccessModal) {
 
   useEffect(() => {
     fetchUsersList();
-  }, [loggedInUser?.role]);
+  }, [loggedInUser?.role,fetchUsersList]);
 
   const initialValues = {
     userId: "",

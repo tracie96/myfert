@@ -1,10 +1,7 @@
 import React, { useState } from "react";
-import { FormGroup, Label, Input } from "reactstrap";
-import { Card, CardHeader, CardBody, CardFooter, Modal } from "reactstrap";
 import { Row } from "react-bootstrap";
 
 const PlanDetails = (props) => {
-  const [subscriptionPlan, setSubscriptionPlan] = useState("");
 
   if (props.currentStep !== 1) {
     return null;

@@ -11,7 +11,7 @@ const Calendar = () => {
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
   const [currentEvent, setCurrentEvent] = useState();
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 600);
-console.log(currentEvents)
+console.log(currentEvents,setWeekendsVisible)
   let eventGuid = 0;
   let createEventId = eventGuid++;
   let todayStr = new Date().toISOString().replace(/T.*$/, ""); // YYYY-MM-DD of today

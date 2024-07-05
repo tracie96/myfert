@@ -17,7 +17,7 @@ const LearnInfo = ({ tabInfo }) => {
   const { userAuth } = useSelector((state) => state.authentication);
   const [showSpinner, setShowSpinner] = useState(false);
   const [previewLinkDto, setPreviewLinkDto] = useState([]);
-console.log(showSpinner)
+console.log(showSpinner,userAuth)
   const fetchPreviewLinkListData = async () => {
     setShowSpinner(true);
     try {
@@ -38,7 +38,7 @@ console.log(showSpinner)
 
   useEffect(() => {
     fetchPreviewLinkListData();
-  }, [userAuth]);
+  }, [fetchPreviewLinkListData]);
 
   return (
     <>

@@ -1,14 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { NavLink } from "react-router-dom";
 import CustomModal from "./CustomModal";
 import UserDropdown from "./UserDropdown";
-import fertilityImage from "../../assets/images/auth/fertilityImage.svg";
-import testIcon from "../../assets/images/sidebar/taskSearch.png";
-import assessIcon from "../../assets/images/sidebar/analytics.png";
-import medsIcon from "../../assets/images/sidebar/care.png";
-import apptIcon from "../../assets/images/sidebar/calender.png";
-import learnIcon from "../../assets/images/sidebar/instruction.png";
 import { GetSideBar } from "../../utils/Permission/GetSideBar";
 
 const Sidebar = () => {
@@ -17,7 +10,7 @@ const Sidebar = () => {
   const handleCloseModal = () => {
     setshowUserDropdownModal(false);
   };
-
+console.log(userAuth)
   useEffect(() => {
     const handleSidebarToggle = () => {
       const sidebar = document.querySelector(".sidebar");

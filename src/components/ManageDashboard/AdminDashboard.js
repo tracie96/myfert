@@ -28,7 +28,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     fetchDashboardGraphData();
-  }, [userAuth]);
+  }, [fetchDashboardGraphData]);
 
   return (
     <>

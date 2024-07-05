@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import CustomButtons from "../global_component/CustomButtons";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import DataTableComponent from "../global_component/DataTableComponent";
 import {
   Button,

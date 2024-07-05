@@ -3,7 +3,7 @@ import * as signalR from "@microsoft/signalr";
 import { notificationURL } from "../../../utils/envAccess";
 import { useDispatch, useSelector } from "react-redux";
 import { truncateText } from "../../../utils/globalFunctions";
-import { Button, ButtonGroup, Col, Row } from "react-bootstrap";
+import { Col, Row } from "react-bootstrap";
 import { deleteRecord, markNotiAsRead } from "../../redux/globalSlice";
 import { toast } from "react-toastify";
 
@@ -17,6 +17,7 @@ const NotificationPanel = ({
   const [isDisabled, setDisabled] = useState(false);
   const { userAuth } = useSelector((state) => state?.authentication);
   const dispatch = useDispatch();
+console.log(hubConnection)
 
   useEffect(() => {
     const URL = `${notificationURL}notificationHub`;

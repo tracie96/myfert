@@ -150,4 +150,3 @@ console.log(hubConnection)
 };
 
 export default NotificationPanel;
-s

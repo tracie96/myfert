@@ -36,7 +36,7 @@ function ResetPassword() {
   });
 
   const session = new URLSearchParams(location.search).get("Token");
-
+console.log(session,'session')
   const { values, handleBlur, handleChange, handleSubmit, errors } = useFormik({
     initialValues: initialValues,
     validationSchema: validateResetPassword,

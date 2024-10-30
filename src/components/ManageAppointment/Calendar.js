@@ -16,7 +16,7 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
     (availability, startYear, startMonth) => {
       const events = availability.map((slot) => ({
         id: `${slot.date}_${slot.roleId}`, 
-        title: `Available`, 
+        title: slot?.free ? 'Available' : 'Booked',
         start: new Date(slot.date), 
         end: new Date(slot.date),
         classNames: `fc-event-blue`,

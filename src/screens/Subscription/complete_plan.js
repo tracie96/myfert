@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Row, Col, Button, Typography } from "antd";
 import { DownOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import "./subscription.css"
 import SubscriptionBanner from "../../assets/images/bg/subscription_home-logo.png";

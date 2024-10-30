@@ -3,7 +3,7 @@ import { Row, Col, Button } from "antd";
 import { Typography } from "antd";
 import { useSelector } from "react-redux";
 import { useMediaQuery } from "react-responsive";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 const PrePlan = () => {
   const navigate = useNavigate();
   const handleClick = (price) => {

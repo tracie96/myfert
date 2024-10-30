@@ -5,7 +5,7 @@ import { Typography } from "antd";
 import { useSelector } from "react-redux";
 import { useMediaQuery } from "react-responsive";
 import { DownOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import "./subscription.css"
 
 const SecondPlan = () => {

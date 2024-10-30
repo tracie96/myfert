@@ -242,10 +242,10 @@ import SecondPlan from "../../screens/Subscription/second-plan";
 const allowedDoctorRoles = ['Nurse', 'Doctor', 'PharmacistClinician', 'NutritionalPractitioner', 'FertilitySupportPractitioner', 'FertilityEducator'];
 const RoleProtectedRoute = ({ element, allowedRoles }) => {
   const userAuth = useSelector((state) => state?.authentication?.userAuth);
-      
+
   if (userAuth && Object.keys(userAuth).length > 0 && userAuth.obj.role === 'Patient') {
     return <><Navigate to="/patient" replace /><PatDash /></>;
-  } 
+  }
 
   if (!userAuth || Object.keys(userAuth).length === 0) {
     return <Navigate to="/" replace />;
@@ -260,10 +260,10 @@ const RoleProtectedRoute = ({ element, allowedRoles }) => {
   return <Navigate to="/" replace />;
 };
 
-const ProtectedRoute = ({allowedRoles}) => {
-  console.log('allowedRoles',allowedRoles)
+const ProtectedRoute = ({ allowedRoles }) => {
+  console.log('allowedRoles', allowedRoles)
   const userAuth = useSelector((state) => state?.authentication?.userAuth);
-  
+
   if (userAuth && Object.keys(userAuth).length > 0 && userAuth.obj.role === 'Patient') {
     return <><Navigate to="/patient" replace /><PatDash /></>;
   }
@@ -290,24 +290,24 @@ const getRouter = createBrowserRouter(
       </Route>
       {/* <Route element={<ProtectedLayout />}> */}
       <Route element={<RootLayout />}>
-         {/* <Route path="home" element={<Dashboard />} /> */}
+        {/* <Route path="home" element={<Dashboard />} /> */}
         <Route path="patient" element={<ProtectedRoute allowedRoles={allowedDoctorRoles} />} />
         <Route path="doctor" element={<ProtectedRoute allowedRoles={allowedDoctorRoles} />} />
         <Route
           path="doctor/user/:id?"
           element={
-            <RoleProtectedRoute 
-              element={<UserInfo />} 
-              allowedRoles={allowedDoctorRoles} 
+            <RoleProtectedRoute
+              element={<UserInfo />}
+              allowedRoles={allowedDoctorRoles}
             />
           }
         />
         <Route
           path="doctor/appointment"
           element={
-            <RoleProtectedRoute 
-              element={<Appointment />} 
-              allowedRoles={allowedDoctorRoles} 
+            <RoleProtectedRoute
+              element={<Appointment />}
+              allowedRoles={allowedDoctorRoles}
             />
           }
         />

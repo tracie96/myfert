@@ -2,7 +2,9 @@ import React, { useEffect } from "react";
 import { Row, Col, Button, Typography, Divider } from "antd";
 import { useMediaQuery } from "react-responsive";
 import { LeftOutlined } from "@ant-design/icons";
-import { useLocation, useNavigate } from "react-router";
+import { useLocation } from "react-router";
+import { useNavigate } from "react-router-dom";
+
 import { useDispatch } from "react-redux";
 import { checkoutSubscription, markSubscriptionSuccess } from "../../components/redux/subscriptionSlice";
 const { Title, Text } = Typography;

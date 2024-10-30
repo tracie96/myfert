@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { GetSideBarPermission } from "../../utils/Permission/SideBarPermission";
 
 const ProtectedLayout = () => {
@@ -8,16 +8,16 @@ const ProtectedLayout = () => {
   const getURlLOcation = useLocation();
   const getPermissions = GetSideBarPermission(userAuth?.role);
   const checkPermission = getPermissions?.some(
-    (item) => item.Name === getURlLOcation.pathname
+    (item) => item.Name === getURlLOcation.pathname,
   );
 
   return (
     <>
       {userAuth ? (
         checkPermission ? (
-          <Outlet />
+          <Navigate to="/dashboard" />
         ) : (
-          <Navigate to="/home" />
+          <Navigate to="/dashboard" />
         )
       ) : (
         <Navigate to="/" />

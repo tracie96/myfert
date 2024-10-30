@@ -23,7 +23,7 @@ export const getById = createAsyncThunk(
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, users);
     }
-  }
+  },
 );
 
 export const deleteRecord = createAsyncThunk(
@@ -46,7 +46,7 @@ export const deleteRecord = createAsyncThunk(
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, users);
     }
-  }
+  },
 );
 
 export const getDropdowns = createAsyncThunk(
@@ -67,7 +67,7 @@ export const getDropdowns = createAsyncThunk(
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, users);
     }
-  }
+  },
 );
 
 //#region Notification
@@ -89,7 +89,7 @@ export const getNotifications = createAsyncThunk(
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, users);
     }
-  }
+  },
 );
 
 export const markNotiAsRead = createAsyncThunk(
@@ -116,7 +116,7 @@ export const markNotiAsRead = createAsyncThunk(
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, users);
     }
-  }
+  },
 );
 //#endregion notification
 //#endregion

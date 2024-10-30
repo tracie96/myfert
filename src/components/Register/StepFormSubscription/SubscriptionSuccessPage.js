@@ -31,7 +31,7 @@ const SubscriptionSuccessPage = () => {
     try {
       setIsLoading(true);
       const getSubscriptionResponse = await dispatch(
-        getUpdatedSubscriptionDetail(loggedInUser.id)
+        getUpdatedSubscriptionDetail(loggedInUser.id),
       );
 
       if (
@@ -46,7 +46,7 @@ const SubscriptionSuccessPage = () => {
       } else {
         await setUserAuthUndefined();
         toast.error(
-          "Your subscription payment is currently being processed. We will notify you as soon as it has been verified."
+          "Your subscription payment is currently being processed. We will notify you as soon as it has been verified.",
           //"Apologies, it seems that there was a failure in processing your subscription payment transaction. Please kindly reach out to our administration team for further assistance and resolution. Thank you for your understanding"
         );
         navigate("/");
@@ -56,7 +56,7 @@ const SubscriptionSuccessPage = () => {
       console.error(error);
       await setUserAuthUndefined();
       toast.error(
-        "Your subscription payment is currently being processed. We will notify you as soon as it has been verified."
+        "Your subscription payment is currently being processed. We will notify you as soon as it has been verified.",
         //"Apologies, it seems that there was a failure in processing your subscription payment transaction. Please kindly reach out to our administration team for further assistance and resolution. Thank you for your understanding"
       );
       setIsLoading(false);
@@ -79,7 +79,7 @@ const SubscriptionSuccessPage = () => {
     if (!loggedInUser) {
       navigate("/");
     }
-  }, [loggedInUser,navigate]);
+  }, [loggedInUser, navigate]);
 
   if (!paymentTicksCorrect) {
     if (paymentTimeTicks && loggedInUser?.paymentTimeTicks) {

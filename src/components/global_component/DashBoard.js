@@ -7,13 +7,13 @@ import AdminDashboard from "../ManageDashboard/AdminDashboard";
 const Dashboard = () => {
   const { userAuth } = useSelector((state) => state.authentication);
 
-
   useEffect(() => {
     // fetchDashboardGraphData();
   }, []);
 
   return (
     <>
+      {console.log(userAuth, "userAu")}
       {userAuth?.role === "SuperAdmin" && <AdminDashboard />}
       {(userAuth?.role === "Coach" || userAuth?.role === "Doctor") && (
         <DoctorDashboard />

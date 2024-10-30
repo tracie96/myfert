@@ -1,45 +1,68 @@
-import React, { useState } from 'react';
-import { NavLink, Navigate } from 'react-router-dom';
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
-import { useDispatch, useSelector } from 'react-redux';
-import { postLogin } from '../redux/AuthController'; // Ensure you import forgotPassword action
-import { Button, Input, Form, Row, Col, Divider, Typography, Modal } from 'antd'; // Import Modal, Spin from Ant Design
-import fertilityImage from '../../assets/images/auth/fertilityImage.svg';
-import Login_one from '../../assets/images/auth/login_one.png';
-import Login_two from '../../assets/images/auth/login_two.png';
-import Login_three from '../../assets/images/auth/login_three.png';
-import Login_four from '../../assets/images/auth/login_four.png';
-
-import './Login.css';
-import ForgotPassword from '../ForgotPassword/ForgotPassword';
+import React, { useState } from "react";
+import { NavLink, Navigate } from "react-router-dom";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import { useDispatch, useSelector } from "react-redux";
+import { postLogin, sendEmailOtp, updateEmail } from "../redux/AuthController";
+import {
+  Button,
+  Input,
+  Form,
+  Row,
+  Col,
+  Divider,
+  Typography,
+  Modal,
+  message,
+} from "antd";
+import fertilityImage from "../../assets/images/auth/fertilityImage.svg";
+import Login_one from "../../assets/images/auth/login_one.png";
+import Login_two from "../../assets/images/auth/login_two.png";
+import Login_three from "../../assets/images/auth/login_three.png";
+import Login_four from "../../assets/images/auth/login_four.png";
+import { useNavigate } from "react-router-dom";
+import "./Login.css";
+import ForgotPassword from "../ForgotPassword/ForgotPassword";
+import EmailInputModal from "../Register/SignUpPages/UpdateEmailModal";
+import EmailVerificationModal from "../Register/SignUpPages/OTPModal";
 
 const { Text } = Typography;
 
 const initialValues = {
-  email: '',
-  password: '',
+  email: "",
+  password: "",
 };
 
 const validateLogin = Yup.object().shape({
-  email: Yup.string()
-    .min(3, 'User Name must be at least 3 characters')
-    .required('Please enter User Name or Email'),
-  password: Yup.string()
-    .min(3, 'Password must be at least 3 characters')
+  email: Yup.string().required("Please enter User Name or Email"),
+  password: Yup.string().min(3, "Password must be at least 3 characters"),
 });
 
 function Login() {
   const dispatch = useDispatch();
-  const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false); // State to control visibility of Forgot Password modal
+  const navigate = useNavigate();
+  const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
+  const [showEmailInputModal, setShowEmailInputModal] = useState(false);
+  const [showEmailVerificationModal, setShowEmailVerificationModal] =
+    useState(false);
+  const [resendEmail, setResendEmail] = useState("");
   const { values, handleBlur, handleChange, handleSubmit, errors } = useFormik({
-    initialValues: initialValues,
+    initialValues,
     validationSchema: validateLogin,
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       try {
-        dispatch(postLogin(values));
+        const resultAction = await dispatch(postLogin(values)).unwrap();
+        if (resultAction?.status) {
+          console.log(resultAction, "result");
+
+          if (resultAction.obj.role === "Patient") {
+            navigate("/patient");
+          } else if (resultAction.obj.role) {
+            navigate("/doctor");
+          }
+        }
       } catch (error) {
-        console.log('login-page api call error: ' + error);
+        console.log("login-page api call error: " + error);
       }
     },
   });
@@ -48,15 +71,36 @@ function Login() {
   const { loading } = useSelector((state) => state?.authentication);
 
   const handleForgotPassword = () => {
-    setShowForgotPasswordModal(true); // Show the Forgot Password modal
+    setShowForgotPasswordModal(true);
   };
 
   const handleCancelForgotPassword = () => {
-    setShowForgotPasswordModal(false); // Close the Forgot Password modal
+    setShowForgotPasswordModal(false);
+  };
+
+  const handleEmailInputSubmit = async (email) => {
+    const session = JSON.parse(localStorage.getItem("userInfo"))?.session;
+
+    if (!session) {
+      message.error("Session not found. Please try again.");
+      return;
+    }
+
+    try {
+      await dispatch(updateEmail({ email, session, newEmail: email })).unwrap();
+      await dispatch(sendEmailOtp({ email, session })).unwrap();
+
+      setResendEmail(email);
+      setShowEmailInputModal(false);
+      setShowEmailVerificationModal(true);
+      message.success(`Verification code sent to ${email}`);
+    } catch (error) {
+      message.error("Failed to update email or send OTP. Please try again.");
+    }
   };
 
   if (data && data.id) {
-    return <Navigate to="/home" />;
+    return <Navigate to="/dashboard" />;
   }
 
   return (
@@ -80,61 +124,52 @@ function Login() {
         <div className="form-container">
           <Form className="user" onFinish={handleSubmit}>
             <Form.Item
-              validateStatus={errors.email ? 'error' : ''}
+              validateStatus={errors.email ? "error" : ""}
               help={errors.email}
             >
               <Input
                 type="text"
                 placeholder="Username or Email"
                 value={values.email}
-                onBlur={handleBlur('email')}
-                onChange={handleChange('email')}
+                onBlur={handleBlur("email")}
+                onChange={handleChange("email")}
                 style={{
-                  height: '41px',
-                  background: '#E4E5E7',
-                  // textAlign: 'center',
-                  border:'none'
+                  height: "41px",
+                  background: "#E4E5E7",
+                  border: "none",
                 }}
               />
             </Form.Item>
             <Form.Item
-              validateStatus={errors.password ? 'error' : ''}
+              validateStatus={errors.password ? "error" : ""}
               help={errors.password}
-              style={{textAlign:'center'}}
             >
- <Form.Item
-  validateStatus={errors.password ? 'error' : ''}
-  help={errors.password}
->
-  <Input.Password
-    placeholder="Password"
-    value={values.password}
-    onBlur={handleBlur('password')}
-    onChange={handleChange('password')}
-    style={{
-      height: '41px',
-      background: '#E4E5E7',
-      border: 'none',
-      textAlign: 'center',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center'
-    }}
-  />
-</Form.Item>
-
-
+              <Input.Password
+                placeholder="Password"
+                value={values.password}
+                onBlur={handleBlur("password")}
+                onChange={handleChange("password")}
+                style={{
+                  height: "41px",
+                  background: "#E4E5E7",
+                  border: "none",
+                  textAlign: "center",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              />
             </Form.Item>
-            <Form.Item style={{paddingTop:50}}> 
+            <Form.Item style={{ paddingTop: 50 }}>
               <Button
                 type="primary"
                 htmlType="submit"
                 block
                 loading={loading}
                 style={{
-                  background:'#01ADF0',
-                  height:'50px',
-                  fontSize:'16px',
+                  background: "#01ADF0",
+                  height: "50px",
+                  fontSize: "16px",
                 }}
               >
                 Sign In
@@ -142,7 +177,13 @@ function Login() {
             </Form.Item>
             <Divider className="divider" />
             <div className="links">
-              <Text onClick={handleForgotPassword} style={{ cursor: 'pointer' , color:'#01ADF0'}}>Forgot Password?</Text>
+              <Text
+                onClick={handleForgotPassword}
+                style={{ cursor: "pointer", color: "#01ADF0" }}
+              >
+                Forgot Password?
+              </Text>
+              {/* <Text onClick={handleResendOtp} style={{ cursor: 'pointer', color: '#01ADF0' }}>Resend OTP?</Text> */}
               <Text className="sign-up-link">
                 Don't have an account? <NavLink to="/register">Sign Up</NavLink>
               </Text>
@@ -151,15 +192,29 @@ function Login() {
         </div>
       </Col>
 
-      {/* Forgot Password Modal */}
       <Modal
         width={1000}
         visible={showForgotPasswordModal}
         onCancel={handleCancelForgotPassword}
         footer={null}
       >
-        <ForgotPassword />
+        <ForgotPassword closeModal = {handleCancelForgotPassword}/>
       </Modal>
+
+      <EmailInputModal
+        visible={showEmailInputModal}
+        onCancel={() => setShowEmailInputModal(false)}
+        onSubmit={handleEmailInputSubmit}
+        title="Enter a new email address"
+        initialEmail={values.email}
+      />
+
+      <EmailVerificationModal
+        visible={showEmailVerificationModal}
+        onCancel={() => setShowEmailVerificationModal(false)}
+        onVerify={() => setShowEmailVerificationModal(false)}
+        email={resendEmail}
+      />
     </Row>
   );
 }

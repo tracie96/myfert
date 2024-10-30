@@ -16,6 +16,9 @@ import UserHistoryController from "../redux/userSlice";
 import TableSlice from "../redux/tableSlice";
 import globalSlice from "../redux/globalSlice";
 import doctorSlice from "../redux/doctorSlice";
+import assessmentSlice from "../redux/assessmentSlice";
+import intakeFormSlice from "../redux/AssessmentController";
+import SubscriptionSlice from "../redux/subscriptionSlice";
 
 const allReducers = combineReducers({
   authentication: AuthController,
@@ -24,6 +27,9 @@ const allReducers = combineReducers({
   userHistory: UserHistoryController,
   globalSlice: globalSlice,
   tableSlice: TableSlice,
+  assessment: assessmentSlice,
+  intake: intakeFormSlice,
+  subscription: SubscriptionSlice
 });
 
 const persistConfig = {

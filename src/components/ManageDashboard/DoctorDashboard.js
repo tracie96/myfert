@@ -15,7 +15,7 @@ const DoctorDashboard = () => {
     perPage: 10,
     currentPage: 1,
   });
-  const [sortConfig, setSortConfig] = useState({
+  const [sortConfig] = useState({
     sortColumn: "",
     sortDirection: "",
   });
@@ -23,16 +23,14 @@ const DoctorDashboard = () => {
 
   const columns = useMemo(
     () => [
-      { name: "First Name", selector: "firstName", sortable: true },
-      { name: "Last Name", selector: "lastName", sortable: true },
+      { name: "First Name", selector: "firstname", sortable: true },
+      { name: "Last Name", selector: "lastname", sortable: true },
       { name: "Flag", selector: "flag", sortable: false },
       { name: "Lab", selector: "lab", sortable: false },
-      { name: "Groups", selector: "groups", sortable: false },
-      { name: "# Weeks TTC", selector: "weeksTTC", sortable: false },
-      { name: "# Weeks Pregnant (Trimester)", selector: "weeksPregnant", sortable: false },
-      { name: "Appointments", selector: "appointmentStartDate", sortable: true, cell: (row) => <span style={{ width: "200px" }}>{row.appointments}</span> },
+      { name: "Group", selector: "groups", sortable: false },
+      { name: "Clinician", selector: "weeksPregnant", sortable: false },
     ],
-    []
+    [],
   );
 
   const fetchPatientList = useCallback(async () => {
@@ -46,9 +44,11 @@ const DoctorDashboard = () => {
     };
     try {
       const response = await dispatch(patientList(params));
+
       if (patientList.fulfilled.match(response)) {
-        const updatedList = response.payload.list.map((item) => {
-          if (item && item.createdById === loggedInUser?.id) {
+        const updatedList = response?.payload?.data?.map((item) => {
+          console.log(item);
+          if (item && item.createdById === loggedInUser?.obj?.id) {
             item.createdBy = "You";
           }
           return item;
@@ -63,7 +63,14 @@ const DoctorDashboard = () => {
     } catch (error) {
       console.error("Error fetching users:", error);
     }
-  }, [dispatch, loggedInUser?.id, pagination.currentPage, pagination.perPage, searchParam, sortConfig.sortColumn, sortConfig.sortDirection]);
+  }, [
+    dispatch,
+    searchParam,
+    sortConfig,
+    pagination,
+    loggedInUserId,
+    loggedInUser.obj?.id,
+  ]);
 
   useEffect(() => {
     fetchPatientList();
@@ -75,13 +82,6 @@ const DoctorDashboard = () => {
 
   const handlePerRowsChange = (newPerPage) => {
     setPagination((prev) => ({ ...prev, perPage: newPerPage }));
-  };
-
-  const handleSort = (column, direction) => {
-    setSortConfig({
-      sortColumn: column.selector.charAt(0).toUpperCase() + column.selector.slice(1),
-      sortDirection: direction === "asc" ? "asc" : "desc",
-    });
   };
 
   const handleSearch = (e) => {
@@ -125,7 +125,6 @@ const DoctorDashboard = () => {
                 paginationDefaultPage={pagination.currentPage}
                 onChangeRowsPerPage={handlePerRowsChange}
                 onChangePage={handlePageChange}
-                onSort={handleSort}
               />
             </div>
           </div>

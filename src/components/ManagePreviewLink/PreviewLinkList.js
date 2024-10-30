@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useCallback, useRef, useState } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useCallback,
+  useRef,
+  useState,
+} from "react";
 import CustomButtons from "../global_component/CustomButtons";
 import { useDispatch } from "react-redux";
 import DataTableComponent from "../global_component/DataTableComponent";
@@ -35,241 +41,267 @@ const PreviewLink = () => {
   const [sortColumn, setSortColumn] = useState("");
   const [sortDirection, setSortDirection] = useState("");
   const [searchParam, setSearchParam] = useState("");
-console.log(setCurrentPage)
-const handleCloseModal = useCallback(() => {
-  setRowToDelete(null);
-  setShowDeleteModal(false);
-  setShowAddPreviewModal(false);
-}, []);
-const addPreviewLinkInitialValues = {
-  id: "",
-  title: "",
-  description: "",
-  link: "",
-  primaryImage: "",
-  isUpdate: false,
-};
+  console.log(setCurrentPage);
+  const handleCloseModal = useCallback(() => {
+    setRowToDelete(null);
+    setShowDeleteModal(false);
+    setShowAddPreviewModal(false);
+  }, []);
+  const addPreviewLinkInitialValues = {
+    id: "",
+    title: "",
+    description: "",
+    link: "",
+    primaryImage: "",
+    isUpdate: false,
+  };
 
-const addPreviewLinkValidationSchema = Yup.object().shape({
-  isUpdate: Yup.bool().required(),
-  title: Yup.string()
-    .min(3, "Title must be at least 3 characters")
-    .required("Title is required"),
-  link: Yup.string()
-    .min(3, "Link must be at least 3 characters")
-    .required("Link is required"),
-  primaryImage: Yup.mixed().when(["isUpdate"], (isUpdate, schema) => {
-    return isUpdate[0]
-      ? schema.optional()
-      : schema
-          .optional()
-          .test("fileSize", "File size must be less than 2MB", (value) => {
-            if (!value) return true; // No file selected, consider it valid
-            const isFileSizeValid = value.size <= 2 * 1024 * 1024; // 2MB limit
-            if (!isFileSizeValid) {
-              throw new Yup.ValidationError(
-                "File size must be less than 2MB",
-                value,
-                "primaryImage"
-              );
+  const addPreviewLinkValidationSchema = Yup.object().shape({
+    isUpdate: Yup.bool().required(),
+    title: Yup.string()
+      .min(3, "Title must be at least 3 characters")
+      .required("Title is required"),
+    link: Yup.string()
+      .min(3, "Link must be at least 3 characters")
+      .required("Link is required"),
+    primaryImage: Yup.mixed().when(["isUpdate"], (isUpdate, schema) => {
+      return isUpdate[0]
+        ? schema.optional()
+        : schema
+            .optional()
+            .test("fileSize", "File size must be less than 2MB", (value) => {
+              if (!value) return true; // No file selected, consider it valid
+              const isFileSizeValid = value.size <= 2 * 1024 * 1024; // 2MB limit
+              if (!isFileSizeValid) {
+                throw new Yup.ValidationError(
+                  "File size must be less than 2MB",
+                  value,
+                  "primaryImage",
+                );
+              }
+              return isFileSizeValid;
+            });
+    }),
+  });
+  const fetchPreviewLinkList = useCallback(
+    async (
+      page = 1,
+      size = 10,
+      sortColumn = "",
+      sortDirection = "",
+      searchParam = "",
+    ) => {
+      setLoading(true);
+      const params = {
+        page,
+        size,
+        sortColumn,
+        sortDirection,
+        searchParam,
+      };
+      try {
+        const response = await dispatch(previewLinkList(params));
+
+        if (previewLinkList.fulfilled.match(response)) {
+          const updatedList = response?.payload?.list?.map((item) => {
+            if (item && !item.primaryImage) {
+              item.primaryImage = defaultIconImage;
             }
-            return isFileSizeValid;
+            return item;
           });
-  }),
-});
-const fetchPreviewLinkList = useCallback(
-  async (
-    page = 1,
-    size = 10,
-    sortColumn = "",
-    sortDirection = "",
-    searchParam = ""
-  ) => {
-    setLoading(true);
-    const params = {
-      page,
-      size,
+          setData(updatedList);
+          setTotalRows(response?.payload?.totalRecords);
+        }
+
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching preview link records:", error);
+      }
+    },
+    [dispatch],
+  );
+
+  useEffect(() => {
+    fetchPreviewLinkList(
+      currentPage,
+      perPage,
       sortColumn,
       sortDirection,
       searchParam,
-    };
-    try {
-      const response = await dispatch(previewLinkList(params));
-
-      if (previewLinkList.fulfilled.match(response)) {
-        const updatedList = response?.payload?.list?.map((item) => {
-          if (item && !item.primaryImage) {
-            item.primaryImage = defaultIconImage;
-          }
-          return item;
-        });
-        setData(updatedList);
-        setTotalRows(response?.payload?.totalRecords);
-      }
-
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching preview link records:", error);
-    }
-  },
-  [dispatch]
-);
-
-useEffect(() => {
-  fetchPreviewLinkList(
+    );
+  }, [
     currentPage,
     perPage,
     sortColumn,
     sortDirection,
-    searchParam
-  );
-}, [currentPage, perPage, sortColumn, sortDirection, searchParam, fetchPreviewLinkList]);
+    searchParam,
+    fetchPreviewLinkList,
+  ]);
 
-const handlePerRowsChange = useCallback((newPerPage) => {
-  setPerPage(newPerPage);
-}, []);
+  const handlePerRowsChange = useCallback((newPerPage) => {
+    setPerPage(newPerPage);
+  }, []);
 
-const handleSort = useCallback((column, direction) => {
-  if (column.selector && typeof column.selector === "string") {
-    const colName = column.selector.charAt(0).toUpperCase() + column.selector.slice(1);
-    setSortColumn(colName);
-  }
-  setSortDirection(direction === "asc" ? "asc" : "desc");
-}, []);
-
-const handleSearch = useCallback((e) => {
-  setSearchParam(e.target.value ? e.target.value : "");
-}, []);
-
-//#region delete preview link
-const [showDeleteModal, setShowDeleteModal] = useState(false);
-const [rowToDelete, setRowToDelete] = useState(null);
-
-const onDelete = useCallback((row) => {
-  setRowToDelete(row);
-  setShowDeleteModal(true);
-}, []);
-
-const addPreviewLink = useFormik({
-  initialValues: addPreviewLinkInitialValues,
-  validationSchema: addPreviewLinkValidationSchema,
-  onSubmit: async (values) => {
-    try {
-      setShowSpinner(true);
-      if (values.isUpdate) {
-        await dispatch(updatePreviewLinkRecord(values));
-      } else {
-        await dispatch(addPreviewLinkRecord(values));
-      }
-    } catch (error) {
-      console.error("Error adding/updating preview link:", error);
-    } finally {
-      setShowSpinner(false);
-      setShowAddPreviewModal(false);
-      await fetchPreviewLinkList();
+  const handleSort = useCallback((column, direction) => {
+    if (column.selector && typeof column.selector === "string") {
+      const colName =
+        column.selector.charAt(0).toUpperCase() + column.selector.slice(1);
+      setSortColumn(colName);
     }
-  },
-});
+    setSortDirection(direction === "asc" ? "asc" : "desc");
+  }, []);
 
-const deletePreviewLinkRecord = useCallback(async () => {
-  setShowSpinner(true);
-  const endpoint = `Admin/DeletePreviewLink?id=${rowToDelete.id}`;
-  await dispatch(deleteRecord(endpoint));
-  handleCloseModal();
-  await fetchPreviewLinkList();
-  setShowSpinner(false);
-}, [dispatch, fetchPreviewLinkList, rowToDelete, handleCloseModal]);
+  const handleSearch = useCallback((e) => {
+    setSearchParam(e.target.value ? e.target.value : "");
+  }, []);
 
-//#endregion delete preview link
+  //#region delete preview link
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [rowToDelete, setRowToDelete] = useState(null);
 
-//#region update preview link
-const onUpdate = useCallback((row) => {
-  addPreviewLink.setFieldValue("id", row.id);
-  addPreviewLink.setFieldValue("title", row.title);
-  addPreviewLink.setFieldValue("description", row.description);
-  addPreviewLink.setFieldValue("link", row.link);
-  addPreviewLink.setFieldValue("primaryImage", row.primaryImage);
-  addPreviewLink.setFieldValue("isUpdate", true);
-  setShowAddPreviewModal(true);
-}, [addPreviewLink]);
+  const onDelete = useCallback((row) => {
+    setRowToDelete(row);
+    setShowDeleteModal(true);
+  }, []);
 
-const buttons = useMemo(() => [
-  {
-    id: 1,
-    title: 'Delete',
-    onClick: onDelete,
-    className: 'btn btn-sm btn-danger me-1',
-    icon: 'bi bi-trash',
-  },
-  {
-    id: 2,
-    title: 'Update',
-    onClick: onUpdate,
-    className: 'btn btn-sm btn-success me-1',
-    icon: 'bi bi-pencil-square',
-  },
-], [onDelete, onUpdate]);
+  const addPreviewLink = useFormik({
+    initialValues: addPreviewLinkInitialValues,
+    validationSchema: addPreviewLinkValidationSchema,
+    onSubmit: async (values) => {
+      try {
+        setShowSpinner(true);
+        if (values.isUpdate) {
+          await dispatch(updatePreviewLinkRecord(values));
+        } else {
+          await dispatch(addPreviewLinkRecord(values));
+        }
+      } catch (error) {
+        console.error("Error adding/updating preview link:", error);
+      } finally {
+        setShowSpinner(false);
+        setShowAddPreviewModal(false);
+        await fetchPreviewLinkList();
+      }
+    },
+  });
 
-const columns = useMemo(() => [
-  {
-    name: 'Title',
-    sortable: true,
-    selector: (row) => row.title,
-  },
-  {
-    name: 'Description',
-    sortable: true,
-    selector: (row) => row.description,
-  },
-  {
-    name: 'Link',
-    sortable: true,
-    selector: (row) => row.link,
-    cell: (row) =>
-      row.link ? (
-        <a href={row.link} target="_blank" rel="noreferrer" className="btn btn-sm btn-primary">
-          <span className="badge bg-primary">Link</span>
-        </a>
-      ) : (
-        'N/A'
-      ),
-  },
-  {
-    name: 'Preview Image',
-    sortable: true,
-    selector: (row) => row.primaryImage,
-    cell: (row) => (
-      <a href={row.primaryImage} target="_blank" rel="noreferrer">
-        <img alt="preview_image" src={row.primaryImage} style={{ width: '50px' }} />
-      </a>
-    ),
-  },
-  {
-    name: 'Actions',
-    sortable: false,
-    cell: (row) => <CustomButtons buttons={buttons} row={row} />,
-  },
-], [buttons]);
+  const deletePreviewLinkRecord = useCallback(async () => {
+    setShowSpinner(true);
+    const endpoint = `Admin/DeletePreviewLink?id=${rowToDelete.id}`;
+    await dispatch(deleteRecord(endpoint));
+    handleCloseModal();
+    await fetchPreviewLinkList();
+    setShowSpinner(false);
+  }, [dispatch, fetchPreviewLinkList, rowToDelete, handleCloseModal]);
 
-//#endregion update preview link
+  //#endregion delete preview link
 
-//#region add preview link
-const [showAddPreviewModal, setShowAddPreviewModal] = useState(false);
+  //#region update preview link
+  const onUpdate = useCallback(
+    (row) => {
+      addPreviewLink.setFieldValue("id", row.id);
+      addPreviewLink.setFieldValue("title", row.title);
+      addPreviewLink.setFieldValue("description", row.description);
+      addPreviewLink.setFieldValue("link", row.link);
+      addPreviewLink.setFieldValue("primaryImage", row.primaryImage);
+      addPreviewLink.setFieldValue("isUpdate", true);
+      setShowAddPreviewModal(true);
+    },
+    [addPreviewLink],
+  );
 
-const addPreviewLinkButton = () => {
-  setShowAddPreviewModal(true);
-  addPreviewLink.resetForm();
-};
+  const buttons = useMemo(
+    () => [
+      {
+        id: 1,
+        title: "Delete",
+        onClick: onDelete,
+        className: "btn btn-sm btn-danger me-1",
+        icon: "bi bi-trash",
+      },
+      {
+        id: 2,
+        title: "Update",
+        onClick: onUpdate,
+        className: "btn btn-sm btn-success me-1",
+        icon: "bi bi-pencil-square",
+      },
+    ],
+    [onDelete, onUpdate],
+  );
 
-//#region handle image
-const fileInputRef = useRef(null);
-const handleFileChange = (event) => {
-  const file = event.currentTarget.files[0];
-  if (file && file.size <= 2 * 1024 * 1024) {
-    addPreviewLink.setFieldValue("primaryImage", file);
-  } else {
-    addPreviewLink.setFieldValue("primaryImage", "");
-    fileInputRef.current.value = "";
+  const columns = useMemo(
+    () => [
+      {
+        name: "Title",
+        sortable: true,
+        selector: (row) => row.title,
+      },
+      {
+        name: "Description",
+        sortable: true,
+        selector: (row) => row.description,
+      },
+      {
+        name: "Link",
+        sortable: true,
+        selector: (row) => row.link,
+        cell: (row) =>
+          row.link ? (
+            <a
+              href={row.link}
+              target="_blank"
+              rel="noreferrer"
+              className="btn btn-sm btn-primary"
+            >
+              <span className="badge bg-primary">Link</span>
+            </a>
+          ) : (
+            "N/A"
+          ),
+      },
+      {
+        name: "Preview Image",
+        sortable: true,
+        selector: (row) => row.primaryImage,
+        cell: (row) => (
+          <a href={row.primaryImage} target="_blank" rel="noreferrer">
+            <img
+              alt="preview_image"
+              src={row.primaryImage}
+              style={{ width: "50px" }}
+            />
+          </a>
+        ),
+      },
+      {
+        name: "Actions",
+        sortable: false,
+        cell: (row) => <CustomButtons buttons={buttons} row={row} />,
+      },
+    ],
+    [buttons],
+  );
+
+  //#endregion update preview link
+
+  //#region add preview link
+  const [showAddPreviewModal, setShowAddPreviewModal] = useState(false);
+
+  const addPreviewLinkButton = () => {
+    setShowAddPreviewModal(true);
+    addPreviewLink.resetForm();
+  };
+
+  //#region handle image
+  const fileInputRef = useRef(null);
+  const handleFileChange = (event) => {
+    const file = event.currentTarget.files[0];
+    if (file && file.size <= 2 * 1024 * 1024) {
+      addPreviewLink.setFieldValue("primaryImage", file);
+    } else {
+      addPreviewLink.setFieldValue("primaryImage", "");
+      fileInputRef.current.value = "";
       alert("File Size must be less than 2MB");
     }
   };
@@ -437,11 +469,11 @@ const handleFileChange = (event) => {
                         src={
                           addPreviewLink.values.primaryImage instanceof Blob
                             ? URL.createObjectURL(
-                                addPreviewLink.values.primaryImage
+                                addPreviewLink.values.primaryImage,
                               )
                             : addPreviewLink.values.primaryImage
-                            ? addPreviewLink.values.primaryImage
-                            : defaultIconImage
+                              ? addPreviewLink.values.primaryImage
+                              : defaultIconImage
                         }
                         className="rounded-circle"
                         width={100}

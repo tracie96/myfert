@@ -4,7 +4,6 @@ import { Row } from "react-bootstrap";
 import { CardFooter, CardHeader, CardBody } from "reactstrap";
 
 const PlanDetails = (props) => {
-
   if (props.currentStep !== 1) {
     return null;
   }

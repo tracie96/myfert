@@ -20,7 +20,10 @@ const CustomModal = ({
       centered
       aria-labelledby="contained-modal-title-vcenter"
     >
-      <Modal.Header closeButton className={classes}>
+      <Modal.Header
+        closeButton
+        style={{ background: "#01ACEE", color: "#fff" }}
+      >
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
       <Modal.Body>{body}</Modal.Body>

@@ -5,7 +5,7 @@ import Spinner from "react-bootstrap/Spinner";
 import * as Yup from "yup";
 import { useDispatch } from "react-redux";
 import { forgotPassword } from "../redux/AuthController";
-import  forgot_password  from "../../assets/images/auth/forgotPassword.svg";
+import forgot_password from "../../assets/images/auth/forgotPassword.svg";
 import { Divider } from "antd";
 
 const initialValues = {
@@ -14,26 +14,27 @@ const initialValues = {
 
 const validateForgotPassword = Yup.object({
   email: Yup.string()
-    // .email("Please enter valid email")
     .matches(
       /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$/,
-      "Please enter a valid email"
+      "Please enter a valid email",
     )
     .required("Please enter email"),
 });
 
-function ForgotPassword() {
+function ForgotPassword({ closeModal }) {
   const [showSpinner, setShowSpinner] = useState(false);
   const dispatch = useDispatch();
 
   const { values, handleBlur, handleChange, handleSubmit, errors } = useFormik({
     initialValues: initialValues,
     validationSchema: validateForgotPassword,
+
     onSubmit: async (values) => {
+      const transformedValues = { value: values.email };
       console.log(values);
       try {
         setShowSpinner(true);
-        const response = await dispatch(forgotPassword(values));
+        const response = await dispatch(forgotPassword(transformedValues));
         if (response) {
           setShowSpinner(false);
           console.log("email success sent: ", response);
@@ -53,12 +54,12 @@ function ForgotPassword() {
               <div className="">
                 <div className="row">
                   <div className="col-lg-6 d-none d-lg-block">
-                    <img src={forgot_password} alt='forgot'/>
+                    <img src={forgot_password} alt="forgot" />
                   </div>
                   <div className="col-lg-6 mt-lg-5">
                     <div className="">
                       <div className="text-center">
-                        <h1 className="h4 mb-2" style={{color:'#01ACEE'}}>
+                        <h1 className="h4 mb-2" style={{ color: "#01ACEE" }}>
                           Forgot Your Password?
                         </h1>
                         <p className="m-4 p-2">
@@ -95,7 +96,7 @@ function ForgotPassword() {
                           type="submit"
                           className="btn btn-user btn-block"
                           disabled={showSpinner}
-                          style={{background:'#01ADF0', color:'#fff'}}
+                          style={{ background: "#01ADF0", color: "#fff" }}
                         >
                           {showSpinner ? (
                             <span>
@@ -112,15 +113,23 @@ function ForgotPassword() {
                           )}
                         </button>
                       </form>
-                      <Divider style={{ marginTop: "10%"}}/>
+                      <Divider style={{ marginTop: "10%" }} />
                       {/* <div className="text-center">
                         <NavLink className="small" to="/register">
                           Create an Account!
                         </NavLink>
                       </div> */}
-                      <div className="text-center" style={{ paddingBottom:30}}>
+                      <div
+                        className="text-center"
+                        style={{ paddingBottom: 30 }}
+                      >
                         <span style={{ fontSize: "13px" }}>Back to </span>
-                        <NavLink className="small" to="/" style={{color:'#01ADF0'}}>
+                        <NavLink
+                          className="small"
+                          to="/"
+                          style={{ color: "#01ADF0" }}
+                          onClick={()=>closeModal()}
+                        >
                           Sign In!
                         </NavLink>
                       </div>

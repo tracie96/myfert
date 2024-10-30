@@ -1,0 +1,16 @@
+.ant-layout .site-layout {
+  background: #fff;
+}
+.no-underline {
+  text-decoration: none;
+}
+
+.no-underline:hover {
+  text-decoration: none;
+}
+.ant-steps.ant-steps-label-vertical .ant-steps-item-tail {
+  margin-inline-start: 0 !important;
+}
+.ant-steps.ant-steps-dot.ant-steps-small .ant-steps-item-icon {
+  margin-inline-start: 0 !important;
+}

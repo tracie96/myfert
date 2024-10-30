@@ -6,7 +6,7 @@ export function calculateMaxDate() {
 export function disabledPreviousDates() {
   const today = new Date();
   const formattedDate = new Date(
-    today.getTime() - today.getTimezoneOffset() * 60000
+    today.getTime() - today.getTimezoneOffset() * 60000,
   )
     .toISOString()
     .slice(0, 16);
@@ -16,7 +16,7 @@ export function disabledPreviousDates() {
 export function disabledPreviousOnlyDates() {
   const today = new Date();
   const formattedDate = new Date(
-    today.getTime() - today.getTimezoneOffset() * 60000
+    today.getTime() - today.getTimezoneOffset() * 60000,
   );
 
   return formattedDate;
@@ -32,7 +32,7 @@ export function calculateDaysDifference(targetDate) {
   const today = new Date();
   const differenceMilliseconds = targetDateTime - today;
   const differenceDays = Math.floor(
-    differenceMilliseconds / (1000 * 60 * 60 * 24)
+    differenceMilliseconds / (1000 * 60 * 60 * 24),
   );
 
   return differenceDays;

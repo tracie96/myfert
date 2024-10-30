@@ -3,6 +3,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { handleApiError, getResponse } from "../Handler/ExceptionHandler";
 import { toast } from "react-toastify";
 import { baseUrl } from "../../utils/envAccess";
+import { validateEmail, validateUsername } from "./AuthController";
 
 //#region designation
 
@@ -20,14 +21,14 @@ export const updateDesignationHistory = createAsyncThunk(
       const response = await axios.put(
         `${baseUrl}Admin/UpdateOfficialDetail`,
         users,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, user);
       return responseBack;
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, user);
     }
-  }
+  },
 );
 
 //#endregion designation
@@ -48,14 +49,14 @@ export const updateSalaryHistory = createAsyncThunk(
       const response = await axios.put(
         `${baseUrl}Admin/UpdateSalaryDetail`,
         users,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, user);
       return responseBack;
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, user);
     }
-  }
+  },
 );
 
 export const updateSalaryAllownces = createAsyncThunk(
@@ -72,7 +73,7 @@ export const updateSalaryAllownces = createAsyncThunk(
       const response = await axios.put(
         `${baseUrl}Admin/PostUpdateSalarySlips`,
         allowances,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, user);
       if (responseBack.status) {
@@ -83,7 +84,7 @@ export const updateSalaryAllownces = createAsyncThunk(
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, user);
     }
-  }
+  },
 );
 
 //#endregion salary
@@ -103,14 +104,14 @@ export const updateWorkHistory = createAsyncThunk(
       const response = await axios.post(
         `${baseUrl}Admin/AddWorkTiming`,
         workRecord,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, user);
       return responseBack;
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, user);
     }
-  }
+  },
 );
 //#endregion
 
@@ -129,7 +130,7 @@ export const requestResponse = createAsyncThunk(
       const response = await axios.put(
         `${baseUrl}Leave/RequestApproval`,
         responseRequest,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, users);
       if (responseBack.status) {
@@ -138,7 +139,7 @@ export const requestResponse = createAsyncThunk(
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, users);
     }
-  }
+  },
 );
 
 export const sendRequestForLeave = createAsyncThunk(
@@ -155,7 +156,7 @@ export const sendRequestForLeave = createAsyncThunk(
       const response = await axios.post(
         `${baseUrl}Leave/AddLeaveRequest`,
         sendRequestForLeave,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, users);
       if (responseBack.status) {
@@ -164,7 +165,7 @@ export const sendRequestForLeave = createAsyncThunk(
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, users);
     }
-  }
+  },
 );
 
 export const updateRequestForLeave = createAsyncThunk(
@@ -181,7 +182,7 @@ export const updateRequestForLeave = createAsyncThunk(
       const response = await axios.put(
         `${baseUrl}Leave/UpdateLeaveRequest`,
         updateRequestForLeave,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, users);
       if (responseBack.status) {
@@ -190,7 +191,7 @@ export const updateRequestForLeave = createAsyncThunk(
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, users);
     }
-  }
+  },
 );
 //#endregion
 
@@ -283,6 +284,32 @@ const userHistorySlices = createSlice({
       state.appStatus = false;
       state.appStatusCode = undefined;
       state.serverErr = undefined;
+    });
+    builder.addCase(validateUsername.pending, (state) => {
+      state.isLoading = true;
+      state.error = null;
+    });
+    builder.addCase(validateUsername.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.usernameStatus = action.payload.isAvailable
+        ? "Available"
+        : "Unavailable";
+    });
+    builder.addCase(validateUsername.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.payload;
+    });
+    builder.addCase(validateEmail.pending, (state) => {
+      state.isLoading = true;
+      state.error = null;
+    });
+    builder.addCase(validateEmail.fulfilled, (state, action) => {
+      state.isLoading = false;
+      // state.emailStatus = action.payload.isAvailable ? 'Available' : 'Unavailable';
+    });
+    builder.addCase(validateEmail.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.payload;
     });
     builder.addCase(requestResponse.rejected, (state, action) => {
       state.loading = false;

@@ -2,14 +2,14 @@ import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
 
 import Sidebar from "../global_component/sidebar";
-import MyNavbar from "../global_component/navbar";
 import Footer from "../global_component/footer";
 import { useSelector } from "react-redux";
+import MyNavbar from "../global_component/navbar";
 
 const RootLayout = () => {
   const userAuth = useSelector((state) => state?.authentication?.userAuth);
 
-  if (Object.keys(userAuth).length === 0) {
+  if (!userAuth || Object.keys(userAuth)?.length === 0) {
     return <Navigate to="/" />;
   }
 
@@ -22,15 +22,11 @@ const RootLayout = () => {
       <div id="wrapper">
         <Sidebar />
         <div id="content-wrapper" className="d-flex flex-column">
-          <div id="content">
-            {/* Topbar */}
+          <div id="content" style={{ background: "#fff" }}>
             <MyNavbar />
-            {/* End of Topbar */}
-
-            {/* Begin Page Content */}
             <div className="container-fluid">
               <Outlet />
-              {/* <MainDashboard /> */}
+              {/* <DashboardMain /> */}
               {/* <AddUser /> */}
               {/* <EditUser /> */}
               {/* <UserList /> */}

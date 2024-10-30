@@ -1,6 +1,10 @@
 import { Link } from "react-router-dom";
 
 export default function UnderDevelopment() {
+
+    const currentUserInfo = JSON.parse(localStorage.getItem("userInfo"));
+    if(!currentUserInfo) return;
+
   return (
     <>
       <div
@@ -37,7 +41,7 @@ export default function UnderDevelopment() {
           <br />
           <br />
           <div className="text-center">
-            <Link to="/">← Go To Home</Link>
+            <Link to={currentUserInfo.obj?.role === 'Patient' ? '/patient' : '/doctor'}>← Go To Home</Link>
           </div>
         </div>
       </div>

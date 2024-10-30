@@ -38,7 +38,7 @@ const Learn = () => {
           <br />
           Supporting Research
         </span>
-      </>
+      </>,
     );
   };
 

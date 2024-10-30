@@ -19,14 +19,14 @@ export const activeUserCount = createAsyncThunk(
     try {
       const response = await axios.get(
         `${baseUrl}Admin/GetActiveUserCount`,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, user);
       return responseBack;
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, user);
     }
-  }
+  },
 );
 //#endregion Dashboard
 
@@ -53,7 +53,7 @@ export const addPreviewLinkRecord = createAsyncThunk(
       const response = await axios.post(
         `${baseUrl}Admin/AddPreviewLink`,
         formData,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, user);
       if (responseBack?.status) {
@@ -62,7 +62,7 @@ export const addPreviewLinkRecord = createAsyncThunk(
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, user);
     }
-  }
+  },
 );
 
 export const updatePreviewLinkRecord = createAsyncThunk(
@@ -87,7 +87,7 @@ export const updatePreviewLinkRecord = createAsyncThunk(
       const response = await axios.post(
         `${baseUrl}Admin/UpdatePreviewLink`,
         formData,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, user);
       if (responseBack?.status) {
@@ -96,14 +96,14 @@ export const updatePreviewLinkRecord = createAsyncThunk(
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, user);
     }
-  }
+  },
 );
 
 export const previewLinkList = createAsyncThunk(
   "admin/previewLinkList",
   async (
     { page, size, sortColumn, sortDirection, searchParam },
-    { rejectWithValue, getState, dispatch }
+    { rejectWithValue, getState, dispatch },
   ) => {
     const user = getState()?.authentication?.userAuth;
     const config = {
@@ -118,14 +118,14 @@ export const previewLinkList = createAsyncThunk(
         `${baseUrl}Admin/GetPreviewLink?start=${page}&length=${size}&sortColumnName=${sortColumn}
         &sortDirection=${sortDirection}&searchValue=${searchParam}`,
         null,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, user);
       return responseBack;
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, user);
     }
-  }
+  },
 );
 //#endregion Dashboard
 
@@ -150,7 +150,7 @@ export const addCompany = createAsyncThunk(
       const response = await axios.post(
         `${baseUrl}Admin/AddCompany`,
         formData,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, user);
       if (responseBack?.status) {
@@ -161,7 +161,7 @@ export const addCompany = createAsyncThunk(
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, user);
     }
-  }
+  },
 );
 
 export const companyListDropdown = createAsyncThunk(
@@ -178,21 +178,21 @@ export const companyListDropdown = createAsyncThunk(
     try {
       const response = await axios.get(
         `${baseUrl}Admin/GetCompanyList`,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, user);
       return responseBack;
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, user);
     }
-  }
+  },
 );
 
 export const companyList = createAsyncThunk(
   "user/companyList",
   async (
     { page, size, sortColumn, sortOrder, searchParam },
-    { rejectWithValue, getState, dispatch }
+    { rejectWithValue, getState, dispatch },
   ) => {
     const user = getState()?.authentication?.userAuth;
     const config = {
@@ -207,14 +207,14 @@ export const companyList = createAsyncThunk(
         `${baseUrl}Admin/GetCompany?start=${page}&length=${size}&sortColumnName=${sortColumn}
         &sortDirection=${sortOrder}&searchValue=${searchParam}`,
         null,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, user);
       return responseBack;
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, user);
     }
-  }
+  },
 );
 
 export const updateRecord = createAsyncThunk(
@@ -238,7 +238,7 @@ export const updateRecord = createAsyncThunk(
       const response = await axios.put(
         `${baseUrl}Admin/UpdateCompany`,
         formData,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, users);
       if (responseBack.status) {
@@ -247,7 +247,7 @@ export const updateRecord = createAsyncThunk(
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, users);
     }
-  }
+  },
 );
 
 //#endregion
@@ -267,24 +267,24 @@ export const addDepartment = createAsyncThunk(
       const response = await axios.post(
         `${baseUrl}Admin/AddDepartment`,
         department,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, user);
       if (response?.data?.status) {
         toast.success(response?.data?.message);
       }
-      console.log(responseBack)
+      console.log(responseBack);
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, user);
     }
-  }
+  },
 );
 
 export const departmentList = createAsyncThunk(
   "user/departmentList",
   async (
     { page, size, sortColumn, sortDirection, searchParam },
-    { rejectWithValue, getState, dispatch }
+    { rejectWithValue, getState, dispatch },
   ) => {
     const user = getState()?.authentication?.userAuth;
     const config = {
@@ -299,14 +299,14 @@ export const departmentList = createAsyncThunk(
         `${baseUrl}Admin/GetDepartment?start=${page}&length=${size}&sortColumnName=${sortColumn}
         &sortDirection=${sortDirection}&searchValue=${searchParam}`,
         null,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, user);
       return responseBack;
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, user);
     }
-  }
+  },
 );
 
 export const updateDepartment = createAsyncThunk(
@@ -323,7 +323,7 @@ export const updateDepartment = createAsyncThunk(
       const response = await axios.put(
         `${baseUrl}Admin/UpdateDepartment`,
         department,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, users);
       if (responseBack.status) {
@@ -332,7 +332,7 @@ export const updateDepartment = createAsyncThunk(
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, users);
     }
-  }
+  },
 );
 
 export const departmentListDropdown = createAsyncThunk(
@@ -349,14 +349,14 @@ export const departmentListDropdown = createAsyncThunk(
     try {
       const response = await axios.get(
         `${baseUrl}Admin/GetDepartmentList`,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, user);
       return responseBack;
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, user);
     }
-  }
+  },
 );
 
 //#endregion
@@ -393,7 +393,7 @@ export const addUser = createAsyncThunk(
       const response = await axios.post(
         `${baseUrl}Admin/AddEmployee`,
         formData,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, user);
       if (responseBack?.status) {
@@ -402,7 +402,7 @@ export const addUser = createAsyncThunk(
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, user);
     }
-  }
+  },
 );
 
 export const updateUserPersonalDetail = createAsyncThunk(
@@ -431,7 +431,7 @@ export const updateUserPersonalDetail = createAsyncThunk(
       const response = await axios.put(
         `${baseUrl}Admin/UpdatePersonalDetail`,
         formData,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, user);
       if (responseBack?.status) {
@@ -440,14 +440,14 @@ export const updateUserPersonalDetail = createAsyncThunk(
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, user);
     }
-  }
+  },
 );
 
 export const usersList = createAsyncThunk(
   "user/usersList",
   async (
     { page, size, sortColumn, sortDirection, searchParam },
-    { rejectWithValue, getState, dispatch }
+    { rejectWithValue, getState, dispatch },
   ) => {
     const user = getState()?.authentication?.userAuth;
     const config = {
@@ -462,14 +462,14 @@ export const usersList = createAsyncThunk(
         `${baseUrl}Admin/GetUserTable?start=${page}&length=${size}&sortColumnName=${sortColumn}
         &sortDirection=${sortDirection}&searchValue=${searchParam}`,
         null,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, user);
       return responseBack;
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, user);
     }
-  }
+  },
 );
 
 export const userListDropdown = createAsyncThunk(
@@ -490,7 +490,7 @@ export const userListDropdown = createAsyncThunk(
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, user);
     }
-  }
+  },
 );
 //#endregion
 
@@ -508,7 +508,7 @@ export const salaryHistory = createAsyncThunk(
       startDate,
       endDate,
     },
-    { rejectWithValue, getState, dispatch }
+    { rejectWithValue, getState, dispatch },
   ) => {
     const user = getState()?.authentication?.userAuth;
     const config = {
@@ -524,14 +524,14 @@ export const salaryHistory = createAsyncThunk(
         &sortDirection=${sortDirection}&searchValue=${searchParam}&userId=${userId}&startDate=${startDate}
         &endDate=${endDate}`,
         null,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, user);
       return responseBack;
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, user);
     }
-  }
+  },
 );
 
 export const designationHistory = createAsyncThunk(
@@ -547,7 +547,7 @@ export const designationHistory = createAsyncThunk(
       startDate,
       endDate,
     },
-    { rejectWithValue, getState, dispatch }
+    { rejectWithValue, getState, dispatch },
   ) => {
     const user = getState()?.authentication?.userAuth;
     const config = {
@@ -563,21 +563,21 @@ export const designationHistory = createAsyncThunk(
         &sortDirection=${sortDirection}&searchValue=${searchParam}&userId=${userId}&startDate=${startDate}
         &endDate=${endDate}`,
         null,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, user);
       return responseBack;
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, user);
     }
-  }
+  },
 );
 
 export const designationHistoryList = createAsyncThunk(
   "user/designationHistoryList",
   async (
     { page, size, sortColumn, sortDirection, searchParam, startDate, endDate },
-    { rejectWithValue, getState, dispatch }
+    { rejectWithValue, getState, dispatch },
   ) => {
     const user = getState()?.authentication?.userAuth;
     const config = {
@@ -592,14 +592,14 @@ export const designationHistoryList = createAsyncThunk(
         &sortDirection=${sortDirection}&searchValue=${searchParam}&startDate=${startDate}
         &endDate=${endDate}`,
         null,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, user);
       return responseBack;
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, user);
     }
-  }
+  },
 );
 
 export const workTimeHistory = createAsyncThunk(
@@ -615,7 +615,7 @@ export const workTimeHistory = createAsyncThunk(
       startDate,
       endDate,
     },
-    { rejectWithValue, getState, dispatch }
+    { rejectWithValue, getState, dispatch },
   ) => {
     const user = getState()?.authentication?.userAuth;
     const config = {
@@ -631,14 +631,14 @@ export const workTimeHistory = createAsyncThunk(
         &sortDirection=${sortDirection}&searchValue=${searchParam}&userId=${userId}&startDate=${startDate}
         &endDate=${endDate}`,
         null,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, user);
       return responseBack;
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, user);
     }
-  }
+  },
 );
 
 export const addPersonalDocument = createAsyncThunk(
@@ -658,7 +658,7 @@ export const addPersonalDocument = createAsyncThunk(
       const response = await axios.post(
         `${baseUrl}Admin/AddPersonalDocument`,
         formData,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, user);
       if (responseBack?.status) {
@@ -667,14 +667,14 @@ export const addPersonalDocument = createAsyncThunk(
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, user);
     }
-  }
+  },
 );
 
 export const personalDocumentDataTable = createAsyncThunk(
   "user/personalDocumentDataTable",
   async (
     { page, size, sortColumn, sortDirection, searchParam, userId },
-    { rejectWithValue, getState, dispatch }
+    { rejectWithValue, getState, dispatch },
   ) => {
     const user = getState()?.authentication?.userAuth;
     const config = {
@@ -689,14 +689,14 @@ export const personalDocumentDataTable = createAsyncThunk(
         `${baseUrl}Admin/PersonalDocumentDataTable?start=${page}&length=${size}&sortColumnName=${sortColumn}
         &sortDirection=${sortDirection}&searchValue=${searchParam}&userId=${userId}`,
         null,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, user);
       return responseBack;
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, user);
     }
-  }
+  },
 );
 //#endregion
 

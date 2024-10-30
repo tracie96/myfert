@@ -1,6 +1,7 @@
 import React from "react";
 
 const PatientDashboard = () => {
+  console.log("i am here");
   return (
     <>
       {/* Page Heading */}

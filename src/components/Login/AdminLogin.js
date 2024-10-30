@@ -16,7 +16,7 @@ const validateLogin = Yup.object().shape({
     // .email("Please enter valid email")
     .matches(
       /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$/,
-      "Please enter a valid email"
+      "Please enter a valid email",
     )
     .required("Please enter email"),
   password: Yup.string().min(3).required("Please enter password"),
@@ -24,7 +24,7 @@ const validateLogin = Yup.object().shape({
 
 function AdminLogin() {
   const [showSpinner, setSpinner] = useState(false);
-console.log(showSpinner)
+  console.log(showSpinner);
   const dispatch = useDispatch();
   const { values, handleBlur, handleChange, handleSubmit, errors } = useFormik({
     initialValues: initialValues,

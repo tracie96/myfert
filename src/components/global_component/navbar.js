@@ -1,12 +1,12 @@
-import { useEffect, useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import CustomModal from "./CustomModal";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutAction } from "../redux/AuthController";
-import { NavLink } from "react-router-dom";
-import defaultIconImage from "../../assets/images/users/user1.jpg";
+import { useNavigate } from "react-router-dom";
 import NotificationPanel from "./Notifiation/NotificationPanel";
 import { getNotifications } from "../redux/globalSlice";
 import { Col } from "react-bootstrap";
+import UserDropdown from "./menu";
 
 function Navbar() {
   const [showModal, setShowModal] = useState(false);
@@ -14,11 +14,10 @@ function Navbar() {
   const [isNotifications, setNotifications] = useState(null);
   const [isUpdate, setUpdate] = useState(false);
   const [unReadCount, setUnReadCount] = useState(0);
-
-console.log(setLogout,isUpdate)
+  const navigate = useNavigate();
+  console.log(isUpdate, setLogout);
   const { userAuth } = useSelector((state) => state.authentication);
   const dispatch = useDispatch();
-
   const fetchNotificationsList = useCallback(async () => {
     try {
       const response = await dispatch(getNotifications());
@@ -34,11 +33,6 @@ console.log(setLogout,isUpdate)
     }
   }, [dispatch, setUnReadCount]);
 
-  useEffect(() => {
-    fetchNotificationsList();
-  }, [fetchNotificationsList]);
-  
-
   const handleNotificationPanel = async () => {
     await fetchNotificationsList();
     setUpdate(true);
@@ -47,46 +41,37 @@ console.log(setLogout,isUpdate)
   const handleCloseModal = () => {
     setShowModal(false);
   };
-
+  const handleLogout = () => {
+    dispatch(logoutAction())
+      .unwrap()
+      .then(() => {
+        navigate("/");
+      })
+      .catch((error) => {
+        console.error("Logout error:", error);
+      });
+  };
   return (
     <>
-      <nav className="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-        {/* Sidebar Toggle (Topbar) */}
-        <button
-          id="sidebarToggleTop"
-          className="btn btn-link d-md-none rounded-circle mr-3"
-        >
-          <i className="fa fa-bars"></i>
-        </button>
-
-        {/* Topbar Search */}
+      <nav className="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top mt-3">
         <form className="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
           <div className="input-group">
             {userAuth && (
-              <span
-                type="text"
-                className="form-control bg-light border-0 small"
-              >
-                {userAuth.companyName ? (
+              <span type="text" style={{ color: "#fff" }}>
+                {userAuth.obj.companyName ? (
                   <>
-                    <b>{userAuth.companyName}</b>
+                    <b>{userAuth.obj.companyName}</b>
                   </>
                 ) : (
                   <>
                     Welcome,{" "}
                     <b>
-                      {userAuth.firstName} {userAuth.lastName}
+                      {userAuth.obj.firstName} {userAuth.obj.lastName}
                     </b>
                   </>
                 )}
               </span>
             )}
-
-            {/* <div className="input-group-append">
-              <button className="btn btn-primary" type="button">
-                <i className="fas fa-search fa-sm"></i>
-              </button>
-            </div> */}
           </div>
         </form>
 
@@ -105,7 +90,7 @@ console.log(setLogout,isUpdate)
             >
               <i
                 className="fas fa-bell fa-fw"
-                onClick={() => fetchNotificationsList()}
+                // onClick={() => fetchNotificationsList()}
               ></i>
 
               <span className="badge badge-danger badge-counter">
@@ -243,58 +228,7 @@ console.log(setLogout,isUpdate)
 
           <div className="topbar-divider d-none d-sm-block"></div>
 
-          {/* Nav Item - User Information */}
-          <li className="nav-item dropdown no-arrow">
-            <a
-              className="nav-link dropdown-toggle"
-              href="##"
-              id="userDropdown"
-              role="button"
-              data-toggle="dropdown"
-              aria-haspopup="true"
-              aria-expanded="false"
-            >
-              <img
-                className="img-profile rounded-circle"
-                src={
-                  // userAuth.profile ? userAuth.profile : "img/undraw_profile.svg"
-                  userAuth.profile ? userAuth.profile : defaultIconImage
-                }
-                alt={userAuth.firstName}
-              />
-              <span className="ml-2 d-none d-lg-inline text-gray-600 small">
-                {userAuth.firstName} {userAuth.lastName}
-              </span>
-              <i className="bi bi-caret-down-fill"></i>
-            </a>
-            {/* Dropdown - User Information */}
-            <div
-              className="dropdown-menu dropdown-menu-right shadow animated--grow-in"
-              aria-labelledby="userDropdown"
-            >
-              <NavLink to="/profile" className="dropdown-item" href="#">
-                <i className="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                Profile
-              </NavLink>
-              <NavLink to="/update-password" className="dropdown-item">
-                <i className="fas fa-key fa-sm fa-fw mr-2 text-gray-400"></i>
-                Update Password
-              </NavLink>
-              <NavLink to="/setting" className="dropdown-item">
-                {/* <i className="fas fa-gear fa-sm fa-fw mr-2 text-gray-400"></i> */}
-                <i className="bi bi-gear-fill mr-2 text-gray-400"></i>
-                Settings
-              </NavLink>
-              <div className="dropdown-divider"></div>
-              <button
-                className="dropdown-item"
-                onClick={() => setShowModal(true)}
-              >
-                <i className="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                Logout
-              </button>
-            </div>
-          </li>
+          <UserDropdown userAuth={userAuth} setShowModal={setShowModal} />
         </ul>
       </nav>
 
@@ -320,7 +254,8 @@ console.log(setLogout,isUpdate)
             </button>
             <button
               className="btn btn-primary"
-              onClick={() => dispatch(logoutAction())}
+              onClick={handleLogout}
+              style={{ background: "#01ACEE" }}
             >
               Logout
             </button>

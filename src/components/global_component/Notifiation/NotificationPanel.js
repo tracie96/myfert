@@ -17,7 +17,7 @@ const NotificationPanel = ({
   const [isDisabled, setDisabled] = useState(false);
   const { userAuth } = useSelector((state) => state?.authentication);
   const dispatch = useDispatch();
-  console.log(hubConnection)
+  console.log(hubConnection);
   const initializeSignalR = useCallback(async () => {
     const URL = `${notificationURL}notificationHub`;
     const connection = new signalR.HubConnectionBuilder().withUrl(URL).build();
@@ -99,12 +99,12 @@ const NotificationPanel = ({
           style={
             message.isRead === 0
               ? {
-                backgroundColor: "rgb(226 248 255)",
-                borderBottom: "1px solid #999",
-              }
+                  backgroundColor: "rgb(226 248 255)",
+                  borderBottom: "1px solid #999",
+                }
               : {
-                borderBottom: "1px solid rgb(227 227 227)",
-              }
+                  borderBottom: "1px solid rgb(227 227 227)",
+                }
           }
         >
           <Col md={10}>

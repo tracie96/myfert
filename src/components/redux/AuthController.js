@@ -3,6 +3,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { handleApiError, getResponse } from "../Handler/ExceptionHandler";
 import { toast } from "react-toastify";
 import { baseUrl } from "../../utils/envAccess";
+import { message } from "antd";
 
 //#region Login, Logout
 export const postLogin = createAsyncThunk(
@@ -17,9 +18,11 @@ export const postLogin = createAsyncThunk(
       const response = await axios.post(
         `${baseUrl}Auth/Login`,
         userData,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch);
+      if (responseBack?.status) {
+      }
       if (!responseBack && responseBack === undefined) {
         return responseBack;
       }
@@ -28,48 +31,130 @@ export const postLogin = createAsyncThunk(
     } catch (error) {
       handleApiError(error, dispatch);
     }
-  }
+  },
+);
+export const getUserProfile = createAsyncThunk(
+  "user/getProfile",
+  async (_, { rejectWithValue, getState, dispatch }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        accept: "text/plain",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+
+    try {
+      const response = await axios.get(`${baseUrl}Profile/GetProfile`, config);
+
+      // Use the response data directly
+      const responseData = response.data;
+
+      if (responseData) {
+        return responseData;
+      }
+
+      return rejectWithValue("No response data");
+    } catch (error) {
+      return rejectWithValue(handleApiError(error, dispatch));
+    }
+  },
 );
 
+export const getMiraInfo = createAsyncThunk(
+  "user/getMiraInfo",
+  async (_, { rejectWithValue, getState, dispatch }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        accept: "text/plain",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+
+    try {
+      const response = await axios.post(
+        `${baseUrl}Patient/GetMiraInfo`,
+        {},
+        config,
+      );
+
+      const responseData = response.data;
+      console.log(responseData, "responseData");
+
+      if (responseData) {
+        return responseData;
+      }
+
+      return rejectWithValue("No response data");
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || "Failed to fetch Mira Info",
+        dispatch,
+      );
+    }
+  },
+);
 export const postRegister = createAsyncThunk(
   "user/postRegister",
   async (users, { rejectWithValue, getState, dispatch }) => {
     const user = getState()?.authentication?.userAuth;
     const formData = new FormData();
+    console.log({ users });
     formData.append("role", parseInt(users.role));
     // formData.append("role", 4);
     formData.append("userName", users.userName);
     formData.append("firstName", users.firstName);
     formData.append("lastName", users.lastName);
-    formData.append("gender", users.gender);
+    formData.append("PreferredName", users.PreferredName);
+    formData.append("Pronouns", users.Pronouns);
+    formData.append("gender", "male");
     formData.append("password", users.password);
     formData.append("confirmPassword", users.cpassword);
     formData.append("email", users.email);
+    formData.append("phoneNumber", users.phoneNumber);
+    formData.append("dob", users.dob);
+    formData.append("Height", users.height);
+    formData.append("Weight", users.weight);
     formData.append("address", users.address);
     formData.append("appartmentOrSuite", users.appartmentOrSuite);
     formData.append("country", users.country);
     formData.append("stateOrProvince", users.stateProvince);
     formData.append("city", users.city);
     formData.append("postalCode", users.postalCode);
-    formData.append("phoneNumber", users.phoneNumber);
-    formData.append(
-      "medicalOrProvincialHealthNumber",
-      users.medicalNumberOrProvinceHealthNumber
-    );
-    formData.append("dob", users.dob);
-
-    formData.append("height", users.height);
-    formData.append("weight", users.weight);
+    formData.append("MetricImperial", users.MetricImperial);
     formData.append("isSMS", users.isSMS);
+    formData.append("isSendResultToEmail", true);
     formData.append(
       "isAgreeToShareInformation",
-      users.isAgreeToShareInformation
+      users.isAgreeToShareInformation,
+    );
+    formData.append(
+      "IAgreeToReceiveInformation",
+      users.IAgreeToReceiveInformation,
     );
     formData.append(
       "isAcceptTermsAndConditions",
-      users.isAcceptTermsAndCondition
+      users.isAcceptTermsAndCondition,
     );
+    formData.append("AgreeToUseData", users.AgreeToUseData);
+    formData.append("DigitalSignature", users.DigitalSignature);
+    formData.append("ExistOnMira", users.ExistOnMira);
+    formData.append("isAssessor", users.isAssessor);
     formData.append("licenseDocument", users.licenseDocument);
+
+    // Partner details
+    formData.append("PartnerFirstName", users.PartnerFirstName);
+    formData.append("PartnerLastName", users.PartnerLastName);
+    formData.append("PartnerSex", "female");
+    formData.append("PartnerPronouns", users.PartnerPronouns);
+    formData.append("PartnerDob", users.PartnerDob);
+
+    formData.append(
+      "medicalOrProvincialHealthNumber",
+      users.medicalNumberOrProvinceHealthNumber,
+    );
+
     const config = {
       headers: {
         "Content-Type": "multipart/form-data",
@@ -79,34 +164,147 @@ export const postRegister = createAsyncThunk(
       const response = await axios.post(
         `${baseUrl}Auth/Register`,
         formData,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, user);
+
       if (responseBack?.status) {
-        toast.success(responseBack?.message);
+        console.log(users.email, "dis");
+        const otpResponse = await dispatch(
+          sendEmailOtp({
+            email: users.email,
+            session: responseBack.session,
+          }),
+        ).unwrap();
+
+        if (otpResponse.statusCode === "200") {
+          message.success("Registration successful. OTP sent to your email!");
+        } else {
+          message.error("Registration successful but failed to send OTP!");
+        }
       }
+      localStorage.setItem("userInfo", JSON.stringify(responseBack));
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, user);
     }
-  }
+  },
+);
+export const sendEmailOtp = createAsyncThunk(
+  "auth/sendEmailOtp",
+  async ({ email, session }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`${baseUrl}Auth/ResendEmailOtp`, {
+        email,
+        session,
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  },
+);
+export const validateEmail = createAsyncThunk(
+  "user/validateEmail",
+  async (email, { rejectWithValue }) => {
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    try {
+      const response = await axios.post(
+        `${baseUrl}Auth/ValidateEmail`,
+        { value: email },
+        config,
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  },
+);
+export const validateEmailOtp = createAsyncThunk(
+  "user/validateEmailOtp",
+  async ({ email, session, code }, { rejectWithValue }) => {
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    try {
+      const response = await axios.post(
+        `${baseUrl}Auth/ValidateEmailOtp`,
+        { email, session, code },
+        config,
+      );
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  },
+);
+export const updateEmail = createAsyncThunk(
+  "auth/updateEmail",
+  async ({ email, session, newEmail }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        "https://myfertilitydevapi.azurewebsites.net/api/Auth/UpdateEmail",
+        { email, session, newEmail },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  },
+);
+export const validateUsername = createAsyncThunk(
+  "user/validateUsername",
+  async (username, { rejectWithValue }) => {
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    try {
+      const response = await axios.post(
+        `${baseUrl}Auth/ValidateUsername`,
+        { value: username },
+        config,
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  },
 );
 
 export const logoutAction = createAsyncThunk(
   "/user/logout",
-  async (payload, { rejectWithValue, getState, dispatch }) => {
+  async (payload, { rejectWithValue, getState }) => {
     const user = getState()?.auth?.userAuth;
     try {
       localStorage.removeItem("userInfo");
+      console.log("Logging out user:", user);
+      return { success: true };
     } catch (error) {
-      handleApiError(error, dispatch, user);
+      console.error("Logout error:", error);
+      return rejectWithValue("Logout failed.");
     }
-  }
+  },
 );
 
-//get user from local storage and place into store
-const userLoginFromStorage = localStorage.getItem("userInfo")
-  ? JSON.parse(localStorage.getItem("userInfo"))
-  : null;
+const getUserFromLocalStorage = () => {
+  const userInfo = localStorage.getItem("userInfo");
+  return userInfo ? JSON.parse(userInfo) : null;
+};
+
 //#endregion
 
 //#region Profile
@@ -123,14 +321,14 @@ export const getLoggedInUser = createAsyncThunk(
     try {
       const response = await axios.get(
         `${baseUrl}Auth/GetLoggedinUser?id=${id}`,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, user);
       return responseBack;
     } catch (error) {
       handleApiError(error, dispatch, user);
     }
-  }
+  },
 );
 
 export const updateProfileImage = createAsyncThunk(
@@ -155,7 +353,7 @@ export const updateProfileImage = createAsyncThunk(
       const response = await axios.put(
         `${baseUrl}Auth/UpdateProfilePicture`,
         formData,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, user);
       if (response?.data?.status) {
@@ -165,7 +363,7 @@ export const updateProfileImage = createAsyncThunk(
     } catch (error) {
       handleApiError(error, dispatch, user);
     }
-  }
+  },
 );
 
 export const updateProfile = createAsyncThunk(
@@ -174,29 +372,42 @@ export const updateProfile = createAsyncThunk(
     const user = getState()?.authentication?.userAuth;
     const config = {
       headers: {
-        Authorization: `Bearer ${user?.token}`,
+        Authorization: `Bearer ${user?.obj?.token}`,
       },
     };
 
     try {
-      const response = await axios.put(
-        `${baseUrl}Auth/UpdateProfile`,
+      const response = await axios.patch(
+        `${baseUrl}Profile/PatchProfile`,
         users,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, user);
+      console.log(response, responseBack);
+
       if (response?.data?.status) {
-        localStorage.setItem("userInfo", JSON.stringify(responseBack));
-        console.log("Profile Update:", responseBack);
-        toast.success(response?.data?.message);
+        const currentUserInfo =
+          JSON.parse(localStorage.getItem("userInfo")) || {};
+
+        const updatedUserInfo = { ...currentUserInfo };
+        Object.keys(responseBack).forEach((key) => {
+          if (responseBack[key] !== currentUserInfo[key]) {
+            updatedUserInfo[key] = responseBack[key];
+          }
+        });
+
+        localStorage.setItem("userInfo", JSON.stringify(updatedUserInfo));
+        console.log("Profile Update:", updatedUserInfo);
+        message.success(response?.data?.message);
       }
       return responseBack;
     } catch (error) {
       handleApiError(error, dispatch, user);
-      rejectWithValue(error);
+      return rejectWithValue(error);
     }
-  }
+  },
 );
+
 //#endregion
 
 //#region Password
@@ -215,7 +426,7 @@ export const updatePassword = createAsyncThunk(
       const response = await axios.put(
         `${baseUrl}Auth/UpdatePassword`,
         user,
-        config
+        config,
       );
 
       getResponse(response, dispatch, users);
@@ -225,7 +436,7 @@ export const updatePassword = createAsyncThunk(
     } catch (error) {
       handleApiError(error, dispatch, users);
     }
-  }
+  },
 );
 
 export const forgotPassword = createAsyncThunk(
@@ -239,9 +450,9 @@ export const forgotPassword = createAsyncThunk(
 
     try {
       const response = await axios.post(
-        `${baseUrl}Auth/ForgotPassword`,
+        `${baseUrl}Auth/SendForgotPasswordLink`,
         email,
-        config
+        config,
       );
       getResponse(response, dispatch);
       if (response?.data?.status) {
@@ -250,7 +461,7 @@ export const forgotPassword = createAsyncThunk(
     } catch (error) {
       handleApiError(error, dispatch);
     }
-  }
+  },
 );
 
 export const resetPassword = createAsyncThunk(
@@ -266,7 +477,7 @@ export const resetPassword = createAsyncThunk(
       const response = await axios.post(
         `${baseUrl}Auth/ResetPassword`,
         data,
-        config
+        config,
       );
       getResponse(response, dispatch);
       if (response?.data?.status) {
@@ -275,7 +486,7 @@ export const resetPassword = createAsyncThunk(
     } catch (error) {
       handleApiError(error, dispatch);
     }
-  }
+  },
 );
 
 //#endregion
@@ -295,13 +506,13 @@ export const postSubscriptionPayment = createAsyncThunk(
       const response = await axios.post(
         `${baseUrl}Patient/SubscriptionPayment`,
         data,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, user);
       if (response?.data?.status) {
         console.log(
           "Subscription controller Update (postSubscriptionPayment) :" +
-            responseBack
+            responseBack,
         );
         toast.success(response?.data?.message);
       }
@@ -310,7 +521,7 @@ export const postSubscriptionPayment = createAsyncThunk(
       handleApiError(error, dispatch, user);
       rejectWithValue(error);
     }
-  }
+  },
 );
 
 export const createCheckoutSession = createAsyncThunk(
@@ -327,13 +538,13 @@ export const createCheckoutSession = createAsyncThunk(
       const response = await axios.post(
         `${baseUrl}Patient/create-checkout-session?priceId=${priceId}`,
         null,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, user);
       if (response?.data?.status) {
         console.log(
           "create-checkout-session controller Update (postSubscriptionPayment) :" +
-            responseBack
+            responseBack,
         );
         toast.success(response?.data?.message);
       }
@@ -342,7 +553,7 @@ export const createCheckoutSession = createAsyncThunk(
       handleApiError(error, dispatch, user);
       // rejectWithValue(error);
     }
-  }
+  },
 );
 
 export const getUpdatedSubscriptionDetail = createAsyncThunk(
@@ -358,13 +569,13 @@ export const getUpdatedSubscriptionDetail = createAsyncThunk(
     try {
       const response = await axios.get(
         `${baseUrl}Patient/GetUpdatedSubscriptionDetail?UserId=${userId}`,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, user);
       if (response?.data?.status) {
         console.log(
           "Get Updated Subscription Detail auth call :",
-          responseBack
+          responseBack,
         );
         // toast.success(response?.data?.message);
       }
@@ -373,15 +584,41 @@ export const getUpdatedSubscriptionDetail = createAsyncThunk(
       handleApiError(error, dispatch, user);
       rejectWithValue(error);
     }
-  }
+  },
 );
 
+//#endregion
+
+//#region Get Calendar Appointment
+export const getAppointmentEvents = createAsyncThunk(
+  "user/getAppointmentEvents",
+  async (data, { rejectWithValue, getState, dispatch }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.token}`,
+      },
+    };
+
+    try {
+      const response = await axios.get(
+        `${baseUrl}Appointment/GetAppointmentCalendarEvents?StartDate=${data.startDate}&EndDate=${data.endDate}`,
+        config,
+      );
+      const responseBack = getResponse(response, dispatch, user);
+      return responseBack;
+    } catch (error) {
+      handleApiError(error?.response?.data, dispatch, user);
+    }
+  },
+);
 //#endregion
 
 const authSlices = createSlice({
   name: "authentication",
   initialState: {
-    userAuth: userLoginFromStorage,
+    userAuth: getUserFromLocalStorage,
     loading: false,
     appErr: null,
     appStatus: null,
@@ -582,6 +819,27 @@ const authSlices = createSlice({
       state.appStatusCode = action?.payload?.statusCode;
     });
 
+    builder.addCase(getAppointmentEvents.pending, (state, action) => {
+      state.loading = true;
+      state.appStatusCode = undefined;
+      state.profileAppErr = undefined;
+      state.profileAppErr = undefined;
+      state.profileServerErr = undefined;
+    });
+    builder.addCase(getAppointmentEvents.fulfilled, (state, action) => {
+      state.loading = false;
+      state.appStatus = false;
+      state.appStatusCode = undefined;
+      state.profileAppErr = undefined;
+      state.profileServerErr = undefined;
+    });
+    builder.addCase(getAppointmentEvents.rejected, (state, action) => {
+      state.loading = false;
+      state.appErr = action?.payload?.message;
+      state.serverErr = undefined;
+      state.appStatus = action?.payload?.status;
+      state.appStatusCode = action?.payload?.statusCode;
+    });
     builder.addCase(updatePassword.pending, (state, action) => {
       state.loading = true;
       state.profileAppErr = undefined;
@@ -596,6 +854,7 @@ const authSlices = createSlice({
       state.appStatus = false;
       state.appStatusCode = undefined;
     });
+
     builder.addCase(updatePassword.rejected, (state, action) => {
       state.appErr = action?.payload?.message;
       state.loading = false;

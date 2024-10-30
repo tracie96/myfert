@@ -54,7 +54,7 @@ const CoachSignup = (userRole) => {
     email: Yup.string()
       .matches(
         /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$/,
-        "Please enter a valid email"
+        "Please enter a valid email",
       )
       .required("Please enter email"),
     phoneNumber: Yup.string().min(8).required("Please enter phone number"),
@@ -73,7 +73,7 @@ const CoachSignup = (userRole) => {
           throw new Yup.ValidationError(
             "File size must be less than 2MB",
             value,
-            "licenseDocument"
+            "licenseDocument",
           );
         }
         return isFileSizeValid;
@@ -376,7 +376,7 @@ const CoachSignup = (userRole) => {
                                   id="isAcceptTermsAndCondition"
                                   checked={values.isAcceptTermsAndCondition}
                                   onChange={handleChange(
-                                    "isAcceptTermsAndCondition"
+                                    "isAcceptTermsAndCondition",
                                   )}
                                 />
                                 <label

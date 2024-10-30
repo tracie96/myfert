@@ -1,9 +1,8 @@
 import { useState } from "react";
 import "./Register.css";
-import { NavLink, Navigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import fertilityImage from "../../assets/images/auth/fertilityImage.svg";
 import tickImage from "../../assets/images/auth/tickImage.png";
 import crossImage from "../../assets/images/auth/crossImage.png";
 import MultiStepProgressBar from "./StepFormSubscription/MultiStepProgressBar";
@@ -13,10 +12,7 @@ import PaymentConfirmation from "./StepFormSubscription/PaymentConfirmation";
 import { Button, Card, CardHeader, CardBody, CardFooter } from "reactstrap";
 import { Col, Row } from "react-bootstrap";
 import CustomModal from "../global_component/CustomModal";
-import {
-  createCheckoutSession,
-  logoutAction,
-} from "../redux/AuthController";
+import { createCheckoutSession } from "../redux/AuthController";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 
@@ -64,7 +60,7 @@ const SubscriptionPlan = () => {
   const validateSubscriptionPlan = Yup.object().shape({
     selectedPlan: Yup.string().required("Please choose a plan to proceed"),
     subscriptionAmount: Yup.string().required(
-      "Subscription amount is required"
+      "Subscription amount is required",
     ),
     // cardNumber: Yup.string().max(16).required("Must enter card number"),
     // phoneNumber: Yup.string()
@@ -100,7 +96,7 @@ const SubscriptionPlan = () => {
           getResponse?.payload.isPaymentAlreadyCompleted
         ) {
           navigate(
-            `/subscription-plan-succeeded/${getResponse?.payload.paymentTimeTicks}`
+            `/subscription-plan-succeeded/${getResponse?.payload.paymentTimeTicks}`,
           );
         }
         setCheckOutPayload(getResponse?.payload);
@@ -168,30 +164,7 @@ const SubscriptionPlan = () => {
       <div className="bg-gradient-white">
         <div className="container">
           {/* navbar content div */}
-          <div className="row">
-            <div className="col-lg-12">
-              <nav className="navbar mt-3">
-                <img
-                  className="float-left"
-                  src={fertilityImage}
-                  alt="loginImage"
-                  style={{ width: "150px" }}
-                />
-                <form className="d-flex" role="search">
-                  {/* <button className="btn btn-outline-success" type="submit">
-                    Search
-                  </button> */}
-                  <NavLink
-                    to="/"
-                    className="btn btn-primary btn-user btn-block"
-                    onClick={() => dispatch(logoutAction())}
-                  >
-                    <span>Logout</span>
-                  </NavLink>
-                </form>
-              </nav>
-            </div>
-          </div>
+
           <Row className="my-5">
             <Col className="col-8 offset-2">
               <MultiStepProgressBar currentStep={currentStep} />
@@ -397,7 +370,7 @@ const SubscriptionPlan = () => {
         title={"ProSPr/Pregnancy"}
         body={
           <>
-            <Row>
+            <Row style={{ padding: 50 }}>
               <div className="d-flex flex-column col-md-6 col-sm-12 mt-2 text-black">
                 <center className="mb-3">
                   <img

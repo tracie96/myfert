@@ -19,14 +19,14 @@ export const expensesTable = createAsyncThunk(
       const response = await axios.post(
         `${baseUrl}Home/GetExpensesDataTable`,
         workRecord,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, user);
       return responseBack;
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, user);
     }
-  }
+  },
 );
 //#endregion
 
@@ -44,7 +44,7 @@ export const getLeavesRequestRecords = createAsyncThunk(
       monthYear,
       leaveStatus,
     },
-    { rejectWithValue, getState, dispatch }
+    { rejectWithValue, getState, dispatch },
   ) => {
     const user = getState()?.authentication?.userAuth;
     const config = {
@@ -60,7 +60,7 @@ export const getLeavesRequestRecords = createAsyncThunk(
         &sortDirection=${sortDirection}&searchValue=${searchParam}&userId=${userId}&leaveType=${leaveType}
         &monthYear=${monthYear}&leaveStatus=${leaveStatus}`,
         null,
-        config
+        config,
       );
       const responseBack = getResponse(response, dispatch, user);
       if (responseBack?.list.length > 0) {
@@ -71,7 +71,7 @@ export const getLeavesRequestRecords = createAsyncThunk(
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, user);
     }
-  }
+  },
 );
 
 const tableSlices = createSlice({

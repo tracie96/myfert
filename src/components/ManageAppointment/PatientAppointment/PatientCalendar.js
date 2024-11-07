@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -9,6 +9,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import { useMediaQuery } from "react-responsive";
+import moment from "moment-timezone";
 
 import { addAppointment } from "../../redux/patientSlice";
 import {
@@ -17,13 +18,13 @@ import {
   RightOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   cancelPatientAppointment,
   getAvailableDoctorsForDate,
   getDoctorAvailabilityForDay,
   getPatientAvailability,
-  setPatientAppointment,
+  codeGrantAuth,
 } from "../../redux/doctorSlice";
 import { List, Card, Typography, Tag, message } from "antd";
 import "./PatientCalendar.css";
@@ -32,15 +33,21 @@ const { Text } = Typography;
 
 const PatientCalendar = ({ selectedProviders }) => {
   const calendarRef = useRef(null);
-  const roleColorMap = {
-    0: "grey",
-    2: "green",
-    3: "blue",
-    4: "purple",
-    9: "lilac",
-    6: "cyan",
-  };
+  const roleColorMap = useMemo(
+    () => ({
+      0: "grey",
+      2: "green",
+      3: "blue",
+      4: "purple",
+      9: "lilac",
+      6: "cyan",
+    }),
+    []
+  );
+  
   const [apptEvents, setApptEvents] = useState([]);
+  let [searchParams] = useSearchParams();
+  const grantAuthCode = searchParams.get('code')
   const {
     availableDoctors,
     doctorAvailability,
@@ -48,7 +55,13 @@ const PatientCalendar = ({ selectedProviders }) => {
     loading,
     error,
   } = useSelector((state) => state?.doctor);
+
   const [newAppointmentList, setAppointmentList] = useState([]);
+  const [meetingAppointmentID, setMeetingAppointmentID] = useState('');
+  const baseURL_Grant_Auth = 'https://accounts.zoho.com/oauth/v2/auth';
+  const grantAuthScope = 'ZohoMeeting.meeting.CREATE';
+  const grantAuthClientID = '1000.NK6Q7FL6QZ4ATXWQLWVLREUFSXUXNJ';
+  const grantAuthRedirectURI = 'http://localhost:3001/patient/appointment';
   useEffect(() => {
     setAppointmentList(appointmentList);
   }, [appointmentList]);
@@ -115,10 +128,7 @@ const PatientCalendar = ({ selectedProviders }) => {
   const onClose = () => {
     setOpen(false);
   };
-  const handleEventClick = (clickInfo) => {
 
-    showDrawer();
-  };
 
   const prevDateRange = useRef(null);
 
@@ -134,74 +144,93 @@ const PatientCalendar = ({ selectedProviders }) => {
       fetchAndSetAvailability(startYear, startMonth);
     }
   };
-  const fetchAndSetAvailability = async (startYear, startMonth) => {
-    try {
-      const response = await dispatch(
-        getPatientAvailability({ month: startMonth, year: startYear })
-      );
-      if (getPatientAvailability.fulfilled.match(response)) {
-        const availability = response.payload;
 
-        updateCalendarEvents(availability, startYear, startMonth);
-      } else {
-        console.error("Failed to fetch availability");
+  const updateCalendarEvents = useCallback(
+    (availability, startYear, startMonth) => {
+      const events = availability.flatMap((slot) => {
+        const backgroundColor = roleColorMap[slot.roleId] || "gray";
+  
+        return slot.free
+          ? [
+              {
+                id: `${slot.date}_${slot.roleId}`,
+                title: `Fertility Coach`,
+                start: new Date(slot.date),
+                end: new Date(slot.date), // Single-day availability
+                classNames: `fc-event-${backgroundColor}`,
+                textColor: "white",
+              },
+            ]
+          : [
+              {
+                id: `${slot.date}_${slot.roleId}`,
+                title: `Booked`,
+                start: new Date(slot.date),
+                end: new Date(slot.date),
+                classNames: "fc-event-green",
+                textColor: "white",
+              },
+            ];
+      });
+  
+      setApptEvents((prevEvents) => {
+        if (JSON.stringify(prevEvents) !== JSON.stringify(events)) {
+          return events;
+        }
+        return prevEvents;
+      });
+    },
+    [roleColorMap, setApptEvents] 
+  );
+
+  const fetchAndSetAvailability = useCallback(
+    async (startYear, startMonth) => {
+      try {
+        const response = await dispatch(
+          getPatientAvailability({ month: startMonth, year: startYear })
+        );
+        if (getPatientAvailability.fulfilled.match(response)) {
+          const availability = response.payload;
+          updateCalendarEvents(availability, startYear, startMonth);
+        } else {
+          console.error("Failed to fetch availability");
+        }
+      } catch (error) {
+        console.error("Error fetching availability:", error);
       }
-    } catch (error) {
-      console.error("Error fetching availability:", error);
-    }
-  };
-  const updateCalendarEvents = (availability, startYear, startMonth) => {
-    const events = availability.flatMap((slot) => {
-      const backgroundColor = roleColorMap[slot.roleId] || "gray";
-
-      return slot.free
-        ? [
-          {
-            id: `${slot.date}_${slot.roleId}`, // Unique ID for each event
-            title: `Fertility Coach`, // Display a generic title for availability
-            start: new Date(slot.date), // Use the date directly from the availability
-            end: new Date(slot.date), // End time is same as start time for single-day availability
-            classNames: `fc-event-${backgroundColor}`,
-            textColor: "white",
-          },
-        ]
-        : [
-          {
-            id: `${slot.date}_${slot.roleId}`, // Unique ID for each event
-            title: `Booked`,
-            start: new Date(slot.date),
-            end: new Date(slot.date),
-            classNames: "fc-event-green",
-            textColor: "white",
-          },
-        ];
-    });
-
-    setApptEvents((prevEvents) => {
-      if (JSON.stringify(prevEvents) !== JSON.stringify(events)) {
-        return events;
-      }
-      return prevEvents;
-    });
-  };
-
+    },
+    [dispatch, updateCalendarEvents] 
+  );
   const handleAppointmentClick = (appointment) => {
-    console.log("Appointment CLicked", appointment);
     const { appointmentId } = appointment;
-    dispatch(setPatientAppointment(appointmentId)).then((result) => {
-      if (setPatientAppointment.fulfilled.match(result)) {
-        message.success("Appointment successfully set!");
-        setIsModalVisible(false);
+    localStorage.setItem('meetingAppointmentID', appointmentId);
+    window.location.href=`${baseURL_Grant_Auth}?scope=${grantAuthScope}&client_id=${grantAuthClientID}&response_type=code&redirect_uri=${grantAuthRedirectURI}&access_type=offline&state=opaque&prompt=consent`
+    setMeetingAppointmentID(appointmentId)
 
-        const currentDate = new Date(selectedDate);
-        const startMonth = currentDate.getMonth() + 1;
-        const startYear = currentDate.getFullYear();
-        fetchAndSetAvailability(startYear, startMonth);
-      } else {
-        message.error(result.error.message || "Failed to set appointment");
-      }
-    });
   };
+
+
+  useEffect(()=>{
+    if(!grantAuthCode) return;
+    async function sendGrantCode () {
+      const retrievedId = localStorage.getItem('meetingAppointmentID');
+      await dispatch(codeGrantAuth({appointmentId: retrievedId, code: grantAuthCode})).then((result)=>{
+        if(codeGrantAuth.fulfilled.match(result)) {
+          message.success("Appointment is set successfully!");
+          const currentDate = new Date(selectedDate);
+          const startMonth = currentDate.getMonth() + 1;
+          const startYear = currentDate.getFullYear();
+          fetchAndSetAvailability(startYear, startMonth);
+          // ToDo: joinMeeting()
+          // joinMeeting();
+        } else {
+          message.error(result.error.message || "failed to set appointment")
+        }
+      })
+     
+    }
+    sendGrantCode();
+  },[grantAuthCode, meetingAppointmentID, dispatch,fetchAndSetAvailability,selectedDate])
 
   // Function to generate 15-minute interval time slots
   const generateTimeSlots = (startHour, startMinute, endHour, endMinute) => {
@@ -288,7 +317,7 @@ const PatientCalendar = ({ selectedProviders }) => {
   const redirectToZohoAuth = () => {
     const clientId = process.env.REACT_APP_CLIENT_ID;
     const redirectUri = process.env.REACT_APP_REDIRECT_URI;
-    const authUrl = `${ZOHO_AUTH_URL}?scope=ZohoMeeting.meeting.CREATE&client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&access_type=offline`;
+    const authUrl = `${ZOHO_AUTH_URL}?scope=ZohoMeeting.meeting.&client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&access_type=offline`;
     window.location.href = authUrl;
   };
 
@@ -399,17 +428,28 @@ const PatientCalendar = ({ selectedProviders }) => {
           center: "title",
           right: "dayGridMonth",
         }}
-        height={isMobile? 464: '70vh'}
+        height={isMobile ? 464 : '100vh'}
         initialView="dayGridMonth"
         events={apptEvents}
         selectable={true}
         datesSet={(dateInfo) => handleDateRangeChange(dateInfo)}
-        eventClick={(selectInfo) => handleEventClick(selectInfo)}
-        selectAllow={(selectInfo) => {
+
+        eventClick={(selectInfo) => {
+          const formattedDate = moment(selectInfo.event.startStr).utc()
+          .add(1, 'day').format("YYYY-MM-DD");
+          console.log(formattedDate, "converted date for Alberta");
+
           addCalendarAppointment.resetForm();
           showDrawer();
+
+          setSelectedDate(formattedDate);
+        }}
+
+        selectAllow={(selectInfo) => {
+          addCalendarAppointment.resetForm();
+          console.log({ selectInfo })
+          showDrawer();
           setSelectedDate(selectInfo.startStr)
-          handleEventClick(selectInfo);
         }}
         select={(selectInfo) => {
           addCalendarAppointment.resetForm();

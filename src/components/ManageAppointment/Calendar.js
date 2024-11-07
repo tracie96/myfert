@@ -5,27 +5,45 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { useDispatch } from "react-redux";
 import { getAvailability } from "../redux/doctorSlice";
+import "./PatientAppointment/PatientCalendar.css"
+import { useMediaQuery } from "react-responsive";
 
 const Calendar = ({ currentWeek, refreshTrigger }) => {
   const [apptEvents, setApptEvents] = useState([]);
-  const isMobile = useState(window.innerWidth <= 600);
+  const isMobile = useMediaQuery({ maxWidth: 767 });
   const calendarRef = useRef(null);
   const dispatch = useDispatch();
-  
+ 
   const updateCalendarEvents = useCallback(
     (availability, startYear, startMonth) => {
-      const events = availability.map((slot) => ({
-        id: `${slot.date}_${slot.roleId}`, 
-        title: slot?.free ? 'Available' : 'Booked',
-        start: new Date(slot.date), 
-        end: new Date(slot.date),
-        classNames: `fc-event-blue`,
-        textColor: "white",
-      }));
+      const events = availability.flatMap((slot, index) => {
+        return slot.free
+          ? [
+              {
+                id: `${slot.date}_${slot.roleId}_${index}`, 
+                title: `Available`,
+                start: new Date(slot.date), 
+                end: new Date(slot.date), 
+                classNames: `fc-event-coach-available`,
+                textColor: "white",
+              },
+            ]
+          : [
+              {
+                id: `${slot.date}_${slot.roleId}_${index}`, 
+                title: `Booked`,
+                start: new Date(slot.date),
+                end: new Date(slot.date),
+                classNames: "fc-event-coach-booked",
+                textColor: "white",
+              },
+            ];
+      });
       setApptEvents(events);
     },
     [],
   );
+  
   const fetchAndSetAvailability = useCallback(
     async (startYear, startMonth) => {
       try {
@@ -58,19 +76,20 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
   }, [refreshTrigger, fetchAndSetAvailability, currentWeek]);
 
   // Header toolbar configuration
-  const headerToolbar = {
-    left: "prev,next today",
-    center: isMobile ? undefined : "title",
-    right: "dayGridMonth,timeGridWeek,timeGridDay",
-  };
+ 
   return (
     <FullCalendar
       ref={calendarRef}
       plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
       initialView="dayGridMonth"
       events={apptEvents}
-      headerToolbar={headerToolbar}
-    />
+      headerToolbar={{
+        left: "prev,next today",
+        center: "title",
+        right: "dayGridMonth",
+      }}
+      height={isMobile? 464:'1000px'}
+       />
   );
 };
 

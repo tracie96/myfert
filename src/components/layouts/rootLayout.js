@@ -8,7 +8,6 @@ import MyNavbar from "../global_component/navbar";
 
 const RootLayout = () => {
   const userAuth = useSelector((state) => state?.authentication?.userAuth);
-
   if (!userAuth || Object.keys(userAuth)?.length === 0) {
     return <Navigate to="/" />;
   }

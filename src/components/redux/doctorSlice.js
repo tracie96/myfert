@@ -1,6 +1,6 @@
 import axios from "axios";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { handleApiError } from "../Handler/ExceptionHandler";
+import { getResponse, handleApiError } from "../Handler/ExceptionHandler";
 import { baseUrl } from "../../utils/envAccess";
 
 export const patientList = createAsyncThunk(
@@ -95,6 +95,31 @@ export const getPatientAvailability = createAsyncThunk(
     }
   },
 );
+
+export const getZohoClientID = createAsyncThunk(
+  "doctor/getZohoClientID",
+  async (_, { rejectWithValue, getState }) => {
+    const user = getState()?.authentication?.userAuth;
+    
+    const config = {
+      headers: {
+        Accept: "text/plain",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+
+    try {
+      const response = await axios.get(
+        `${baseUrl}Doctor/GetZohoClientId`,
+        config,
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error?.response?.data);
+    }
+  },
+);
+
 export const getAvailableDoctorsForDate = createAsyncThunk(
   "availability/getAvailableDoctorsForDate",
   async (date, { rejectWithValue, getState }) => {
@@ -161,6 +186,28 @@ export const setPatientAppointment = createAsyncThunk(
     }
   },
 );
+
+export const codeGrantAuth = createAsyncThunk(
+  "user/codeGrantAuth",
+  async ( {appointmentId,code}, { rejectWithValue, getState, dispatch }) => {
+    const users = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        Authorization: `Bearer ${users?.obj?.token}`,
+      },
+    };
+
+    try {
+      const url = `${baseUrl}Patient/SetPatientAppointment/${appointmentId}/${code}`;
+      const response = await axios.get(url, config);
+      const responseBack = getResponse(response, dispatch, users);
+      return responseBack;
+    } catch (error) {
+      handleApiError(error?.response?.data, dispatch, users);
+    }
+  },
+);
+
 export const cancelPatientAppointment = createAsyncThunk(
   "availability/cancelPatientAppointment",
   async (appointmentId, { rejectWithValue, getState }) => {
@@ -183,6 +230,30 @@ export const cancelPatientAppointment = createAsyncThunk(
     }
   },
 );
+
+export const getUpcomingAppointments = createAsyncThunk(
+  "doctor/getUpcomingAppointments",
+  async (_, { rejectWithValue, getState }) => {
+    const user = getState()?.authentication?.userAuth; 
+    const config = {
+      headers: {
+        Accept: "text/plain",
+        Authorization: `Bearer ${user?.obj?.token}`, 
+      },
+    };
+
+    try {
+      const response = await axios.get(
+        `${baseUrl}Doctor/GetUpComingAppointment`,
+        config
+      );
+      return response.data; 
+    } catch (error) {
+      return rejectWithValue(error?.response?.data); 
+    }
+  }
+);
+
 
 const doctorSlices = createSlice({
   name: "doctor",
@@ -237,6 +308,18 @@ const doctorSlices = createSlice({
       state.error = null;
     });
 
+    builder.addCase(getZohoClientID.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+    builder.addCase(getZohoClientID.fulfilled, (state, action) => {
+      state.loading = false;
+      state.availableDoctors = action.payload;
+    });
+    builder.addCase(getZohoClientID.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
     builder.addCase(getAvailableDoctorsForDate.pending, (state) => {
       state.loading = true;
       state.error = null;
@@ -279,6 +362,34 @@ const doctorSlices = createSlice({
       state.loading = true;
       state.error = null;
     });
+    builder.addCase(codeGrantAuth.fulfilled, (state, action) => {
+      state.loading = false;
+      state.appointmentConfirmation = action.payload; 
+      state.error = null;
+    });
+    builder.addCase(codeGrantAuth.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload; 
+    });
+    builder.addCase(codeGrantAuth.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+
+    builder
+      .addCase(getUpcomingAppointments.pending, (state) => {
+        state.loading = true; 
+        state.appErr = null;
+        state.serverErr = null;
+      })
+      .addCase(getUpcomingAppointments.fulfilled, (state, action) => {
+        state.loading = false;
+        state.upcomingAppointments = action.payload.records;
+      })
+      .addCase(getUpcomingAppointments.rejected, (state, action) => {
+        state.loading = false;
+        state.appErr = action.payload || "Failed to fetch upcoming appointments";
+      });
   },
 });
 

@@ -41,7 +41,6 @@ const PatientAppointment = () => {
   };
   const [moreVisible, setMoreVisible] = useState(filteredAppointments.map(() => true));
 
-  // Function to toggle "More" and "Cancel" for a specific index
   const toggleMore = (index) => {
     setMoreVisible(prevState =>
       prevState.map((visible, i) => (i === index ? !visible : visible))

@@ -236,6 +236,7 @@ import SubscriptionPlanV2 from "../../screens/Subscription/index";
 import PaymentDetails from "../../screens/Subscription/payment-details";
 import PrePlan from "../../screens/Subscription/pre-plan";
 import SecondPlan from "../../screens/Subscription/second-plan";
+import AppointmentList from "../DashboardV2/DoctorDashboard/AppointmentList";
 
 //#endregion
 
@@ -335,6 +336,8 @@ const getRouter = createBrowserRouter(
 
         #endregion #region Appointment
         <Route path="patient/appointment" element={<PatientAppointment />} />
+        <Route path="doctor/appointments" element={<AppointmentList />} />
+
         <Route path="appointment" element={<PatientAppointment />} />
         #endregion #region Learn
         <Route path="learn" element={<Learn />} />

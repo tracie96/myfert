@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Row, Col, Tabs, Button, Table, Card, message, Switch } from "antd";
+import { Row, Col, Tabs, Table, Card, message, Switch, Input } from "antd";
 import {
   ExperimentOutlined,
   FlagTwoTone,
   QuestionCircleOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { patientList } from "../../redux/doctorSlice";
+import { getZohoClientID, patientList } from "../../redux/doctorSlice";
 import { useNavigate } from "react-router-dom";
 
 const SwitchWrapper = ({ onChange, ...props }) => {
@@ -24,6 +25,7 @@ const SwitchWrapper = ({ onChange, ...props }) => {
 export default function DoctorDash() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState(""); // For search input
   const loggedInUserId = useSelector(
     (state) => state?.authentication?.userAuth?.obj?.id,
   );
@@ -34,7 +36,6 @@ export default function DoctorDash() {
     sortField: null,
     sortOrder: null,
   });
-  const [searchParam, setSearchParam] = useState("");
 
   const fetchPatientList = useCallback(async () => {
     setLoading(true);
@@ -43,7 +44,6 @@ export default function DoctorDash() {
       size: 100,
       sortColumn: sortConfig.sortField,
       sortDirection: sortConfig.sortOrder,
-      searchParam,
     };
 
     try {
@@ -65,7 +65,6 @@ export default function DoctorDash() {
     }
   }, [
     dispatch,
-    searchParam,
     sortConfig.sortField,
     sortConfig.sortOrder,
     loggedInUserId,
@@ -75,6 +74,16 @@ export default function DoctorDash() {
     fetchPatientList();
   }, [fetchPatientList]);
 
+  useEffect(() => {
+    dispatch(getZohoClientID()).then((response) => {
+      if (getZohoClientID.fulfilled.match(response)) {
+        console.log("Zoho Client Id-", response.payload);
+      } else {
+        console.error("Failed to fetch the Zoho client Id-", response.error.message);
+      }
+    });
+  }, [dispatch]);
+
   const handleTableChange = useCallback((pagination, filters, sorter) => {
     setSortConfig({
       sortField: sorter.field,
@@ -83,11 +92,11 @@ export default function DoctorDash() {
   }, []);
 
   const handleSearch = useCallback((value) => {
-    setSearchParam(value);
+    setSearchQuery(value); // Update searchQuery when the user types
   }, []);
 
   const handleSwitch = (checked, record, e) => {
-    e.stopPropagation(); // This is important to prevent row navigation
+    e.stopPropagation();
     localStorage.setItem("calendar", checked ? "auto" : "manual");
   };
 
@@ -100,6 +109,17 @@ export default function DoctorDash() {
     [data],
   );
 
+  // Filter the data based on the search query
+  const filteredData = useMemo(() => {
+    if (!searchQuery) return dataWithIds;
+    return dataWithIds.filter((item) =>
+      item.firstname.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.lastname.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (item.flag && item.flag.toString().toLowerCase().includes(searchQuery.toLowerCase())) // Check if flag exists before calling toString()
+    );
+  }, [searchQuery, dataWithIds]);
+
+
   const columns = useMemo(
     () => [
       {
@@ -107,7 +127,6 @@ export default function DoctorDash() {
         dataIndex: "firstname",
         key: "firstname",
         sorter: true,
-        
       },
       {
         title: "Last Name",
@@ -123,11 +142,7 @@ export default function DoctorDash() {
           flag ? (
             <FlagTwoTone style={{ color: "red" }} twoToneColor={"red"} />
           ) : (
-            <FlagTwoTone
-              fill="red"
-              twoToneColor={"red"}
-              style={{ color: "red" }}
-            />
+            <FlagTwoTone fill="red" twoToneColor={"red"} style={{ color: "red" }} />
           ),
       },
       {
@@ -154,8 +169,8 @@ export default function DoctorDash() {
         render: () => <p> Clinician Bama Bish</p>,
       },
       {
-        title: "Action", // Title for the new column
-        key: "action", // Key for the new column
+        title: "Action",
+        key: "action",
         render: (_, record) => (
           <SwitchWrapper
             onChange={(checked, e) => handleSwitch(checked, record, e)}
@@ -169,13 +184,13 @@ export default function DoctorDash() {
   const PatientList = React.memo(
     () => (
       <Card>
-        <div style={{ marginBottom: 16 }}></div>
+
         <Table
           columns={columns}
-          dataSource={dataWithIds}
+          dataSource={filteredData}
           loading={loading}
-          scroll={{ x: 'max-content' }} 
-          pagination={false} 
+          scroll={{ x: "max-content" }}
+          pagination={false}
           onChange={handleTableChange}
           rowKey="id"
           onRow={(record) => ({
@@ -190,7 +205,7 @@ export default function DoctorDash() {
         />
       </Card>
     ),
-    [columns, dataWithIds, loading, handleTableChange, handleSearch, navigate],
+    [columns, filteredData, loading, handleTableChange, navigate],
   );
 
   const items = [
@@ -212,10 +227,15 @@ export default function DoctorDash() {
         <p style={{ color: "#335CAD", fontWeight: "bold", fontSize: "16px" }}>
           Patient List
         </p>
-        <Tabs
-          tabBarExtraContent={<Button>Search Section</Button>}
-          items={items}
-        />
+        <Tabs items={items}
+          tabBarExtraContent={<div style={{ marginBottom: 16 }}>
+            <Input
+              placeholder="Search"
+              value={searchQuery}
+              onChange={(e) => handleSearch(e.target.value)}
+              prefix={<SearchOutlined />}
+            />
+          </div>} />
       </Col>
     </Row>
   );

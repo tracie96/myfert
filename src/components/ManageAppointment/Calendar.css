@@ -29,3 +29,6 @@
   background-color: blue !important;
   color: white !important;
 }
+.fc .fc-button-primary:not(:disabled).fc-button-active:focus, .fc .fc-button-primary:not(:disabled):active:focus{
+  border: none !important;
+}

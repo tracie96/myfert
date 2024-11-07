@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Calendar from "./Calendar";
-import { Drawer, Button, Checkbox, Row, Col, Space, TimePicker } from "antd";
+import { Drawer, Button, Checkbox, Row, Col, Space, Avatar, TimePicker } from "antd";
 import moment from "moment";
 import {
   MinusCircleOutlined,
@@ -8,12 +8,25 @@ import {
   RightCircleTwoTone,
   PlusCircleTwoTone,
 } from "@ant-design/icons";
+import {
+  CalendarOutlined,
+  ClockCircleOutlined,
+  DownOutlined,
+  EnvironmentOutlined,
+  MoreOutlined,
+  UpOutlined,
+  UserOutlined,
+  VideoCameraOutlined,
+} from "@ant-design/icons";
+
 import { submitAvailability } from "../redux/doctorSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useMediaQuery } from "react-responsive";
 
 const Appointment = () => {
   const [open, setOpen] = useState(false);
   const [currentWeek, setCurrentWeek] = useState(moment());
+  const [drawerKey, setDrawerKey] = useState(0);
   const [availability, setAvailability] = useState({
     Sunday: [],
     Monday: [],
@@ -23,13 +36,42 @@ const Appointment = () => {
     Friday: [],
     Saturday: [],
   });
+  const isMobile = useMediaQuery({ maxWidth: 767 });
   const maxSlots = 5;
+  const [viewAll, setViewAll] = useState(false);
+  const handleViewAll = () => {
+    setViewAll(!viewAll);
+  };
+  const toggleMore = (index) => {
+    setMoreVisible(prevState =>
+      prevState.map((visible, i) => (i === index ? !visible : visible))
+    );
+  };
   const showDrawer = () => {
+    setDrawerKey((prevKey) => prevKey + 1);
     setOpen(true);
   };
   const [refreshCalendar, setRefreshCalendar] = useState(0);
   const dispatch = useDispatch();
+  const { appointmentList = [] } = useSelector((state) => state?.doctor);
+  const filteredAppointments = appointmentList.filter(
+    (app) => app.roleId === 0
+  );
+  const visibleAppointments = viewAll
+    ? filteredAppointments
+    : filteredAppointments.slice(0, 2);
+  const [moreVisible, setMoreVisible] = useState(filteredAppointments.map(() => true));
+console.log({filteredAppointments})
   const onClose = () => {
+    setAvailability({
+      Sunday: [],
+      Monday: [],
+      Tuesday: [],
+      Wednesday: [],
+      Thursday: [],
+      Friday: [],
+      Saturday: [],
+    })
     setOpen(false);
   };
   const addTimeSlot = (day) => {
@@ -49,6 +91,7 @@ const Appointment = () => {
   };
 
   const handleTimeChange = (day, index, field, value) => {
+
     const updatedSlots = availability[day].map((slot, idx) =>
       idx === index ? { ...slot, [field]: value } : slot,
     );
@@ -108,7 +151,7 @@ const Appointment = () => {
       disabledMinutes: (selectedHour) =>
         selectedHour === startHour
           ? Array.from({ length: startMinute }, (_, i) => i)
-          : [], // Disable minutes less than the start minute if the selected hour is the same
+          : [],
     };
   };
   const handlePreviousWeek = () => {
@@ -121,14 +164,14 @@ const Appointment = () => {
   return (
     <>
       <div className="row">
-        <div className="col-lg-12 mb-4">
-          {/* Header Row with Button */}
+        <div className="col-lg-12 mb-4" >
           <div
             style={{
               display: "flex",
               justifyContent: "flex-end",
               alignItems: "center",
-              marginBottom: "10px",
+              marginBottom: isMobile ? '30px' : '10px'
+
             }}
           >
             <Button
@@ -155,20 +198,79 @@ const Appointment = () => {
         <div className="col-lg-12 mb-4">
           <div className="card shadow mb-4">
             <div className="card-body">
-              <form className="user">
-                <div className="form-group col-lg-12">
-                  <label className="form-label ml-1 font-weight-bold">
-                    Upcoming Appointment:
-                  </label>
-                </div>
-                <span
-                  type="button"
-                  className="btn btn-user btn-block"
-                  style={{ backgroundColor: "#e0e1e3", color: "black" }}
-                >
-                  Appointments
-                </span>
-              </form>
+            <div className="user" style={{ maxWidth: "600px", margin: "auto", padding: "20px", border: "1px solid #f0f0f0", borderRadius: "8px", backgroundColor: "#fff" }}>
+      <div className="form-group">
+        <h3 style={{ color: "#333", marginBottom: "15px", fontWeight: "bold" }}>
+          Upcoming Appointment
+        </h3>
+      </div>
+      
+      {filteredAppointments.length > 0 ? (
+        <div>
+          {visibleAppointments.map((appointment, index) => (
+            <div
+              key={index}
+              style={{
+                borderBottom: "1px solid #e0e0e0",
+                padding: "15px 0",
+                fontSize: "14px",
+                position: "relative",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <p style={{ fontWeight: "bold", color: "#333" }}>
+                  <Avatar style={{ backgroundColor: "#1E90FF", marginRight: "8px" }} icon={<UserOutlined />} />
+                  Patient Gullbringa
+                </p>
+                {moreVisible[index] ? (
+                  <MoreOutlined style={{ fontSize: '18px', color: "#1E90FF", cursor: "pointer" }} onClick={() => toggleMore(index)} />
+                ) : (
+                  <Button type="link" onClick={() => toggleMore(index)} style={{ color: "#ff4d4f" }}>
+                    Cancel
+                  </Button>
+                )}
+              </div>
+
+              <div style={{ color: "#666" }}>
+                <p>
+                  <CalendarOutlined style={{ marginRight: "8px" }} />
+                  {new Date(appointment.date).toLocaleDateString("en-Us", { month: "short", day: "numeric", year: "numeric" })}
+                </p>
+                <p>
+                  <ClockCircleOutlined style={{ marginRight: "8px" }} />
+                  {new Date(appointment.date).toLocaleTimeString("en-US", { hour: '2-digit', minute: '2-digit' })}
+                </p>
+                <p>
+                  <EnvironmentOutlined style={{ marginRight: "8px" }} />
+                  Virtual or In-person
+                </p>
+              </div>
+
+              <div style={{ textAlign: "center", marginTop: "10px" }}>
+                <Button type="primary" icon={<VideoCameraOutlined />} style={{ backgroundColor: "#1E90FF", border: "none", width: "100%", marginBottom: "8px" }}>
+                  Join
+                </Button>
+                <p style={{ fontSize: "13px", color: "#888", margin: "5px 0 0" }}>
+                  Ongoing Care Plan - Initial Care Team Appointment
+                </p>
+              </div>
+            </div>
+          ))}
+
+          {filteredAppointments.length > 2 && (
+            <div onClick={handleViewAll} style={{ color: "#1E90FF", textAlign: "center", marginTop: "15px", cursor: "pointer" }}>
+              {viewAll ? <UpOutlined style={{ marginRight: "8px" }} /> : <DownOutlined style={{ marginRight: "8px" }} />}
+              {viewAll ? "View Less" : "View All"}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div style={{ textAlign: "center", color: "#888", fontSize: "14px" }}>
+          <p>You have no upcoming appointment.</p>
+          <p>The earliest appointment you can schedule with your provider is:</p>
+        </div>
+      )}
+    </div>
               <form className="user mt-4">
                 <div className="form-group col-lg-12">
                   <label className="form-label ml-1 font-weight-bold">
@@ -180,6 +282,7 @@ const Appointment = () => {
                 </div>
               </form>
               <Drawer
+                key={drawerKey}
                 title={
                   <div
                     style={{
@@ -306,6 +409,7 @@ const Appointment = () => {
                           span={16}
                           style={{ display: "flex", alignItems: "center" }}
                         >
+
                           {availability[day].length === 0 ? (
                             <span style={{ color: "grey" }}>Unavailable</span>
                           ) : (
@@ -316,11 +420,7 @@ const Appointment = () => {
                               >
                                 <TimePicker
                                   placeholder="Start Time"
-                                  value={
-                                    slot.startTime
-                                      ? moment(slot.startTime, "HH:mm")
-                                      : null
-                                  }
+
                                   onChange={(time, timeString) =>
                                     handleTimeChange(
                                       day,
@@ -336,11 +436,7 @@ const Appointment = () => {
                                 />
                                 <TimePicker
                                   placeholder="End Time"
-                                  value={
-                                    slot.endTime
-                                      ? moment(slot.endTime, "HH:mm")
-                                      : null
-                                  }
+
                                   onChange={(time, timeString) =>
                                     handleTimeChange(
                                       day,

@@ -7,6 +7,7 @@ import NotificationPanel from "./Notifiation/NotificationPanel";
 import { getNotifications } from "../redux/globalSlice";
 import { Col } from "react-bootstrap";
 import UserDropdown from "./menu";
+import { useMediaQuery } from "react-responsive";
 
 function Navbar() {
   const [showModal, setShowModal] = useState(false);
@@ -15,6 +16,7 @@ function Navbar() {
   const [isUpdate, setUpdate] = useState(false);
   const [unReadCount, setUnReadCount] = useState(0);
   const navigate = useNavigate();
+  const isMobile = useMediaQuery({ maxWidth: 767 });
   console.log(isUpdate, setLogout);
   const { userAuth } = useSelector((state) => state.authentication);
   const dispatch = useDispatch();
@@ -74,7 +76,24 @@ function Navbar() {
             )}
           </div>
         </form>
-
+          {isMobile?<div className="input-group">
+            {userAuth && (
+              <span type="text" style={{ color: "#00ADEF", fontSize:'12px', margin:"0% 30%"}}>
+                {userAuth.obj.companyName ? (
+                  <>
+                    <b>{userAuth.obj.companyName}</b>
+                  </>
+                ) : (
+                  <>
+                    Welcome,{" "}
+                    <b>
+                      {userAuth.obj.firstName} {userAuth.obj.lastName}
+                    </b>
+                  </>
+                )}
+              </span>
+            )}
+          </div>:''}
         {/* Topbar Navbar */}
         <ul className="navbar-nav ml-auto">
           {/* Nav Item - Alerts */}

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import fertilityImage from "../../assets/images/auth/fertilityImage.svg";
 import docDashBoardIcon from "../../assets/images/sidebar/docDashboardIcon.png";
 import { useSelector } from "react-redux";
@@ -21,6 +21,7 @@ export const GetSideBar = () => {
   const [visible, setVisible] = useState(false);
   const { Sider } = Layout;
   const isMobile = useMediaQuery({ maxWidth: 767 });
+  const location = useLocation();
 
   const showDrawer = () => {
     setVisible(true);
@@ -30,11 +31,44 @@ export const GetSideBar = () => {
     setVisible(false);
   };
 
+  const getSelectedKey = () => {
+    switch (location.pathname) {
+      case "/patient":
+        return "1";
+      case "/assessment":
+        return "2";
+      case "/chart":
+        return "3";
+      case "/patient/appointment":
+        return "6";
+      case "/plans":
+        return "7";
+      case "/second-plan":
+        return "8";
+      case "/pre-plan":
+        return "9";
+      default:
+        return "1"; 
+    }
+  };
+
+  const getSelectedDoctorKey = () => {
+    switch (location.pathname) {
+      case "/doctor":
+        return "1";
+      case "/doctor/appointment":
+        return "2";
+      case "/doctor/appointments":
+        return "3";
+      default:
+        return "1"; 
+    }
+  };
   const menuItems = (
     <Menu
       theme="light"
-      defaultSelectedKeys={["1"]}
-      mode="inline"
+      selectedKeys={[getSelectedKey()]}
+            mode="inline"
       onClick={onClose}
     >
       <Menu.Item key="1" icon={<QrcodeOutlined />}>
@@ -80,7 +114,7 @@ export const GetSideBar = () => {
   const doctorMenuItems = (
     <Menu
       theme="light"
-      defaultSelectedKeys={["1"]}
+      selectedKeys={[getSelectedDoctorKey()]}
       mode="inline"
       onClick={onClose}
     >
@@ -92,6 +126,11 @@ export const GetSideBar = () => {
       <Menu.Item key="2" icon={<CalendarTwoTone />}>
         <NavLink to="/doctor/appointment" style={{ textDecoration: "none" }}>
           <span className="no-underline">CALENDAR</span>
+        </NavLink>
+      </Menu.Item>
+      <Menu.Item key="3" icon={<OrderedListOutlined />}>
+        <NavLink to="/doctor/appointments" style={{ textDecoration: "none" }}>
+          <span>APPOINTMENTS</span>
         </NavLink>
       </Menu.Item>
     </Menu>
@@ -229,17 +268,19 @@ export const GetSideBar = () => {
           {isMobile ? (
             <>
               <Button
-                type="primary"
-                onClick={showDrawer}
-                className="sidebar-toggle"
-                style={{
-                  marginBottom: 16,
-                  position: "absolute",
-                  top: 15,
-                  left: 30,
-                  zIndex: 9,
-                }}
-              >
+              type="primary"
+              onClick={showDrawer}
+              className="sidebar-toggle"
+              style={{
+                marginBottom: 16,
+                position: "absolute",
+                top: 30,
+                left: 30,
+                zIndex: 9,
+                background:"none",
+                color:"#00ADEF"
+              }}
+            >
                 <MenuOutlined />
               </Button>
               <Drawer
@@ -386,9 +427,11 @@ export const GetSideBar = () => {
               style={{
                 marginBottom: 16,
                 position: "absolute",
-                top: 15,
+                top: 30,
                 left: 30,
                 zIndex: 9,
+                background:"none",
+                color:"#00ADEF"
               }}
             >
               <MenuOutlined />

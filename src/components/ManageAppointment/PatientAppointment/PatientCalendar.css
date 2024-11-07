@@ -9,16 +9,33 @@
   color: #000 !important;
   text-align: center;
 }
-
+.fc-today-button:not(:disabled){
+ float: none !important;
+}
 .fc-event-green {
   background-color: green !important;
   color: #000 !important;
   text-align: center;
 }
 
+.fc-event-coach-booked{
+  background-color: #cef2f4 !important;
+  color: #000 !important;
+  text-align: center;
+}
+.fc-event-coach-available{
+    background-color: #111F4A !important;
+    color: #fff !important;
+    text-align: center;
+  
+}
+.fc .fc-button:not(:disabled){
+border: none !important;
+}
+
 .fc-event-lilac {
   background-color: #B46DB880 !important;
-  color: #000 !important;
+  color: #fff !important;
   text-align: center;
 }
 
@@ -53,6 +70,15 @@
 
 .fc .fc-toolbar {
   align-items: stretch;
+}
+.fc-button {
+  border: none !important; /* Removes the border */
+  box-shadow: none !important; /* Removes any shadow effects */
+}
+
+.fc-button:hover {
+  border: none !important; /* Ensures no border appears on hover */
+  box-shadow: none !important;
 }
 
 @media (max-width: 768px) {

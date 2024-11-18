@@ -17,3 +17,28 @@
 .ant-steps-item{
   width: 30%;
 }
+.ant-steps.ant-steps-dot.ant-steps-small .ant-steps-item-tail{
+  top: 8px !important;
+}
+.ant-steps-item-title{
+height: 150px;
+flex-direction: column;
+}
+ul{
+  padding: 0%;
+}
+.ant-steps.ant-steps-dot.ant-steps-small .ant-steps-item-content {
+  width: 100% !important;
+}
+@media (max-width: 768px) {
+  .ant-steps.ant-steps-dot.ant-steps-small .ant-steps-item-content {
+    width: 100px !important;
+  } 
+  .ant-steps.ant-steps-dot.ant-steps-small .ant-steps-item-content {
+    width: 100% ;
+  }
+}
+
+.ant-steps-item-title{
+  display: block !important; 
+}

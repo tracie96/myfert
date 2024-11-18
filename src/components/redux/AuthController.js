@@ -4,6 +4,7 @@ import { handleApiError, getResponse } from "../Handler/ExceptionHandler";
 import { toast } from "react-toastify";
 import { baseUrl } from "../../utils/envAccess";
 import { message } from "antd";
+import { keysToRemove } from "../../utils/constant";
 
 //#region Login, Logout
 export const postLogin = createAsyncThunk(
@@ -290,7 +291,9 @@ export const logoutAction = createAsyncThunk(
   async (payload, { rejectWithValue, getState }) => {
     const user = getState()?.auth?.userAuth;
     try {
-      localStorage.removeItem("userInfo");
+      keysToRemove.forEach(key => {
+        localStorage.removeItem(key);
+      });
       console.log("Logging out user:", user);
       return { success: true };
     } catch (error) {
@@ -512,7 +515,7 @@ export const postSubscriptionPayment = createAsyncThunk(
       if (response?.data?.status) {
         console.log(
           "Subscription controller Update (postSubscriptionPayment) :" +
-            responseBack,
+          responseBack,
         );
         toast.success(response?.data?.message);
       }
@@ -544,7 +547,7 @@ export const createCheckoutSession = createAsyncThunk(
       if (response?.data?.status) {
         console.log(
           "create-checkout-session controller Update (postSubscriptionPayment) :" +
-            responseBack,
+          responseBack,
         );
         toast.success(response?.data?.message);
       }

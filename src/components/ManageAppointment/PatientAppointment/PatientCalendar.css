@@ -14,7 +14,7 @@
 }
 .fc-event-green {
   background-color: green !important;
-  color: #000 !important;
+  color: #fff !important;
   text-align: center;
 }
 
@@ -34,9 +34,10 @@ border: none !important;
 }
 
 .fc-event-lilac {
-  background-color: #B46DB880 !important;
+  background-color: #B46DB8 !important;
   color: #fff !important;
   text-align: center;
+  cursor: pointer;
 }
 
 .fc-event-time {
@@ -85,6 +86,7 @@ border: none !important;
   .fc-toolbar {
     flex-direction: column;
   }
+
   .fc-prev-button {
     background: none !important;
     border: none !important;
@@ -98,7 +100,9 @@ border: none !important;
     color: #000 !important;
     margin-top: -45% !important;
   }
- 
+ .fc-daygrid-dot-event .fc-event-title {
+  display: none;
+ }
   .fc .fc-toolbar-title {
     font-size: 12px !important;
     margin-left: 10px !important;
@@ -135,7 +139,7 @@ border: none !important;
   }
 
   .fc-event-lilac {
-    background-color: #B46DB880 !important;
+    background-color: #B46DB8 !important;
     color: #B46DB880 !important;
     text-align: center;
     width: 20px;
@@ -146,7 +150,19 @@ border: none !important;
     align-items: center;
     justify-content: center;
   }
-
+  .fc-event-green {
+    background-color: green !important;
+    color: #000 !important;
+    text-align: center;
+    width: 20px;
+    height: 20px;
+    margin: auto !important;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
   .fc .fc-daygrid-event {
     font-size: 12px;
   }

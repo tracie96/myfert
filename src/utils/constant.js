@@ -1,0 +1,1 @@
+export const keysToRemove = ['userInfo', 'appointmentAvailability','zohoClientId', 'DoctorAppointmentData'];

@@ -23,9 +23,9 @@ const SubscriptionPlanV2 = () => {
   const { Title, Text } = Typography;
   const renderContent = () => {
     switch (currentStep) {
-      case 1:
-        return <SecondPlan />;
       case 2:
+        return <SecondPlan />;
+      case 3:
         return <CompletePlan />;
       default:
         return (

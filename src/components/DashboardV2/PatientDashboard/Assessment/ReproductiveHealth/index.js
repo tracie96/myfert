@@ -173,7 +173,7 @@ const questions = [
   {
     question:
       "Do you have menstrual pain around the time of your period? (Check all that apply)?",
-    type: "checkbox",
+    type: "radio",
     title: "Cycle Information",
     name: "is_menstrual_pain",
     options: [

@@ -78,6 +78,7 @@ export default function DoctorDash() {
     dispatch(getZohoClientID()).then((response) => {
       if (getZohoClientID.fulfilled.match(response)) {
         console.log("Zoho Client Id-", response.payload);
+        localStorage.setItem("zohoClientId", JSON.stringify(response.payload));
       } else {
         console.error("Failed to fetch the Zoho client Id-", response.error.message);
       }
@@ -118,7 +119,6 @@ export default function DoctorDash() {
       (item.flag && item.flag.toString().toLowerCase().includes(searchQuery.toLowerCase())) // Check if flag exists before calling toString()
     );
   }, [searchQuery, dataWithIds]);
-
 
   const columns = useMemo(
     () => [
@@ -172,15 +172,64 @@ export default function DoctorDash() {
         title: "Action",
         key: "action",
         render: (_, record) => (
-          <SwitchWrapper
-            onChange={(checked, e) => handleSwitch(checked, record, e)}
-          />
+          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+            <SwitchWrapper
+              onChange={(checked, e) => handleSwitch(checked, record, e)}
+            />
+          
+          </div>
+        ),
+      },
+      {
+        title: "Second Step",
+        key: "action1",
+        render: (_, record) => (
+          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+          
+            {/* Second Plan Switch */}
+            <Switch
+              onChange={(checked) => handleSecondPlanSwitch(checked, record)}
+           
+            />
+           
+          </div>
+        ),
+      },
+      {
+        title: "Third Step",
+        key: "action2",
+        render: (_, record) => (
+          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+        
+            {/* Third Plan Switch */}
+            <Switch
+              onChange={(checked) => handleThirdPlanSwitch(checked, record)}
+           
+            />
+          </div>
         ),
       },
     ],
-    [],
+    []
   );
-
+  
+  // Handlers for the additional switches
+  const handleSecondPlanSwitch = (checked, record) => {
+    console.log(
+      `Second Plan switch ${checked ? "enabled" : "disabled"} for record:`,
+      record
+    );
+  };
+  
+  const handleThirdPlanSwitch = (checked, record) => {
+    console.log(
+      `Third Plan switch ${checked ? "enabled" : "disabled"} for record:`,
+      record
+    );
+  };
+  
+  
+  
   const PatientList = React.memo(
     () => (
       <Card>

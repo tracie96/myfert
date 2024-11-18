@@ -10,6 +10,8 @@ const QuestionnaireGrid = ({ cards, onCardClick }) => {
   };
 
   useEffect(() => {}, [cards]);
+ 
+  const currentStep = localStorage.getItem("currentStep");
 
   return (
     <Container className="mt-4 assessment-container">
@@ -50,14 +52,14 @@ const QuestionnaireGrid = ({ cards, onCardClick }) => {
               <div
                 className="mt-4"
                 onClick={
-                  index === 0 ? () => handleCardClick(card?.component) : null
-                } // Only make card with index 0 clickable
+                  currentStep >= 4 || index === 0 ? () => handleCardClick(card?.component) : null
+                } 
                 style={{
                   cursor: "pointer",
                   borderRadius: "20px",
                   overflow: "hidden",
                   backgroundColor: "#F2AA93",
-                  opacity: index === 0 ? 1 : 0.5,
+                  opacity: currentStep >= 4 || index === 0 ? 1 : 0.5,
                   position: "relative",
                   padding: "20px",
                   width: isMobile ? "100%" : "300px",

@@ -202,7 +202,6 @@ import Appointment from "../ManageAppointment/Appointment";
 //#endregion
 
 //#region Manange Learn
-import Learn from "../ManageLearn/Learn";
 //#endregion
 
 //#region Manange SubscriptionPlan
@@ -237,6 +236,7 @@ import PaymentDetails from "../../screens/Subscription/payment-details";
 import PrePlan from "../../screens/Subscription/pre-plan";
 import SecondPlan from "../../screens/Subscription/second-plan";
 import AppointmentList from "../DashboardV2/DoctorDashboard/AppointmentList";
+import LearnInfo from "../DashboardV2/PatientDashboard/Learning";
 
 //#endregion
 
@@ -328,6 +328,8 @@ const getRouter = createBrowserRouter(
         <Route path="questionnaire/10" element={<Readiness />} />
         <Route path="questionnaire/11" element={<ReproductiveHealth />} />
         <Route path="profile" element={<Profile />} />
+        <Route path="info-hub" element={<LearnInfo />} />
+
         <Route path="update-password" element={<Password />} />
         #region Medication
         <Route path="medication" element={<Medication />} />
@@ -340,7 +342,7 @@ const getRouter = createBrowserRouter(
 
         <Route path="appointment" element={<PatientAppointment />} />
         #endregion #region Learn
-        <Route path="learn" element={<Learn />} />
+        <Route path="learn" element={<LearnInfo />} />
         #endregion #region subscription-plan
         <Route path="preview-link" element={<PreviewLink />} />
         #endregion

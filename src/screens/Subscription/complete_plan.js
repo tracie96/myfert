@@ -29,7 +29,7 @@ const CompletePlan = () => {
     navigate("/payment-details", { state });
   };
   return (
-    <Row gutter={16} style={{ padding: "0 5%" }}>
+    <Row gutter={16} style={{ padding: "0 2%" }}>
       <Col xs={20} sm={14}>
         <p style={{ color: "#335CAD", fontSize: "16px" }}>SUBSCRIPTION PLANS</p>
         <p style={{ padding: "5% 0" }}>
@@ -173,7 +173,7 @@ const CompletePlan = () => {
                         display: "flex",
                         justifyContent: "space-between",
                         marginBottom: 10,
-                        flexWrap: "wrap", // Ensure it wraps on smaller screens
+                        flexWrap: "wrap", 
                       }}
                     >
                       <div style={{ flex: "1 1 300px", marginBottom: "10px" }}>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Row, Col, Button, Spin, Steps, Avatar, Divider ,Modal} from "antd";
+import { Row, Col, Button, Spin, Steps, Avatar, Divider, Modal, Switch } from "antd";
 import PeriodCycleTracker from "../../../screens/PatientDashboard/Cycle/cycle";
 import { useDispatch } from "react-redux";
 import { getMiraInfo } from "../../redux/AuthController"; // Ensure this path is correct
@@ -79,6 +79,25 @@ const customDot = (dot, { status, index }) => (
     {index + 1}
   </span>
 );
+const assessCustomDot = (dot, { status, index }) => (
+  <span
+    style={{
+      backgroundColor: status === "process" ? "#008000" : "#E2E8F0",
+      padding: "5px",
+      borderRadius: "50%",
+      color: status === "process" ? "#fff" : "#000",
+      fontWeight: "bold",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      width: "24px",
+      height: "24px",
+    }}
+  >
+    {index + 1}
+  </span>
+);
+
 export default function PatDash() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -86,6 +105,8 @@ export default function PatDash() {
   const [cycleInfo, setCycleInfo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
+  const [userCurrentStep] = useState(0);
+
   const [error, setError] = useState(null);
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const [viewAll, setViewAll] = useState(false);
@@ -146,8 +167,6 @@ export default function PatDash() {
     fetchMiraInfo();
   }, [dispatch]);
 
-  localStorage.setItem("currentStep", 1);
-
   useEffect(() => {
     const storedStep = localStorage.getItem("currentStep");
     if (storedStep) {
@@ -159,6 +178,16 @@ export default function PatDash() {
     localStorage.setItem("currentStep", step);
   };
 
+  const handleSwitchChange = (checked) => {
+    if (checked) {
+      setCurrentStep(4);
+      localStorage.setItem("currentStep", 4)
+    } else {
+      setCurrentStep(3);
+      localStorage.setItem("currentStep", 3)
+
+    }
+  };
   return (
     <div>
       <Row gutter={16} style={{ padding: "0 5%" }}>
@@ -184,100 +213,341 @@ export default function PatDash() {
         <h3 style={{ color: "#335CAD", fontSize: "20px" }}>
           Initial Sign Up Steps:
         </h3>
-        <Steps
-          current={currentStep}
-          progressDot={customDot}
-          direction={isMobile ? "horizontal" : "horizontal"}
-          responsive={false}
-          size="small"
-          style={{
-            marginTop: "20px",
-            display: "flex",
-            flexDirection: isMobile ? "row" : "row",
-            alignItems: isMobile ? "flex-start" : "center",
-
-          }}
-          items={[
-            {
-              title: (
-                <div style={{ textAlign: "left", fontSize: isMobile ? '12px' : '14px' }}>
-                  <span>Complete Reproductive Health Assessment Form</span>
-                  <div style={{ marginTop: "10px" }}>
-                    <Button
-                      onClick={() => {
-                        handleStepChange(1);
-                        navigate("/assessment");
-                      }}
-                      type="primary"
-                      style={{
-                        backgroundColor: "#C2E6F8",
-                        borderColor: "none",
-                        color: "#00ADEF",
-                        width: isMobile ? '80px' : '',
-                        fontSize: isMobile ? '8px' : ''
-                      }}
-                    >
-                      ASSESS
-                    </Button>
-                  </div>
-                </div>
-              ),
-            },
-            {
-              title: (
-                <div style={{ textAlign: "left", fontSize: isMobile ? '12px' : '14px' }}>
-                  <span>Book Free 15-minute Consult with Fertility Coach</span>
-                  <div style={{ marginTop: isMobile ? "30px" : "10px" }}>
-                    <Button
-                      type="primary"
-                      onClick={() => {
-                        navigate("/patient/appointment");
-                      }}
-                      disabled={currentStep < 1}
-                      style={{
-                        backgroundColor: "#C2E6F8",
-                        borderColor: "none",
-                        color: "#00ADEF",
-                        width: isMobile ? '80px' : '',
-                        fontSize: isMobile ? '8px' : ''
-                      }}
-                    >
-                      APPT
-                    </Button>
-                  </div>
-                </div>
-              ),
-            },
-            {
-              title: (
-                <div style={{ textAlign: "left", fontSize: isMobile ? '12px' : '14px' }}>
-                  <span>Continue Care by visiting the Plan section for Initial Assessment</span>
-                  <div style={{ marginTop: "10px" }}>
-                    <Button
-                      type="primary"
-                      onClick={() => {
-                        navigate("/plans");
-                      }}
-                      disabled={currentStep < 2}
-                      style={{
-                        backgroundColor: "#C2E6F8",
-                        borderColor: "none",
-                        color: "#00ADEF",
-                        width: isMobile ? '80px' : '',
-                        fontSize: isMobile ? '8px' : ''
-                      }}
-                    >
-                      PLAN
-                    </Button>
-                  </div>
-                </div>
-              ),
-
-            },
-
-          ]
-          }
+        <Switch
+          onChange={handleSwitchChange}
         />
+        {currentStep < 4 ?
+          <Steps
+            current={currentStep}
+            progressDot={customDot}
+            direction={isMobile ? "horizontal" : "horizontal"}
+            responsive={false}
+            size="small"
+            style={{
+              marginTop: "20px",
+              display: "flex",
+              flexDirection: isMobile ? "row" : "row",
+              alignItems: isMobile ? "flex-start" : "center",
+
+            }}
+            items={[
+              {
+                title: (
+                  <div style={{ textAlign: "left", fontSize: isMobile ? '12px' : '14px' }}>
+                    <span>Complete Reproductive Health Assessment Form</span>
+                    <div style={{ marginTop: "10px" }}>
+                      <Button
+                        onClick={() => {
+                          handleStepChange(1);
+                          navigate("/assessment");
+                        }}
+                        type="primary"
+                        style={{
+                          backgroundColor: "#C2E6F8",
+                          borderColor: "none",
+                          color: "#00ADEF",
+                          width: isMobile ? '80px' : '',
+                          fontSize: isMobile ? '8px' : ''
+                        }}
+                      >
+                        ASSESS
+                      </Button>
+                    </div>
+                  </div>
+                ),
+              },
+              {
+                title: (
+                  <div style={{ textAlign: "left", fontSize: isMobile ? '12px' : '14px' }}>
+                    <span>Book Free 15-minute Consult with Fertility Coach</span>
+                    <div style={{ marginTop: isMobile ? "30px" : "10px" }}>
+                      <Button
+                        type="primary"
+                        onClick={() => {
+                          navigate("/patient/appointment");
+                        }}
+                        disabled={currentStep < 1}
+                        style={{
+                          backgroundColor: "#C2E6F8",
+                          borderColor: "none",
+                          color: "#00ADEF",
+                          width: isMobile ? '80px' : '',
+                          fontSize: isMobile ? '8px' : ''
+                        }}
+                      >
+                        APPT
+                      </Button>
+                    </div>
+                  </div>
+                ),
+              },
+              {
+                title: (
+                  <div style={{ textAlign: "left", fontSize: isMobile ? '12px' : '14px' }}>
+                    <span>Continue Care by visiting the Plan section for Initial Assessment</span>
+                    <div style={{ marginTop: "10px" }}>
+                      <Button
+                        type="primary"
+                        onClick={() => {
+                          navigate("/plans");
+                        }}
+                        disabled={currentStep < 2}
+                        style={{
+                          backgroundColor: "#C2E6F8",
+                          borderColor: "none",
+                          color: "#00ADEF",
+                          width: isMobile ? '80px' : '',
+                          fontSize: isMobile ? '8px' : ''
+                        }}
+                      >
+                        PLAN
+                      </Button>
+                    </div>
+                  </div>
+                ),
+
+              },
+
+            ]
+            }
+          />
+
+          :
+
+          <Steps
+            current={userCurrentStep}
+            progressDot={assessCustomDot}
+            direction={isMobile ? "horizontal" : "horizontal"}
+            responsive={false}
+
+            size="small"
+            style={{
+              marginTop: "20px",
+              display: "flex",
+              flexDirection: isMobile ? "row" : "row",
+              alignItems: isMobile ? "flex-start" : "",
+              overflowX: "auto",
+            }}
+            items={[
+              {
+                title: (
+                  <div style={{ textAlign: "left", fontSize: isMobile ? '12px' : '14px', display: "flex", flexDirection: "column", height: "100%" }}>
+                    <span>Complete General Intake Form</span>
+                    <div style={{ marginTop: "auto", display: "flex", flexDirection: "row", gap: "10px" }}> {/* Adjusted this line */}
+                      <Button
+                        onClick={() => {
+                          handleStepChange(1);
+                          navigate("/assessment");
+                        }}
+                        type="primary"
+                        style={{
+                          backgroundColor: "#C2E6F8",
+                          borderColor: "none",
+                          color: "#00ADEF",
+                          width: isMobile ? '80px' : '',
+                          fontSize: isMobile ? '8px' : ''
+                        }}
+                      >
+                        ASSESS
+                      </Button>
+                      {/* Add other buttons here if needed */}
+                    </div>
+                  </div>
+
+                ),
+              },
+              {
+                title: (
+                  <div style={{ textAlign: "left", fontSize: isMobile ? '12px' : '14px', display: "flex", flexDirection: "column", height: "100%" }}>
+                    <span>Watch the Cycle Tracking Video</span>
+                    <div style={{ marginTop: "auto", display: "flex", flexDirection: "row", gap: "10px" }}> {/* Adjusted this line */}
+                      <Button
+                        type="primary"
+                        onClick={() => {
+                          navigate("/patient/appointment");
+                        }}
+                        disabled
+                        style={{
+                          backgroundColor: "#C2E6F8",
+                          borderColor: "none",
+                          color: "#00ADEF",
+                          width: isMobile ? '80px' : '',
+                          fontSize: isMobile ? '8px' : ''
+                        }}
+                      >
+                        LEARN
+                      </Button>
+                    </div>
+                  </div>
+                ),
+              },
+              {
+                title: (
+                  <div style={{ textAlign: "left", fontSize: isMobile ? '12px' : '14px', display: "flex", flexDirection: "column", height: "100%" }}>
+                    <ul>
+                      <li>Book appt #1 with Fertility Coach</li>
+                      <li>Book 1 hour appt with Clinician</li>
+                    </ul>
+                    <div style={{ marginTop: "auto" }}>
+                      <Button
+                        type="primary"
+                        onClick={() => {
+                          navigate("/plans");
+                        }}
+                        disabled
+                        style={{
+                          backgroundColor: "#C2E6F8",
+                          borderColor: "none",
+                          color: "#00ADEF",
+                          width: isMobile ? '100%' : '',
+                          fontSize: isMobile ? '8px' : ''
+                        }}
+                      >
+                        PLAN
+                      </Button>
+                    </div>
+                  </div>
+                ),
+              },
+              {
+                title: (
+                  <div style={{ textAlign: "left", fontSize: isMobile ? '12px' : '14px', display: "flex", flexDirection: "column", height: "100%" }}>
+                    <span>Day 3 Bloodwork</span>
+                    <div style={{ marginTop: "auto" }}> {/* Adjusted this line */}
+                      <Button
+                        type="primary"
+                        onClick={() => {
+                          navigate("/plans");
+                        }}
+                        disabled
+                        style={{
+                          backgroundColor: "#C2E6F8",
+                          borderColor: "none",
+                          color: "#00ADEF",
+                          width: isMobile ? '80px' : '',
+                          fontSize: isMobile ? '8px' : ''
+                        }}
+                      >
+                        LABS
+                      </Button>
+                    </div>
+                  </div>
+
+                ),
+
+              },
+              {
+                title: (
+                  <div style={{ textAlign: "left", fontSize: isMobile ? '12px' : '14px', display: "flex", flexDirection: "column", height: "100%" }}>
+                    <span>Book appt #2 with Fertility Coach</span>
+                    <div style={{ marginTop: "auto" }}>
+                      <Button
+                        type="primary"
+                        onClick={() => {
+                          navigate("/plans");
+                        }}
+                        disabled
+                        style={{
+                          backgroundColor: "#C2E6F8",
+                          borderColor: "none",
+                          color: "#00ADEF",
+                          width: isMobile ? '80px' : '',
+                          fontSize: isMobile ? '8px' : ''
+                        }}
+                      >
+                        APPT
+                      </Button>
+                    </div>
+                  </div>
+
+                ),
+
+              },
+              {
+                title: (
+                  <div style={{ textAlign: "left", fontSize: isMobile ? '12px' : '14px', display: "flex", flexDirection: "column", height: "100%" }}>
+                    <span>Peak +7 Bloodwork</span>
+                    <div style={{ marginTop: "auto" }}>
+                      <Button
+                        type="primary"
+                        onClick={() => {
+                          navigate("/plans");
+                        }}
+                        disabled
+                        style={{
+                          backgroundColor: "#C2E6F8",
+                          borderColor: "none",
+                          color: "#00ADEF",
+                          width: isMobile ? '80px' : '',
+                          fontSize: isMobile ? '8px' : ''
+                        }}
+                      >
+                        LABS
+                      </Button>
+                    </div>
+                  </div>
+
+                ),
+
+              },
+              {
+                title: (
+                  <div style={{ textAlign: "left", fontSize: isMobile ? '12px' : '14px', display: "flex", flexDirection: "column", height: "100%" }}>
+                    <span>Book 30 minute appt with Clinician</span>
+                    <div style={{ marginTop: "auto" }}>
+                      <Button
+                        type="primary"
+                        onClick={() => {
+                          navigate("/plans");
+                        }}
+                        disabled
+                        style={{
+                          backgroundColor: "#C2E6F8",
+                          borderColor: "none",
+                          color: "#00ADEF",
+                          width: isMobile ? '80px' : '',
+                          fontSize: isMobile ? '8px' : ''
+                        }}
+                      >
+                        APPT
+                      </Button>
+                    </div>
+                  </div>
+
+                ),
+
+              },
+              {
+                title: (
+                  <div style={{ textAlign: "left", fontSize: isMobile ? '12px' : '14px', display: "flex", flexDirection: "column", height: "100%" }}>
+                    <span>Continue Care</span>
+                    <div style={{ marginTop: "auto" }}>
+                      <Button
+                        type="primary"
+                        onClick={() => {
+                          navigate("/plans");
+                        }}
+                        disabled
+                        style={{
+                          backgroundColor: "#C2E6F8",
+                          borderColor: "none",
+                          color: "#00ADEF",
+                          width: isMobile ? '80px' : '',
+                          fontSize: isMobile ? '8px' : ''
+                        }}
+                      >
+                        PLANS
+                      </Button>
+                    </div>
+                  </div>
+
+                ),
+
+              },
+            ]
+            }
+          />
+        }
       </div>
       <Row gutter={16}>
 
@@ -307,134 +577,134 @@ export default function PatDash() {
               </h3>
             </div>
             <div
-                style={{
-                  padding: "16px 16px",
-                  borderRadius: 12,
-                  borderWidth: "1px",
-                  marginTop: -10,
-                  backgroundColor: "#fff",
-                  borderColor: "#C2E6F8",
-                  borderStyle: "solid",
-                }}
-              >
-            {isMobile ? (
-              <div
-                style={{
-                  order: isMobile ? 2 : 1,
-                }}
-              >
-               
-
-                {filteredAppointments.length > 0 ? (
-                  <div>
-                    {visibleAppointments.map((appointment, index) => (
-                      <>
-                      <div
-                        key={index} // Add a unique key for each appointment
-                        style={{
-                          width: "100%",
-                          background: index % 2 === 0 ? "#F2AA9380" : "#B46DB8",
-                          borderRadius: "10px",
-                        }}
-                      >
-                        <div
-                          style={{
-                            width: "100%",
-                            background: "#fff",
-                            display: "flex",
-                            justifyContent: "space-between",
-                            boxSizing: "border-box",
-                            float: 'right',
-                            marginBottom:'20px'
-                          }}
-                        >
-                          {/* Column 1 - Clinician Info */}
-                          <Col style={{ fontSize: "8px" }} span={8}>
-                            <div style={{ fontSize: "8px", display: "flex", alignItems: "center" }}>
-                              <Avatar style={{ marginRight: "10px" }} icon={<UserOutlined />} />
-                              <div style={{ fontWeight: "bold", color: "#F2AA93" }}>Doctor Doctor</div>
-                            </div>
-                            <div style={{ color: "#7D7D7D" }}>Ongoing Care Plan - Initial Care Team Appointment</div>
-                          </Col>
-
-                          {/* Column 2 - Date and Time Info */}
-                          <Col style={{ flex: 1, textAlign: "left", fontSize: '10px' }} span={10}>
-                            <div style={{ display: "flex", alignItems: "center", marginBottom: "5px" }}>
-                              <CalendarOutlined style={{ marginRight: "8px" }} />
-                              {new Date(appointment.date).toLocaleDateString("en-US", {
-                                month: "short",
-                                day: "numeric",
-                                year: "numeric",
-                              })}
-                            </div>
-                            <div style={{ display: "flex", alignItems: "center", marginBottom: "5px" }}>
-                              <ClockCircleOutlined style={{ marginRight: "8px" }} /> 9:00 AM - 9:30 AM
-                            </div>
-                            <div style={{ display: "flex", alignItems: "center" }}>
-                              <EnvironmentOutlined style={{ marginRight: "8px" }} /> Virtual or In-person
-                            </div>
-                          </Col>
-
-                          {/* Column 3 - Join Button */}
-                          <Col span={4} style={{ display: "flex", flexDirection: 'column', alignItems: "center", fontSize: '8px' }}>
-                            <MoreOutlined style={{ fontSize: '10px' }} />
-                            <Button type="primary" style={{ width: 60, marginTop: '10px', borderRadius: 5 }} icon={<VideoCameraOutlined />}>
-                              <span style={{ fontSize: '8px' }}>JOIN</span>
-                            </Button>
-                          </Col>
-                        </div>
-                      </div>
-                      <Divider/>
-                      </>
-                    ))}
-
-                    {filteredAppointments.length > 2 && (
-                      <div
-                        onClick={handleViewAll}
-                        style={{ color: "#1E90FF", cursor: "pointer" }} // Added cursor for better UX
-                      >
-                        {viewAll ? (
-                          <UpOutlined style={{ marginRight: "10px" }} />
-                        ) : (
-                          <DownOutlined style={{ marginRight: "10px" }} />
-                        )}
-                        {viewAll ? "View Less" : "View All"}
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div>
-                    <p>You have no upcoming appointments.</p>
-                    <p>Earliest appointment you can schedule with your provider is:</p>
-                  </div>
-                )}
-              </div>
-            ) :
-              <div
-               
-              >
-                <p>
-                  You have no upcoming appointments.
-                </p>
-
-                <Button
-                  type="primary"
+              style={{
+                padding: "16px 16px",
+                borderRadius: 12,
+                borderWidth: "1px",
+                marginTop: -10,
+                backgroundColor: "#fff",
+                borderColor: "#C2E6F8",
+                borderStyle: "solid",
+              }}
+            >
+              {isMobile ? (
+                <div
                   style={{
-                    height: 46,
-                    boxShadow: "0px 4px 4px 0px #00000040",
-                    background: "#00ADEF",
+                    order: isMobile ? 2 : 1,
                   }}
                 >
-                  <div
-                    style={{ color: "white", textDecoration: "none" }}
-                    onClick={()=>navigate('/patient/appointment')}
+
+
+                  {filteredAppointments.length > 0 ? (
+                    <div>
+                      {visibleAppointments.map((appointment, index) => (
+                        <>
+                          <div
+                            key={index} // Add a unique key for each appointment
+                            style={{
+                              width: "100%",
+                              background: index % 2 === 0 ? "#F2AA9380" : "#B46DB8",
+                              borderRadius: "10px",
+                            }}
+                          >
+                            <div
+                              style={{
+                                width: "100%",
+                                background: "#fff",
+                                display: "flex",
+                                justifyContent: "space-between",
+                                boxSizing: "border-box",
+                                float: 'right',
+                                marginBottom: '20px'
+                              }}
+                            >
+                              {/* Column 1 - Clinician Info */}
+                              <Col style={{ fontSize: "8px" }} span={8}>
+                                <div style={{ fontSize: "8px", display: "flex", alignItems: "center" }}>
+                                  <Avatar style={{ marginRight: "10px" }} icon={<UserOutlined />} />
+                                  <div style={{ fontWeight: "bold", color: "#F2AA93" }}>Doctor Doctor</div>
+                                </div>
+                                <div style={{ color: "#7D7D7D" }}>Ongoing Care Plan - Initial Care Team Appointment</div>
+                              </Col>
+
+                              {/* Column 2 - Date and Time Info */}
+                              <Col style={{ flex: 1, textAlign: "left", fontSize: '10px' }} span={10}>
+                                <div style={{ display: "flex", alignItems: "center", marginBottom: "5px" }}>
+                                  <CalendarOutlined style={{ marginRight: "8px" }} />
+                                  {new Date(appointment.date).toLocaleDateString("en-US", {
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                  })}
+                                </div>
+                                <div style={{ display: "flex", alignItems: "center", marginBottom: "5px" }}>
+                                  <ClockCircleOutlined style={{ marginRight: "8px" }} /> 9:00 AM - 9:30 AM
+                                </div>
+                                <div style={{ display: "flex", alignItems: "center" }}>
+                                  <EnvironmentOutlined style={{ marginRight: "8px" }} /> Virtual or In-person
+                                </div>
+                              </Col>
+
+                              {/* Column 3 - Join Button */}
+                              <Col span={4} style={{ display: "flex", flexDirection: 'column', alignItems: "center", fontSize: '8px' }}>
+                                <MoreOutlined style={{ fontSize: '10px' }} />
+                                <Button type="primary" style={{ width: 60, marginTop: '10px', borderRadius: 5 }} icon={<VideoCameraOutlined />}>
+                                  <span style={{ fontSize: '8px' }}>JOIN</span>
+                                </Button>
+                              </Col>
+                            </div>
+                          </div>
+                          <Divider />
+                        </>
+                      ))}
+
+                      {filteredAppointments.length > 2 && (
+                        <div
+                          onClick={handleViewAll}
+                          style={{ color: "#1E90FF", cursor: "pointer" }} // Added cursor for better UX
+                        >
+                          {viewAll ? (
+                            <UpOutlined style={{ marginRight: "10px" }} />
+                          ) : (
+                            <DownOutlined style={{ marginRight: "10px" }} />
+                          )}
+                          {viewAll ? "View Less" : "View All"}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div>
+                      <p>You have no upcoming appointments.</p>
+                      <p>Earliest appointment you can schedule with your provider is:</p>
+                    </div>
+                  )}
+                </div>
+              ) :
+                <div
+
+                >
+                  <p>
+                    You have no upcoming appointments.
+                  </p>
+
+                  <Button
+                    type="primary"
+                    style={{
+                      height: 46,
+                      boxShadow: "0px 4px 4px 0px #00000040",
+                      background: "#00ADEF",
+                    }}
                   >
-                    Book Appointment
-                  </div>
-                </Button>
-              </div>
+                    <div
+                      style={{ color: "white", textDecoration: "none" }}
+                      onClick={() => navigate('/patient/appointment')}
+                    >
+                      Book Appointment
+                    </div>
+                  </Button>
+                </div>
               }
-              </div>
+            </div>
           </div>
           <div className="mt-4">
             <div
@@ -516,80 +786,80 @@ export default function PatDash() {
             </div>
           </div>
         </Col>
-        {isMobile? <>    
-        
-        {/* Fixed button on the right */}
-        <img
-          onClick={showCyleModal}
-          src={MiraButton}
-          style={{
-            position: "fixed",
-            right: "0px",
-            bottom: "20px",
-            top:"320px",
-            backgroundColor: "#C2E6F8",
-            borderColor: "none",
-            color: "#00ADEF",
-            transform: "rotateY(360deg)", 
-          }}
-          alt="mira"
-        >
-        </img>
+        {isMobile ? <>
 
-      {/* Modal for cycle info */}
-      <Modal
-        title="Cycle Information"
-        visible={isModalVisible}
-        onOk={handleOk}
-        centered
-        onCancel={handleCancel}
-        footer={[
-          <Button key="cancel" onClick={handleCancel}>
-            Cancel
-          </Button>,
-        ]}
-      >
-        {cycleInfo && cycleInfo.cycleInfo ? (
-          <PeriodCycleTracker cycleInfo={cycleInfo} dummyInfo={cycleData} />
-        ) : (
-          <p>No cycle information available.</p>
-        )}
-      </Modal>
-    </>: 
-        <Col
-          xs={24}
-          md={12}
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <div style={{ width: "100%" }}>
-            {loading ? (
-              <Spin
-                indicator={
-                  <LoadingOutlined
-                    style={{
-                      fontSize: 100,
-                      alignItems: "center",
-                      margin: "auto",
-                    }}
-                    spin
-                  />
-                }
-              />
-            ) : error ? (
-              <p style={{ color: "red" }}>Error: {error}</p>
-            ) : cycleInfo && cycleInfo.cycleInfo ? ( // Correct condition to check if cycleInfo is available
+          {/* Fixed button on the right */}
+          <img
+            onClick={showCyleModal}
+            src={MiraButton}
+            style={{
+              position: "fixed",
+              right: "0px",
+              bottom: "20px",
+              top: "320px",
+              backgroundColor: "#C2E6F8",
+              borderColor: "none",
+              color: "#00ADEF",
+              transform: "rotateY(360deg)",
+            }}
+            alt="mira"
+          >
+          </img>
+
+          {/* Modal for cycle info */}
+          <Modal
+            title="Cycle Information"
+            visible={isModalVisible}
+            onOk={handleOk}
+            centered
+            onCancel={handleCancel}
+            footer={[
+              <Button key="cancel" onClick={handleCancel}>
+                Cancel
+              </Button>,
+            ]}
+          >
+            {cycleInfo && cycleInfo.cycleInfo ? (
               <PeriodCycleTracker cycleInfo={cycleInfo} dummyInfo={cycleData} />
             ) : (
-              <p style={{ textAlign: "center" }}>
-                No cycle information available.
-              </p> // This message shows when cycleInfo is null or undefined
+              <p>No cycle information available.</p>
             )}
-          </div>
-        </Col>}
+          </Modal>
+        </> :
+          <Col
+            xs={24}
+            md={12}
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <div style={{ width: "100%" }}>
+              {loading ? (
+                <Spin
+                  indicator={
+                    <LoadingOutlined
+                      style={{
+                        fontSize: 100,
+                        alignItems: "center",
+                        margin: "auto",
+                      }}
+                      spin
+                    />
+                  }
+                />
+              ) : error ? (
+                <p style={{ color: "red" }}>Error: {error}</p>
+              ) : cycleInfo && cycleInfo.cycleInfo ? ( // Correct condition to check if cycleInfo is available
+                <PeriodCycleTracker cycleInfo={cycleInfo} dummyInfo={cycleData} />
+              ) : (
+                <p style={{ textAlign: "center" }}>
+                  No cycle information available.
+                </p> // This message shows when cycleInfo is null or undefined
+              )}
+            </div>
+          </Col>}
       </Row>
     </div>
   );

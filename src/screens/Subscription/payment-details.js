@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
-import { Row, Col, Button, Typography, Divider } from "antd";
+import { Row, Col, Button, Typography, Divider, message } from "antd";
 import { useMediaQuery } from "react-responsive";
 import { LeftOutlined } from "@ant-design/icons";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { checkoutSubscription, markSubscriptionSuccess } from "../../components/redux/subscriptionSlice";
+import { markSubscriptionSuccess } from "../../components/redux/subscriptionSlice";
 const { Title, Text } = Typography;
 
 const PaymentDetails = () => {
@@ -34,12 +34,15 @@ const PaymentDetails = () => {
 
   const handleConfirmPurchase = (id) => {
     console.log(id)
-    dispatch(checkoutSubscription(id)).then((result) => {
-      console.log({result})
-      if (result.payload) {
-        window.location.href = result.payload; 
-      }
-    });
+    localStorage.setItem("currentStep", 4)
+    message.success("Payment disaled temporily for testing purpose")
+    navigate("/")
+    // dispatch(checkoutSubscription(id)).then((result) => {
+    //   console.log({result})
+    //   if (result.payload) {
+    //     window.location.href = result.payload; 
+    //   }
+    // });
   };
 
   return (

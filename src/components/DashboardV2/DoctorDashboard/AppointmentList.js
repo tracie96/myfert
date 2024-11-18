@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Row, Col, Tabs, Button, Table, Card, Input, message } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { getUpcomingAppointments, getZohoClientID } from "../../redux/doctorSlice";
+import { cancelAppointment, createMeeting, getUpcomingAppointments, getZohoClientID } from "../../redux/doctorSlice";
 
 export default function AppointmentList() {
   const dispatch = useDispatch();
@@ -15,6 +15,13 @@ export default function AppointmentList() {
     sortOrder: null,
   });
   const [searchParam, setSearchParam] = useState("");
+  // let [searchParams] = useSearchParams();
+  // const grantAuthCode = searchParams.get('code')
+  const zohoClientId = JSON.parse(localStorage.getItem("zohoClientId"));
+  const baseURL_Grant_Auth = 'https://accounts.zoho.com/oauth/v2/auth';
+  const grantAuthScope = 'ZohoMeeting.meeting.CREATE';
+  const grantAuthRedirectURI = 'http://localhost:3001/doctor/appointments';
+  // const appointmentData = useSelector((state) => state.doctor.appointmentForDoctor?.records);
 
   useEffect(() => {
     dispatch(getUpcomingAppointments());
@@ -39,6 +46,95 @@ export default function AppointmentList() {
     });
   }, []);
 
+
+  // useEffect(()=>{
+  //   if(!appointmentData || appointmentData.length === 0 ) {
+  //     dispatch(getUpcomingAppointmentForDoctor()).then((res)=>{
+  //       if(getUpcomingAppointmentForDoctor.fulfilled.match(res)) {
+  //         localStorage.setItem("DoctorAppointmentData", JSON.stringify(res.payload.records));
+  //       }
+  //     })
+  //   }
+  // },[dispatch, appointmentData])
+
+  // const handleAcceptAppointment = () => {
+  //   let doctorAppointments = appointmentData || JSON.parse(localStorage.getItem("DoctorAppointmentData"));
+  //   if (doctorAppointments?.length > 0) {
+  //     const appointmentID = doctorAppointments?.[0]?.appointId;
+  //     localStorage.setItem('meetingAppointmentID', appointmentID);
+  //     window.location.href=`${baseURL_Grant_Auth}?scope=${grantAuthScope}&client_id=${zohoClientId}&response_type=code&redirect_uri=${grantAuthRedirectURI}&access_type=offline&state=opaque&prompt=consent`
+  //     // handleCreateMeeting(appointmentID)
+  //   } else {
+  //     console.log('Appointment data is not yet available.');
+  //   }
+  // }
+  // const handleCreateMeeting = async(appointmentID) => {
+  //   if(!grantAuthCode) return;
+  //     // const retrievedId = localStorage.getItem('meetingAppointmentID');
+  //     await dispatch(createMeeting({appointmentId: appointmentID, code: grantAuthCode})).then((result)=>{
+  //       console.log('create meeting response',result)
+  //       if(createMeeting.fulfilled.match(result)) {
+  //         message.success("Meeting is scheduled successfully!");
+  //       } else {
+  //         message.error(result.error.message || "failed to set appointment")
+  //       }
+  //     })
+  // }
+
+  const handleCreateMeeting = useCallback(async (appointmentID, grantAuthCode) => {
+    if (!grantAuthCode || !appointmentID) {
+      console.error('Missing authorization code or appointment ID');
+      return;
+    }
+    
+    // Call your create meeting action
+    await dispatch(createMeeting({ appointmentId: appointmentID, code: grantAuthCode }))
+      .then((result) => {
+        console.log('create meeting response', result);
+        if (createMeeting.fulfilled.match(result)) {
+          message.success("Meeting is scheduled successfully!");
+        } else {
+          message.error(result.error.message || "Failed to set appointment");
+        }
+      });
+  }, [dispatch]); 
+
+  useEffect(() => {
+    // Check if the page has returned from the redirect with an authorization code
+    const urlParams = new URLSearchParams(window.location.search);
+    const grantAuthCode = urlParams.get('code'); // Get authorization code from the URL
+    if (grantAuthCode) {
+      // Once redirected back and the code is available, call handleCreateMeeting
+      const appointmentID = localStorage.getItem('meetingAppID');
+      handleCreateMeeting(appointmentID, window.location.search);
+    }
+  }, [handleCreateMeeting]);  // Empty dependency array ensures this effect runs only once when the component mounts (or when the URL changes)
+
+ 
+  // useEffect(()=>{
+  //   if(!grantAuthCode) return;
+  //   async function sendGrantCode () {
+  //   let doctorAppointments = appointmentData || JSON.parse(localStorage.getItem("DoctorAppointmentData"));
+  //   const appointmentID = doctorAppointments?.[0]?.appointId;
+  //     // const retrievedId = localStorage.getItem('meetingAppointmentID');
+  //     await dispatch(createMeeting({appointmentId: appointmentID, code: grantAuthCode})).then((result)=>{
+  //       if(createMeeting.fulfilled.match(result)) {
+  //         message.success("Meeting is scheduled successfully!");
+  //         const currentDate = new Date(selectedDate);
+  //         const startMonth = currentDate.getMonth() + 1;
+  //         const startYear = currentDate.getFullYear();
+  //         fetchAndSetAvailability(startYear, startMonth);
+  //         // ToDo: joinMeeting()
+  //         // joinMeeting();
+  //       } else {
+  //         message.error(result.error.message || "failed to set appointment")
+  //       }
+  //     })
+     
+  //   }
+  //   sendGrantCode();
+  // },[grantAuthCode, dispatch,fetchAndSetAvailability,selectedDate])
+
   const handleSearch = useCallback((value) => {
     setSearchParam(value);
   }, []);
@@ -57,13 +153,29 @@ export default function AppointmentList() {
         item.appointDate.toLowerCase().includes(searchParam.toLowerCase())
     );
   }, [searchParam, upcomingAppointments]);
-  const handleAccept = (appointId) => {
+  const handleAccept = useCallback((appointId) => {
     message.success(`Appointment ${appointId} accepted.`);
-  };
+    localStorage.setItem('meetingAppID', appointId);
+    window.location.href = `${baseURL_Grant_Auth}?scope=${grantAuthScope}&client_id=${zohoClientId}&response_type=code&redirect_uri=${grantAuthRedirectURI}&access_type=offline&state=opaque&prompt=consent`;
+  }, [baseURL_Grant_Auth, grantAuthScope, zohoClientId, grantAuthRedirectURI]);
+  
+  
 
-  const handleReject = (appointId) => {
-    message.error(`Appointment ${appointId} rejected.`);
-  };
+  const handleReject = useCallback(
+    (appointId) => {
+      message.error(`Appointment ${appointId} rejected.`);
+      dispatch(cancelAppointment(appointId)).then((result) => {
+        if (cancelAppointment.fulfilled.match(result)) {
+          message.success("Meeting is canceled successfully!");
+          dispatch(getUpcomingAppointments());
+        } else {
+          message.error(result.error.message || "Failed to cancel the appointment");
+        }
+      });
+    },
+    [dispatch] 
+  );
+
   const columns = useMemo(
     () => [
       {
@@ -122,8 +234,26 @@ export default function AppointmentList() {
           </Row>
         ),
       },
+      // {
+      //   title: "Accept Meeting",
+      //   key: "accept",
+      //   render: (_,record) => (
+      //     <Button
+      //     type="primary"
+      //     onClick={handleAcceptAppointment}
+      //     style={{
+      //       backgroundColor: "#1E90FF",
+      //       border: "none",
+      //       width: "100%",
+      //       marginBottom: "8px",
+      //     }}
+      //     >
+      //       Accept
+      //     </Button>
+      //   ),
+      // },
     ],
-    []
+    [handleAccept,handleReject]
   );
 
   return (

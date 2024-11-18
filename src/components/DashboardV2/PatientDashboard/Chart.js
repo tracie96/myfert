@@ -13,6 +13,7 @@ import {
 import annotationPlugin from "chartjs-plugin-annotation";
 import { getMiraInfo } from "../../redux/AuthController";
 import { useDispatch } from "react-redux";
+import { Card, Col, Row } from "antd";
 
 ChartJS.register(
   LineElement,
@@ -31,28 +32,24 @@ const HormoneChart = () => {
   const [cycleInfo, setCycleInfo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
+  
   useEffect(() => {
     const fetchMiraInfo = async () => {
       setLoading(true);
       setError(null);
-
       try {
         const resultAction = await dispatch(getMiraInfo());
-
         if (getMiraInfo.fulfilled.match(resultAction)) {
           const hormones = resultAction.payload.hormones || [];
           const parsedHormones = hormones.map((hormone) => ({
             lh: parseFloat(hormone.lh) || 0,
             e3g: parseFloat(hormone.e3g) || 0,
             pdg: parseFloat(hormone.pdg) || 0,
-            test_time: hormone.test_time
-              ? new Date(hormone.test_time)
-              : new Date(),
+            test_time: hormone.test_time ? new Date(hormone.test_time) : new Date(),
           }));
-
-          setHormoneData(parsedHormones);
-          setCycleInfo(resultAction.payload.cycleInfo); // Set cycle info here
+          
+             setHormoneData(parsedHormones);
+          setCycleInfo(resultAction.payload.cycleInfo); 
         } else {
           setError(resultAction.payload || "Failed to fetch Mira Info");
         }
@@ -63,13 +60,22 @@ const HormoneChart = () => {
         setLoading(false);
       }
     };
-
     fetchMiraInfo();
   }, [dispatch]);
 
-  const labels = Array.from({ length: 62 }, (_, i) => {
-    const day = i % 31;
-    return day.toString();
+  const periodStart = new Date("2024-11-1"); 
+  const labels = Array.from({ length: 62 }, (_, i) => (i % 31) + 1);
+  const lhData = Array(62).fill(null);
+  const e3gData = Array(62).fill(null);
+  const pdgData = Array(62).fill(null);
+
+  hormoneData.forEach((entry) => {
+    const dayIndex = Math.floor((new Date(entry.test_time) - periodStart) / (1000 * 60 * 60 * 24));
+    if (dayIndex >= 0 && dayIndex < lhData.length) {
+      lhData[dayIndex] = entry.lh;
+      e3gData[dayIndex] = entry.e3g;
+      pdgData[dayIndex] = entry.pdg;
+    }
   });
 
   const data = {
@@ -77,18 +83,14 @@ const HormoneChart = () => {
     datasets: [
       {
         label: "Luteinizing Hormone (LH)",
-        data: hormoneData.length
-          ? hormoneData.map((entry) => entry.lh)
-          : Array(30).fill(0),
+        data: lhData,
         borderColor: "rgba(3, 154, 243, 0.8)",
         borderWidth: 2,
         fill: false,
       },
       {
         label: "Estradiol (E3G)",
-        data: hormoneData.length
-          ? hormoneData.map((entry) => entry.e3g)
-          : Array(30).fill(0),
+        data: e3gData,
         borderColor: "rgba(75, 192, 192, 0.7)",
         borderWidth: 2,
         borderDash: [5, 5],
@@ -96,9 +98,7 @@ const HormoneChart = () => {
       },
       {
         label: "Pregnanediol 3 Glucuronide (PdG)",
-        data: hormoneData.length
-          ? hormoneData.map((entry) => entry.pdg)
-          : Array(30).fill(0),
+        data: pdgData,
         borderColor: "rgba(255, 99, 132, 0.7)",
         borderWidth: 2,
         borderDash: [5, 5],
@@ -109,17 +109,17 @@ const HormoneChart = () => {
 
   const getDayIndex = (date) => {
     if (!cycleInfo) return 0;
-    const periodStart = new Date("2024-08-01");
+    const periodStart = new Date("2024-11-01");
     const targetDate = new Date(date);
     return Math.floor((targetDate - periodStart) / (1000 * 60 * 60 * 24)) + 1;
   };
 
   const options = {
     responsive: true,
-    maintainAspectRatio: false, // Disable fixed aspect ratio for responsive charts
+    maintainAspectRatio: false, 
     scales: {
+      
       y: {
-        beginAtZero: true,
         title: {
           display: true,
           text: "Hormone Levels",
@@ -128,13 +128,11 @@ const HormoneChart = () => {
       x: {
         title: {
           display: true,
-          text: "Cycle (2)",
+          text: "Day in Cycle",
         },
         ticks: {
-          callback: function (value, index) {
-            return labels[index]; // Use the labels array directly
-          },
-        },
+          autoSkip: true,
+        }
       },
     },
     plugins: {
@@ -189,9 +187,32 @@ const HormoneChart = () => {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div style={{ position: "relative", width: "100%", height: "400px" }}>
-      <Line data={data} options={options} />
+    <>
+    <div style={{ overflowX: "auto", paddingBottom: "10px" }}>
+      <div style={{ position: "relative", width: window.innerWidth < 600 ? "1000px" : "100%", height: "400px" }}>
+        <Line data={data} options={options} />
+
+      
     </div>
+    </div>
+      <div style={{ marginTop: "20px" }}>
+      <Row gutter={[16, 16]}>
+        {hormoneData?.map((entry, index) => (
+          <Col key={index} xs={24} sm={12} md={8} lg={6}>
+            <Card
+              title={entry.test_time.toLocaleDateString()}
+              bordered={true}
+              style={{ textAlign: "center" }}
+            >
+              <p><strong>LH:</strong> {entry.lh}</p>
+              <p><strong>E3G:</strong> {entry.e3g}</p>
+              <p><strong>PdG:</strong> {entry.pdg}</p>
+            </Card>
+          </Col>
+        ))}
+      </Row>
+    </div>
+    </>
   );
 };
 

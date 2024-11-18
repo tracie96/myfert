@@ -120,6 +120,28 @@ export const getZohoClientID = createAsyncThunk(
   },
 );
 
+export const getUpcomingAppointmentForDoctor = createAsyncThunk(
+  "doctor/getUpcomingAppointmentForDoctor",
+  async (_, { rejectWithValue, getState }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        Accept: "text/plain",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+    try {
+      const response = await axios.get(
+        `${baseUrl}Doctor/GetUpComingAppointment`,
+        config,
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error?.response?.data);
+    }
+  },
+);
+
 export const getAvailableDoctorsForDate = createAsyncThunk(
   "availability/getAvailableDoctorsForDate",
   async (date, { rejectWithValue, getState }) => {
@@ -208,6 +230,38 @@ export const codeGrantAuth = createAsyncThunk(
   },
 );
 
+export const createMeeting = createAsyncThunk(
+  "user/createMeeting",
+  async ( {appointmentId,code}, { rejectWithValue, getState, dispatch }) => {
+    const users = getState()?.authentication?.userAuth;
+    const appointmentIdNumber = Number(appointmentId);
+    const config = {
+      headers: {
+        Authorization: `Bearer ${users?.obj?.token}`,
+      },
+    };
+
+    try {
+      const url = `${baseUrl}Doctor/CreateZohoMeeting`;
+      //  const locationUrl = new URLSearchParams(code);
+      //  const currentLocation = locationUrl.get('location');
+      //  console.log('updatedCode',currentLocation)
+      //  if(currentLocation == 'in') {
+      //    locationUrl.set('location', 'ca'); // Set the location to 'CA' for Canada
+      //  }
+
+      //  // Reconstruct the full URL with the updated location
+      //  const updatedCode = locationUrl.toString();
+ 
+      const response = await axios.post(url, {appointmentId: appointmentIdNumber, url:code}, config);
+      const responseBack = getResponse(response, dispatch, users);
+      return responseBack;
+    } catch (error) {
+      handleApiError(error?.response?.data, dispatch, users);
+    }
+  },
+);
+
 export const cancelPatientAppointment = createAsyncThunk(
   "availability/cancelPatientAppointment",
   async (appointmentId, { rejectWithValue, getState }) => {
@@ -254,6 +308,29 @@ export const getUpcomingAppointments = createAsyncThunk(
   }
 );
 
+export const cancelAppointment = createAsyncThunk(
+  "doctor/cancelAppointment",
+  async (appointmentId, { rejectWithValue, getState }) => {
+    const user = getState()?.authentication?.userAuth; 
+    const config = {
+      headers: {
+        Accept: "text/plain",
+        Authorization: `Bearer ${user?.obj?.token}`, 
+      },
+    };
+
+    try {
+      const response = await axios.get(
+        `${baseUrl}Doctor/CancelAppointment/${appointmentId}`,
+        config
+      );
+      return response.data; 
+    } catch (error) {
+      return rejectWithValue(error?.response?.data); 
+    }
+  }
+);
+
 
 const doctorSlices = createSlice({
   name: "doctor",
@@ -263,6 +340,7 @@ const doctorSlices = createSlice({
     appStatus: null,
     appStatusCode: null,
     serverErr: null,
+    upcomingPatientAppointment: [],
     doctorAvailability: {},
   },
   extraReducers: (builder) => {
@@ -297,8 +375,27 @@ const doctorSlices = createSlice({
       state.appStatus = true;
       state.appErr = null;
       state.serverErr = null;
+      state.upcomingPatientAppointment = state.upcomingPatientAppointment.filter(
+        (appointment) => appointment.appointId !== action.payload
+      );
     });
     builder.addCase(cancelPatientAppointment.rejected, (state, action) => {
+      state.loading = false;
+      state.appErr = action.payload;
+      state.serverErr = action.error;
+    });
+    builder.addCase(cancelAppointment.pending, (state, action) => {
+      state.loading = true;
+      state.appErr = null;
+      state.serverErr = null;
+    });
+    builder.addCase(cancelAppointment.fulfilled, (state, action) => {
+      state.loading = false;
+      state.appStatus = true;
+      state.appErr = null;
+      state.serverErr = null;
+    });
+    builder.addCase(cancelAppointment.rejected, (state, action) => {
       state.loading = false;
       state.appErr = action.payload;
       state.serverErr = action.error;
@@ -314,9 +411,21 @@ const doctorSlices = createSlice({
     });
     builder.addCase(getZohoClientID.fulfilled, (state, action) => {
       state.loading = false;
-      state.availableDoctors = action.payload;
+      state.zohoClientId = action.payload;
     });
     builder.addCase(getZohoClientID.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
+    builder.addCase(getUpcomingAppointmentForDoctor.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+    builder.addCase(getUpcomingAppointmentForDoctor.fulfilled, (state, action) => {
+      state.loading = false;
+      state.appointmentForDoctor = action.payload;
+    });
+    builder.addCase(getUpcomingAppointmentForDoctor.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload;
     });
@@ -390,6 +499,19 @@ const doctorSlices = createSlice({
         state.loading = false;
         state.appErr = action.payload || "Failed to fetch upcoming appointments";
       });
+    builder.addCase(createMeeting.fulfilled, (state, action) => {
+      state.loading = false;
+      state.createMeetingData = action.payload; 
+      state.error = null;
+    });
+    builder.addCase(createMeeting.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload; 
+    });
+    builder.addCase(createMeeting.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    });
   },
 });
 

@@ -1145,7 +1145,7 @@ const CurrentLifeStyle = ({ onComplete }) => {
         </h3>
         {renderInput(questions[currentQuestionIndex])}
         <div
-          style={{ margin: "20px 0", marginTop: isMobile ? 50 : 200,height:40 ,position:'fixed'}}
+          style={{ margin: "20px 0", marginTop: isMobile ? 50 : 200,height:40 ,position:'fixedp'}}
           className="button_group"
         >
           {isMobile ? (

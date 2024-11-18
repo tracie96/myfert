@@ -106,32 +106,47 @@ console.log({filteredAppointments})
     let endDate;
     startDate = currentWeek.startOf("week").format("YYYY-MM-DD");
     endDate = currentWeek.endOf("week").format("YYYY-MM-DD");
-
-    const formattedAvailability = Object.entries(availability).map(
-      ([day, slots], index) => ({
-        dayOfWeek: index,
-        availabilityPeriod: slots.map((slot) => ({
-          start: {
-            hour: moment(slot.startTime, "HH:mm").hour(),
-            minute: moment(slot.startTime, "HH:mm").minute(),
-          },
-          end: {
-            hour: moment(slot.endTime, "HH:mm").hour(),
-            minute: moment(slot.endTime, "HH:mm").minute(),
-          },
-        })),
+  
+    const formattedAvailability = Object.entries(availability).map(([day, slots], index) => ({
+      dayOfWeek: index,
+      availabilityPeriod: slots.flatMap((slot) => {
+        const intervals = [];
+        let start = moment(slot.startTime, "HH:mm");
+        const end = moment(slot.endTime, "HH:mm");
+  
+        while (start.isBefore(end)) {
+          const intervalEnd = moment(start).add(15, "minutes");
+          if (intervalEnd.isAfter(end)) break; 
+  
+          intervals.push({
+            start: {
+              hour: start.hour(),
+              minute: start.minute(),
+            },
+            end: {
+              hour: intervalEnd.hour(),
+              minute: intervalEnd.minute(),
+            },
+          });
+  
+          start = intervalEnd;
+        }
+  
+        return intervals;
       }),
-    );
-
+    }));
+  
     const payload = {
       startDate,
       endDate,
       availability: formattedAvailability,
     };
+  
     setRefreshCalendar((prev) => prev + 1);
     dispatch(submitAvailability(payload));
     onClose();
   };
+  
 
   const isPastDay = (day) => {
     const currentDayIndex = moment().day();

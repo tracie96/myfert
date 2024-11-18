@@ -292,7 +292,6 @@ const PatientSignup = () => {
     // Merge current form values with the ones accumulated in the state
     const allFormValues = { ...formValues, ...values };
 
-    // Check username and email validation statuses
     if (
       (usernameCheck && usernameCheck.statusCode !== "200") ||
       (emailCheck && emailCheck.statusCode !== "200")
@@ -302,20 +301,19 @@ const PatientSignup = () => {
     }
 
     try {
-      setShowSpinner(true); // Show spinner during async operation
+      setShowSpinner(true); 
 
       setTimeout(() => {
         setEmailVerificationVisible(true);
       }, 1000);
-console.log(allFormValues)
-      // Prepare processed values for submission
+      console.log(allFormValues)
       const processedValues = {
         ...allFormValues,
         country: selectedCountry.label,
         stateProvince: selectedState.label,
         isAssessor: false,
         ExistOnMira: false,
-        height: parseFloat(allFormValues.Height) || 0, // Ensure height is a number
+        height: parseFloat(allFormValues.Height) || 0, 
         weight: parseFloat(allFormValues.Weight) || 0,
         MetricImperial: unit === "Metric",
         Pronouns: selectedPronoun?.value,
@@ -342,7 +340,7 @@ console.log(allFormValues)
         "There was an error submitting the form. Please try again.",
       );
     } finally {
-      setShowSpinner(false); // Hide spinner once async operation completes
+      setShowSpinner(false); 
     }
   };
 
@@ -436,7 +434,6 @@ console.log(allFormValues)
       {required && <span style={{ color: "red" }}>*</span>}
     </>
   );
-  //Mira Prompts
   const [radioValue, setRadioValue] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -444,7 +441,6 @@ console.log(allFormValues)
     const value = e.target.value;
     setRadioValue(value);
 
-    // Show modal if 'No' is selected
     if (value === "No") {
       setIsModalVisible(true);
     }
@@ -907,13 +903,7 @@ console.log(allFormValues)
                                       <FormItem
                                         label="Apartment, Suite, etc"
                                         name="appartmentOrSuite"
-                                        rules={[
-                                          {
-                                            required: true,
-                                            message:
-                                              "! Please enter your Apartment number",
-                                          },
-                                        ]}
+                                       
                                       >
                                         <Input placeholder="Enter Apartment Or Suite" />
                                       </FormItem>
@@ -939,12 +929,16 @@ console.log(allFormValues)
                                             (option) =>
                                               option.value ===
                                               selectedCountry?.value,
-                                          )} // Display the selected country
+                                          )} 
                                           onChange={(selectedOption) => {
-                                            setSelectedCountry(selectedOption); // Store the whole object (label and value)
+                                            setSelectedCountry(selectedOption); 
                                             form.setFieldsValue({
                                               country: selectedOption,
-                                            }); // Store the object in the form
+                                            });
+                                            setSelectedState(null); 
+                                            form.setFieldsValue({
+                                              stateProvince: null, 
+                                            });
                                           }}
                                         />
                                       </FormItem>
@@ -971,7 +965,7 @@ console.log(allFormValues)
                                             (option) =>
                                               option.value ===
                                               selectedState?.value,
-                                          )} // Display the selected state
+                                          )} 
                                           onChange={(selectedOption) => {
                                             setSelectedState(selectedOption);
                                             form.setFieldsValue({

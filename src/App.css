@@ -141,7 +141,9 @@ hr {
   height: 0;
   overflow: visible;
 }
-
+input, textarea, select, button {
+  font-size: 16px;
+}
 h1,
 h2,
 h3,

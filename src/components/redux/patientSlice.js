@@ -56,8 +56,6 @@ export const getAvailability = createAsyncThunk(
   "availability/getAvailability",
   async ({ doctorId, month, year }, { rejectWithValue, getState }) => {
     const user = getState()?.authentication?.userAuth;
-    console.log({ user });
-
     const config = {
       headers: {
         Accept: "text/plain",
@@ -130,7 +128,6 @@ export const updateAppointment = createAsyncThunk(
       );
       const responseBack = getResponse(response, dispatch, user);
       if (response?.data?.status) {
-        console.log("Appointment Update:", responseBack);
         toast.success(response?.data?.message);
       }
       return responseBack;
@@ -164,6 +161,29 @@ export const getPreviewLinkList = createAsyncThunk(
       handleApiError(error?.response?.data, dispatch, user);
     }
   },
+);
+
+export const getUpcomingAppointments = createAsyncThunk(
+  "patient/getUpcomingAppointments",
+  async (_, { rejectWithValue, getState }) => {
+    const user = getState()?.authentication?.userAuth; 
+    const config = {
+      headers: {
+        Accept: "text/plain",
+        Authorization: `Bearer ${user?.obj?.token}`, 
+      },
+    };
+
+    try {
+      const response = await axios.get(
+        `${baseUrl}Patient/GetUpComingAppointment`,
+        config
+      );
+      return response.data; 
+    } catch (error) {
+      return rejectWithValue(error?.response?.data); 
+    }
+  }
 );
 //#endregion
 
@@ -304,6 +324,22 @@ const patientSlices = createSlice({
       state.patientAppStatus = action?.payload?.status;
       state.patientAppStatusCode = action?.payload?.statusCode;
     });
+    builder
+    .addCase(getUpcomingAppointments.pending, (state,action) => {
+      state.patientLoading = false;
+      state.patientAppErr = action?.payload?.message;
+      state.patientServerErr = action?.error?.message;
+      state.patientAppStatus = action?.payload?.status;
+      state.patientAppStatusCode = action?.payload?.statusCode;
+    })
+    .addCase(getUpcomingAppointments.fulfilled, (state, action) => {
+      state.patientLoading = false;
+      state.patientAppErr = action?.payload?.message;
+      state.patientServerErr = action?.error?.message;
+      state.upcomingPatientAppointment = action?.payload?.records;
+      state.patientAppStatusCode = action?.payload?.statusCode;
+    })
+
   },
 });
 

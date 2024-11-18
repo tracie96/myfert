@@ -18,13 +18,12 @@ import {
   RightOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
-  cancelPatientAppointment,
   getAvailableDoctorsForDate,
   getDoctorAvailabilityForDay,
   getPatientAvailability,
-  codeGrantAuth,
+  setPatientAppointment,
 } from "../../redux/doctorSlice";
 import { List, Card, Typography, Tag, message } from "antd";
 import "./PatientCalendar.css";
@@ -46,8 +45,6 @@ const PatientCalendar = ({ selectedProviders }) => {
   );
   
   const [apptEvents, setApptEvents] = useState([]);
-  let [searchParams] = useSearchParams();
-  const grantAuthCode = searchParams.get('code')
   const {
     availableDoctors,
     doctorAvailability,
@@ -57,11 +54,7 @@ const PatientCalendar = ({ selectedProviders }) => {
   } = useSelector((state) => state?.doctor);
 
   const [newAppointmentList, setAppointmentList] = useState([]);
-  const [meetingAppointmentID, setMeetingAppointmentID] = useState('');
-  const baseURL_Grant_Auth = 'https://accounts.zoho.com/oauth/v2/auth';
-  const grantAuthScope = 'ZohoMeeting.meeting.CREATE';
-  const grantAuthClientID = '1000.NK6Q7FL6QZ4ATXWQLWVLREUFSXUXNJ';
-  const grantAuthRedirectURI = 'http://localhost:3001/patient/appointment';
+console.log({newAppointmentList})
   useEffect(() => {
     setAppointmentList(appointmentList);
   }, [appointmentList]);
@@ -71,7 +64,6 @@ const PatientCalendar = ({ selectedProviders }) => {
   const [unavailableDates, setUnavailableDates] = useState([
     16, 17, 18, 19, 20, 24,
   ]);
-  console.log({ newAppointmentList })
   console.log(loading, error, setUnavailableDates);
   const [open, setOpen] = useState(false);
 
@@ -118,7 +110,6 @@ const PatientCalendar = ({ selectedProviders }) => {
     setSelectedClinician(null);
   };
   const showDrawer = () => {
-    console.log({ selectedDate });
     if (unavailableDates.includes(selectedDate)) {
       return;
     }
@@ -202,70 +193,23 @@ const PatientCalendar = ({ selectedProviders }) => {
     [dispatch, updateCalendarEvents] 
   );
   const handleAppointmentClick = (appointment) => {
+    console.log("Appointment CLicked", appointment);
     const { appointmentId } = appointment;
-    localStorage.setItem('meetingAppointmentID', appointmentId);
-    window.location.href=`${baseURL_Grant_Auth}?scope=${grantAuthScope}&client_id=${grantAuthClientID}&response_type=code&redirect_uri=${grantAuthRedirectURI}&access_type=offline&state=opaque&prompt=consent`
-    setMeetingAppointmentID(appointmentId)
+    dispatch(setPatientAppointment(appointmentId)).then((result) => {
+      if (setPatientAppointment.fulfilled.match(result)) {
+        message.success("Appointment successfully set!");
+        setIsModalVisible(false);
 
+        const currentDate = new Date(selectedDate);
+        const startMonth = currentDate.getMonth() + 1;
+        const startYear = currentDate.getFullYear();
+        fetchAndSetAvailability(startYear, startMonth); 
+      } else {
+        message.error(result.error.message || "Failed to set appointment");
+      }
+    });
   };
 
-
-  useEffect(()=>{
-    if(!grantAuthCode) return;
-    async function sendGrantCode () {
-      const retrievedId = localStorage.getItem('meetingAppointmentID');
-      await dispatch(codeGrantAuth({appointmentId: retrievedId, code: grantAuthCode})).then((result)=>{
-        if(codeGrantAuth.fulfilled.match(result)) {
-          message.success("Appointment is set successfully!");
-          const currentDate = new Date(selectedDate);
-          const startMonth = currentDate.getMonth() + 1;
-          const startYear = currentDate.getFullYear();
-          fetchAndSetAvailability(startYear, startMonth);
-          // ToDo: joinMeeting()
-          // joinMeeting();
-        } else {
-          message.error(result.error.message || "failed to set appointment")
-        }
-      })
-     
-    }
-    sendGrantCode();
-  },[grantAuthCode, meetingAppointmentID, dispatch,fetchAndSetAvailability,selectedDate])
-
-  // Function to generate 15-minute interval time slots
-  const generateTimeSlots = (startHour, startMinute, endHour, endMinute) => {
-    let timeSlots = [];
-    let currentHour = startHour;
-    let currentMinute = startMinute;
-
-    while (
-      currentHour < endHour ||
-      (currentHour === endHour && currentMinute < endMinute)
-    ) {
-      let nextMinute = currentMinute + 15;
-      let nextHour = currentHour;
-
-      if (nextMinute >= 60) {
-        nextMinute -= 60;
-        nextHour += 1;
-      }
-
-      if (
-        nextHour < endHour ||
-        (nextHour === endHour && nextMinute <= endMinute)
-      ) {
-        timeSlots.push({
-          start: { hour: currentHour, minute: currentMinute },
-          end: { hour: nextHour, minute: nextMinute },
-        });
-      }
-
-      currentHour = nextHour;
-      currentMinute = nextMinute;
-    }
-
-    return timeSlots;
-  };
 
   const formatTime = (hour, minute) => {
     const isPM = hour >= 12;
@@ -274,8 +218,6 @@ const PatientCalendar = ({ selectedProviders }) => {
     const period = isPM ? "PM" : "AM";
     return `${formattedHour}:${formattedMinute} ${period}`;
   };
-  const selectedDateObj = new Date(selectedDate);
-  const selectedDay = selectedDateObj.getDate();
   const addAppointmentValidationSchema = Yup.object().shape({
     title: Yup.string().min(3).required("Title is required"),
     description: Yup.string().min(10).required("Description is required"),
@@ -310,21 +252,12 @@ const PatientCalendar = ({ selectedProviders }) => {
     },
   });
 
-  const ZOHO_AUTH_URL = "https://accounts.zoho.com/oauth/v2/auth";
   const ZOHO_TOKEN_URL = "https://accounts.zoho.com/oauth/v2/token";
-  const ZOHO_MEETING_API_URL = "https://meeting.zoho.com/api/v2/meetings";
 
-  const redirectToZohoAuth = () => {
-    const clientId = process.env.REACT_APP_CLIENT_ID;
-    const redirectUri = process.env.REACT_APP_REDIRECT_URI;
-    const authUrl = `${ZOHO_AUTH_URL}?scope=ZohoMeeting.meeting.&client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&access_type=offline`;
-    window.location.href = authUrl;
-  };
-
+ 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const authCode = urlParams.get("code");
-    console.log(authCode, "authcode");
     if (authCode) {
       fetchAccessToken(authCode);
     }
@@ -366,57 +299,59 @@ const PatientCalendar = ({ selectedProviders }) => {
     }
   };
 
-  const handleJoinCall = async (appointmentId) => {
-    alert(`Joining call`);
-    console.log(`Joining call for appointment ID: ${appointmentId}`);
+  // const handleJoinCall = async (appointmentId) => {
+  //   localStorage.setItem("currentStep",3);
 
-    const token = localStorage.getItem("zoho_access_token");
+  //   alert(`Joining call`);
+  //   console.log(`Joining call for appointment ID: ${appointmentId}`);
 
-    if (!token) {
-      console.log("Access token not found, redirecting for OAuth...");
-      redirectToZohoAuth();
-      return;
-    }
+  //   const token = localStorage.getItem("zoho_access_token");
 
-    try {
-      const response = await axios.get(
-        `${ZOHO_MEETING_API_URL}/${appointmentId}`,
-        {
-          headers: {
-            Authorization: `Zoho-oauthtoken ${token}`,
-          },
-        }
-      );
+  //   if (!token) {
+  //     console.log("Access token not found, redirecting for OAuth...");
+  //     redirectToZohoAuth();
+  //     return;
+  //   }
 
-      const meetingData = response.data;
-      const joinUrl = meetingData.join_url;
-      window.open(joinUrl, "_blank");
-    } catch (error) {
-      console.error("Error joining the meeting:", error);
-      alert("Failed to join the meeting. Please try again.");
-    }
-  };
+  //   try {
+  //     const response = await axios.get(
+  //       `${ZOHO_MEETING_API_URL}/${appointmentId}`,
+  //       {
+  //         headers: {
+  //           Authorization: `Zoho-oauthtoken ${token}`,
+  //         },
+  //       }
+  //     );
 
-  const handleDeleteAppointment = (appointmentId) => {
-    const updatedAppointmentList = newAppointmentList?.availability?.map(
-      (slot) => ({
-        ...slot,
-        checkAvailabilities: slot.checkAvailabilities.filter(
-          (availabilitySlot) => availabilitySlot.appointmentId !== appointmentId
-        ),
-      })
-    );
+  //     const meetingData = response.data;
+  //     const joinUrl = meetingData.join_url;
+  //     window.open(joinUrl, "_blank");
+  //   } catch (error) {
+  //     console.error("Error joining the meeting:", error);
+  //     alert("Failed to join the meeting. Please try again.");
+  //   }
+  // };
 
-    dispatch(cancelPatientAppointment(appointmentId)).then((result) => {
-      if (result.type.endsWith("fulfilled")) {
-        message.success("Appointment canceled successfully");
-      } else {
-        message.error("Failed to cancel appointment");
-      }
-    });
-    fetchAndSetAvailability(2024, 9);
-    setAppointmentList(updatedAppointmentList);
-  };
+  // const handleDeleteAppointment = (appointmentId) => {
+  //   const updatedAppointmentList = newAppointmentList?.availability?.map(
+  //     (slot) => ({
+  //       ...slot,
+  //       checkAvailabilities: slot.checkAvailabilities.filter(
+  //         (availabilitySlot) => availabilitySlot.appointmentId !== appointmentId
+  //       ),
+  //     })
+  //   );
+
+  //   dispatch(cancelPatientAppointment(appointmentId)).then((result) => {
+  //     if (result.type.endsWith("fulfilled")) {
+  //       message.success("Appointment canceled successfully");
+  //     } else {
+  //       message.error("Failed to cancel appointment");
+  //     }
+  //   });
+  //   fetchAndSetAvailability(2024, 9);
+  //   setAppointmentList(updatedAppointmentList);
+  // };
 
   return (
     <>
@@ -437,19 +372,21 @@ const PatientCalendar = ({ selectedProviders }) => {
         eventClick={(selectInfo) => {
           const formattedDate = moment(selectInfo.event.startStr).utc()
           .add(1, 'day').format("YYYY-MM-DD");
-          console.log(formattedDate, "converted date for Alberta");
 
           addCalendarAppointment.resetForm();
           showDrawer();
 
           setSelectedDate(formattedDate);
-        }}
 
+        }}
         selectAllow={(selectInfo) => {
+
+          const formattedDate = moment(selectInfo.startStr).utc()
+          .add(1, 'day').format("YYYY-MM-DD");
+
           addCalendarAppointment.resetForm();
-          console.log({ selectInfo })
           showDrawer();
-          setSelectedDate(selectInfo.startStr)
+          setSelectedDate(formattedDate)
         }}
         select={(selectInfo) => {
           addCalendarAppointment.resetForm();
@@ -477,7 +414,6 @@ const PatientCalendar = ({ selectedProviders }) => {
             <Col>
               <CalendarTwoTone style={{ fontSize: 24, marginRight: 50 }} />
               <span>
-                {console.log({ selectedDate })}
                 {selectedDate
                   ? new Date(selectedDate).toDateString()
                   : "No date selected"}
@@ -485,7 +421,7 @@ const PatientCalendar = ({ selectedProviders }) => {
             </Col>
           </Row>
         </div>
-        <div style={{ marginBottom: 24 }}>
+        {/* <div style={{ marginBottom: 24 }}>
           <p style={{ fontSize: "14px", fontWeight: "bold" }}> Select a time</p>
         </div>
         <div style={{ margin: "50px 0" }}>
@@ -545,7 +481,7 @@ const PatientCalendar = ({ selectedProviders }) => {
                   );
                 })}
           </div>
-        </div>
+        </div> */}
 
         <div style={{ margin: "50px 0" }}>
           <p style={{ fontSize: "14px", fontWeight: "bold" }}>
@@ -701,14 +637,8 @@ const PatientCalendar = ({ selectedProviders }) => {
                                   flexWrap: "wrap",
                                 }}
                               >
-                                {generateTimeSlots(
-                                  appointment.start.hour,
-                                  appointment.start.minute,
-                                  appointment.end.hour,
-                                  appointment.end.minute
-                                ).map((slot, index) => (
+                          
                                   <Tag
-                                    key={index}
                                     color="blue"
                                     style={{
                                       cursor: "pointer",
@@ -718,23 +648,22 @@ const PatientCalendar = ({ selectedProviders }) => {
                                       transition: "all 0.3s ease",
                                     }}
                                     onClick={() =>
-                                      handleAppointmentClick(appointment, slot)
+                                      handleAppointmentClick(appointment)
                                     }
                                   >
                                     {`${formatTime(
-                                      slot.start.hour,
-                                      slot.start.minute
+                                      appointment.start.hour,
+                                      appointment.start.minute
                                     )} - ${formatTime(
-                                      slot.end.hour,
-                                      slot.end.minute
+                                      appointment.end.hour,
+                                      appointment.end.minute
                                     )}`}
                                   </Tag>
-                                ))}
                               </div>
                             </div>
                           </List.Item>
                         )}
-                        locale={{ emptyText: "No available time slot" }} // Shows when list is empty
+                        locale={{ emptyText: "No available time slot" }} 
                       />
                     </Card>
                   </Col>

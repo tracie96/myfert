@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import PatientCalendar from "./PatientCalendar";
 import { useMediaQuery } from "react-responsive";
 import "./PatientCalendar.css";
-import { useSelector } from "react-redux";
-import { Avatar, Button, Col, Modal, Row, Space } from "antd";
+import { useDispatch, useSelector } from "react-redux";
+import { Avatar, Button, Col, Modal, Row, Space, message } from "antd";
 import {
   CalendarOutlined,
   ClockCircleOutlined,
@@ -14,6 +14,8 @@ import {
   UserOutlined,
   VideoCameraOutlined,
 } from "@ant-design/icons";
+import { getUpcomingAppointments } from "../../redux/patientSlice";
+import { cancelPatientAppointment } from "../../redux/doctorSlice";
 
 const PatientAppointment = () => {
   const isMobile = useMediaQuery({ maxWidth: 767 });
@@ -40,7 +42,8 @@ const PatientAppointment = () => {
     setIsFilterModalVisible(true);
   };
   const [moreVisible, setMoreVisible] = useState(filteredAppointments.map(() => true));
-
+  const { upcomingPatientAppointment  } = useSelector((state) => state.patient); 
+  console.log({upcomingPatientAppointment})
   const toggleMore = (index) => {
     setMoreVisible(prevState =>
       prevState.map((visible, i) => (i === index ? !visible : visible))
@@ -49,6 +52,10 @@ const PatientAppointment = () => {
   const handleOk = () => {
     setIsFilterModalVisible(false);
   };
+  const dispatch = useDispatch();
+    useEffect(() => {
+      dispatch(getUpcomingAppointments());
+    }, [dispatch]);
 
   useEffect(() => {
     const handleStorageChange = (event) => {
@@ -57,17 +64,15 @@ const PatientAppointment = () => {
       }
     };
 
+  
     window.addEventListener("storage", handleStorageChange);
 
     return () => {
       window.removeEventListener("storage", handleStorageChange);
     };
   }, []);
-  useEffect(() => {
-    if (filteredAppointments.length > 0) {
-      localStorage.setItem("currentStep", 2);
-    }
-  }, [filteredAppointments.length]);
+
+  const currentStep = localStorage.getItem("currentStep");
 
   const handleCheckboxChange = (provider) => {
     setSelectedProviders({
@@ -78,6 +83,31 @@ const PatientAppointment = () => {
   const handleViewAll = () => {
     setViewAll(!viewAll);
   };
+
+  const handleJoinCall = (appointment) => {
+    localStorage.setItem("currentStep",3)
+    console.log('join the call',appointment)
+    const {zohoLink} = appointment
+    if(zohoLink) {
+      window.open(zohoLink, '_blank');
+    } else {
+      alert('Meeting link is not yet ready.')
+    }
+  }
+
+
+  const handleCancelAppointment = (appointment) => {
+    const {appointId} = appointment
+    dispatch(cancelPatientAppointment(appointId)).then((response) => {
+      if (cancelPatientAppointment.fulfilled.match(response)) {
+        message.success("Meeting is cancelled successfully!");
+        dispatch(getUpcomingAppointments());
+      } else {
+        console.error("Failed to cancel the meeting", response.error.message);
+      }
+    });
+  };
+
   return (
     <>
       <div className="row">
@@ -215,7 +245,7 @@ const PatientAppointment = () => {
                             {/* Column 3 - Join Button */}
                             <Col span={4} style={{ display: "flex", flexDirection: 'column', alignItems: "center", fontSize: '8px' }}>
                               <MoreOutlined style={{ fontSize: '10px' }} />
-                              <Button type="primary" style={{ width: 60, marginTop: '10px', borderRadius: 5 }} icon={<VideoCameraOutlined />}>
+                              <Button type="primary" style={{ width: 60, marginTop: '10px', borderRadius: 5 }} icon={<VideoCameraOutlined />} onClick={()=>localStorage.setItem("currentStep",3)}>
                                 <span style={{ fontSize: '8px' }}>JOIN</span>
                               </Button>
                             </Col>
@@ -285,9 +315,9 @@ const PatientAppointment = () => {
                         marginTop: "-10px",
                       }}
                     >
-                      {filteredAppointments.length > 0 ? (
+                      {upcomingPatientAppointment?.length > 0 ? (
                         <div>
-                          {visibleAppointments.map((appointment, index) => (
+                          {upcomingPatientAppointment.map((appointment, index) => (
                             <div
                               key={index}
                               style={{
@@ -305,7 +335,7 @@ const PatientAppointment = () => {
                               ) : (
                                 <Button
                                   type="default"
-                                  onClick={() => toggleMore(index)}
+                                  onClick={() =>handleCancelAppointment(appointment)}
                                   style={{ float: 'right' }}
                                 >
                                   Cancel
@@ -371,11 +401,14 @@ const PatientAppointment = () => {
                                 <Button
                                   type="primary"
                                   icon={<VideoCameraOutlined />}
+                                  disabled={!appointment.zohoLink}
                                   style={{
                                     marginBottom: "5px",
-                                    background: "#1E90FF",
+                                    background: `${!appointment.zohoLink ? '#808080' : '#1E90FF'}`,
                                   }}
-                                >
+
+                                  onClick={()=> handleJoinCall(appointment)}>
+                                
                                   Join
                                 </Button>
 
@@ -449,7 +482,7 @@ const PatientAppointment = () => {
                         marginTop: "-10px",
                       }}
                     >
-                      {calendar !== "auto" || !calendar ? (
+                      {currentStep < 4 ? (
                         <>
                           <div>Initial Accessers</div>
                         </>

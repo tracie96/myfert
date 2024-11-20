@@ -23,7 +23,7 @@ const UserDropdown = ({ userAuth, setShowModal }) => {
         <NavLink to="/update-password">Update Password</NavLink>
       </Menu.Item>
       <Menu.Item key="settings" icon={<SettingOutlined />}>
-        <NavLink to="/setting">Settings</NavLink>
+        <NavLink to="/settings">Settings</NavLink>
       </Menu.Item>
       <Menu.Divider />
       <Menu.Item key="logout" icon={<LogoutOutlined />}>

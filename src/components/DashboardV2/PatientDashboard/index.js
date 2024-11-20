@@ -19,6 +19,7 @@ import {
   VideoCameraOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import CircleWithArc from "./periodchart";
 const cycleData = {
   cycleInfo: {
     cycle_length: 29,
@@ -786,6 +787,7 @@ export default function PatDash() {
             </div>
           </div>
         </Col>
+        {cycleInfo && cycleInfo.cycleInfo ?  <CircleWithArc cycleInfo={cycleInfo}/> :""}
         {isMobile ? <>
 
           {/* Fixed button on the right */}

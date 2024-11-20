@@ -236,7 +236,10 @@ import PaymentDetails from "../../screens/Subscription/payment-details";
 import PrePlan from "../../screens/Subscription/pre-plan";
 import SecondPlan from "../../screens/Subscription/second-plan";
 import AppointmentList from "../DashboardV2/DoctorDashboard/AppointmentList";
+import UserManagement from "../Admin/UserManagement";
 import LearnInfo from "../DashboardV2/PatientDashboard/Learning";
+import SettingsPage from "../DashboardV2/Settings";
+import NewHormoneChart from "../DashboardV2/PatientDashboard/NewChart";
 
 //#endregion
 
@@ -267,6 +270,9 @@ const ProtectedRoute = ({ allowedRoles }) => {
 
   if (userAuth && Object.keys(userAuth).length > 0 && userAuth.obj.role === 'Patient') {
     return <><Navigate to="/patient" replace /><PatDash /></>;
+  }
+  if (userAuth && Object.keys(userAuth).length > 0 && userAuth.obj.role === 'Admin') {
+    return <><Navigate to="/admin" replace /><UserManagement /></>;
   }
   if (userAuth && Object.keys(userAuth).length > 0 && (allowedRoles.includes(userAuth.obj.role))) {
     return <><Navigate to="/doctor" replace /><DoctorDash /></>;
@@ -312,8 +318,11 @@ const getRouter = createBrowserRouter(
             />
           }
         />
+        <Route path="users" element={<UserManagement />} />
         <Route path="assessment" element={<Assessment />} />
         <Route path="chart" element={<HormoneChart />} />
+        <Route path="newchart" element={<NewHormoneChart />} />
+
         <Route path="plans" element={<SubscriptionPlanV2 />} />
         <Route path="payment-details" element={<PaymentDetails />} />
         <Route path="questionnaire/1" element={<GeneralIntakeForm />} />
@@ -335,6 +344,7 @@ const getRouter = createBrowserRouter(
         <Route path="medication" element={<Medication />} />
         <Route path="pre-plan" element={<PrePlan />} />
         <Route path="second-plan" element={<SecondPlan />} />
+        <Route path="settings" element={<SettingsPage />} />
 
         #endregion #region Appointment
         <Route path="patient/appointment" element={<PatientAppointment />} />

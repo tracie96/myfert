@@ -87,6 +87,7 @@ const HormoneChart = () => {
         borderColor: "rgba(3, 154, 243, 0.8)",
         borderWidth: 2,
         fill: false,
+        spanGaps: true,
       },
       {
         label: "Estradiol (E3G)",
@@ -95,6 +96,7 @@ const HormoneChart = () => {
         borderWidth: 2,
         borderDash: [5, 5],
         fill: false,
+        spanGaps: true,
       },
       {
         label: "Pregnanediol 3 Glucuronide (PdG)",
@@ -103,6 +105,7 @@ const HormoneChart = () => {
         borderWidth: 2,
         borderDash: [5, 5],
         fill: false,
+        spanGaps: true,
       },
     ],
   };
@@ -211,6 +214,8 @@ const HormoneChart = () => {
           </Col>
         ))}
       </Row>
+
+
     </div>
     </>
   );

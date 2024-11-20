@@ -58,53 +58,48 @@ const PeriodCycleTracker = ({ cycleInfo }) => {
     const totalDays = cycleData.length;
     const radius = isMobile ? 150 : 200;
     const angleIncrement = (2 * Math.PI) / totalDays;
-
+  
     const today = moment().startOf("day");
-
+  
     return cycleData.map((day, index) => {
       const angle = index * angleIncrement;
       const x = radius * Math.cos(angle);
       const y = radius * Math.sin(angle);
       const dayDate = moment(day.date).local().startOf("day");
-
-      let color = "#f3f3f5";
-      let gradient = "";
+  
       let circleSize = isMobile ? 5 : 15;
       let borderSize = "50%";
-
-      if (day.flow || day.phase === "fertile") {
+      let color = "#f3f3f5";
+      let gradient = "";
+  
+      // Fertile days styling
+      if (day.phase === "fertile") {
         circleSize = isMobile ? 25 : 40;
         borderSize = "70%";
-        if (day.phase === "fertile") {
-          gradient = "linear-gradient(135deg, #AFE1AF 0%, #097969 100%)";
-        }
+        gradient = "linear-gradient(135deg, #AFE1AF 0%, #097969 100%)";
       }
-
+  
+      // Period flow days styling
+      if (day.flow) {
+        circleSize = isMobile ? 25 : 40;
+        borderSize = "70%";
+        gradient = "linear-gradient(135deg, #C70039 0%, #FF5733 100%)";
+      }
+  
+      // Ovulation styling
       if (day.phase === "ovulation") {
         circleSize = isMobile ? 25 : 40;
         borderSize = "70%";
-      }
-
-      if (day.flow) {
-        gradient = "linear-gradient(135deg, #C70039 0%, #FF5733 100%)";
-      } else if (day.phase === "fertile") {
-        color = "transparent";
-      } else if (day.phase === "ovulation") {
         color = "#097969";
       }
-
-      if (day.isCycleEnd) {
-        color = "#DFFF00";
-        gradient = "linear-gradient(135deg, #E4D00A 0%, #FFC300 100%)";
-      }
-
+  
+      // Highlight today's date
       if (dayDate.isSame(today, "day")) {
-        color = "#FFFF00"; // Set color to yellow for the current date
+        color = "#FFFF00";
         circleSize = isMobile ? 25 : 40;
         gradient = "linear-gradient(135deg, #E4D00A 0%, #FFC300 100%)";
       }
-      const formattedDate = day.date.format("ddd D"); // Properly format the date
-
+  
       const dayStyle = {
         width: `${circleSize}px`,
         height: `${circleSize}px`,
@@ -122,7 +117,9 @@ const PeriodCycleTracker = ({ cycleInfo }) => {
         color: "#fff",
         zIndex: 1,
       };
-
+  
+      const formattedDate = day.date.format("ddd D"); // Properly format the date
+  
       return (
         <div key={index} style={dayStyle}>
           {day.phase === "fertile" ||
@@ -135,6 +132,7 @@ const PeriodCycleTracker = ({ cycleInfo }) => {
       );
     });
   };
+  
 
   const formatDate = () => {
     return moment().format("ddd / MMM Do");

@@ -57,6 +57,8 @@ function Login() {
 
           if (resultAction.obj.role === "Patient") {
             navigate("/patient");
+          } else if (resultAction.obj.role === "SuperAdmin") {
+            navigate("/users");
           } else if (resultAction.obj.role) {
             navigate("/doctor");
           }

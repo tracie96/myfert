@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import fertilityImage from "../../assets/images/auth/fertilityImage.svg";
 import docDashBoardIcon from "../../assets/images/sidebar/docDashboardIcon.png";
+import usersIcon from "../../assets/images/sidebar/usersIcon.png";
 import { useSelector } from "react-redux";
 import { Menu, Button, Drawer, Layout } from "antd";
 import {
@@ -13,6 +14,7 @@ import {
   PieChartTwoTone,
   FileAddTwoTone,
   OrderedListOutlined,
+  InfoCircleTwoTone,
 } from "@ant-design/icons";
 import { useMediaQuery } from "react-responsive";
 
@@ -86,6 +88,11 @@ export const GetSideBar = () => {
           <span className="no-underline">CHART</span>
         </NavLink>
       </Menu.Item>
+      <Menu.Item key="4" icon={<PieChartTwoTone />}>
+        <NavLink to="/newchart" style={{ textDecoration: "none" }}>
+          <span className="no-underline">NEW CHART (PROG...)</span>
+        </NavLink>
+      </Menu.Item>
       <Menu.Item key="5" icon={<MedicineBoxTwoTone />}>
         <span>MEDS</span>
       </Menu.Item>
@@ -99,16 +106,12 @@ export const GetSideBar = () => {
           <span className="no-underline">PLANS</span>
         </NavLink>
       </Menu.Item>
-      <Menu.Item key="8" icon={<PlayCircleTwoTone />}>
-        <NavLink to="/second-plan" style={{ textDecoration: "none" }}>
-          <span className="no-underline">PLANS-1</span>
+      <Menu.Item key="8" icon={<InfoCircleTwoTone />}>
+        <NavLink to="/learn" style={{ textDecoration: "none" }}>
+          <span className="no-underline">LEARN</span>
         </NavLink>
       </Menu.Item>
-      <Menu.Item key="9" icon={<PlayCircleTwoTone />}>
-        <NavLink to="/pre-plan" style={{ textDecoration: "none" }}>
-          <span className="no-underline">PLANS-2</span>
-        </NavLink>
-      </Menu.Item>
+   
     </Menu>
   );
   const doctorMenuItems = (
@@ -186,13 +189,13 @@ export const GetSideBar = () => {
           </li>
 
           <li className="nav-item">
-            <NavLink className="nav-link" to="/">
+            <NavLink className="nav-link" to="/users">
               <img
-                src={docDashBoardIcon}
+                src={usersIcon}
                 alt="dashboard"
                 style={{ width: "35px" }}
               ></img>
-              <span className="pl-2">Dashboard</span>
+              <span className="pl-2">Users</span>
             </NavLink>
           </li>
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Row, Col, Button, Spin, Steps, Avatar, Divider, Modal, Switch } from "antd";
+import { Row, Col, Button, Spin, Steps, Avatar, Divider, Modal } from "antd";
 import PeriodCycleTracker from "../../../screens/PatientDashboard/Cycle/cycle";
 import { useDispatch } from "react-redux";
 import { getMiraInfo } from "../../redux/AuthController"; // Ensure this path is correct
@@ -107,11 +107,11 @@ export default function PatDash() {
   const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [userCurrentStep] = useState(0);
-
+  const { userAuth } = useSelector((state) => state.authentication);
+  const status = userAuth.obj.status
   const [error, setError] = useState(null);
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const [viewAll, setViewAll] = useState(false);
-
   const filteredAppointments = appointmentList.filter(
     (app) => app.roleId === 0
   );
@@ -171,23 +171,13 @@ export default function PatDash() {
   useEffect(() => {
     const storedStep = localStorage.getItem("currentStep");
     if (storedStep) {
-      setCurrentStep(parseInt(storedStep, 10)); // Parse as integer
+      setCurrentStep(parseInt(storedStep, 10));
     }
   }, []);
+
   const handleStepChange = (step) => {
     setCurrentStep(step);
     localStorage.setItem("currentStep", step);
-  };
-
-  const handleSwitchChange = (checked) => {
-    if (checked) {
-      setCurrentStep(4);
-      localStorage.setItem("currentStep", 4)
-    } else {
-      setCurrentStep(3);
-      localStorage.setItem("currentStep", 3)
-
-    }
   };
   return (
     <div>
@@ -200,7 +190,7 @@ export default function PatDash() {
           </p>
         </div>
       </Row>
-      <div // this div to cover screen width
+      <div
         style={{
           background: "#F0F8FF",
           padding: isMobile ? "8%" : "30px",
@@ -211,13 +201,13 @@ export default function PatDash() {
           width: isMobile ? "auto" : "100%",
         }}
       >
-        <h3 style={{ color: "#335CAD", fontSize: "20px" }}>
-          Initial Sign Up Steps:
-        </h3>
-        <Switch
-          onChange={handleSwitchChange}
-        />
-        {currentStep < 4 ?
+        {status === null &&
+          <>
+            <h3 style={{ color: "#335CAD", fontSize: "20px" }}>
+              Initial Sign Up Steps:
+            </h3>
+          </>}
+        {status === null ?
           <Steps
             current={currentStep}
             progressDot={customDot}
@@ -234,7 +224,7 @@ export default function PatDash() {
             items={[
               {
                 title: (
-                  <div style={{ textAlign: "left", fontSize: isMobile ? '12px' : '14px' }}>
+                  <div style={{ textAlign: "left", fontSize: isMobile ? '12px' : '14px', width: isMobile ? 'auto' : '200px' }}>
                     <span>Complete Reproductive Health Assessment Form</span>
                     <div style={{ marginTop: "10px" }}>
                       <Button
@@ -259,15 +249,16 @@ export default function PatDash() {
               },
               {
                 title: (
-                  <div style={{ textAlign: "left", fontSize: isMobile ? '12px' : '14px' }}>
+                  <div style={{ textAlign: "left", fontSize: isMobile ? '12px' : '14px', width: isMobile ? 'auto' : '200px' }}>
                     <span>Book Free 15-minute Consult with Fertility Coach</span>
                     <div style={{ marginTop: isMobile ? "30px" : "10px" }}>
                       <Button
                         type="primary"
                         onClick={() => {
+                          handleStepChange(2);
                           navigate("/patient/appointment");
                         }}
-                        disabled={currentStep < 1}
+                        disabled={currentStep !== 1}
                         style={{
                           backgroundColor: "#C2E6F8",
                           borderColor: "none",
@@ -284,7 +275,7 @@ export default function PatDash() {
               },
               {
                 title: (
-                  <div style={{ textAlign: "left", fontSize: isMobile ? '12px' : '14px' }}>
+                  <div style={{ textAlign: "left", fontSize: isMobile ? '12px' : '14px', width: isMobile ? 'auto' : '200px' }}>
                     <span>Continue Care by visiting the Plan section for Initial Assessment</span>
                     <div style={{ marginTop: "10px" }}>
                       <Button
@@ -292,7 +283,7 @@ export default function PatDash() {
                         onClick={() => {
                           navigate("/plans");
                         }}
-                        disabled={currentStep < 2}
+                        disabled={currentStep !== 2}
                         style={{
                           backgroundColor: "#C2E6F8",
                           borderColor: "none",
@@ -323,18 +314,18 @@ export default function PatDash() {
 
             size="small"
             style={{
-              marginTop: "20px",
               display: "flex",
               flexDirection: isMobile ? "row" : "row",
               alignItems: isMobile ? "flex-start" : "",
               overflowX: "auto",
+              padding: isMobile ? 0 : '0 2%'
             }}
             items={[
               {
                 title: (
                   <div style={{ textAlign: "left", fontSize: isMobile ? '12px' : '14px', display: "flex", flexDirection: "column", height: "100%" }}>
                     <span>Complete General Intake Form</span>
-                    <div style={{ marginTop: "auto", display: "flex", flexDirection: "row", gap: "10px" }}> {/* Adjusted this line */}
+                    <div style={{ marginTop: "auto", display: "flex", flexDirection: "row", gap: "10px" }}>
                       <Button
                         onClick={() => {
                           handleStepChange(1);
@@ -351,7 +342,6 @@ export default function PatDash() {
                       >
                         ASSESS
                       </Button>
-                      {/* Add other buttons here if needed */}
                     </div>
                   </div>
 
@@ -367,7 +357,6 @@ export default function PatDash() {
                         onClick={() => {
                           navigate("/patient/appointment");
                         }}
-                        disabled
                         style={{
                           backgroundColor: "#C2E6F8",
                           borderColor: "none",
@@ -395,7 +384,6 @@ export default function PatDash() {
                         onClick={() => {
                           navigate("/plans");
                         }}
-                        disabled
                         style={{
                           backgroundColor: "#C2E6F8",
                           borderColor: "none",
@@ -404,7 +392,7 @@ export default function PatDash() {
                           fontSize: isMobile ? '8px' : ''
                         }}
                       >
-                        PLAN
+                        APPT
                       </Button>
                     </div>
                   </div>
@@ -420,7 +408,7 @@ export default function PatDash() {
                         onClick={() => {
                           navigate("/plans");
                         }}
-                        disabled
+                        disabled={status.statLevel !== 2}
                         style={{
                           backgroundColor: "#C2E6F8",
                           borderColor: "none",
@@ -447,7 +435,7 @@ export default function PatDash() {
                         onClick={() => {
                           navigate("/plans");
                         }}
-                        disabled
+                        disabled={status.statLevel !== 2}
                         style={{
                           backgroundColor: "#C2E6F8",
                           borderColor: "none",
@@ -474,7 +462,7 @@ export default function PatDash() {
                         onClick={() => {
                           navigate("/plans");
                         }}
-                        disabled
+                        disabled={status.statLevel !== 2}
                         style={{
                           backgroundColor: "#C2E6F8",
                           borderColor: "none",
@@ -501,7 +489,7 @@ export default function PatDash() {
                         onClick={() => {
                           navigate("/plans");
                         }}
-                        disabled
+                        disabled={status.statLevel !== 2}
                         style={{
                           backgroundColor: "#C2E6F8",
                           borderColor: "none",
@@ -528,7 +516,7 @@ export default function PatDash() {
                         onClick={() => {
                           navigate("/plans");
                         }}
-                        disabled
+                        disabled={status.statLevel !== 2}
                         style={{
                           backgroundColor: "#C2E6F8",
                           borderColor: "none",
@@ -787,7 +775,7 @@ export default function PatDash() {
             </div>
           </div>
         </Col>
-        {cycleInfo && cycleInfo.cycleInfo ?  <CircleWithArc cycleInfo={cycleInfo}/> :""}
+        {cycleInfo && cycleInfo.cycleInfo ? <CircleWithArc cycleInfo={cycleInfo} /> : ""}
         {isMobile ? <>
 
           {/* Fixed button on the right */}
@@ -854,15 +842,16 @@ export default function PatDash() {
               ) : error ? (
                 <p style={{ color: "red" }}>Error: {error}</p>
               ) : cycleInfo && cycleInfo.cycleInfo ? ( // Correct condition to check if cycleInfo is available
-                <PeriodCycleTracker cycleInfo={cycleInfo} dummyInfo={cycleData} />
+                ""
               ) : (
                 <p style={{ textAlign: "center" }}>
                   No cycle information available.
-                </p> // This message shows when cycleInfo is null or undefined
+                </p>
               )}
             </div>
           </Col>}
       </Row>
+  
     </div>
   );
 }

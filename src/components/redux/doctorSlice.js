@@ -119,6 +119,28 @@ export const getZohoClientID = createAsyncThunk(
     }
   },
 );
+export const increaseUserStep = createAsyncThunk(
+  "doctor/increaseUserStep",
+  async ({ patientId, step }, { rejectWithValue, getState, dispatch }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+    try {
+      const response = await axios.get(
+        `${baseUrl}Doctor/MarkPatientStep/${patientId}/${step}`,
+        config
+      );
+      return response.data; // Assuming the API returns JSON data
+    } catch (error) {
+      handleApiError(error?.response?.data, dispatch, user);
+      return rejectWithValue(error?.response?.data || "An error occurred");
+    }
+  }
+);
 
 export const getUpcomingAppointmentForDoctor = createAsyncThunk(
   "doctor/getUpcomingAppointmentForDoctor",

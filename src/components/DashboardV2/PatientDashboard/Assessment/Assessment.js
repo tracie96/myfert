@@ -29,6 +29,7 @@ const icons = {
 
 export default function Assessment() {
   const cards = useSelector((state) => state.assessment);
+  
   const navigate = useNavigate();
 
   const handleCardClick = (path) => {

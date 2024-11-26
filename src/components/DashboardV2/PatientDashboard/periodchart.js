@@ -49,7 +49,6 @@ const CircleWithArc = ({ cycleInfo }) => {
         return d;
     };
 
-    // Helper function to check if a specific day is in a given date range
     const isDayInRange = (day, startDate, endDate) => {
         const dayDate = moment().startOf('month').add(day - 1, 'days');
         return dayDate.isBetween(startDate, endDate, null, '[]');
@@ -73,19 +72,37 @@ const CircleWithArc = ({ cycleInfo }) => {
                         <feDropShadow dx="2" dy="2" stdDeviation="3" floodColor="rgba(0, 0, 0, 0.3)" />
                     </filter>
                 </defs>
+                <defs>
+                    <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style={{ stopColor: "#C70039", stopOpacity: 1 }} />
+                        <stop offset="100%" style={{ stopColor: "#FF5733", stopOpacity: 1 }} />
+                    </linearGradient>
+                </defs>
+                <defs>
+                    <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style={{ stopColor: "#AFE1AF", stopOpacity: 1 }} />
+                        <stop offset="100%" style={{ stopColor: "#097969", stopOpacity: 1 }} />
+                    </linearGradient>
+                </defs>
+                <defs>
+                    <linearGradient id="gradient3" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style={{ stopColor: "#E4D00A", stopOpacity: 1 }} />
+                        <stop offset="100%" style={{ stopColor: "#FFC300", stopOpacity: 1 }} />
+                    </linearGradient>
+                </defs>
                 <circle cx={centerX} cy={centerY} r={radius} stroke="gray" strokeWidth="0" fill="none" />
 
                 <path
                     d={createArc(periodStartDate.date(), periodEndDate.date())}
                     fill="none"
-                    stroke="red"
+                    stroke="url(#gradient1)"
                     strokeWidth="40"
                     strokeLinecap="round"
                 />
                 <path
                     d={createArc(fertileStartDate.date(), fertileEndDate.date())}
                     fill="none"
-                    stroke="green"
+                    stroke="url(#gradient2)"
                     strokeWidth="40"
                     strokeLinecap="round"
                 />
@@ -97,47 +114,39 @@ const CircleWithArc = ({ cycleInfo }) => {
                                 cx={position.x}
                                 cy={position.y}
                                 r={25}
-                                fill="yellow"
+                                fill="url(#gradient3)"
                                 strokeWidth="5"
                                 filter="url(#shadow)"
                             />
                         ) : (
                             <>
                                 {isDayInRange(i + 1, periodStartDate, periodEndDate) ? (
-                                    <circle
-                                        cx={position.x}
-                                        cy={position.y}
-                                        r={8}
-                                        fill="red"
-                                        opacity={0.5}
-                                    />
+                                    ""
                                 ) : isDayInRange(i + 1, fertileStartDate, fertileEndDate) ? (
-                                    <circle
-                                        cx={position.x}
-                                        cy={position.y}
-                                        r={8}
-                                        fill="green"
-                                        opacity={0.5}
-                                    />
+                                   ""
                                 ) : (
-                                    // For other days, render as small gray dot
                                     <circle
                                         cx={position.x}
                                         cy={position.y}
-                                        r={4}  // Smaller size for non-period/fertile days
+                                        r={4}  
                                         fill="#f3f3f5"
-                                        filter="url(#shadow)" // Apply the shadow filter
+                                        filter="url(#shadow)" 
                                     />
                                 )}
                             </>
                         )}
 
-                        {/* Render the day number for Period or Ovulation Days */}
-                        {(isDayInRange(i + 1, periodStartDate, periodEndDate) || isDayInRange(i + 1, fertileStartDate, fertileEndDate)) && (
-                            <text x={position.x} y={position.y} textAnchor="middle" alignmentBaseline="middle" fontSize="10" color='#fff'>
-                                {moment().startOf('month').add(i, 'days').format('ddd DD')}
-
-                            </text>
+                        {(isDayInRange(i + 1, periodStartDate, periodEndDate) || isDayInRange(i + 1, fertileStartDate, fertileEndDate)  || i+1 === today )&& (
+                            <text
+                                x={position.x}
+                                y={position.y}
+                                textAnchor="middle"
+                                alignmentBaseline="middle"
+                                fontSize="10"
+                                fill="white"
+                            >
+                                {moment().startOf('month').add(i, 'days').format('ddd DD')}   
+                                                         </text>
                         )}
                     </React.Fragment>
                 ))}
@@ -148,15 +157,15 @@ const CircleWithArc = ({ cycleInfo }) => {
                     alignItems: "center",
                     justifyContent: "center",
                     position: "absolute",
-                    width: isMobile?"90%":"65%",
-                    height: isMobile?"65%":"65%",
+                    width: isMobile ? "90%" : "65%",
+                    height: isMobile ? "65%" : "65%",
                     borderRadius: "50%",
                     borderWidth: 10,
                     borderColor: "#f3f3f5",
                     borderStyle: "solid",
                     backgroundColor: "#fff",
                     top: "8%",
-                    left: isMobile?"5%":"20%",
+                    left: isMobile ? "5%" : "19.2%",
                     fontSize: "16px",
                     color: "#000",
                     zIndex: 2,

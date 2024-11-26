@@ -513,7 +513,7 @@ const PatientSignup = () => {
                             >
                               <Steps
                                 current={currentStep}
-                                style={{ marginTop: 100 }}
+                                style={{ marginTop: 100,height:30 }}
                               >
                                 <Step title="Personal Information" />
                                 <Step title="Partner Information (Optional)" />
@@ -616,7 +616,13 @@ const PatientSignup = () => {
                                   </div>
                                   <div className="row">
                                     <div className="col-lg-3 col-sm-3">
-                                      <FormItem label="Sex" name="gender">
+                                      <FormItem label="Sex" name="gender"  rules={[
+                                          {
+                                            required: true,
+                                            message:
+                                              "! Please enter your Sex",
+                                          },
+                                        ]}>
                                         <Select
                                           onChange={(selectedOption) => {
                                             form.setFieldsValue({
@@ -1554,7 +1560,7 @@ const PatientSignup = () => {
                               onCancel={handleCancel}
                               footer={[
                                 <Button key="back" onClick={handleCancel}>
-                                  No, I dont like thier services
+                                  No, thank you
                                 </Button>,
                                 <Button
                                   key="submit"
@@ -1566,8 +1572,7 @@ const PatientSignup = () => {
                               ]}
                             >
                               <p>
-                                Please would you like us to create an account
-                                for you on Mira with this email?.
+                              Would you like us to create an account for you on Mira using the same email you plan to use for MFL?
                               </p>
                             </Modal>
                           </div>

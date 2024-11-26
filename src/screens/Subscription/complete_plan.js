@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { Row, Col, Button, Typography } from "antd";
+import React, { useEffect, useState } from "react";
+import { Row, Col, Button, Typography, Modal } from "antd";
 import { DownOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,22 +14,44 @@ const CompletePlan = () => {
   const { plans, loading, error } = useSelector((state) => state.subscription);
   const isPaymentComplete = useSelector((state) => state.authentication.userAuth.obj.isPaymentComplete);
   const isMobile = useMediaQuery({ maxWidth: 767 });
-
   useEffect(() => {
     dispatch(fetchSubscriptionPlans());
   }, [dispatch]);
-
+  const [isModalVisible, setIsModalVisible] = useState(true);
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
   const { Title, Text } = Typography;
 
-
+  const handleModalCancel = () => {
+    setIsModalVisible(false);
+  };
   const handleClick = (price, id) => {
     const state = { price: price, id: id };
     navigate("/payment-details", { state });
   };
   return (
     <Row gutter={16} style={{ padding: "0 2%" }}>
+      <Modal
+  title="Complete Learning and Assessments"
+  visible={isModalVisible}
+  onCancel={handleModalCancel}
+  footer={[
+    <Button key="cancel" onClick={handleModalCancel}>
+      Later
+    </Button>,
+      <Button key="ok" type="primary" onClick={()=>navigate('/assessment')}>
+      Go to Assessment
+    </Button>,
+    <Button key="ok" type="primary" onClick={()=>navigate('/learn')}>
+      Go to Learning
+    </Button>,
+  ]}
+>
+        <p>
+          You haven't completed the required learning materials and assessments. 
+          Please complete them to proceed further.
+        </p>
+      </Modal>
       <Col xs={20} sm={14}>
         <p style={{ color: "#335CAD", fontSize: "16px" }}>SUBSCRIPTION PLANS</p>
         <p style={{ padding: "5% 0" }}>
@@ -184,7 +206,7 @@ const CompletePlan = () => {
                             fontWeight: "bold",
                           }}
                         >
-                          {plan.months} Months
+                          6 Months
                         </h3>
                         <p style={{ fontWeight: "bold" }}>Description:</p>
                       </div>
@@ -266,7 +288,7 @@ const CompletePlan = () => {
                   backgroundColor: "#F2AA93",
                   borderRadius: "12px 12px 0 0",
                   height: "61px",
-                  display: "flex",
+                  display: "none",
                   alignItems: "center",
                   justifyContent: "left",
                 }}

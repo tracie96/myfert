@@ -68,7 +68,6 @@ export const markSubscriptionSuccess = createAsyncThunk(
         `${baseUrl}Subscription/MarkSubscription/true`,
         config
       );
-      toast.success("Payment successful, subscription marked!");
       return response.data; 
     } catch (error) {
       handleApiError(error?.response?.data);

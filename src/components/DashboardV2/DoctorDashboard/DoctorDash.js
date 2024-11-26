@@ -7,7 +7,7 @@ import {
   SearchOutlined,
 } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { getZohoClientID, patientList } from "../../redux/doctorSlice";
+import { getZohoClientID, increaseUserStep, patientList } from "../../redux/doctorSlice";
 import { useNavigate } from "react-router-dom";
 
 const SwitchWrapper = ({ onChange, ...props }) => {
@@ -25,7 +25,7 @@ const SwitchWrapper = ({ onChange, ...props }) => {
 export default function DoctorDash() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState(""); // For search input
+  const [searchQuery, setSearchQuery] = useState(""); 
   const loggedInUserId = useSelector(
     (state) => state?.authentication?.userAuth?.obj?.id,
   );
@@ -93,13 +93,19 @@ export default function DoctorDash() {
   }, []);
 
   const handleSearch = useCallback((value) => {
-    setSearchQuery(value); // Update searchQuery when the user types
+    setSearchQuery(value);
   }, []);
 
-  const handleSwitch = (checked, record, e) => {
-    e.stopPropagation();
-    localStorage.setItem("calendar", checked ? "auto" : "manual");
-  };
+  const handleSwitchChange = useCallback((checked, record, step) => {
+    console.log(step,'step')
+    if (checked) {
+      dispatch(increaseUserStep({ patientId: record.id, step }));
+      console.log(
+        `${step} stage switch ${checked ? "enabled" : "disabled"} for record:`,
+        record
+      );
+    }
+  }, [dispatch]); 
 
   const dataWithIds = useMemo(
     () =>
@@ -110,13 +116,12 @@ export default function DoctorDash() {
     [data],
   );
 
-  // Filter the data based on the search query
   const filteredData = useMemo(() => {
     if (!searchQuery) return dataWithIds;
     return dataWithIds.filter((item) =>
       item.firstname.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.lastname.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (item.flag && item.flag.toString().toLowerCase().includes(searchQuery.toLowerCase())) // Check if flag exists before calling toString()
+      (item.flag && item.flag.toString().toLowerCase().includes(searchQuery.toLowerCase()))
     );
   }, [searchQuery, dataWithIds]);
 
@@ -174,9 +179,10 @@ export default function DoctorDash() {
         render: (_, record) => (
           <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
             <SwitchWrapper
-              onChange={(checked, e) => handleSwitch(checked, record, e)}
+            checked={record.patientStat?.statLevel === 1 || record.patientStat?.statLevel === 2 || record.patientStat?.statLevel === 3 } 
+              onChange={(checked, e) => handleSwitchChange(checked, record, 1, e)}
             />
-          
+
           </div>
         ),
       },
@@ -185,13 +191,11 @@ export default function DoctorDash() {
         key: "action1",
         render: (_, record) => (
           <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-          
-            {/* Second Plan Switch */}
             <Switch
-              onChange={(checked) => handleSecondPlanSwitch(checked, record)}
-           
+            checked={record.patientStat?.statLevel === 2 || record.patientStat?.statLevel === 3 } 
+            onChange={(checked, e) => handleSwitchChange(checked, record, 2, e)}
             />
-           
+
           </div>
         ),
       },
@@ -200,36 +204,22 @@ export default function DoctorDash() {
         key: "action2",
         render: (_, record) => (
           <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-        
-            {/* Third Plan Switch */}
             <Switch
-              onChange={(checked) => handleThirdPlanSwitch(checked, record)}
-           
+            checked={record.patientStat?.statLevel === 3} 
+              onChange={(checked, e) => handleSwitchChange(checked, record, 3, e)}
+
             />
           </div>
         ),
       },
     ],
-    []
+    [handleSwitchChange]
   );
-  
-  // Handlers for the additional switches
-  const handleSecondPlanSwitch = (checked, record) => {
-    console.log(
-      `Second Plan switch ${checked ? "enabled" : "disabled"} for record:`,
-      record
-    );
-  };
-  
-  const handleThirdPlanSwitch = (checked, record) => {
-    console.log(
-      `Third Plan switch ${checked ? "enabled" : "disabled"} for record:`,
-      record
-    );
-  };
-  
-  
-  
+
+
+
+
+
   const PatientList = React.memo(
     () => (
       <Card>

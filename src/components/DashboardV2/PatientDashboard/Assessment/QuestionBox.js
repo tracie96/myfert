@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { Container, Row, Col } from "react-bootstrap";
+import { useSelector } from "react-redux";
 import { useMediaQuery } from "react-responsive";
 
 const QuestionnaireGrid = ({ cards, onCardClick }) => {
@@ -10,8 +11,8 @@ const QuestionnaireGrid = ({ cards, onCardClick }) => {
   };
 
   useEffect(() => {}, [cards]);
- 
-  const currentStep = localStorage.getItem("currentStep");
+  const { userAuth } = useSelector((state) => state.authentication);
+  const status = userAuth.obj.status?.statLevel
 
   return (
     <Container className="mt-4 assessment-container">
@@ -52,14 +53,14 @@ const QuestionnaireGrid = ({ cards, onCardClick }) => {
               <div
                 className="mt-4"
                 onClick={
-                  currentStep >= 4 || index === 0 ? () => handleCardClick(card?.component) : null
+                  status >= 3 || index === 0 ? () => handleCardClick(card?.component) : null
                 } 
                 style={{
                   cursor: "pointer",
                   borderRadius: "20px",
                   overflow: "hidden",
                   backgroundColor: "#F2AA93",
-                  opacity: currentStep >= 4 || index === 0 ? 1 : 0.5,
+                  opacity: status >= 3 || index === 0 ? 1 : 0.5,
                   position: "relative",
                   padding: "20px",
                   width: isMobile ? "100%" : "300px",
@@ -84,8 +85,7 @@ const QuestionnaireGrid = ({ cards, onCardClick }) => {
                     src={card.icon}
                     alt="questionnaires"
                     style={{ width: "60%", height: "auto" }}
-                  />{" "}
-                  {/* Adjust image size */}
+                  />
                 </div>
                 <div
                   style={{

@@ -410,7 +410,6 @@ const ReproductiveHealth = ({ onComplete }) => {
     );
     const savedAnswers = JSON.parse(localStorage.getItem("answers"));
     if (!isNaN(savedIndex) && savedAnswers) {
-      // setCurrentQuestionIndex(savedIndex);
       setAnswers(savedAnswers);
     }
   }, []);
@@ -472,15 +471,109 @@ const ReproductiveHealth = ({ onComplete }) => {
       <span style={{ color: "red" }}>* </span>
     </span>
   );
-  const handleSubmit = () => {
-    // Handle form submission logic
-    message.success("Form submitted successfully!");
-    dispatch(completeCard("/questionnaire/11"));
-    localStorage.setItem("currentQuestionIndex11", 0);
-    localStorage.setItem("currentStep", 1);
-    localStorage.setItem("answers", JSON.stringify(answers));
+  const handleSubmit = async () => {
+    try {
+        // Add your form submission logic here
+        message.success("Form submitted successfully!");
+        dispatch(completeCard("/questionnaire/11"));
+        localStorage.setItem("currentQuestionIndex11", 0);
+        localStorage.setItem("currentStep", 1);
+        localStorage.setItem("answers", JSON.stringify(answers));
+
+        // Prepare the data for API request
+        const requestData = {
+            birthControl: true,
+            hormonalBirthControl: "string",
+            nonHormonalBirthControl: "string",
+            currentlyPregnant: true,
+            tryingToConceive: true,
+            difficultyTryingToConceive: true,
+            familyMemberWithReproductiveConcerns: "string",
+            howLongTryingToConceive: "string",
+            methodToConceive: ["string"],
+            chartingToConceive: ["string"],
+            utilizingFertilityAwareness: true,
+            methodFertilityAwareness: "string",
+            intercouseDays: "string",
+            intercouseEachCycle: "string",
+            menstrualPainDuringPeriod: ["string"],
+            menstralBleedingPelvicPain: {
+                duration: "string",
+                colour: "string"
+            },
+            experiencePelvicPain: true,
+            duringCirclePelvicPain: {
+                duration: "string",
+                colour: "string"
+            },
+            doYouPmsSymptoms: true,
+            pmsSymptoms: ["string"],
+            pms: {
+                duration: "string",
+                colour: "string"
+            },
+            longestCycleLenght: "string",
+            shortestCycleLenght: "string",
+            averageCycleLenght: "string",
+            midCycleSpotting: true,
+            menstralCycleFrequency: "string",
+            menstralCycleDuration: "string",
+            menstralCycleColour: "string",
+            cycleDischargeCreamy: {
+                duration: "string",
+                colour: "string"
+            },
+            cycleDischargeWatery: {
+                duration: "string",
+                colour: "string"
+            },
+            cycleDischargeEggWhite: {
+                duration: "string",
+                colour: "string"
+            },
+            cycleDischargePrePeriod: {
+                duration: "string",
+                colour: "string"
+            },
+            cycleDischargeMenstralBleeding: {
+                duration: "string",
+                colour: "string",
+                clots: "string"
+            },
+            cycleDischargeAfterPeriodSpotting: {
+                duration: "string",
+                colour: "string"
+            },
+            chartBase64: "string"
+        };
+        const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
+        const token = userInfo.obj.token || "";
+        const response = await fetch(
+            "https://myfertilitydevapi.azurewebsites.net/api/Patient/AddReproductiveHealth",
+            {
+                method: "POST",
+                headers: {
+                  accept: "text/plain",
+                  "Content-Type": "application/json", 
+                  Authorization: `Bearer ${token}`,
+              },
+                body: JSON.stringify(requestData)
+            }
+        );
+
+        if (response.ok) {
+            const result = await response.json();
+            console.log("API response:", result);
+        } else {
+            console.error("API error:", response.statusText);
+        }
+    } catch (error) {
+        console.error("Error during API call:", error);
+    }
+
     navigate("/assessment");
-  };
+};
+
   const renderSubQuestions = (subQuestions) => {
     return subQuestions.map((subQuestion, index) => (
       <div key={index} style={{ marginTop: "20px" }}>

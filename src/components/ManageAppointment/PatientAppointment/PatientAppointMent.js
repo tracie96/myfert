@@ -42,20 +42,21 @@ const PatientAppointment = () => {
     setIsFilterModalVisible(true);
   };
   const [moreVisible, setMoreVisible] = useState(filteredAppointments.map(() => true));
-  const { upcomingPatientAppointment  } = useSelector((state) => state.patient); 
-  console.log({upcomingPatientAppointment})
+  const { upcomingPatientAppointment } = useSelector((state) => state.patient);
+  console.log({ upcomingPatientAppointment })
   const toggleMore = (index) => {
     setMoreVisible(prevState =>
       prevState.map((visible, i) => (i === index ? !visible : visible))
     );
   };
+  console.log({ upcomingPatientAppointment })
   const handleOk = () => {
     setIsFilterModalVisible(false);
   };
   const dispatch = useDispatch();
-    useEffect(() => {
-      dispatch(getUpcomingAppointments());
-    }, [dispatch]);
+  useEffect(() => {
+    dispatch(getUpcomingAppointments());
+  }, [dispatch]);
 
   useEffect(() => {
     const handleStorageChange = (event) => {
@@ -64,7 +65,7 @@ const PatientAppointment = () => {
       }
     };
 
-  
+
     window.addEventListener("storage", handleStorageChange);
 
     return () => {
@@ -72,7 +73,8 @@ const PatientAppointment = () => {
     };
   }, []);
 
-  const currentStep = localStorage.getItem("currentStep");
+  const { userAuth } = useSelector((state) => state.authentication);
+  const status = userAuth.obj.status
 
   const handleCheckboxChange = (provider) => {
     setSelectedProviders({
@@ -85,10 +87,10 @@ const PatientAppointment = () => {
   };
 
   const handleJoinCall = (appointment) => {
-    localStorage.setItem("currentStep",3)
-    console.log('join the call',appointment)
-    const {zohoLink} = appointment
-    if(zohoLink) {
+    localStorage.setItem("currentStep", 3)
+    console.log('join the call', appointment)
+    const { zohoLink } = appointment
+    if (zohoLink) {
       window.open(zohoLink, '_blank');
     } else {
       alert('Meeting link is not yet ready.')
@@ -97,7 +99,7 @@ const PatientAppointment = () => {
 
 
   const handleCancelAppointment = (appointment) => {
-    const {appointId} = appointment
+    const { appointId } = appointment
     dispatch(cancelPatientAppointment(appointId)).then((response) => {
       if (cancelPatientAppointment.fulfilled.match(response)) {
         message.success("Meeting is cancelled successfully!");
@@ -242,10 +244,9 @@ const PatientAppointment = () => {
                               </div>
                             </Col>
 
-                            {/* Column 3 - Join Button */}
                             <Col span={4} style={{ display: "flex", flexDirection: 'column', alignItems: "center", fontSize: '8px' }}>
                               <MoreOutlined style={{ fontSize: '10px' }} />
-                              <Button type="primary" style={{ width: 60, marginTop: '10px', borderRadius: 5 }} icon={<VideoCameraOutlined />} onClick={()=>localStorage.setItem("currentStep",3)}>
+                              <Button type="primary" style={{ width: 60, marginTop: '10px', borderRadius: 5 }} icon={<VideoCameraOutlined />}>
                                 <span style={{ fontSize: '8px' }}>JOIN</span>
                               </Button>
                             </Col>
@@ -335,7 +336,7 @@ const PatientAppointment = () => {
                               ) : (
                                 <Button
                                   type="default"
-                                  onClick={() =>handleCancelAppointment(appointment)}
+                                  onClick={() => handleCancelAppointment(appointment)}
                                   style={{ float: 'right' }}
                                 >
                                   Cancel
@@ -407,8 +408,8 @@ const PatientAppointment = () => {
                                     background: `${!appointment.zohoLink ? '#808080' : '#1E90FF'}`,
                                   }}
 
-                                  onClick={()=> handleJoinCall(appointment)}>
-                                
+                                  onClick={() => handleJoinCall(appointment)}>
+
                                   Join
                                 </Button>
 
@@ -482,13 +483,14 @@ const PatientAppointment = () => {
                         marginTop: "-10px",
                       }}
                     >
-                      {currentStep < 4 ? (
+                      {status === null ? (
                         <>
                           <div>Initial Accessers</div>
                         </>
                       ) : (
                         <>
-                          <div>
+                          <div style={{ display: 'none' }}
+                          >
                             <label>
                               <input
                                 type="checkbox"
@@ -500,6 +502,7 @@ const PatientAppointment = () => {
                             </label>
                           </div>
                           <div>
+
                             <label>
                               <input
                                 type="checkbox"
@@ -510,7 +513,8 @@ const PatientAppointment = () => {
                               Doctor
                             </label>
                           </div>
-                          <div>
+                          <div style={{ display: 'none' }}
+                          >
                             <label>
                               <input
                                 type="checkbox"
@@ -523,7 +527,8 @@ const PatientAppointment = () => {
                               Pharmacist Clinician
                             </label>
                           </div>
-                          <div>
+                          <div style={{ display: 'none' }}
+                          >
                             <label>
                               <input
                                 type="checkbox"
@@ -540,11 +545,13 @@ const PatientAppointment = () => {
                               Nutritional Practitioner
                             </label>
                           </div>
-                          <div>
+                          <div style={{ display: 'none' }}
+                          >
                             <label>
                               <input
                                 type="checkbox"
                                 className="checkbox-antd"
+
                                 checked={
                                   selectedProviders.fertilitySupportPractitioner
                                 }

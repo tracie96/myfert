@@ -1,56 +1,65 @@
-import React, { useEffect } from "react";
-import { Row, Col, Button, Typography, Divider, message } from "antd";
+import React, { useEffect, useState } from "react";
+import { Row, Col, Button, Typography, Divider, Modal } from "antd";
 import { useMediaQuery } from "react-responsive";
 import { LeftOutlined } from "@ant-design/icons";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { markSubscriptionSuccess } from "../../components/redux/subscriptionSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { checkoutSubscription, markSubscriptionSuccess } from "../../components/redux/subscriptionSlice";
+import moment from "moment";
+
 const { Title, Text } = Typography;
 
 const PaymentDetails = () => {
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
   const { state } = location;
-  
+  const { userAuth } = useSelector((state) => state.authentication);
+
   const searchParams = new URLSearchParams(location.search);
-  const isSuccess = searchParams.get('success');
-  const isCanceled = searchParams.get('canceled');
+  const isSuccess = searchParams.get("success");
+  const isCanceled = searchParams.get("canceled");
 
   const handleBack = () => {
     navigate(-1);
   };
-  
+
   useEffect(() => {
     const paymentSuccess = isSuccess === "true";
     if (paymentSuccess) {
-      dispatch(markSubscriptionSuccess(true)); 
+      dispatch(markSubscriptionSuccess(true));
+      setIsModalVisible(true); 
     } else if (isCanceled === "true") {
-      dispatch(markSubscriptionSuccess(false)); 
+      dispatch(markSubscriptionSuccess(false));
     }
   }, [dispatch, isSuccess, isCanceled]);
 
-
   const handleConfirmPurchase = (id) => {
-    console.log(id)
-    localStorage.setItem("currentStep", 4)
-    message.success("Payment disaled temporily for testing purpose")
-    navigate("/")
-    // dispatch(checkoutSubscription(id)).then((result) => {
-    //   console.log({result})
-    //   if (result.payload) {
-    //     window.location.href = result.payload; 
-    //   }
-    // });
+    dispatch(checkoutSubscription(id)).then((result) => {
+      console.log({ result });
+      if (result.payload) {
+        window.location.href = result.payload;
+      }
+    });
+  };
+
+  const handleModalOk = () => {
+    setIsModalVisible(false);
+    navigate("/patient"); 
+  };
+
+  const handleModalCancel = () => {
+    setIsModalVisible(false);
   };
 
   return (
-    <div style={{ padding: isMobile ? "10px" : "20px", maxWidth: isMobile? "100%":"90%" }}>
+    <div style={{ padding: isMobile ? "10px" : "20px", maxWidth: isMobile ? "100%" : "90%" }}>
       <Button
         type="link"
         style={{ marginBottom: "10px" }}
-        onClick={() => handleBack()}
+        onClick={handleBack}
       >
         <LeftOutlined /> Back to Payment Method
       </Button>
@@ -63,12 +72,11 @@ const PaymentDetails = () => {
         }}
       >
         <Row>
-          <Col span={24} style={{width: '100%'}}>
-            <Title level={4} style={{ color: "#335CAD" , marginLeft:'3%'}}>
+          <Col span={24} style={{ width: "100%" }}>
+            <Title level={4} style={{ color: "#335CAD", marginLeft: "3%" }}>
               Summary
             </Title>
           </Col>
-        
         </Row>
         <Row>
           <Col span={12} style={{ margin: "0 3%" }}>
@@ -83,19 +91,13 @@ const PaymentDetails = () => {
                 <p>Date of Purchase: </p>
               </Col>
               <Col span={12}>
-                <p>January 11, 2024</p>
+                <p>{moment().format("YYYY-MM-DD")}</p>
               </Col>
               <Col span={12}>
                 <p>Email Address: </p>
               </Col>
               <Col span={12}>
-                <p>j.smith@email.com</p>
-              </Col>
-              <Col span={12}>
-                <p>Phone Number: </p>
-              </Col>
-              <Col span={12}>
-                <p>(123) 123-4567</p>
+                <p>{userAuth?.obj.email}</p>
               </Col>
             </Row>
           </Col>
@@ -127,13 +129,24 @@ const PaymentDetails = () => {
               type="primary"
               size="large"
               style={{ width: "100%", background: "#00ADEF" }}
-              onClick={()=>handleConfirmPurchase(state.id)}
+              onClick={() => handleConfirmPurchase(state.id)}
             >
               CONFIRM PURCHASE
             </Button>
           </Col>
         </Row>
       </div>
+
+      <Modal
+        title="Payment Confirmed"
+        visible={isModalVisible}
+        onOk={handleModalOk}
+        onCancel={handleModalCancel}
+        okText="Go to Dashboard"
+        cancelText="Close"
+      >
+        <p>We have confirmed your payment, and Account would be updated Shortly Thank you for your purchase!</p>
+      </Modal>
     </div>
   );
 };

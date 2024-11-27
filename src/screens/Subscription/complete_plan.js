@@ -17,7 +17,7 @@ const CompletePlan = () => {
   useEffect(() => {
     dispatch(fetchSubscriptionPlans());
   }, [dispatch]);
-  const [isModalVisible, setIsModalVisible] = useState(true);
+  const [isModalVisible, setIsModalVisible] = useState(false);
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
   const { Title, Text } = Typography;

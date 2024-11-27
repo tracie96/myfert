@@ -207,7 +207,7 @@ export default function PatDash() {
               Initial Sign Up Steps:
             </h3>
           </>}
-        {status === null ?
+        {status === null  || status?.statLevel === 1 ?
           <Steps
             current={currentStep}
             progressDot={customDot}
@@ -258,7 +258,7 @@ export default function PatDash() {
                           handleStepChange(2);
                           navigate("/patient/appointment");
                         }}
-                        disabled={currentStep !== 1}
+                        disabled={currentStep !==1 && currentStep !==2}
                         style={{
                           backgroundColor: "#C2E6F8",
                           borderColor: "none",
@@ -283,7 +283,7 @@ export default function PatDash() {
                         onClick={() => {
                           navigate("/plans");
                         }}
-                        disabled={currentStep !== 2}
+                        disabled={status?.statLevel !==1 || status?.statLevel === null}
                         style={{
                           backgroundColor: "#C2E6F8",
                           borderColor: "none",
@@ -382,7 +382,7 @@ export default function PatDash() {
                       <Button
                         type="primary"
                         onClick={() => {
-                          navigate("/plans");
+                          navigate("/appointment");
                         }}
                         style={{
                           backgroundColor: "#C2E6F8",
@@ -406,9 +406,8 @@ export default function PatDash() {
                       <Button
                         type="primary"
                         onClick={() => {
-                          navigate("/plans");
+                          navigate("/labs");
                         }}
-                        disabled={status.statLevel !== 2}
                         style={{
                           backgroundColor: "#C2E6F8",
                           borderColor: "none",
@@ -433,9 +432,8 @@ export default function PatDash() {
                       <Button
                         type="primary"
                         onClick={() => {
-                          navigate("/plans");
+                          navigate("/appointment");
                         }}
-                        disabled={status.statLevel !== 2}
                         style={{
                           backgroundColor: "#C2E6F8",
                           borderColor: "none",
@@ -460,9 +458,8 @@ export default function PatDash() {
                       <Button
                         type="primary"
                         onClick={() => {
-                          navigate("/plans");
+                          navigate("/labs");
                         }}
-                        disabled={status.statLevel !== 2}
                         style={{
                           backgroundColor: "#C2E6F8",
                           borderColor: "none",
@@ -487,9 +484,8 @@ export default function PatDash() {
                       <Button
                         type="primary"
                         onClick={() => {
-                          navigate("/plans");
+                          navigate("/appointment");
                         }}
-                        disabled={status.statLevel !== 2}
                         style={{
                           backgroundColor: "#C2E6F8",
                           borderColor: "none",
@@ -516,7 +512,7 @@ export default function PatDash() {
                         onClick={() => {
                           navigate("/plans");
                         }}
-                        disabled={status.statLevel !== 2}
+                        disabled={status.statLevel !== 3}
                         style={{
                           backgroundColor: "#C2E6F8",
                           borderColor: "none",

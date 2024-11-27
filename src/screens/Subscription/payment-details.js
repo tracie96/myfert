@@ -6,6 +6,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { checkoutSubscription, markSubscriptionSuccess } from "../../components/redux/subscriptionSlice";
 import moment from "moment";
+import { increaseUserStep } from "../../components/redux/patientSlice";
 
 const { Title, Text } = Typography;
 
@@ -27,14 +28,29 @@ const PaymentDetails = () => {
   };
 
   useEffect(() => {
-    const paymentSuccess = isSuccess === "true";
-    if (paymentSuccess) {
-      dispatch(markSubscriptionSuccess(true));
-      setIsModalVisible(true); 
-    } else if (isCanceled === "true") {
-      dispatch(markSubscriptionSuccess(false));
-    }
+    const handlePaymentStatus = async () => {
+      const paymentSuccess = isSuccess === "true";
+      if (paymentSuccess) {
+        dispatch(markSubscriptionSuccess(true));
+        try {        console.log("Calling increaseUserStep API...");
+          await dispatch(increaseUserStep({ step :  2 }));
+          console.log(
+            `stage switch ${
+              paymentSuccess ? "enabled" : "disabled"
+            } for record:`          );
+  
+          setIsModalVisible(true);
+        } catch (error) {
+          console.error("Error while increasing user step:", error);
+        }
+      } else if (isCanceled === "true") {
+        dispatch(markSubscriptionSuccess(false));
+      }
+    };
+  
+    handlePaymentStatus();
   }, [dispatch, isSuccess, isCanceled]);
+  
 
   const handleConfirmPurchase = (id) => {
     dispatch(checkoutSubscription(id)).then((result) => {

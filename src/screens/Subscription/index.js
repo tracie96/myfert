@@ -15,9 +15,7 @@ const SubscriptionPlanV2 = () => {
 
   const renderContent = () => {
     switch (status?.statLevel) {
-      case 1:
-        return <CompletePlan />;
-      case 2:
+      case 3:
         return <CompletePlan />;
       default:
         return (

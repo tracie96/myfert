@@ -27,7 +27,28 @@ export const getDoctorListDropdownForAppointment = createAsyncThunk(
     }
   },
 );
-
+export const increaseUserStep = createAsyncThunk(
+  "patient/increaseUserStep",
+  async ({step }, { rejectWithValue, getState, dispatch }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+    try {
+      const response = await axios.get(
+        `${baseUrl}Patient/UpdatePatientStep/${step}`,
+        config
+      );
+      return response.data; 
+    } catch (error) {
+      handleApiError(error?.response?.data, dispatch, user);
+      return rejectWithValue(error?.response?.data || "An error occurred");
+    }
+  }
+);
 export const getDoctorAvailableSlotsForAppointment = createAsyncThunk(
   "patient/getDoctorAvailableSlotsForAppointment",
   async (obj, { rejectWithValue, getState, dispatch }) => {

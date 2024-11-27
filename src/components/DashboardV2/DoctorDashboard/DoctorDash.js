@@ -96,16 +96,29 @@ export default function DoctorDash() {
     setSearchQuery(value);
   }, []);
 
-  const handleSwitchChange = useCallback((checked, record, step) => {
-    console.log(step,'step')
-    if (checked) {
-      dispatch(increaseUserStep({ patientId: record.id, step }));
-      console.log(
-        `${step} stage switch ${checked ? "enabled" : "disabled"} for record:`,
-        record
-      );
-    }
-  }, [dispatch]); 
+  const handleSwitchChange = useCallback(
+    async (checked, record, step) => {
+      console.log(step, "step");
+  
+      if (checked) {
+        try {
+          await dispatch(increaseUserStep({ patientId: record.id, step }));
+  
+          console.log(
+            `${step} stage switch ${checked ? "enabled" : "disabled"} for record:`,
+            record
+          );
+  
+          fetchPatientList();
+        } catch (error) {
+          console.error("Error while updating step:", error);
+        }
+      }
+    },
+    [dispatch, fetchPatientList]
+  );
+  
+   
 
   const dataWithIds = useMemo(
     () =>
@@ -192,8 +205,8 @@ export default function DoctorDash() {
         render: (_, record) => (
           <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
             <Switch
-            checked={record.patientStat?.statLevel === 2 || record.patientStat?.statLevel === 3 } 
-            onChange={(checked, e) => handleSwitchChange(checked, record, 2, e)}
+            checked={record.patientStat?.statLevel === 3 || record.patientStat?.statLevel === 4 } 
+            onChange={(checked, e) => handleSwitchChange(checked, record, 3, e)}
             />
 
           </div>
@@ -205,8 +218,8 @@ export default function DoctorDash() {
         render: (_, record) => (
           <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
             <Switch
-            checked={record.patientStat?.statLevel === 3} 
-              onChange={(checked, e) => handleSwitchChange(checked, record, 3, e)}
+            checked={record.patientStat?.statLevel === 4} 
+              onChange={(checked, e) => handleSwitchChange(checked, record, 4, e)}
 
             />
           </div>

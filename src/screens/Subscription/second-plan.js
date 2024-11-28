@@ -15,7 +15,7 @@ const SecondPlan = () => {
   );
   const navigate = useNavigate();
   const handleClick = (price) => {
-    const state = { price: price, id: 1 };
+    const state = { price: price, id: 3 };
     navigate("/payment-details", { state });
   };
 
@@ -230,7 +230,7 @@ const SecondPlan = () => {
                       </Typography.Title>
                       <Button
                         type="primary"
-                        onClick={() => handleClick(500)}
+                        onClick={() => handleClick(500, 3)}
                         style={{
                           background: "#00000080",
                           borderColor: "#00000080",

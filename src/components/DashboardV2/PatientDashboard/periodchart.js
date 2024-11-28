@@ -11,15 +11,15 @@ const CircleWithArc = ({ cycleInfo }) => {
     } = cycleInfo?.cycleInfo;
     const isMobile = useMediaQuery({ maxWidth: 767 });
 
-    const periodStartDate = moment(period_start); // Period start date
-    const periodEndDate = moment(period_end); // Period end date
-    const fertileStartDate = moment(fertile_window_start); // Fertile window start date
-    const fertileEndDate = moment(fertile_window_end); // Fertile window end date
-    const totalDays = periodStartDate.clone().endOf("month").date(); // Total days in the month (circle's full span)
+    const periodStartDate = moment(period_start); 
+    const periodEndDate = moment(period_end); 
+    const fertileStartDate = moment(fertile_window_start); 
+    const fertileEndDate = moment(fertile_window_end); 
+    const totalDays = periodStartDate.clone().endOf("month").date(); 
 
     const radius = 200;
     const centerX = 200;
-    const centerY = 200;
+    const centerY = 250;
     const startAngle = -90;
 
     const today = new Date().getDate();
@@ -39,9 +39,9 @@ const CircleWithArc = ({ cycleInfo }) => {
 
     const createArc = (startDay, endDay, radiusOffset = 0) => {
         const start = getDayPosition(startDay - 1);
-        const end = getDayPosition(endDay - 1); // Subtract 1 to convert to 0-indexed
+        const end = getDayPosition(endDay - 1); 
 
-        const largeArcFlag = endDay - startDay <= 15 ? 0 : 1; // Determines if the arc is large or small
+        const largeArcFlag = endDay - startDay <= 15 ? 0 : 1;
         const d = `
       M ${start.x} ${start.y}
       A ${radius + radiusOffset} ${radius + radiusOffset} 0 ${largeArcFlag} 1 ${end.x} ${end.y}
@@ -157,15 +157,15 @@ const CircleWithArc = ({ cycleInfo }) => {
                     alignItems: "center",
                     justifyContent: "center",
                     position: "absolute",
-                    width: isMobile ? "90%" : "65%",
-                    height: isMobile ? "65%" : "65%",
+                    width: isMobile ? "90%" : "70%",
+                    height: isMobile ? "65%" : "70%",
                     borderRadius: "50%",
                     borderWidth: 10,
                     borderColor: "#f3f3f5",
                     borderStyle: "solid",
                     backgroundColor: "#fff",
-                    top: "8%",
-                    left: isMobile ? "5%" : "19.2%",
+                    top: "18%",
+                    left: isMobile ? "5%" : "19%",
                     fontSize: "16px",
                     color: "#000",
                     zIndex: 2,

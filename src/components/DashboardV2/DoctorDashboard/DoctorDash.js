@@ -25,7 +25,7 @@ const SwitchWrapper = ({ onChange, ...props }) => {
 export default function DoctorDash() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState(""); 
+  const [searchQuery, setSearchQuery] = useState("");
   const loggedInUserId = useSelector(
     (state) => state?.authentication?.userAuth?.obj?.id,
   );
@@ -99,16 +99,16 @@ export default function DoctorDash() {
   const handleSwitchChange = useCallback(
     async (checked, record, step) => {
       console.log(step, "step");
-  
+
       if (checked) {
         try {
           await dispatch(increaseUserStep({ patientId: record.id, step }));
-  
+
           console.log(
             `${step} stage switch ${checked ? "enabled" : "disabled"} for record:`,
             record
           );
-  
+
           fetchPatientList();
         } catch (error) {
           console.error("Error while updating step:", error);
@@ -117,8 +117,8 @@ export default function DoctorDash() {
     },
     [dispatch, fetchPatientList]
   );
-  
-   
+
+
 
   const dataWithIds = useMemo(
     () =>
@@ -192,9 +192,10 @@ export default function DoctorDash() {
         render: (_, record) => (
           <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
             <SwitchWrapper
-            checked={record.patientStat?.statLevel === 1 || record.patientStat?.statLevel === 2 || record.patientStat?.statLevel === 3 } 
+              checked={record.patientStat?.statLevel === 1 || record.patientStat?.statLevel === 2 || record.patientStat?.statLevel === 3 || record.patientStat?.statLevel === 4}
               onChange={(checked, e) => handleSwitchChange(checked, record, 1, e)}
             />
+
 
           </div>
         ),
@@ -205,9 +206,11 @@ export default function DoctorDash() {
         render: (_, record) => (
           <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
             <Switch
-            checked={record.patientStat?.statLevel === 3 || record.patientStat?.statLevel === 4 } 
-            onChange={(checked, e) => handleSwitchChange(checked, record, 3, e)}
-            />
+              checked={record.patientStat?.statLevel === 3 || record.patientStat?.statLevel === 4}
+              onChange={(checked, e) => handleSwitchChange(checked, record, 3, e)}
+              disabled={
+                record.patientStat?.statLevel !== 1  && record.patientStat?.statLevel !== 2
+              } />
 
           </div>
         ),
@@ -218,10 +221,11 @@ export default function DoctorDash() {
         render: (_, record) => (
           <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
             <Switch
-            checked={record.patientStat?.statLevel === 4} 
+              checked={record.patientStat?.statLevel === 4}
               onChange={(checked, e) => handleSwitchChange(checked, record, 4, e)}
-
-            />
+              disabled={
+               record.patientStat?.statLevel !== 3
+              } />
           </div>
         ),
       },

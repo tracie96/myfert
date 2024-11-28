@@ -110,6 +110,8 @@ const PatientSignup = () => {
   const [selectedPartnerPronoun, setSelectedPartnerPronoun] = useState(null);
   const [formValues, setFormValues] = useState({});
   const [unit, setUnit] = useState("Metric");
+  const [heightOfPatient, setHeightOfPatient] = useState('');
+  const [weightOfPatient, setWeightOfPatient] = useState('');
   const [currentStep, setCurrentStep] = useState(0);
   const { Step } = Steps;
   const startYear = 2007;
@@ -455,6 +457,8 @@ const PatientSignup = () => {
   };
   const handleSetUnit = (checked) => {
     setUnit(checked ? "Metric" : "Imperial");
+    setHeightOfPatient('')
+    setWeightOfPatient('')
   };
   const nextStep = () => {
     form
@@ -1133,6 +1137,8 @@ const PatientSignup = () => {
                                             type="number"
                                             className="input_questionnaire"
                                             placeholder="Enter Height"
+                                            value={heightOfPatient}
+                                            onChange={(e)=>setHeightOfPatient(e.target.value)}
                                             style={{ marginRight: "10px" }}
                                           />
                                           <span>
@@ -1162,6 +1168,8 @@ const PatientSignup = () => {
                                             type="number"
                                             className="input_questionnaire"
                                             placeholder="Enter Weight"
+                                            value={weightOfPatient}
+                                            onChange={(e)=>setWeightOfPatient(e.target.value)}
                                             style={{ marginRight: "10px" }}
                                           />
                                           <span>

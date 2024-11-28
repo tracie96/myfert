@@ -21,7 +21,6 @@ const CompletePlan = () => {
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
   const { Title, Text } = Typography;
-
   const handleModalCancel = () => {
     setIsModalVisible(false);
   };

@@ -20,6 +20,7 @@ import {
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import CircleWithArc from "./periodchart";
+import { getPatientStatus } from "../../redux/patientSlice";
 const cycleData = {
   cycleInfo: {
     cycle_length: 29,
@@ -108,7 +109,7 @@ export default function PatDash() {
   const [currentStep, setCurrentStep] = useState(0);
   const [userCurrentStep] = useState(0);
   const { userAuth } = useSelector((state) => state.authentication);
-  const status = userAuth.obj.status
+  const { status} = useSelector((state) => state.patient);
   const [error, setError] = useState(null);
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const [viewAll, setViewAll] = useState(false);
@@ -122,8 +123,6 @@ export default function PatDash() {
   const handleViewAll = () => {
     setViewAll(!viewAll);
   };
-  //Cycle Modal
-
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   const showCyleModal = () => {
@@ -137,7 +136,12 @@ export default function PatDash() {
   const handleCancel = () => {
     setIsModalVisible(false);
   };
-
+console.log(status,'ggg')
+  useEffect(() => {
+    if (userAuth?.obj?.token) {
+      dispatch(getPatientStatus());
+    }
+  }, [userAuth?.obj?.token, dispatch]);
 
   useEffect(() => {
     const fetchMiraInfo = async () => {
@@ -145,12 +149,11 @@ export default function PatDash() {
       setError(null);
 
       try {
-        // Debug: Confirm that dispatch and getMiraInfo are being called
         console.log("Dispatching getMiraInfo");
 
         const resultAction = await dispatch(getMiraInfo());
 
-        console.log(resultAction, "Result Action"); // Debug: Check resultAction
+        console.log(resultAction, "Result Action"); 
 
         if (getMiraInfo.fulfilled.match(resultAction)) {
           setCycleInfo(resultAction.payload);
@@ -158,7 +161,7 @@ export default function PatDash() {
           setError(resultAction.payload || "Failed to fetch Mira Info");
         }
       } catch (err) {
-        console.error("Error occurred:", err); // Debug: Log error
+        console.error("Error occurred:", err); 
         setError("An unexpected error occurred");
       } finally {
         setLoading(false);
@@ -201,13 +204,13 @@ export default function PatDash() {
           width: isMobile ? "auto" : "100%",
         }}
       >
-        {status === null &&
+        {status === undefined &&
           <>
             <h3 style={{ color: "#335CAD", fontSize: "20px" }}>
               Initial Sign Up Steps:
             </h3>
           </>}
-        {status === null  || status?.statLevel === 1 ?
+        {status === "" || status?.statLevel === 1 || status === undefined ?
           <Steps
             current={currentStep}
             progressDot={customDot}
@@ -512,7 +515,7 @@ export default function PatDash() {
                         onClick={() => {
                           navigate("/plans");
                         }}
-                        disabled={status.statLevel !== 3}
+                        disabled={status?.statLevel !== 3}
                         style={{
                           backgroundColor: "#C2E6F8",
                           borderColor: "none",

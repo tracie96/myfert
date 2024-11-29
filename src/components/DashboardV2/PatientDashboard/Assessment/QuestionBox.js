@@ -1,7 +1,8 @@
 import React, { useEffect } from "react";
 import { Container, Row, Col } from "react-bootstrap";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useMediaQuery } from "react-responsive";
+import { getPatientStatus } from "../../../redux/patientSlice";
 
 const QuestionnaireGrid = ({ cards, onCardClick }) => {
   const isMobile = useMediaQuery({ maxWidth: 767 });
@@ -9,10 +10,16 @@ const QuestionnaireGrid = ({ cards, onCardClick }) => {
   const handleCardClick = (component) => {
     onCardClick(component);
   };
-
+  const dispatch = useDispatch();
   useEffect(() => {}, [cards]);
   const { userAuth } = useSelector((state) => state.authentication);
-  const status = userAuth.obj.status?.statLevel
+  const { status } = useSelector((state) => state.patient);
+
+  useEffect(() => {
+    if (userAuth?.obj?.token) {
+      dispatch(getPatientStatus());
+    }
+  }, [userAuth?.obj?.token, dispatch]);
 
   return (
     <Container className="mt-4 assessment-container">
@@ -53,14 +60,16 @@ const QuestionnaireGrid = ({ cards, onCardClick }) => {
               <div
                 className="mt-4"
                 onClick={
-                  status > 1 || index === 0 ? () => handleCardClick(card?.component) : null
-                } 
+                  status?.statLevel > 1 || index === 0
+                    ? () => handleCardClick(card?.component)
+                    : null
+                }
                 style={{
                   cursor: "pointer",
                   borderRadius: "20px",
                   overflow: "hidden",
                   backgroundColor: "#F2AA93",
-                  opacity: status >= 1 || index === 0 ? 1 : 0.5,
+                  opacity: status?.statLevel >= 1 || index === 0 ? 1 : 0.5,
                   position: "relative",
                   padding: "20px",
                   width: isMobile ? "100%" : "300px",

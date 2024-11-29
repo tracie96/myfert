@@ -1,21 +1,28 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 // import SubscriptionBanner from "../../assets/images/bg/subscription_home-logo.png";
 import SecondPlan from "./second-plan";
 import CompletePlan from "./complete_plan";
 
 import "./subscription.css"
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { getPatientStatus } from "../../components/redux/patientSlice";
 
 
 
 const SubscriptionPlanV2 = () => {
-  const { userAuth } = useSelector((state) => state.authentication);
-  const status = userAuth.obj.status
+  const dispatch = useDispatch();
 
+  const { userAuth } = useSelector((state) => state.authentication);
+  const { status } = useSelector((state) => state.patient); 
+  useEffect(() => {
+    if (userAuth?.obj?.token) {
+      dispatch(getPatientStatus());
+    }
+  }, [userAuth?.obj?.token, dispatch]);
   const renderContent = () => {
     switch (status?.statLevel) {
-      case 3:
+      case (4):
         return <CompletePlan />;
       default:
         return (

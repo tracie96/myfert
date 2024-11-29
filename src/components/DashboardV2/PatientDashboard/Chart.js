@@ -144,8 +144,8 @@ const HormoneChart = () => {
           period: cycleInfo
             ? {
                 type: "box",
-                xMin: getDayIndex(cycleInfo.period_start),
-                xMax: getDayIndex(cycleInfo.period_end),
+                xMin: getDayIndex(cycleInfo.period_start) -1 ,
+                xMax: getDayIndex(cycleInfo.period_end) - 1,
                 backgroundColor: "rgba(255, 99, 132, 0.25)",
                 borderWidth: 0,
                 label: {
@@ -158,8 +158,8 @@ const HormoneChart = () => {
           fertile: cycleInfo
             ? {
                 type: "box",
-                xMin: getDayIndex(cycleInfo.fertile_window_start),
-                xMax: getDayIndex(cycleInfo.fertile_window_end),
+                xMin: getDayIndex(cycleInfo.fertile_window_start)-1,
+          xMax: getDayIndex(cycleInfo.fertile_window_end) ,
                 backgroundColor: "rgba(75, 192, 192, 0.25)",
                 borderWidth: 0,
                 label: {

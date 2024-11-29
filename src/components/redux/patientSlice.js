@@ -49,6 +49,30 @@ export const increaseUserStep = createAsyncThunk(
     }
   }
 );
+export const getPatientStatus = createAsyncThunk(
+  "patient/getPatientStatus",
+  async (_, { rejectWithValue, getState, dispatch }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        "accept": "text/plain",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+    try {
+      const response = await axios.get(
+        `${baseUrl}Patient/GetPatientStatus`,
+        config
+      );
+      console.log(response)
+      return response.data;
+    } catch (error) {
+      handleApiError(error?.response?.data, dispatch, user);
+      return rejectWithValue(error?.response?.data || "An error occurred");
+    }
+  }
+);
+
 export const getDoctorAvailableSlotsForAppointment = createAsyncThunk(
   "patient/getDoctorAvailableSlotsForAppointment",
   async (obj, { rejectWithValue, getState, dispatch }) => {
@@ -360,7 +384,18 @@ const patientSlices = createSlice({
       state.upcomingPatientAppointment = action?.payload?.records;
       state.patientAppStatusCode = action?.payload?.statusCode;
     })
-
+    builder
+    .addCase(getPatientStatus.pending, (state) => {
+      state.loading = true;
+    })
+    .addCase(getPatientStatus.fulfilled, (state, action) => {
+      state.loading = false;
+      state.status = action.payload; 
+    })
+    .addCase(getPatientStatus.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
   },
 });
 

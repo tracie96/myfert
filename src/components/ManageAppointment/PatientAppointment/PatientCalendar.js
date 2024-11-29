@@ -75,7 +75,7 @@ console.log({newAppointmentList})
 
   useEffect(() => {
     if (selectedProviders) {
-      dispatch(getPatientAvailability({ month: 9, year: 2024 }));
+      dispatch(getPatientAvailability({ month: 12, year: 2024 }));
     }
   }, [selectedProviders, dispatch]);
 
@@ -140,14 +140,13 @@ console.log({newAppointmentList})
     (availability, startYear, startMonth) => {
       const events = availability.flatMap((slot) => {
         const backgroundColor = roleColorMap[slot.roleId] || "gray";
-  
         return slot.free
           ? [
               {
                 id: `${slot.date}_${slot.roleId}`,
-                title: `Fertility Coach`,
+                title: slot.roleName,
                 start: new Date(slot.date),
-                end: new Date(slot.date), // Single-day availability
+                end: new Date(slot.date),
                 classNames: `fc-event-${backgroundColor}`,
                 textColor: "white",
               },

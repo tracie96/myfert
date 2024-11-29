@@ -369,20 +369,15 @@ console.log({newAppointmentList})
         datesSet={(dateInfo) => handleDateRangeChange(dateInfo)}
 
         eventClick={(selectInfo) => {
-          const formattedDate = moment(selectInfo.event.startStr).utc()
-          .add(1, 'day').format("YYYY-MM-DD");
-
+          console.log({selectInfo})
+          const formattedDate = moment(selectInfo.event.startStr).utc().add(1, 'day').format("YYYY-MM-DD");
           addCalendarAppointment.resetForm();
           showDrawer();
-
           setSelectedDate(formattedDate);
-
         }}
         selectAllow={(selectInfo) => {
 
-          const formattedDate = moment(selectInfo.startStr).utc()
-          .add(1, 'day').format("YYYY-MM-DD");
-
+          const formattedDate = moment(selectInfo.startStr).utc().add(1, 'day').format("YYYY-MM-DD");
           addCalendarAppointment.resetForm();
           showDrawer();
           setSelectedDate(formattedDate)

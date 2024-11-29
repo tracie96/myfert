@@ -8,7 +8,6 @@ import { Menu, Button, Drawer, Layout } from "antd";
 import {
   QrcodeOutlined,
   MenuOutlined,
-  PlayCircleTwoTone,
   CalendarTwoTone,
   MedicineBoxTwoTone,
   PieChartTwoTone,

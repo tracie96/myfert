@@ -186,7 +186,7 @@ const CircleWithArc = ({ cycleInfo }) => {
                     width: isMobile ? "90%" : "70%",
                     height: isMobile ? "65%" : "70%",
                     borderRadius: "50%",
-                    borderWidth: 10,
+                    borderWidth: 0,
                     borderColor: "#f3f3f5",
                     borderStyle: "solid",
                     backgroundColor: "#fff",

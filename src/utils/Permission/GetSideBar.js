@@ -101,11 +101,11 @@ export const GetSideBar = () => {
           <span className="no-underline">APPOINTMENT</span>
         </NavLink>
       </Menu.Item>
-      <Menu.Item key="7" icon={<PlayCircleTwoTone />}>
+      {/* <Menu.Item key="7" icon={<PlayCircleTwoTone />}>
         <NavLink to="/plans" style={{ textDecoration: "none" }}>
           <span className="no-underline">PLANS</span>
         </NavLink>
-      </Menu.Item>
+      </Menu.Item> */}
       <Menu.Item key="8" icon={<InfoCircleTwoTone />}>
         <NavLink to="/learn" style={{ textDecoration: "none" }}>
           <span className="no-underline">LEARN</span>

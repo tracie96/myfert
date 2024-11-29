@@ -136,12 +136,25 @@ export default function PatDash() {
   const handleCancel = () => {
     setIsModalVisible(false);
   };
-console.log(status,'ggg')
   useEffect(() => {
+    let intervalId;
+  
     if (userAuth?.obj?.token) {
       dispatch(getPatientStatus());
+  
+      if (status?.statLevel <= 2 || status === '') {
+        intervalId = setInterval(() => {
+          dispatch(getPatientStatus());
+        }, 5000); 
+      }
     }
-  }, [userAuth?.obj?.token, dispatch]);
+  
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [userAuth?.obj?.token, status?.statLevel,status, dispatch]); 
 
   useEffect(() => {
     const fetchMiraInfo = async () => {

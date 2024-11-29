@@ -8,8 +8,6 @@ import "./subscription.css"
 import { useDispatch, useSelector } from "react-redux";
 import { getPatientStatus } from "../../components/redux/patientSlice";
 
-
-
 const SubscriptionPlanV2 = () => {
   const dispatch = useDispatch();
 
@@ -22,7 +20,7 @@ const SubscriptionPlanV2 = () => {
   }, [userAuth?.obj?.token, dispatch]);
   const renderContent = () => {
     switch (status?.statLevel) {
-      case (4):
+      case (2):
         return <CompletePlan />;
       default:
         return (

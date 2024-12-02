@@ -10811,6 +10811,14 @@ a:focus {
   height: auto;
 }
 
+.button_group {
+  position: absolute;
+  display: flex;
+  bottom: 24px;
+  justify-content: space-between;
+  width: 60vw;
+}
+
 .topbar .topbar-divider {
   width: 0;
   border-right: 1px solid #000;

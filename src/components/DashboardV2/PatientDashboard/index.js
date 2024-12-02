@@ -142,7 +142,7 @@ export default function PatDash() {
     if (userAuth?.obj?.token) {
       dispatch(getPatientStatus());
   
-      if (status?.statLevel <= 2 || status === '') {
+      if (status?.statLevel <= 1 || status?.statLevel === '' || status?.statLevel === undefined) {
         intervalId = setInterval(() => {
           dispatch(getPatientStatus());
         }, 5000); 
@@ -154,7 +154,7 @@ export default function PatDash() {
         clearInterval(intervalId);
       }
     };
-  }, [userAuth?.obj?.token, status?.statLevel,status, dispatch]); 
+  }, [userAuth?.obj?.token, status?.statLevel, dispatch]); 
 
   useEffect(() => {
     const fetchMiraInfo = async () => {

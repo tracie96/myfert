@@ -1015,7 +1015,7 @@ const PatientSignup = () => {
                                           },
                                         ]}
                                       >
-                                        <Input placeholder="Enter Postal Code" />
+                                        <Input maxLength={6} placeholder="Enter Postal Code" />
                                       </FormItem>
                                     </div>
                                   </div>
@@ -1478,7 +1478,15 @@ const PatientSignup = () => {
                                       </FormItem>
                                     </div>
 
-                                    <Form.Item>
+                                    <Form.Item
+                                    name="DigitalSignatureName"
+                                    rules={[
+                                      {
+                                        required: true,
+                                        message: "! Please confirm",
+                                      },
+                                    ]}
+                                    >
                                       <div
                                         style={{
                                           display: "flex",

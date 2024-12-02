@@ -7,6 +7,7 @@ import FormWrapper from "../FormWrapper";
 import "../assesment.css";
 import { DeleteOutlined } from "@ant-design/icons";
 import { useMediaQuery } from "react-responsive";
+import { backBtnTxt } from "../../../../../utils/constant";
 
 const questions = [
   {
@@ -1120,7 +1121,7 @@ const SymptomReview = ({ onComplete }) => {
               className="back-button"
               disabled={currentQuestionIndex === 0}
             >
-              Back
+              {backBtnTxt}
             </Button>
           ) : (
             <Button onClick={handleExit} className="previous-button">
@@ -1146,7 +1147,7 @@ const SymptomReview = ({ onComplete }) => {
                   className="back-button"
                   disabled={currentQuestionIndex === 0}
                 >
-                  Back
+                  {backBtnTxt}
                 </Button>
               )}
             </>
@@ -1169,7 +1170,7 @@ const SymptomReview = ({ onComplete }) => {
                   className="back-button"
                   disabled={currentQuestionIndex === 0}
                 >
-                  Back
+                  {backBtnTxt}
                 </Button>
               )}
             </>

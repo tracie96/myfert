@@ -1,6 +1,7 @@
 import React from "react";
 import { Button } from "reactstrap";
 import Spinner from "react-bootstrap/Spinner";
+import { backBtnTxt } from "../../../utils/constant";
 // import StripeCheckOutButton from "./StripeCheckOutButton";
 
 const PaymentConfirmation = (props) => {
@@ -153,7 +154,7 @@ const PaymentConfirmation = (props) => {
                   props.emptyCheckOutPayloadValue();
                 }}
               >
-                Back
+                {backBtnTxt}
               </span>
             </div>
             {!props.checkOutPayload && (

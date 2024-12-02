@@ -23,6 +23,7 @@ import moment from "moment";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import Title from "antd/es/typography/Title";
 import Paragraph from "antd/es/typography/Paragraph";
+import { backBtnTxt, exitBtnTxt, reproductiveGeneralHeading, reproductiveGeneralInfo } from "../../../../../utils/constant";
 
 const { Option } = Select;
 
@@ -173,7 +174,7 @@ const questions = [
   {
     question:
       "Do you have menstrual pain around the time of your period? (Check all that apply)?",
-    type: "radio",
+    type: "checkbox",
     title: "Cycle Information",
     name: "is_menstrual_pain",
     options: [
@@ -185,11 +186,13 @@ const questions = [
   },
 
   {
-    question: "Duration per Cycle",
+    question: "Describe the duration and severity of pain during menstrual bleeding.",
     type: "number_with_radio",
     title: "Cycle Information",
     name: "duration_per_cycle",
-    sub_question: "Period Pain: PELVIC PAIN/ CRAMPS",
+    sub_question: "Duration per Cycle",
+    question_description: "Period Pain: ",
+    question_description_answer: "PELVIC PAIN/ CRAMPS",
     subQuestions: [
       {
         type: "number_with_radio_sub",
@@ -1055,9 +1058,10 @@ const ReproductiveHealth = ({ onComplete }) => {
     currentQuestionIndex === totalQuestions - 1 ? "#01ACEE" : "#C2E6F8";
   const progressPercentage =
     ((currentQuestionIndex + 1) / totalQuestions) * 100;
+    const percentProgressBar = Math.round(100/totalQuestions);
 
   return (
-<Row gutter={16} style={{ padding: "0 5%" }}>
+<Row gutter={16} style={{ padding: "0 5%", height:"80vh" }}>
   <Col
     xs={24}
     sm={24}
@@ -1067,7 +1071,7 @@ const ReproductiveHealth = ({ onComplete }) => {
   >
     <FormWrapper name="FEMALE INTAKE QUESTIONNAIRE"/>
     <Progress
-      percent={Math.round(progressPercentage)}
+      percent={Math.round(progressPercentage) - percentProgressBar}
       strokeColor={progressColor}
       style={{
         top: 10,                  
@@ -1083,13 +1087,38 @@ const ReproductiveHealth = ({ onComplete }) => {
         paddingRight: "20px",
       }}
     >
+      <div 
+        style={{
+          font: "inter",
+          fontWeight:"700",
+          fontSize: "20px",
+          lineHeight:"24.25px",
+          color: "#F2AA93"
+        }}>
+          {reproductiveGeneralHeading}
+      </div>
       <h3 style={{ margin: "20px 0", color: "#F2AA93" }}>
         {questions[currentQuestionIndex].sub}
       </h3>
 
-      <h3 style={{ margin: "20px 0", color: "#000", fontSize: "15px" }}>
+      <i 
+        style={{
+          font: "inter",
+          fontWeight:"600",
+          fontSize: "16px",
+          lineHeight:"18.15px",
+          color: "#FF0000"
+        }}>
+          {reproductiveGeneralInfo}
+      </i>
+
+      <h3 style={{ margin: "20px 0", fontWeight:"600", color: "#000", fontSize: "15px" }}>
         {label}
         {questions[currentQuestionIndex].question}{" "}
+        <div>{
+          questions[currentQuestionIndex]?.question_description}
+          <span style={{color:"#325cae", fontWeight:"600", fontSize: "15px"}}>{questions[currentQuestionIndex]?.question_description_answer}</span>
+        </div>
         {questions[currentQuestionIndex].postname && (
           <span style={{ color: "#335CAD", fontWeight: "bold" }}>
             {` ${questions[currentQuestionIndex].postname}`}
@@ -1110,11 +1139,11 @@ const ReproductiveHealth = ({ onComplete }) => {
           className="back-button"
           disabled={currentQuestionIndex === 0}
         >
-          Back
+         {backBtnTxt}
         </Button>
       ) : (
         <Button onClick={handleExit} className="previous-button">
-          Exit
+          {exitBtnTxt}
         </Button>
       )}
 
@@ -1129,7 +1158,7 @@ const ReproductiveHealth = ({ onComplete }) => {
           </Button>
           {isMobile ? (
             <Button onClick={handleExit} className="previous-button">
-              Exit
+              {exitBtnTxt}
             </Button>
           ) : (
             <Button
@@ -1137,12 +1166,12 @@ const ReproductiveHealth = ({ onComplete }) => {
               className="back-button"
               disabled={currentQuestionIndex === 0}
             >
-              Back
+             {backBtnTxt}
             </Button>
           )}
         </>
       ) : (
-        <>
+        <span className="save_and_exit_group_btn">
           <Button
             type="primary"
             className="save-button"
@@ -1152,7 +1181,7 @@ const ReproductiveHealth = ({ onComplete }) => {
           </Button>
           {isMobile ? (
             <Button onClick={handleExit} className="previous-button">
-              Exit
+              {exitBtnTxt}
             </Button>
           ) : (
             <Button
@@ -1160,10 +1189,10 @@ const ReproductiveHealth = ({ onComplete }) => {
               className="back-button"
               disabled={currentQuestionIndex === 0}
             >
-              Back
+             {backBtnTxt}
             </Button>
           )}
-        </>
+        </span>
       )}
     </div>
   </Col>

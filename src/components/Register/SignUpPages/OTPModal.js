@@ -87,7 +87,7 @@ const EmailVerificationModal = ({ visible, onCancel, email }) => {
       const result = await dispatch(
         validateEmailOtp({ email: new_email, code: otp, session }),
       ).unwrap();
-      if (result.statusCode === "200") {
+      if (result.statusCode === "200" && result?.status) {
         message.success("Verification successful, Please login!");
         navigate("/");
       } else {

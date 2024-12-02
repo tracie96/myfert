@@ -56,9 +56,36 @@ const CircleWithArc = ({ cycleInfo }) => {
     };
 
     const isWithinRange = (date, rangeStart, rangeEnd) => {
-        return moment(date).isBetween(moment(rangeStart), moment(rangeEnd), "day", "[]");
+        const dateMoment = moment(date).startOf('day');
+        const rangeStartMoment = moment(rangeStart).startOf('day');
+        const rangeEndMoment = moment(rangeEnd).startOf('day');
+    
+        const rangeStartMonth = rangeStartMoment.month();
+        const rangeEndMonth = rangeEndMoment.month();
+    
+        if (rangeStartMonth === rangeEndMonth) {
+            return dateMoment.isBetween(rangeStartMoment, rangeEndMoment, 'days', '[]');
+        } else {
+            // Check if the range spans from the previous month to the current month or vice versa
+            const isWithinPreviousMonth = dateMoment.isBetween(
+                moment(rangeStartMoment).subtract(1, 'month').startOf('month'),
+                rangeStartMoment.endOf('month'),
+                'days',
+                '[]'
+            );
+            const isWithinCurrentMonth = dateMoment.isBetween(
+                rangeStartMoment.startOf('month'),
+                rangeEndMoment.endOf('month'),
+                'days',
+                '[]'
+            );
+    
+            return isWithinPreviousMonth || isWithinCurrentMonth;
+        }
     };
-
+    
+    
+    
     return (
         <div
             style={{
@@ -115,13 +142,12 @@ const CircleWithArc = ({ cycleInfo }) => {
                     strokeLinecap="round"
                 />
 
-                {/* Day Circles */}
                 {dayPositions.map((position, i) => {
-                    const dayDate = moment().date(i + 1); // Generate each day's date
+                    const dayDate = moment().date(i + 1);
                     const isToday = i + 1 === today.date();
+                    console.log(isWithinRange(dayDate,period_start,period_end,'ll'))
                     const isPeriod = isWithinRange(dayDate, period_start, period_end);
                     const isFertile = isWithinRange(dayDate, fertile_window_start, fertile_window_end);
-                    console.log({isToday,i})
                     if (isToday ) {
                         return (
                             <React.Fragment key={i}>

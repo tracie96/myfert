@@ -32,7 +32,7 @@ const HormoneChart = () => {
   const [cycleInfo, setCycleInfo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+
   useEffect(() => {
     const fetchMiraInfo = async () => {
       setLoading(true);
@@ -47,9 +47,9 @@ const HormoneChart = () => {
             pdg: parseFloat(hormone.pdg) || 0,
             test_time: hormone.test_time ? new Date(hormone.test_time) : new Date(),
           }));
-          
-             setHormoneData(parsedHormones);
-          setCycleInfo(resultAction.payload.cycleInfo); 
+
+          setHormoneData(parsedHormones);
+          setCycleInfo(resultAction.payload.cycleInfo);
         } else {
           setError(resultAction.payload || "Failed to fetch Mira Info");
         }
@@ -63,7 +63,7 @@ const HormoneChart = () => {
     fetchMiraInfo();
   }, [dispatch]);
 
-  const periodStart = new Date("2024-11-1"); 
+  const periodStart = new Date("2024-11-1");
   const labels = Array.from({ length: 62 }, (_, i) => (i % 31) + 1);
   const lhData = Array(62).fill(null);
   const e3gData = Array(62).fill(null);
@@ -119,9 +119,9 @@ const HormoneChart = () => {
 
   const options = {
     responsive: true,
-    maintainAspectRatio: false, 
+    maintainAspectRatio: false,
     scales: {
-      
+
       y: {
         title: {
           display: true,
@@ -143,44 +143,44 @@ const HormoneChart = () => {
         annotations: {
           period: cycleInfo
             ? {
-                type: "box",
-                xMin: getDayIndex(cycleInfo.period_start) -1 ,
-                xMax: getDayIndex(cycleInfo.period_end) - 1,
-                backgroundColor: "rgba(255, 99, 132, 0.25)",
-                borderWidth: 0,
-                label: {
-                  content: "Period",
-                  enabled: true,
-                  position: "center",
-                },
-              }
+              type: "box",
+              xMin: getDayIndex(cycleInfo.period_start) - 1,
+              xMax: getDayIndex(cycleInfo.period_end) - 1,
+              backgroundColor: "rgba(255, 99, 132, 0.25)",
+              borderWidth: 0,
+              label: {
+                content: "Period",
+                enabled: true,
+                position: "center",
+              },
+            }
             : {},
           fertile: cycleInfo
             ? {
-                type: "box",
-                xMin: getDayIndex(cycleInfo.fertile_window_start)-1,
-          xMax: getDayIndex(cycleInfo.fertile_window_end) ,
-                backgroundColor: "rgba(75, 192, 192, 0.25)",
-                borderWidth: 0,
-                label: {
-                  content: "Fertile Window",
-                  enabled: true,
-                  position: "center",
-                },
-              }
+              type: "box",
+              xMin: getDayIndex(cycleInfo.fertile_window_start) - 1,
+              xMax: getDayIndex(cycleInfo.fertile_window_end),
+              backgroundColor: "rgba(75, 192, 192, 0.25)",
+              borderWidth: 0,
+              label: {
+                content: "Fertile Window",
+                enabled: true,
+                position: "center",
+              },
+            }
             : {},
         },
       },
       legend: {
         labels: {
           font: {
-            size: window.innerWidth < 600 ? 10 : 14, 
+            size: window.innerWidth < 600 ? 10 : 14,
           },
         },
       },
       tooltip: {
         bodyFont: {
-          size: window.innerWidth < 600 ? 10 : 14, 
+          size: window.innerWidth < 600 ? 10 : 14,
         },
       },
     },
@@ -191,32 +191,32 @@ const HormoneChart = () => {
 
   return (
     <>
-    <div style={{ overflowX: "auto", paddingBottom: "10px" }}>
-      <div style={{ position: "relative", width: window.innerWidth < 600 ? "1000px" : "100%", height: "400px" }}>
-        <Line data={data} options={options} />
+      <div style={{ overflowX: "auto", paddingBottom: "10px" }}>
+        <div style={{ position: "relative", width: window.innerWidth < 600 ? "1000px" : "100%", height: "400px" }}>
+          <Line data={data} options={options} />
 
-      
-    </div>
-    </div>
+
+        </div>
+      </div>
       <div style={{ marginTop: "20px" }}>
-      <Row gutter={[16, 16]}>
-        {hormoneData?.map((entry, index) => (
-          <Col key={index} xs={24} sm={12} md={8} lg={6}>
-            <Card
-              title={entry.test_time.toLocaleDateString()}
-              bordered={true}
-              style={{ textAlign: "center" }}
-            >
-              <p><strong>LH:</strong> {entry.lh}</p>
-              <p><strong>E3G:</strong> {entry.e3g}</p>
-              <p><strong>PdG:</strong> {entry.pdg}</p>
-            </Card>
-          </Col>
-        ))}
-      </Row>
+        <Row gutter={[16, 16]}>
+          {hormoneData?.map((entry, index) => (
+            <Col key={index} xs={24} sm={12} md={8} lg={6}>
+              <Card
+                title={entry.test_time.toLocaleDateString()}
+                bordered={true}
+                style={{ textAlign: "center" }}
+              >
+                <p><strong>LH:</strong> {entry.lh}</p>
+                <p><strong>E3G:</strong> {entry.e3g}</p>
+                <p><strong>PdG:</strong> {entry.pdg}</p>
+              </Card>
+            </Col>
+          ))}
+        </Row>
 
 
-    </div>
+      </div>
     </>
   );
 };

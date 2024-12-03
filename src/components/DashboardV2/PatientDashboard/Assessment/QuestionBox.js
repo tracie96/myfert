@@ -69,7 +69,7 @@ const QuestionnaireGrid = ({ cards, onCardClick }) => {
                   borderRadius: "20px",
                   overflow: "hidden",
                   backgroundColor: "#F2AA93",
-                  opacity: status?.statLevel >= 1 || index === 0 ? 1 : 0.5,
+                  opacity: status?.statLevel > 1 || index === 0 ? 1 : 0.5 || status?.statLevel === undefined,
                   position: "relative",
                   padding: "20px",
                   width: isMobile ? "100%" : "300px",

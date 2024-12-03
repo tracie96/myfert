@@ -1085,6 +1085,7 @@ const ReproductiveHealth = ({ onComplete }) => {
         overflowY: "auto", 
         marginTop: "2%", 
         paddingRight: "20px",
+        height:"70%",
       }}
     >
       <div 

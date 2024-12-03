@@ -459,6 +459,8 @@ const PatientSignup = () => {
     setUnit(checked ? "Metric" : "Imperial");
     setHeightOfPatient('')
     setWeightOfPatient('')
+    form.resetFields(["Height", "Weight"]);
+    form.validateFields(["Height", "Weight"]);
   };
   const nextStep = () => {
     form
@@ -543,6 +545,13 @@ const PatientSignup = () => {
                                             required: true,
                                             message:
                                               "! Please enter your first name",
+                                          },
+                                          {
+                                            validator: (_, value) => {
+                                              if (value.length < 3) {
+                                                return Promise.reject("Name length should be greater than 3");
+                                              }
+                                            },
                                           },
                                         ]}
                                       >
@@ -1125,6 +1134,21 @@ const PatientSignup = () => {
                                             required: true,
                                             message: "Please enter your height",
                                           },
+                                          {
+                                            validator: (_, value) => {
+                                              if (!value) {
+                                                return Promise.reject("Height is required");
+                                              }
+                                              const isValid = unit === "Metric"
+                                                ? value >= 50 && value <= 250
+                                                : value >= 20 && value <= 100;
+                                              return isValid
+                                                ? Promise.resolve()
+                                                : Promise.reject(`Height must be valid for ${unit}, should be between 
+                                                ${unit === "Metric" ? "50 cm and 250 cm" : "20 inches and 100 inches"}
+                                                `);
+                                            },
+                                          },
                                         ]}
                                       >
                                         <div
@@ -1155,6 +1179,19 @@ const PatientSignup = () => {
                                           {
                                             required: true,
                                             message: "Please enter your weight",
+                                          },
+                                          {
+                                            validator: (_, value) => {
+                                              if (!value) {
+                                                return Promise.reject("Weight is required");
+                                              }
+                                              const isValid = unit === "Metric"
+                                                ? value >= 10 && value <= 200
+                                                : value >= 20 && value <= 500;
+                                              return isValid
+                                                ? Promise.resolve()
+                                                : Promise.reject(`Weight must be valid for ${unit}`);
+                                            },
                                           },
                                         ]}
                                       >

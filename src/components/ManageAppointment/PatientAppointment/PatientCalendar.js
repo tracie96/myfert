@@ -43,7 +43,7 @@ const PatientCalendar = ({ selectedProviders }) => {
     }),
     []
   );
-  
+
   const [apptEvents, setApptEvents] = useState([]);
   const {
     availableDoctors,
@@ -54,7 +54,7 @@ const PatientCalendar = ({ selectedProviders }) => {
   } = useSelector((state) => state?.doctor);
 
   const [newAppointmentList, setAppointmentList] = useState([]);
-console.log({newAppointmentList})
+  console.log({ newAppointmentList })
   useEffect(() => {
     setAppointmentList(appointmentList);
   }, [appointmentList]);
@@ -142,27 +142,27 @@ console.log({newAppointmentList})
         const backgroundColor = roleColorMap[slot.roleId] || "gray";
         return slot.free
           ? [
-              {
-                id: `${slot.date}_${slot.roleId}`,
-                title: slot.roleName,
-                start: new Date(slot.date),
-                end: new Date(slot.date),
-                classNames: `fc-event-${backgroundColor}`,
-                textColor: "white",
-              },
-            ]
+            {
+              id: `${slot.date}_${slot.roleId}`,
+              title: slot.roleName,
+              start: new Date(slot.date),
+              end: new Date(slot.date),
+              classNames: `fc-event-${backgroundColor}`,
+              textColor: "white",
+            },
+          ]
           : [
-              {
-                id: `${slot.date}_${slot.roleId}`,
-                title: `Booked`,
-                start: new Date(slot.date),
-                end: new Date(slot.date),
-                classNames: "fc-event-green",
-                textColor: "white",
-              },
-            ];
+            {
+              id: `${slot.date}_${slot.roleId}`,
+              title: `Booked`,
+              start: new Date(slot.date),
+              end: new Date(slot.date),
+              classNames: "fc-event-green",
+              textColor: "white",
+            },
+          ];
       });
-  
+
       setApptEvents((prevEvents) => {
         if (JSON.stringify(prevEvents) !== JSON.stringify(events)) {
           return events;
@@ -170,7 +170,7 @@ console.log({newAppointmentList})
         return prevEvents;
       });
     },
-    [roleColorMap, setApptEvents] 
+    [roleColorMap, setApptEvents]
   );
 
   const fetchAndSetAvailability = useCallback(
@@ -189,7 +189,7 @@ console.log({newAppointmentList})
         console.error("Error fetching availability:", error);
       }
     },
-    [dispatch, updateCalendarEvents] 
+    [dispatch, updateCalendarEvents]
   );
   const handleAppointmentClick = (appointment) => {
     console.log("Appointment CLicked", appointment);
@@ -202,7 +202,7 @@ console.log({newAppointmentList})
         const currentDate = new Date(selectedDate);
         const startMonth = currentDate.getMonth() + 1;
         const startYear = currentDate.getFullYear();
-        fetchAndSetAvailability(startYear, startMonth); 
+        fetchAndSetAvailability(startYear, startMonth);
       } else {
         message.error(result.error.message || "Failed to set appointment");
       }
@@ -253,7 +253,7 @@ console.log({newAppointmentList})
 
   const ZOHO_TOKEN_URL = "https://accounts.zoho.com/oauth/v2/token";
 
- 
+
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const authCode = urlParams.get("code");
@@ -370,21 +370,21 @@ console.log({newAppointmentList})
 
         eventClick={(selectInfo) => {
           const formattedDate = moment(selectInfo.event.startStr)
-              .local() // Convert to local time
-              .format("YYYY-MM-DD"); // Format to your desired date format
+            .local()
+            .format("YYYY-MM-DD");
           addCalendarAppointment.resetForm();
           showDrawer();
           setSelectedDate(formattedDate);
-      }}
-      
-      selectAllow={(selectInfo) => {
+        }}
+
+        selectAllow={(selectInfo) => {
           const formattedDate = moment(selectInfo.startStr)
-              .local() // Convert to local time
-              .format("YYYY-MM-DD"); // Format to your desired date format
+            .local()
+            .format("YYYY-MM-DD");
           addCalendarAppointment.resetForm();
           showDrawer();
           setSelectedDate(formattedDate);
-      }}
+        }}
         select={(selectInfo) => {
           addCalendarAppointment.resetForm();
           const startStr = selectInfo.startStr.split("T")[0];
@@ -397,7 +397,6 @@ console.log({newAppointmentList})
           start: new Date().toISOString().split("T")[0],
         }}
       />
-
       <Drawer
         title="Booking"
         placement="right"
@@ -412,9 +411,9 @@ console.log({newAppointmentList})
               <CalendarTwoTone style={{ fontSize: 24, marginRight: 50 }} />
               <span>
                 {selectedDate
-                  ? new Date(selectedDate).toDateString()
+                  ? moment(selectedDate).local().format("dddd, MMMM Do YYYY")
                   : "No date selected"}
-              </span>{" "}
+              </span>
             </Col>
           </Row>
         </div>
@@ -534,7 +533,7 @@ console.log({newAppointmentList})
             {availableDoctors?.length === 0 && "No clinicians available"}
           </div>
         </div>
-      </Drawer>
+      </Drawer >
       <Modal
         title={
           <p
@@ -634,33 +633,33 @@ console.log({newAppointmentList})
                                   flexWrap: "wrap",
                                 }}
                               >
-                          
-                                  <Tag
-                                    color="blue"
-                                    style={{
-                                      cursor: "pointer",
-                                      borderRadius: "4px",
-                                      padding: "4px 8px",
-                                      border: "1px solid #1890ff",
-                                      transition: "all 0.3s ease",
-                                    }}
-                                    onClick={() =>
-                                      handleAppointmentClick(appointment)
-                                    }
-                                  >
-                                    {`${formatTime(
-                                      appointment.start.hour,
-                                      appointment.start.minute
-                                    )} - ${formatTime(
-                                      appointment.end.hour,
-                                      appointment.end.minute
-                                    )}`}
-                                  </Tag>
+
+                                <Tag
+                                  color="blue"
+                                  style={{
+                                    cursor: "pointer",
+                                    borderRadius: "4px",
+                                    padding: "4px 8px",
+                                    border: "1px solid #1890ff",
+                                    transition: "all 0.3s ease",
+                                  }}
+                                  onClick={() =>
+                                    handleAppointmentClick(appointment)
+                                  }
+                                >
+                                  {`${formatTime(
+                                    appointment.start.hour,
+                                    appointment.start.minute
+                                  )} - ${formatTime(
+                                    appointment.end.hour,
+                                    appointment.end.minute
+                                  )}`}
+                                </Tag>
                               </div>
                             </div>
                           </List.Item>
                         )}
-                        locale={{ emptyText: "No available time slot" }} 
+                        locale={{ emptyText: "No available time slot" }}
                       />
                     </Card>
                   </Col>

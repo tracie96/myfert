@@ -59,14 +59,13 @@ const CircleWithArc = ({ cycleInfo }) => {
         const dateMoment = moment(date).startOf('day');
         const rangeStartMoment = moment(rangeStart).startOf('day');
         const rangeEndMoment = moment(rangeEnd).startOf('day');
-    
+
         const rangeStartMonth = rangeStartMoment.month();
         const rangeEndMonth = rangeEndMoment.month();
-    
+
         if (rangeStartMonth === rangeEndMonth) {
             return dateMoment.isBetween(rangeStartMoment, rangeEndMoment, 'days', '[]');
         } else {
-            // Check if the range spans from the previous month to the current month or vice versa
             const isWithinPreviousMonth = dateMoment.isBetween(
                 moment(rangeStartMoment).subtract(1, 'month').startOf('month'),
                 rangeStartMoment.endOf('month'),
@@ -79,13 +78,12 @@ const CircleWithArc = ({ cycleInfo }) => {
                 'days',
                 '[]'
             );
-    
+
             return isWithinPreviousMonth || isWithinCurrentMonth;
         }
     };
-    
-    
-    
+
+
     return (
         <div
             style={{
@@ -145,10 +143,28 @@ const CircleWithArc = ({ cycleInfo }) => {
                 {dayPositions.map((position, i) => {
                     const dayDate = moment().date(i + 1);
                     const isToday = i + 1 === today.date();
-                    console.log(isWithinRange(dayDate,period_start,period_end,'ll'))
-                    const isPeriod = isWithinRange(dayDate, period_start, period_end);
                     const isFertile = isWithinRange(dayDate, fertile_window_start, fertile_window_end);
-                    if (isToday ) {
+                    const dayNumber = dayDate.date();
+                    const periodNumber = moment(period_start).date();
+                    const periodRange = Array.from(
+                        { length: moment(period_end).date() - moment(period_start).date() + 1 },
+                        (_, index) => moment(period_start).date() + index
+                    );
+
+                    // Define the fertility window range (for example: 31, 1, 2, 3)
+                    const fertilityRange = Array.from(
+                        { length: moment(fertile_window_end).date() - moment(fertile_window_start).date() + 1 },
+                        (_, index) => moment(fertile_window_start).date() + index
+                    );
+
+                    const periodEndNumber = moment(period_end).date()
+                    const isNotInPeriodRange = !periodRange.includes(dayNumber);
+                    const isNotInFertilityRange = !fertilityRange.includes(dayNumber);
+                    console.log(dayNumber, periodNumber, periodEndNumber, "so")
+
+
+                    // Check if date is regular or highlight circle
+                    if (isToday) {
                         return (
                             <React.Fragment key={i}>
                                 <circle
@@ -170,11 +186,21 @@ const CircleWithArc = ({ cycleInfo }) => {
                                     {i + 1}
                                 </text>
                             </React.Fragment>
-                        );}
-                    else if  (isPeriod || isFertile) {
+                        );
+                    }
+                    else if (isNotInPeriodRange && isNotInFertilityRange && !isFertile) {
                         return (
                             <React.Fragment key={i}>
-                          
+
+                                <circle
+                                    key={i}
+                                    cx={position.x}
+                                    cy={position.y}
+                                    r={4}
+                                    fill="#f3f3f5"
+                                    filter="url(#shadow)"
+                                />
+
                                 <text
                                     x={position.x}
                                     y={position.y}
@@ -183,23 +209,37 @@ const CircleWithArc = ({ cycleInfo }) => {
                                     fontSize="10"
                                     fill="white"
                                 >
-                                    {i + 1}
+                                    {dayNumber}
                                 </text>
                             </React.Fragment>
                         );
                     }
-
-                    return (
-                        <circle
-                            key={i}
-                            cx={position.x}
-                            cy={position.y}
-                            r={4}
-                            fill="#f3f3f5"
-                            filter="url(#shadow)"
-                        />
+                    else return (
+                        <React.Fragment key={i}>
+                            {(isNotInPeriodRange) ? 
+                                <circle
+                                    key={i}
+                                    cx={position.x}
+                                    cy={position.y}
+                                    r={4}
+                                    fill="#f3f3f5"
+                                    filter="url(#shadow)"
+                                /> : ''}
+                            <text
+                                x={position.x}
+                                y={position.y}
+                                textAnchor="middle"
+                                alignmentBaseline="middle"
+                                fontSize="10"
+                                fill="white"
+                            >
+                                {dayNumber}
+                            </text>
+                        </React.Fragment>
                     );
                 })}
+
+
             </svg>
 
             {/* Center Content */}

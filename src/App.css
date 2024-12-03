@@ -10812,11 +10812,16 @@ a:focus {
 }
 
 .button_group {
-  position: absolute;
+  /* position: absolute; */
   display: flex;
-  bottom: 24px;
+  bottom: 0;
   justify-content: space-between;
   width: 60vw;
+}
+@media (max-width: 780px) {
+  .button_group {
+   flex-direction: column;
+  }
 }
 
 .topbar .topbar-divider {

@@ -567,11 +567,11 @@ const PatientCalendar = ({ selectedProviders }) => {
             <Row gutter={0} style={{ marginBottom: 8 }}>
               <Col span={18} style={{ display: "flex", alignItems: "center" }}>
                 <CalendarTwoTone style={{ fontSize: "20px" }} />
-                <span className="ml-2">
-                  {selectedDate
-                    ? new Date(selectedDate).toDateString()
-                    : "No date selected"}
-                </span>
+                <span>
+                {selectedDate
+                  ? moment(selectedDate).local().format("dddd, MMMM Do YYYY")
+                  : "No date selected"}
+              </span>
               </Col>
             </Row>
 

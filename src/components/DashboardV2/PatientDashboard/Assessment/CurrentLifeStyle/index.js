@@ -18,6 +18,7 @@ import FormWrapper from "../FormWrapper";
 import "./styles.css";
 import { useMediaQuery } from "react-responsive";
 import { DeleteTwoTone, EditTwoTone } from "@ant-design/icons";
+import { backBtnTxt, exitBtnTxt } from "../../../../../utils/constant";
 
 const { Option } = Select;
 
@@ -1134,7 +1135,7 @@ const CurrentLifeStyle = ({ onComplete }) => {
           {questions[currentQuestionIndex].sub}
         </h3>
 
-        <h3 style={{ margin: "20px 0", color: "#000", fontSize: "15px" }}>
+        <h3 style={{ margin: "20px 0", fontWeight:"600", color: "#000", fontSize: "15px" }}>
           {label}
           {questions[currentQuestionIndex].question}{" "}
           {questions[currentQuestionIndex].postname && (
@@ -1154,11 +1155,11 @@ const CurrentLifeStyle = ({ onComplete }) => {
               className="back-button"
               disabled={currentQuestionIndex === 0}
             >
-              Back
+             {backBtnTxt}
             </Button>
           ) : (
             <Button onClick={handleExit} className="previous-button">
-              Exit
+              {exitBtnTxt}
             </Button>
           )}
           {currentQuestionIndex === totalQuestions - 1 ? (
@@ -1172,7 +1173,7 @@ const CurrentLifeStyle = ({ onComplete }) => {
               </Button>
               {isMobile ? (
                 <Button onClick={handleExit} className="previous-button">
-                  Exit
+                  {exitBtnTxt}
                 </Button>
               ) : (
                 <Button
@@ -1180,12 +1181,12 @@ const CurrentLifeStyle = ({ onComplete }) => {
                   className="back-button"
                   disabled={currentQuestionIndex === 0}
                 >
-                  Back
+                 {backBtnTxt}
                 </Button>
               )}
             </>
           ) : (
-            <>
+            <span className="save_and_exit_group_btn">
               <Button
                 type="primary"
                 className="save-button"
@@ -1195,7 +1196,7 @@ const CurrentLifeStyle = ({ onComplete }) => {
               </Button>
               {isMobile ? (
                 <Button onClick={handleExit} className="previous-button">
-                  Exit
+                  {exitBtnTxt}
                 </Button>
               ) : (
                 <Button
@@ -1203,10 +1204,10 @@ const CurrentLifeStyle = ({ onComplete }) => {
                   className="back-button"
                   disabled={currentQuestionIndex === 0}
                 >
-                  Back
+                 {backBtnTxt}
                 </Button>
               )}
-            </>
+            </span>
           )}
         </div>
       </Col>

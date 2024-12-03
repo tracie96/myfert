@@ -17,6 +17,7 @@ import { completeCard } from "../../../../redux/assessmentSlice";
 import "../assesment.css";
 import { useMediaQuery } from "react-responsive";
 import { submitGeneralInformation } from "../../../../redux/AssessmentController";
+import { backBtnTxt, exitBtnTxt } from "../../../../../utils/constant";
 
 const { Option } = Select;
 
@@ -100,6 +101,23 @@ const GeneralIntakeForm = ({ onComplete }) => {
     navigate("/assessment");
   };
 
+  // Old code-
+  // ToDo: Remove this commented code if testing goes fine
+  // const validateQuestion = () => {
+  //   const question = questions[currentQuestionIndex];
+
+  //   if (question.type === "emergency_contact") {
+  //     const contact = answers[question.name];
+  //     return (
+  //       contact && contact.contact && contact.relationship && contact.phoneHome
+  //     );
+  //   }
+
+    // return (
+    //   answers[question.name] !== undefined && answers[question.name] !== ""
+    // );
+  // };
+
   const validateQuestion = () => {
     const question = questions[currentQuestionIndex];
 
@@ -109,10 +127,17 @@ const GeneralIntakeForm = ({ onComplete }) => {
         contact && contact.contact && contact.relationship && contact.phoneHome
       );
     }
-
-    return (
-      answers[question.name] !== undefined && answers[question.name] !== ""
-    );
+  
+    if (question.type === "radio") {
+      if (answers[question.name] === "Other") {
+        const otherValue = answers[`${question.name}_other`];
+        if (!otherValue || otherValue.trim() === "") {
+          return false;
+        }
+      }
+    }
+  
+    return answers[question.name] !== undefined && answers[question.name] !== "";
   };
 
   const handleSave = async () => {
@@ -287,16 +312,17 @@ const GeneralIntakeForm = ({ onComplete }) => {
     currentQuestionIndex === totalQuestions - 1 ? "#01ACEE" : "#C2E6F8";
   const progressPercentage =
     ((currentQuestionIndex + 1) / totalQuestions) * 100;
+    const percentProgressBar = Math.round(100/totalQuestions);
 
   return (
     <Row gutter={16} style={{ padding: "0 5%" }}>
       <Col xs={24} sm={24} md={16} lg={24} xl={24}>
         <FormWrapper name="FEMALE INTAKE QUESTIONNAIRE" />
-        <Progress percent={progressPercentage} strokeColor={progressColor} />
+        <Progress percent={Math.round(progressPercentage)- percentProgressBar} strokeColor={progressColor} />
         <h3 style={{ margin: "20px 0", color: "#F2AA93" }}>
           General Information
         </h3>
-        <h3 style={{ margin: "20px 0", color: "#000", fontSize: "15px" }}>
+        <h3 style={{ margin: "20px 0", fontWeight:"600", color: "#000", fontSize: "15px" }}>
           {questions[currentQuestionIndex].name === "emergency_contact" ? (
             questions[currentQuestionIndex].question
           ) : (
@@ -317,11 +343,11 @@ const GeneralIntakeForm = ({ onComplete }) => {
               className="back-button"
               disabled={currentQuestionIndex === 0}
             >
-              Back
+              {backBtnTxt}
             </Button>
           ) : (
             <Button onClick={handleExit} className="previous-button">
-              Exit
+              {exitBtnTxt}
             </Button>
           )}
           {currentQuestionIndex === totalQuestions - 1 ? (
@@ -335,7 +361,7 @@ const GeneralIntakeForm = ({ onComplete }) => {
               </Button>
               {isMobile ? (
                 <Button onClick={handleExit} className="previous-button">
-                  Exit
+                  {exitBtnTxt}
                 </Button>
               ) : (
                 <Button
@@ -343,12 +369,12 @@ const GeneralIntakeForm = ({ onComplete }) => {
                   className="back-button"
                   disabled={currentQuestionIndex === 0}
                 >
-                  Back
+                  {backBtnTxt}
                 </Button>
               )}
             </>
           ) : (
-            <>
+            <span className="save_and_exit_group_btn">
               <Button
                 type="primary"
                 className="save-button"
@@ -358,7 +384,7 @@ const GeneralIntakeForm = ({ onComplete }) => {
               </Button>
               {isMobile ? (
                 <Button onClick={handleExit} className="previous-button">
-                  Exit
+                  {exitBtnTxt}
                 </Button>
               ) : (
                 <Button
@@ -366,10 +392,10 @@ const GeneralIntakeForm = ({ onComplete }) => {
                   className="back-button"
                   disabled={currentQuestionIndex === 0}
                 >
-                  Back
+                  {backBtnTxt}
                 </Button>
               )}
-            </>
+            </span>
           )}
         </div>
       </Col>

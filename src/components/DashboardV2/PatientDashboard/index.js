@@ -139,22 +139,25 @@ export default function PatDash() {
   useEffect(() => {
     let intervalId;
   
+    // Fetch patient status only if user is authenticated
     if (userAuth?.obj?.token) {
       dispatch(getPatientStatus());
-  
+    
+      // Fetch status only if it needs updating based on the statLevel
       if (status?.statLevel <= 1 || status?.statLevel === '' || status?.statLevel === undefined) {
         intervalId = setInterval(() => {
           dispatch(getPatientStatus());
-        }, 5000); 
+        }, 10000);
       }
     }
   
     return () => {
+      // Clear the interval if set
       if (intervalId) {
         clearInterval(intervalId);
       }
     };
-  }, [userAuth?.obj?.token, status?.statLevel, dispatch]); 
+  }, [userAuth?.obj?.token, status?.statLevel, dispatch]);
 
   useEffect(() => {
     const fetchMiraInfo = async () => {

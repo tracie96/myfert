@@ -141,29 +141,28 @@ const CircleWithArc = ({ cycleInfo }) => {
                 />
 
                 {dayPositions.map((position, i) => {
-                    const dayDate = moment().date(i + 1);
-                    const isToday = i + 1 === today.date();
-                    const isFertile = isWithinRange(dayDate, fertile_window_start, fertile_window_end);
+                    const dayDate = moment().date(i + 1); // Current day (i + 1)
+                    const isToday = i + 1 === today.date(); // Check if it's today
+                    const isFertile = isWithinRange(dayDate, fertile_window_start, fertile_window_end); // Check if the day is in the fertile window
                     const dayNumber = dayDate.date();
-                    const periodNumber = moment(period_start).date();
                     const periodRange = Array.from(
                         { length: moment(period_end).date() - moment(period_start).date() + 1 },
                         (_, index) => moment(period_start).date() + index
                     );
+                    const formattedDate = dayDate.format('ddd D');
+                    // Define the fertility window range for multiple months
+                    const fertilityRange = [];
+                    let currentDay = moment(fertile_window_start);
+                    while (currentDay.isBefore(moment(fertile_window_end)) || currentDay.isSame(moment(fertile_window_end))) {
+                        fertilityRange.push(currentDay.date());
+                        currentDay.add(1, 'day');
+                    }
 
-                    // Define the fertility window range (for example: 31, 1, 2, 3)
-                    const fertilityRange = Array.from(
-                        { length: moment(fertile_window_end).date() - moment(fertile_window_start).date() + 1 },
-                        (_, index) => moment(fertile_window_start).date() + index
-                    );
-
-                    const periodEndNumber = moment(period_end).date()
+                    // Check if the day is in the period range or fertility range
                     const isNotInPeriodRange = !periodRange.includes(dayNumber);
                     const isNotInFertilityRange = !fertilityRange.includes(dayNumber);
-                    console.log(dayNumber, periodNumber, periodEndNumber, "so")
 
-
-                    // Check if date is regular or highlight circle
+                    // Check if it's today
                     if (isToday) {
                         return (
                             <React.Fragment key={i}>
@@ -188,19 +187,18 @@ const CircleWithArc = ({ cycleInfo }) => {
                             </React.Fragment>
                         );
                     }
+
+                    // If the day is not in the period range and not in the fertility range
                     else if (isNotInPeriodRange && isNotInFertilityRange && !isFertile) {
                         return (
                             <React.Fragment key={i}>
-
                                 <circle
-                                    key={i}
                                     cx={position.x}
                                     cy={position.y}
                                     r={4}
                                     fill="#f3f3f5"
                                     filter="url(#shadow)"
                                 />
-
                                 <text
                                     x={position.x}
                                     y={position.y}
@@ -214,30 +212,34 @@ const CircleWithArc = ({ cycleInfo }) => {
                             </React.Fragment>
                         );
                     }
-                    else return (
-                        <React.Fragment key={i}>
-                            {(isNotInPeriodRange) ? 
-                                <circle
-                                    key={i}
-                                    cx={position.x}
-                                    cy={position.y}
-                                    r={4}
-                                    fill="#f3f3f5"
-                                    filter="url(#shadow)"
-                                /> : ''}
-                            <text
-                                x={position.x}
-                                y={position.y}
-                                textAnchor="middle"
-                                alignmentBaseline="middle"
-                                fontSize="10"
-                                fill="white"
-                            >
-                                {dayNumber}
-                            </text>
-                        </React.Fragment>
-                    );
+
+                    // For other cases (days in period range or fertility range)
+                    else {
+                        return (
+                            <React.Fragment key={i}>
+                                {(isNotInPeriodRange && isNotInFertilityRange) ?
+                                    <circle
+                                        cx={position.x}
+                                        cy={position.y}
+                                        r={4}
+                                        fill="#f3f3f5"
+                                        filter="url(#shadow)"
+                                    /> : ''}
+                                <text
+                                    x={position.x}
+                                    y={position.y}
+                                    textAnchor="middle"
+                                    alignmentBaseline="middle"
+                                    fontSize="10"
+                                    fill="white"
+                                >
+              {(isNotInPeriodRange && isNotInFertilityRange) ? "":formattedDate}                     
+               </text>
+                            </React.Fragment>
+                        );
+                    }
                 })}
+
 
 
             </svg>

@@ -1,0 +1,58 @@
+.modal-content {
+  text-align: center;
+}
+
+.otp-input-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.otp-input {
+  width: 63px;
+  height: 63px;
+  text-align: center;
+  margin: 0 5px;
+  border-color: #b0b0b0;
+}
+
+.verify-button {
+  width: 100%;
+  max-width: 400px;
+  height: 42.82px;
+  border-radius: 20px;
+  background: #00adef;
+  border: none;
+  color: #fff;
+  margin-bottom: 20px;
+}
+
+.resend-text {
+  margin-bottom: 10px;
+}
+
+.email-change-text {
+  width: 100%;
+  text-align: center;
+}
+
+.email-change-link {
+  color: #01acee;
+  text-decoration: underline;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .otp-input {
+    width: 45px;
+    height: 45px;
+    margin: 0 3px;
+  }
+  ant-modal .ant-modal-title {
+    font-size: 18px;
+  }
+  .verify-button {
+    width: 80%;
+  }
+}

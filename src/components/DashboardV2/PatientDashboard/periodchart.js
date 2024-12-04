@@ -90,12 +90,12 @@ const CircleWithArc = ({ cycleInfo }) => {
                 position: "relative",
                 width: isMobile ? "250px" : "500px",
                 height: isMobile ? "250px" : "500px",
-                margin: "auto",
+                margin: isMobile?"10px":"auto",
                 marginTop: isMobile ? 0 : 70,
                 padding: 10,
             }}
         >
-            <svg width={isMobile ? 400 : 600} height={500} viewBox={isMobile ? "0 0 400 500" : "0 0 500 500"}>
+            <svg width={isMobile ? 300 : 600} height={isMobile?350:500} viewBox={isMobile ? "0 0 350 500" : "0 0 500 500"}>
                 <defs>
                     <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
                         <feDropShadow dx="2" dy="2" stdDeviation="3" floodColor="rgba(0, 0, 0, 0.3)" />
@@ -127,7 +127,7 @@ const CircleWithArc = ({ cycleInfo }) => {
                     d={createArc(periodStartAngle, periodEndAngle)}
                     fill="none"
                     stroke="url(#gradient1)"
-                    strokeWidth="40"
+                    strokeWidth="50"
                     strokeLinecap="round"
                 />
 
@@ -136,7 +136,7 @@ const CircleWithArc = ({ cycleInfo }) => {
                     d={createArc(fertileStartAngle, fertileEndAngle)}
                     fill="none"
                     stroke="url(#gradient2)"
-                    strokeWidth="40"
+                    strokeWidth="50"
                     strokeLinecap="round"
                 />
 
@@ -233,8 +233,8 @@ const CircleWithArc = ({ cycleInfo }) => {
                                     fontSize="10"
                                     fill="white"
                                 >
-              {(isNotInPeriodRange && isNotInFertilityRange) ? "":formattedDate}                     
-               </text>
+                                    {(isNotInPeriodRange && isNotInFertilityRange) ? "" : formattedDate}
+                                </text>
                             </React.Fragment>
                         );
                     }
@@ -244,7 +244,6 @@ const CircleWithArc = ({ cycleInfo }) => {
 
             </svg>
 
-            {/* Center Content */}
             <div
                 style={{
                     display: "flex",
@@ -252,14 +251,13 @@ const CircleWithArc = ({ cycleInfo }) => {
                     justifyContent: "center",
                     position: "absolute",
                     width: isMobile ? "90%" : "70%",
-                    height: isMobile ? "65%" : "70%",
+                    height: isMobile ? "90%" : "70%",
                     borderRadius: "50%",
                     borderWidth: 0,
                     borderColor: "#f3f3f5",
                     borderStyle: "solid",
-                    backgroundColor: "#fff",
-                    top: "18%",
-                    left: isMobile ? "5%" : "16%",
+                    top: isMobile?"30%":"18%",
+                    left: isMobile ? "25%" : "16%",
                     fontSize: "16px",
                     color: "#000",
                     zIndex: 2,

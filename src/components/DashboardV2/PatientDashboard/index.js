@@ -392,7 +392,7 @@ export default function PatDash() {
               },
               {
                 title: (
-                  <div style={{ textAlign: "left", fontSize: isMobile ? '12px' : '14px', display: "flex", flexDirection: "column", height: "100%" }}>
+                  <div style={{ textAlign: "left", fontSize: isMobile ? '12px' : '14px', display: "flex", flexDirection: "column", height: "100%"}}>
                     <ul>
                       <li>Book appt #1 with Fertility Coach</li>
                       <li>Book 1 hour appt with Clinician</li>

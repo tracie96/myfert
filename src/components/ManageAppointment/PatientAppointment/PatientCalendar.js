@@ -365,7 +365,6 @@ const PatientCalendar = ({ selectedProviders }) => {
         height={isMobile ? 464 : '100vh'}
         initialView="dayGridMonth"
         events={apptEvents}
-        selectable={true}
         datesSet={(dateInfo) => handleDateRangeChange(dateInfo)}
 
         eventClick={(selectInfo) => {
@@ -494,44 +493,45 @@ const PatientCalendar = ({ selectedProviders }) => {
               <Row
                 key={index}
                 align="middle"
-                style={{ marginBottom: 16 }}
+                justify="space-between"
+                style={{ marginBottom: 16, padding: "10px 20px",borderRadius: "8px" }}
                 onClick={() => handleClinicianClick(clinician)}
               >
                 <Col
-                  span={18}
-                  style={{ display: "flex", alignItems: "center" }}
+                  span={12}
+                  style={{ display: "flex", alignItems: "center", gap: "12px" }}
                 >
                   <Avatar
                     style={{ backgroundColor: "#87d068" }}
                     icon={<UserOutlined />}
                   />
-
                   <Link
                     to="#"
-                    style={{ marginLeft: "12px", whiteSpace: "nowrap" }}
+                    style={{ whiteSpace: "nowrap", fontSize: "16px", fontWeight: "500" }}
                   >
                     {clinician.name}
                   </Link>
                 </Col>
-                <Col span={4}>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      marginTop: 5,
-                    }}
+                <Col span={4} style={{ textAlign: "" }}>
+                  <Link
+                    to="#"
+                    style={{ color: "#000", fontSize: "14px", fontWeight: "400" }}
                   >
-                    <EnvironmentOutlined style={{ marginRight: 30 }} />
-                    Virtual
-                  </div>
+                    {clinician?.roleName}
+                  </Link>
+                </Col>
+                <Col span={4} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+                  <EnvironmentOutlined />
+                  <span style={{ fontSize: "14px", fontWeight: "400" }}>Virtual</span>
                 </Col>
                 <Col span={2} style={{ textAlign: "right" }}>
                   <RightOutlined style={{ color: "#08c" }} />
                 </Col>
               </Row>
             ))}
-            {availableDoctors?.length === 0 && "No clinicians available"}
+            {availableDoctors?.length === 0 && <div style={{ textAlign: "center", marginTop: "20px" }}>No clinicians available</div>}
           </div>
+
         </div>
       </Drawer >
       <Modal
@@ -568,10 +568,10 @@ const PatientCalendar = ({ selectedProviders }) => {
               <Col span={18} style={{ display: "flex", alignItems: "center" }}>
                 <CalendarTwoTone style={{ fontSize: "20px" }} />
                 <span>
-                {selectedDate
-                  ? moment(selectedDate).local().format("dddd, MMMM Do YYYY")
-                  : "No date selected"}
-              </span>
+                  {selectedDate
+                    ? moment(selectedDate).local().format("dddd, MMMM Do YYYY")
+                    : "No date selected"}
+                </span>
               </Col>
             </Row>
 

@@ -91,11 +91,11 @@ const CircleWithArc = ({ cycleInfo }) => {
                 width: isMobile ? "250px" : "500px",
                 height: isMobile ? "250px" : "500px",
                 margin: isMobile?"10px":"auto",
-                marginTop: isMobile ? 0 : 70,
+                marginTop: isMobile ? -20 : 70,
                 padding: 10,
             }}
         >
-            <svg width={isMobile ? 300 : 600} height={isMobile?350:500} viewBox={isMobile ? "0 0 350 500" : "0 0 500 500"}>
+            <svg width={isMobile ? 300 : 600} height={isMobile?300:500} viewBox={isMobile ? "0 0 350 500" : "0 0 500 500"}>
                 <defs>
                     <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
                         <feDropShadow dx="2" dy="2" stdDeviation="3" floodColor="rgba(0, 0, 0, 0.3)" />
@@ -256,7 +256,7 @@ const CircleWithArc = ({ cycleInfo }) => {
                     borderWidth: 0,
                     borderColor: "#f3f3f5",
                     borderStyle: "solid",
-                    top: isMobile?"30%":"18%",
+                    top: isMobile?"15%":"18%",
                     left: isMobile ? "25%" : "16%",
                     fontSize: "16px",
                     color: "#000",

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Row, Col, Button, Spin, Steps, Avatar, Divider, Modal } from "antd";
-import PeriodCycleTracker from "../../../screens/PatientDashboard/Cycle/cycle";
+// import PeriodCycleTracker from "../../../screens/PatientDashboard/Cycle/cycle";
 import { useDispatch } from "react-redux";
 import { getMiraInfo } from "../../redux/AuthController"; // Ensure this path is correct
 import { LoadingOutlined } from "@ant-design/icons";
@@ -790,7 +790,6 @@ export default function PatDash() {
             </div>
           </div>
         </Col>
-        {cycleInfo && cycleInfo.cycleInfo ? <CircleWithArc cycleInfo={cycleInfo} /> : ""}
         {isMobile ? <>
 
           {/* Fixed button on the right */}
@@ -825,7 +824,7 @@ export default function PatDash() {
             ]}
           >
             {cycleInfo && cycleInfo.cycleInfo ? (
-              <PeriodCycleTracker cycleInfo={cycleInfo} dummyInfo={cycleData} />
+              <CircleWithArc cycleInfo={cycleInfo} dummyInfo={cycleData} />
             ) : (
               <p>No cycle information available.</p>
             )}
@@ -856,9 +855,8 @@ export default function PatDash() {
                 />
               ) : error ? (
                 <p style={{ color: "red" }}>Error: {error}</p>
-              ) : cycleInfo && cycleInfo.cycleInfo ? ( // Correct condition to check if cycleInfo is available
-                ""
-              ) : (
+              ) : cycleInfo && cycleInfo.cycleInfo ?    <CircleWithArc cycleInfo={cycleInfo} /> 
+              : (
                 <p style={{ textAlign: "center" }}>
                   No cycle information available.
                 </p>

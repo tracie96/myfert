@@ -52,7 +52,8 @@ const PatientCalendar = ({ selectedProviders }) => {
     loading,
     error,
   } = useSelector((state) => state?.doctor);
-
+  const [selectedRole, setSelectedRole] = useState("");
+  const [doctorList, setAvailableDoctors] = useState(availableDoctors);
   const [newAppointmentList, setAppointmentList] = useState([]);
   console.log({ newAppointmentList })
   useEffect(() => {
@@ -64,7 +65,7 @@ const PatientCalendar = ({ selectedProviders }) => {
   const [unavailableDates, setUnavailableDates] = useState([
     16, 17, 18, 19, 20, 24,
   ]);
-  console.log(loading, error, setUnavailableDates);
+  console.log(loading, error, setUnavailableDates,selectedRole);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -371,6 +372,17 @@ const PatientCalendar = ({ selectedProviders }) => {
           const formattedDate = moment(selectInfo.event.startStr)
             .local()
             .format("YYYY-MM-DD");
+            const selectedRole = selectInfo.event.title;
+            console.log({selectedRole})
+
+            const filteredClinicians = availableDoctors.filter(
+              (clinician) => clinician.roleName === selectedRole
+            );
+        
+            setSelectedRole(selectedRole);
+            setAvailableDoctors(filteredClinicians); 
+
+
           addCalendarAppointment.resetForm();
           showDrawer();
           setSelectedDate(formattedDate);
@@ -386,6 +398,7 @@ const PatientCalendar = ({ selectedProviders }) => {
         }}
         select={(selectInfo) => {
           addCalendarAppointment.resetForm();
+      
           const startStr = selectInfo.startStr.split("T")[0];
           addCalendarAppointment.setFieldValue(
             "appointmentStartDate",
@@ -489,7 +502,7 @@ const PatientCalendar = ({ selectedProviders }) => {
             care.
           </p>
           <div style={{ margin: "50px 0" }}>
-            {availableDoctors?.map((clinician, index) => (
+            {doctorList?.map((clinician, index) => (
               <Row
                 key={index}
                 align="middle"

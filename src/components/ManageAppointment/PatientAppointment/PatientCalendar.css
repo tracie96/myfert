@@ -2,12 +2,14 @@
   background-color: #cef2f4 !important;
   color: #000 !important;
   text-align: center;
+  cursor: pointer;
 }
 
 .fc-event-red {
   background-color: #9df5b5 !important;
   color: #000 !important;
   text-align: center;
+  cursor: pointer;
 }
 .fc-today-button:not(:disabled){
  float: none !important;
@@ -16,18 +18,20 @@
   background-color: green !important;
   color: #fff !important;
   text-align: center;
+  cursor: pointer;
 }
 
 .fc-event-coach-booked{
   background-color: #cef2f4 !important;
   color: #000 !important;
   text-align: center;
+  cursor: pointer;
 }
 .fc-event-coach-available{
     background-color: #111F4A !important;
     color: #fff !important;
     text-align: center;
-  
+    cursor: pointer;
 }
 .fc .fc-button:not(:disabled){
 border: none !important;

@@ -879,7 +879,7 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
           Parent’s Birth/Childhood History
         </h3>
 
-        <h3 style={{ margin: "20px 0", color: "#000", fontSize: "15px" }}>
+        <h3 style={{ margin: "20px 0", color: "#000", fontWeight:"600", fontSize: "15px" }}>
           {label}
           {questions[currentQuestionIndex].question}
           <i style={{ color: "#335CAD", fontWeight: "bold" }}>

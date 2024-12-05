@@ -71,7 +71,7 @@ const HormoneChart = () => {
 
   hormoneData.forEach((entry) => {
     const dayIndex = Math.floor((new Date(entry.test_time) - periodStart) / (1000 * 60 * 60 * 24));
-    if (dayIndex >= 0 && dayIndex < lhData.length) {
+    if (dayIndex >= 0 && dayIndex <= lhData.length) {
       lhData[dayIndex] = entry.lh;
       e3gData[dayIndex] = entry.e3g;
       pdgData[dayIndex] = entry.pdg;
@@ -188,7 +188,14 @@ const HormoneChart = () => {
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
-
+  const distinctHormoneData = hormoneData.reduce((acc, entry) => {
+    const dateString = entry.test_time.toLocaleDateString(); // Convert date to string
+    if (!acc.some(item => item.test_time.toLocaleDateString() === dateString)) {
+      acc.push(entry); // Add the entry if the date is not already in the accumulator
+    }
+    return acc;
+  }, []);
+  
   return (
     <>
       <div style={{ overflowX: "auto", paddingBottom: "10px" }}>
@@ -200,7 +207,7 @@ const HormoneChart = () => {
       </div>
       <div style={{ marginTop: "20px" }}>
         <Row gutter={[16, 16]}>
-          {hormoneData?.map((entry, index) => (
+          {distinctHormoneData?.map((entry, index) => (
             <Col key={index} xs={24} sm={12} md={8} lg={6}>
               <Card
                 title={entry.test_time.toLocaleDateString()}

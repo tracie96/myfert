@@ -9,7 +9,7 @@ import {
   validateUsername,
 } from "../../redux/AuthController";
 import { useDispatch } from "react-redux";
-import { Row, Col, Card, message, Radio, Modal, Switch } from "antd";
+import { Row, Col, Card, message, Radio, Modal } from "antd";
 import "./SignupPages.css";
 import { Form, Input, Button, Checkbox, DatePicker, Spin, Steps } from "antd";
 import Select from "react-select";
@@ -456,7 +456,7 @@ const PatientSignup = () => {
     setIsModalVisible(false);
   };
   const handleSetUnit = (checked) => {
-    setUnit(checked ? "Metric" : "Imperial");
+    setUnit(checked);
     setHeightOfPatient('')
     setWeightOfPatient('')
     form.resetFields(["Height", "Weight"]);
@@ -1090,32 +1090,14 @@ const PatientSignup = () => {
                                           fontSize: "15px",
                                         }}
                                       >
-                                        <p
-                                          style={{
-                                            margin: 0,
-                                            marginLeft: 10,
-                                            fontSize: "15px",
-                                          }}
+                                        <Radio.Group
+                                          value={unit}
+                                          onChange={(e) => handleSetUnit(e.target.value)}
+                                          style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}
                                         >
-                                          Metric
-                                        </p>
-                                        <Switch
-                                          checked={unit === "Metric"}
-                                          onChange={(checked) =>
-                                            handleSetUnit(checked)
-                                          }
-                                          checkedChildren=""
-                                          unCheckedChildren=""
-                                        />
-                                        <p
-                                          style={{
-                                            margin: 0,
-                                            marginRight: 10,
-                                            fontSize: "15px",
-                                          }}
-                                        >
-                                          Imperial
-                                        </p>
+                                          <Radio value="Metric" style={{ margin: "0 10px" }}>Metric</Radio>
+                                          <Radio value="Imperial" style={{ margin: "0 10px" }}>Imperial</Radio>
+                                        </Radio.Group>
                                       </div>
                                     </div>
                                     <div className="col-lg-4 col-sm-4">

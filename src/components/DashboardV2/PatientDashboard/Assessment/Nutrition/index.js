@@ -620,7 +620,7 @@ const Nutrition = ({ onComplete }) => {
         />
         <h3 style={{ margin: "20px 0", color: "#F2AA93" }}>Nutrition</h3>
 
-        <h3 style={{ margin: "20px 0", color: "#000", fontSize: "15px" }}>
+        <h3 style={{ margin: "20px 0", fontWeight:"600", color: "#000", fontSize: "15px" }}>
           {label}
           {questions[currentQuestionIndex].question}{" "}
           <i style={{ color: "#335CAD", fontWeight: "bold" }}>

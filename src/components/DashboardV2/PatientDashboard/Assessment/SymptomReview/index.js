@@ -1106,7 +1106,7 @@ const SymptomReview = ({ onComplete }) => {
           {questions[currentQuestionIndex].title}
         </h3>
 
-        <h3 style={{ margin: "20px 0", color: "#000", fontSize: "15px" }}>
+        <h3 style={{ margin: "20px 0", color: "#000", fontWeight:"600", fontSize: "15px" }}>
           {questions[currentQuestionIndex].question}
         </h3>
         {renderInput(questions[currentQuestionIndex])}

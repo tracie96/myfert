@@ -417,25 +417,39 @@ const ReproductiveHealth = ({ onComplete }) => {
     }
   }, []);
 
+  // handling number as well.
   const validateQuestion = () => {
     const question = questions[currentQuestionIndex];
     const mainAnswer = answers[question.name];
+  
     const isCheckbox = Array.isArray(mainAnswer);
     const isOtherSelected = isCheckbox
       ? mainAnswer.includes("Other")
       : mainAnswer === "Other";
+  
     const otherAnswerKey = `${question.name}_other`;
     const otherAnswer = answers[otherAnswerKey];
     if (isOtherSelected && (!otherAnswer || otherAnswer.trim() === "")) {
       return false;
     }
+
+    if (question.type === "number_with_radio" && question.subQuestions) {
+      const subQuestion = question.subQuestions[0];
+      const subAnswer = answers[subQuestion.name];
+  
+      const isSubAnswered =
+        typeof subAnswer === "number" && subAnswer >= 0;
+  
+      return isSubAnswered;
+    }
     if (isCheckbox) {
       return mainAnswer.length > 0;
-    } else {
-      return mainAnswer !== undefined && mainAnswer !== "";
     }
+    if (typeof mainAnswer === "number") {
+      return !isNaN(mainAnswer) && mainAnswer >= 0;
+    }
+    return mainAnswer !== undefined && mainAnswer !== "";
   };
-  
   
   
 // ToDo: previous implementation, after successful testing of the applplication, this can be deleted.
@@ -1080,7 +1094,6 @@ const ReproductiveHealth = ({ onComplete }) => {
     currentQuestionIndex === totalQuestions - 1 ? "#01ACEE" : "#C2E6F8";
   const progressPercentage =
     ((currentQuestionIndex + 1) / totalQuestions) * 100;
-    const percentProgressBar = Math.round(100/totalQuestions);
 
   return (
 <Row gutter={16} style={{ padding: "0 5%", height:"80vh" }}>
@@ -1093,7 +1106,7 @@ const ReproductiveHealth = ({ onComplete }) => {
   >
     <FormWrapper name="FEMALE INTAKE QUESTIONNAIRE"/>
     <Progress
-      percent={Math.round(progressPercentage) - percentProgressBar}
+      percent={Math.round(progressPercentage)}
       strokeColor={progressColor}
       style={{
         top: 10,                  

@@ -24,6 +24,7 @@ import { InfoCircleOutlined } from "@ant-design/icons";
 import Title from "antd/es/typography/Title";
 import Paragraph from "antd/es/typography/Paragraph";
 import { backBtnTxt, exitBtnTxt, reproductiveGeneralHeading, reproductiveGeneralInfo, saveAndContinueBtn, submitBtn } from "../../../../../utils/constant";
+import InfoModal from "./InfoModal";
 
 const { Option } = Select;
 
@@ -247,7 +248,8 @@ const questions = [
   },
 
   {
-    question: "Do you experience PMS symptoms?   ℹ️ ",
+    question: "Do you experience PMS symptoms?",
+    infoIconBtn:"   ℹ️ ",
     type: "radio",
     title: "Cycle Information",
     name: "is_pms_symptom",
@@ -400,6 +402,7 @@ const questions = [
 
 const ReproductiveHealth = ({ onComplete }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [showInfoMoal,setShowInfoMoal] = useState(false);
   const [answers, setAnswers] = useState({});
   const totalQuestions = questions.length;
   const dispatch = useDispatch();
@@ -417,7 +420,6 @@ const ReproductiveHealth = ({ onComplete }) => {
     }
   }, []);
 
-  // handling number as well.
   const validateQuestion = () => {
     const question = questions[currentQuestionIndex];
     const mainAnswer = answers[question.name];
@@ -433,6 +435,7 @@ const ReproductiveHealth = ({ onComplete }) => {
       return false;
     }
 
+    // Validate number_with_radio questions
     if (question.type === "number_with_radio" && question.subQuestions) {
       const subQuestion = question.subQuestions[0];
       const subAnswer = answers[subQuestion.name];
@@ -442,6 +445,17 @@ const ReproductiveHealth = ({ onComplete }) => {
   
       return isSubAnswered;
     }
+  
+    // Validate subQuestions for "Yes" or other dependent answers
+    if (question.subQuestions && mainAnswer === "Yes") {
+      for (const subQuestion of question.subQuestions) {
+        const subAnswer = answers[subQuestion.name];
+        if (!subAnswer || subAnswer.trim() === "") {
+          return false; // Fail validation if any sub-question is not answered
+        }
+      }
+    }
+  
     if (isCheckbox) {
       return mainAnswer.length > 0;
     }
@@ -451,29 +465,39 @@ const ReproductiveHealth = ({ onComplete }) => {
     return mainAnswer !== undefined && mainAnswer !== "";
   };
   
-  
-// ToDo: previous implementation, after successful testing of the applplication, this can be deleted.
+
+  // // ToDo: previous implementation, after successful testing of the applplication, this can be deleted. Handling number as well.
   // const validateQuestion = () => {
   //   const question = questions[currentQuestionIndex];
-  //     const mainAnswer = answers[question.name];
+  //   const mainAnswer = answers[question.name];
   
-  //   const isMainAnswered = mainAnswer !== undefined && mainAnswer !== "";
+  //   const isCheckbox = Array.isArray(mainAnswer);
+  //   const isOtherSelected = isCheckbox
+  //     ? mainAnswer.includes("Other")
+  //     : mainAnswer === "Other";
   
-  //   if (question.subQuestions && !question.options && question.subQuestions.length > 0) {
-  //     const subQuestion = question.subQuestions[0]; 
-  //     const subQuestionNumberAnswer = answers[subQuestion.name];
-  //     const subQuestionRadioAnswer = answers[`${subQuestion.name}_radio`];
-  //     console.log(subQuestionNumberAnswer,subQuestionRadioAnswer,'dd')
+  //   const otherAnswerKey = `${question.name}_other`;
+  //   const otherAnswer = answers[otherAnswerKey];
+  //   if (isOtherSelected && (!otherAnswer || otherAnswer.trim() === "")) {
+  //     return false;
+  //   }
 
-  //     const isSubAnswered = 
-  //       (subQuestionNumberAnswer !== undefined && subQuestionNumberAnswer !== 0) || 
-  //       subQuestionRadioAnswer === "Unsure";
-        
-  //       console.log({isMainAnswered, isSubAnswered})
+  //   if (question.type === "number_with_radio" && question.subQuestions) {
+  //     const subQuestion = question.subQuestions[0];
+  //     const subAnswer = answers[subQuestion.name];
+  
+  //     const isSubAnswered =
+  //       typeof subAnswer === "number" && subAnswer >= 0;
+  
   //     return isSubAnswered;
   //   }
-  
-  //   return isMainAnswered;
+  //   if (isCheckbox) {
+  //     return mainAnswer.length > 0;
+  //   }
+  //   if (typeof mainAnswer === "number") {
+  //     return !isNaN(mainAnswer) && mainAnswer >= 0;
+  //   }
+  //   return mainAnswer !== undefined && mainAnswer !== "";
   // };
   
   
@@ -505,6 +529,10 @@ const ReproductiveHealth = ({ onComplete }) => {
   const handleExit = () => {
     navigate("/assessment");
   };
+
+  const handleInfoModal = () => {
+    setShowInfoMoal(!showInfoMoal)
+  }
   const label = (
     <span>
       <span style={{ color: "red" }}>* </span>
@@ -1151,6 +1179,7 @@ const ReproductiveHealth = ({ onComplete }) => {
       <h3 style={{ margin: "20px 0", fontWeight:"600", color: "#000", fontSize: "15px" }}>
         {label}
         {questions[currentQuestionIndex].question}{" "}
+        <span style={{cursor: "pointer"}} onClick={handleInfoModal}>{questions[currentQuestionIndex]?.infoIconBtn}</span>
         <div>{
           questions[currentQuestionIndex]?.question_description}
           <span style={{color:"#325cae", fontWeight:"600", fontSize: "15px"}}>{questions[currentQuestionIndex]?.question_description_answer}</span>
@@ -1161,6 +1190,12 @@ const ReproductiveHealth = ({ onComplete }) => {
           </span>
         )}
       </h3>
+      {showInfoMoal && 
+        <InfoModal
+          showInfoMoal={showInfoMoal} 
+          handleInfoModal={handleInfoModal} 
+        />
+      }
       {renderInput(questions[currentQuestionIndex])}
     </div>
 

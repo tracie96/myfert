@@ -374,7 +374,7 @@ export default function PatDash() {
                       <Button
                         type="primary"
                         onClick={() => {
-                          navigate("/patient/appointment");
+                        navigate("/learn");
                         }}
                         style={{
                           backgroundColor: "#C2E6F8",

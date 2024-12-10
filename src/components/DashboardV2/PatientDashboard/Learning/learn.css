@@ -21,7 +21,7 @@ padding: 1rem 7rem;
   .video-frame {
     border-radius: 8px;
     overflow: hidden;
-  }
+    }
   .video-placeholder {
     width: 150px;
     height: 100px;

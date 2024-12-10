@@ -171,18 +171,7 @@ export const postRegister = createAsyncThunk(
 
       if (responseBack?.status) {
         console.log(users.email, "dis");
-        const otpResponse = await dispatch(
-          sendEmailOtp({
-            email: users.email,
-            session: responseBack.session,
-          }),
-        ).unwrap();
-
-        if (otpResponse.statusCode === "200") {
-          message.success("Registration successful. OTP sent to your email!");
-        } else {
-          message.error("Registration successful but failed to send OTP!");
-        }
+       
       }
       localStorage.setItem("userInfo", JSON.stringify(responseBack));
     } catch (error) {
@@ -190,20 +179,7 @@ export const postRegister = createAsyncThunk(
     }
   },
 );
-export const sendEmailOtp = createAsyncThunk(
-  "auth/sendEmailOtp",
-  async ({ email, session }, { rejectWithValue }) => {
-    try {
-      const response = await axios.post(`${baseUrl}Auth/ResendEmailOtp`, {
-        email,
-        session,
-      });
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response.data);
-    }
-  },
-);
+
 export const validateEmail = createAsyncThunk(
   "user/validateEmail",
   async (email, { rejectWithValue }) => {

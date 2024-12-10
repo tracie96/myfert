@@ -53,7 +53,7 @@ const PatientSignup = () => {
     lastName: "",
     PreferredName: "",
     Pronouns: "",
-    gender: "Female",
+    gender: "",
     password: "",
     cpassword: "",
     email: "",

@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Modal, Input, Button, message } from "antd";
 import { useDispatch } from "react-redux";
-import { validateEmailOtp, sendEmailOtp } from "../../redux/AuthController";
+import { validateEmailOtp } from "../../redux/AuthController";
 import { useNavigate } from "react-router-dom";
 import { Player } from "@lottiefiles/react-lottie-player";
 import EmailInputModal from "./UpdateEmailModal";
@@ -18,42 +18,42 @@ const EmailVerificationModal = ({ visible, onCancel, email }) => {
   useEffect(() => {
     setEmail(email);
   }, [email]);
-  const handleResendOtp = useCallback(async () => {
-    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-    const session = userInfo?.session;
+  // const handleResendOtp = useCallback(async () => {
+  //   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  //   const session = userInfo?.session;
 
-    if (!session) {
-      message.error("Session not found. Please try again.");
-      return;
-    }
+  //   if (!session) {
+  //     message.error("Session not found. Please try again.");
+  //     return;
+  //   }
 
-    try {
-      await dispatch(sendEmailOtp({ email: new_email, session })).unwrap();
-      setTimer(60);
-      message.success(`Verification code sent to ${new_email}`);
-    } catch (error) {
-      message.error("Failed to resend OTP. Please try again.");
-    }
-  }, [dispatch, new_email]);
-  useEffect(() => {
-    let intervalId;
+  //   try {
+  //     await dispatch(sendEmailOtp({ email: new_email, session })).unwrap();
+  //     setTimer(60);
+  //     message.success(`Verification code sent to ${new_email}`);
+  //   } catch (error) {
+  //     message.error("Failed to resend OTP. Please try again.");
+  //   }
+  // }, [dispatch, new_email]);
+  // useEffect(() => {
+  //   let intervalId;
 
-    if (visible && timer > 0) {
-      intervalId = setInterval(() => {
-        setTimer((prevTimer) => {
-          if (prevTimer === 1) {
-            handleResendOtp();
-            setTimer(60);
-          }
-          return prevTimer - 1;
-        });
-      }, 1000);
-    } else if (timer === 0) {
-      clearInterval(intervalId);
-    }
+  //   if (visible && timer > 0) {
+  //     intervalId = setInterval(() => {
+  //       setTimer((prevTimer) => {
+  //         if (prevTimer === 1) {
+  //           handleResendOtp();
+  //           setTimer(60);
+  //         }
+  //         return prevTimer - 1;
+  //       });
+  //     }, 1000);
+  //   } else if (timer === 0) {
+  //     clearInterval(intervalId);
+  //   }
 
-    return () => clearInterval(intervalId);
-  }, [visible, timer, handleResendOtp]);
+  //   return () => clearInterval(intervalId);
+  // }, [visible, timer, handleResendOtp]);
 
   useEffect(() => {
     if (visible) {

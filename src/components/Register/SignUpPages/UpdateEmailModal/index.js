@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Modal, Input, Button, message } from "antd";
 import { Player } from "@lottiefiles/react-lottie-player";
 import { useDispatch } from "react-redux";
-import { updateEmail, sendEmailOtp } from "../../../redux/AuthController"; // Import the sendEmailOtp thunk
+import { updateEmail } from "../../../redux/AuthController"; // Import the sendEmailOtp thunk
 
 const EmailInputModal = ({
   visible,
@@ -31,7 +31,6 @@ const EmailInputModal = ({
           updateEmail({ email: initialEmail, session, newEmail: email }),
         ).unwrap();
 
-        await dispatch(sendEmailOtp({ email, session })).unwrap();
 
         onSubmit(email);
       } catch (error) {

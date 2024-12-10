@@ -3,7 +3,7 @@ import { NavLink, Navigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
-import { postLogin, sendEmailOtp, updateEmail } from "../redux/AuthController";
+import { postLogin, updateEmail } from "../redux/AuthController";
 import {
   Button,
   Input,
@@ -90,7 +90,7 @@ function Login() {
 
     try {
       await dispatch(updateEmail({ email, session, newEmail: email })).unwrap();
-      await dispatch(sendEmailOtp({ email, session })).unwrap();
+      // await dispatch(sendEmailOtp({ email, session })).unwrap();
 
       setResendEmail(email);
       setShowEmailInputModal(false);

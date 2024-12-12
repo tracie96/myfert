@@ -101,7 +101,7 @@ const HormoneChart = () => {
     if (!cycleInfo) return null;
     return (
       Math.ceil(
-        (new Date(cycleInfo.ovulation) - new Date(cycleInfo.period_start)) /
+        (new Date(cycleInfo?.ovulation) - new Date(cycleInfo?.period_start)) /
           (1000 * 60 * 60 * 24)
       ) + 1
     );
@@ -177,8 +177,8 @@ const HormoneChart = () => {
             {userInfo.obj.firstName === 'Amara' && shadingAreas.map((area, index) => (
               <ReferenceArea
                 key={index}
-                x1={area.start}
-                x2={area.end}
+                x1={area?.start}
+                x2={area?.end}
                 stroke="none"
                 fill={area.type === "period" ? "#ffcccc" : "#ccffcc"}
                 fillOpacity={0.2}

@@ -63,6 +63,7 @@
     "react-text-mask": "^5.5.0",
     "react-toastify": "^9.1.3",
     "reactstrap": "^9.2.1",
+    "recharts": "^2.14.1",
     "redux-persist": "^6.0.0",
     "styled-components": "^6.1.11",
     "text-mask-addons": "^3.8.0",

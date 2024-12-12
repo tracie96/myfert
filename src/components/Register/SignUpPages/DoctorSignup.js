@@ -32,6 +32,7 @@ const DoctorSignup = ({ userRole }) => {
   const [email, setEmail] = useState("");
   const [usernameCheck, setUsernameCheck] = useState("");
   const [emailCheck, setEmailCheck] = useState(null);
+  const [uploadedFileUrl, setUploadedFileUrl] = useState(null);
   const [emailVerificationVisible, setEmailVerificationVisible] =
     useState(false);
 
@@ -46,7 +47,6 @@ const DoctorSignup = ({ userRole }) => {
   const [username, setUsername] = useState("");
   const { Item: FormItem } = Form;
   console.log(location.state, "pro");
-  const [fileList, setFileList] = useState("");
   const initialValues = {
     role: location.state?.role,
     userName: "",
@@ -74,17 +74,26 @@ const DoctorSignup = ({ userRole }) => {
     isAssessor: location.state?.isAccessor,
   };
 
-  console.log(fileList);
   const uploadProps = {
-    name: "file",
+    name: 'file',
     multiple: false,
-    onChange(info) {
-      const { fileList: newFileList } = info;
-      setFileList(newFileList);
+    action: 'https://api.cloudinary.com/v1_1/tracysoft/upload', 
+    data: {
+      upload_preset: 'myfertility',
     },
-    onPreview(file) {
-      const url = URL.createObjectURL(file.originFileObj);
-      window.open(url);
+    onChange(info) {
+      const { status } = info.file;
+
+      if (status === 'done') {
+        const url = info.file.response.secure_url; 
+        setUploadedFileUrl(url);
+        message.success(`${info.file.name} file uploaded successfully!`);
+      } else if (status === 'error') {
+        message.error(`${info.file.name} file upload failed.`);
+      }
+    },
+    onDrop(e) {
+      console.log('Dropped files', e.dataTransfer.files);
     },
   };
 
@@ -225,14 +234,15 @@ const DoctorSignup = ({ userRole }) => {
         dob: "2021-03-03",
         isAssessor: false,
         isAccessor: false,
-        height:  0, // Ensure height is a number
-        weight:0,
+        height: 0, // Ensure height is a number
+        weight: 0,
         MetricImperial: true,
         ExistOnMira: false,
-        AgreeToUseData:true,
-        DigitalSignature:'',
-        IsSendResultToEmail:true,
-        IAgreeToReceiveInformation:true,
+        AgreeToUseData: true,
+        DigitalSignature: '',
+        licenseDocument:uploadedFileUrl,
+        IsSendResultToEmail: true,
+        IAgreeToReceiveInformation: true,
       };
       console.log("Processed Values:", processedValues);
 
@@ -570,8 +580,8 @@ const DoctorSignup = ({ userRole }) => {
                                           value === password
                                             ? Promise.resolve()
                                             : Promise.reject(
-                                                "Passwords do not match",
-                                              ),
+                                              "Passwords do not match",
+                                            ),
                                       },
                                     ]}
                                   >
@@ -667,13 +677,13 @@ const DoctorSignup = ({ userRole }) => {
                               >
                                 <Dragger {...uploadProps}>
                                   <p className="ant-upload-drag-icon">
-                                    <UploadOutlined color="#000" />
+                                    <UploadOutlined />
                                   </p>
-                                  <p className="ant-upload-text">
-                                    Upload / Drag and drop
-                                  </p>
+                                  <p className="ant-upload-text">Upload / Drag and drop</p>
                                 </Dragger>
                               </Form.Item>
+
+                         
                               <div className="row">
                                 <div className="col-lg-12 col-sm-12">
                                   <FormItem

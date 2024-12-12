@@ -7,6 +7,7 @@ import { Avatar, Button, Col, Modal, Row, Space, message } from "antd";
 import {
   CalendarOutlined,
   ClockCircleOutlined,
+  DeleteOutlined,
   DownOutlined,
   EnvironmentOutlined,
   MoreOutlined,
@@ -317,125 +318,141 @@ const PatientAppointment = () => {
                       }}
                     >
                       {upcomingPatientAppointment?.length > 0 ? (
-                        <div>
-                          {upcomingPatientAppointment.map((appointment, index) => (
-                            <div
-                              key={index}
-                              style={{
-                                borderBottom: "1px solid #00000033",
-                                marginBottom: "10px",
-                                paddingBottom: "10px",
-                                fontSize: "12px",
-                              }}
-                            >
-                              {moreVisible[index] ? (
-                                <MoreOutlined
-                                  style={{ fontSize: '20px', float: 'right' }}
-                                  onClick={() => toggleMore(index)}
-                                />
-                              ) : (
-                                <Button
-                                  type="default"
-                                  onClick={() => handleCancelAppointment(appointment)}
-                                  style={{ float: 'right' }}
-                                >
-                                  Cancel
-                                </Button>
-                              )}
-                              <p>
-                                <Avatar
-                                  style={{
-                                    marginRight: "5px",
-                                  }}
-                                  icon={<UserOutlined />}
-                                />
-                                Doctor Doctor
-                              </p>
-                              <p>
-                                <Avatar
-                                  style={{
-                                    marginRight: "5px",
-                                  }}
-                                  icon={<CalendarOutlined />}
-                                />
-                                {new Date(appointment.date).toLocaleDateString(
-                                  "en-Us",
-                                  {
-                                    month: "short",
-                                    day: "numeric",
-                                    year: "numeric",
-                                  }
-                                )}
-                              </p>
-                              <p>
-                                <Avatar
-                                  style={{
-                                    marginRight: "5px",
-                                  }}
-                                  icon={<ClockCircleOutlined />}
-                                />
-                                {new Date(appointment.date).toLocaleDateString(
-                                  "en-Us",
-                                  {
-                                    month: "short",
-                                    day: "numeric",
-                                    year: "numeric",
-                                  }
-                                )}
-                              </p>
-                              <p>
-                                <Avatar
-                                  style={{
-                                    marginRight: "5px",
-                                  }}
-                                  icon={<EnvironmentOutlined />}
-                                />
-                                Virtual or In-person
-                              </p>
-                              <div
-                                style={{
-                                  width: "90%",
-                                  marginLeft: "10%",
-                                  position: "relative",
-                                }}
-                              >
-                                <Button
-                                  type="primary"
-                                  icon={<VideoCameraOutlined />}
-                                  disabled={!appointment.zohoLink}
-                                  style={{
-                                    marginBottom: "5px",
-                                    background: `${!appointment.zohoLink ? '#808080' : '#1E90FF'}`,
-                                  }}
+  <div>
+    {upcomingPatientAppointment.map((appointment, index) => {
+      const startTime = new Date(appointment.startTime.replace(/-/g, '/'));
+      const endTime = new Date(appointment.endTime.replace(/-/g, '/'));
 
-                                  onClick={() => handleJoinCall(appointment)}>
+      const formattedStartTime = startTime.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      
+      const formattedEndTime = endTime.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
 
-                                  Join
-                                </Button>
+      return (
+        <div
+          key={index}
+          style={{
+            borderBottom: "1px solid #00000033",
+            marginBottom: "15px",
+            paddingBottom: "15px",
+            fontSize: "14px", // Improved font size for readability
+            backgroundColor: "#f9f9f9", // Soft background color
+            borderRadius: "8px", // Rounded corners
+            padding: "15px", // Padding around the content
+          }}
+        >
+          {moreVisible[index] ? (
+            <MoreOutlined
+              style={{ fontSize: '20px', float: 'right', color: '#1E90FF' }}
+              onClick={() => toggleMore(index)}
+            />
+          ) : (
+            <DeleteOutlined
+              style={{
+                fontSize: '20px',
+                color: '#ff4d4f', // Red color for the cancel icon
+                float: 'right',
+                cursor: 'pointer', // To show it's clickable
+              }}
+              onClick={() => handleCancelAppointment(appointment)}
+            />
+          )}
 
-                                <p style={{ fontSize: "12px" }}>
-                                  Ongoing Care Plan - Initial Care Team
-                                  Appointment{" "}
-                                </p>
-                              </div>
-                            </div>
-                          ))}
-                          {filteredAppointments.length > 2 && (
-                            <div
-                              onClick={handleViewAll}
-                              style={{ color: "#1E90FF" }}
-                            >
-                              {viewAll ? (
-                                <UpOutlined style={{ marginRight: "10px" }} />
-                              ) : (
-                                <DownOutlined style={{ marginRight: "10px" }} />
-                              )}
+          <p style={{ fontSize: '12px', marginTop:'20px'}}>
+            <Avatar
+              style={{
+                marginRight: "8px",
+              }}
+              icon={<UserOutlined />}
+            />
+            <strong>Doctor Doctor</strong>
+          </p>
 
-                              {viewAll ? "View Less" : "View All"}
-                            </div>
-                          )}
-                        </div>
-                      ) : (
+          <p style={{ fontSize: '12px'}}>
+            <Avatar
+              style={{
+                marginRight: "8px",
+              }}
+              icon={<CalendarOutlined />}
+            />
+            <strong>{new Date(appointment.appointDate).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })}</strong>
+          </p>
+
+          <p style={{ fontSize: '12px'}}>
+            <Avatar
+              style={{
+                marginRight: "8px",
+              }}
+              icon={<ClockCircleOutlined />}
+            />
+            <strong>{formattedStartTime}</strong> - <strong>{formattedEndTime}</strong>
+          </p>
+
+          <p style={{ fontSize: '12px'}}>
+            <Avatar
+              style={{
+                marginRight: "8px",
+              }}
+              icon={<EnvironmentOutlined />}
+            />
+            <strong>Virtual or In-person</strong>
+          </p>
+
+          <div
+            style={{
+              width: "90%",
+              marginLeft: "10%",
+              position: "relative",
+            }}
+          >
+            <Button
+              type="primary"
+              icon={<VideoCameraOutlined />}
+              disabled={!appointment.zohoLink}
+              style={{
+                marginBottom: "10px",
+                backgroundColor: `${!appointment.zohoLink ? '#808080' : '#1E90FF'}`,
+                borderRadius: "5px", // Rounded button edges
+                padding: "10px 20px",
+              }}
+              onClick={() => handleJoinCall(appointment)}
+            >
+              Join
+            </Button>
+
+            <p style={{ fontSize: "12px", color: "#555" }}>
+              Ongoing Care Plan - Initial Care Team Appointment
+            </p>
+          </div>
+        </div>
+      );
+    })}
+
+    {filteredAppointments.length > 2 && (
+      <div
+        onClick={handleViewAll}
+        style={{ color: "#1E90FF", cursor: "pointer", textAlign: "center", padding: "10px 0" }}
+      >
+        {viewAll ? (
+          <UpOutlined style={{ marginRight: "10px" }} />
+        ) : (
+          <DownOutlined style={{ marginRight: "10px" }} />
+        )}
+        {viewAll ? "View Less" : "View All"}
+      </div>
+    )}
+  </div>
+) 
+ : (
                         <div>
                           <p>You have no upcoming appointment.</p>
                           <p>

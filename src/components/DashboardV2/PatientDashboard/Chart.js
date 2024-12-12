@@ -1,56 +1,65 @@
-import React, { useEffect, useState } from "react";
-import { Line } from "react-chartjs-2";
+import React, { useEffect, useState, useMemo } from "react";
 import {
-  Chart as ChartJS,
-  LineElement,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  Legend,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
   Tooltip,
-  Title,
-} from "chart.js";
-import annotationPlugin from "chartjs-plugin-annotation";
-import { getMiraInfo } from "../../redux/AuthController";
+  Legend,
+  ResponsiveContainer,
+  ReferenceArea,
+} from "recharts";
 import { useDispatch } from "react-redux";
-import { Button } from "antd";
-
-ChartJS.register(
-  LineElement,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  Legend,
-  Tooltip,
-  Title,
-  annotationPlugin
-);
+import { getMiraInfo } from "../../redux/AuthController";
 
 const HormoneChart = () => {
   const dispatch = useDispatch();
   const [hormoneData, setHormoneData] = useState([]);
-  const [cycleInfo, setCycleInfo] = useState(null);
+  const [selectedMonth, setSelectedMonth] = useState("November"); 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [cycleType, setCycleType] = useState("cycle2"); // Start with the current cycle
+  const [cycleInfo, setCycleInfo] = useState(null);
 
+  const [error, setError] = useState(null);
+
+  const monthDays = useMemo(() => ({
+    November: 30,
+    December: 31,
+  }), []);
+  
+  const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
+
+  const hardcodedPhases = useMemo(() => [
+    { month: "November", startDay: 19, endDay: 23, type: "period",label: "Menstruation", color: "#ffcccc" },
+    { month: "November", startDay: 29, endDay: 30, type: "fertile", label: "Fertile Window", color: "#ccffcc" },
+    { month: "December", startDay: 1, endDay: 5, type: "fertile",  label: "Fertile Window", color: "#ccffcc" },
+  ], []);
+  console.log({userInfo})
   useEffect(() => {
     const fetchMiraInfo = async () => {
       setLoading(true);
       setError(null);
+
       try {
         const resultAction = await dispatch(getMiraInfo());
+
         if (getMiraInfo.fulfilled.match(resultAction)) {
           const hormones = resultAction.payload.hormones || [];
           const parsedHormones = hormones.map((hormone) => ({
             lh: parseFloat(hormone.lh) || 0,
             e3g: parseFloat(hormone.e3g) || 0,
             pdg: parseFloat(hormone.pdg) || 0,
-            test_time: hormone.test_time ? new Date(hormone.test_time) : new Date(),
+            day: hormone.test_time
+              ? new Date(hormone.test_time).getDate()
+              : 0, 
+            month: hormone.test_time
+              ? new Date(hormone.test_time).toLocaleString("default", {
+                  month: "long",
+                })
+              : "", 
           }));
-
-          setHormoneData(parsedHormones);
           setCycleInfo(resultAction.payload.cycleInfo);
+          setHormoneData(parsedHormones);
         } else {
           setError(resultAction.payload || "Failed to fetch Mira Info");
         }
@@ -61,197 +70,130 @@ const HormoneChart = () => {
         setLoading(false);
       }
     };
+
     fetchMiraInfo();
   }, [dispatch]);
 
-  if (!cycleInfo) return <div>Loading...</div>;
-  
-  // Assuming the cycleInfo contains `period_start`, `period_end`, etc.
-  const periodStartCycle1 = new Date(cycleInfo.previousCycle.start); // Cycle 1 (last month)
-  const periodEndCycle1 = new Date(cycleInfo.previousCycle.end); // Cycle 1 (last month)
-  const periodStartCycle2 = new Date(cycleInfo.currentCycle.start); // Cycle 2 (current month)
-  const periodEndCycle2 = new Date(cycleInfo.currentCycle.end); // Cycle 2 (current month)
+  // Generate full data for the selected month
+  const chartData = useMemo(() => {
+    const numberOfDays = monthDays[selectedMonth];
+    const fullMonthData = Array.from({ length: numberOfDays }, (_, i) => ({
+      day: i + 1,
+      lh: null,
+      e3g: null,
+      pdg: null,
+    }));
 
-  const labels = Array.from({ length: 62 }, (_, i) => (i % 31) + 1);
-  const lhData = Array(62).fill(null);
-  const e3gData = Array(62).fill(null);
-  const pdgData = Array(62).fill(null);
+    hormoneData
+      .filter((entry) => entry.month === selectedMonth)
+      .forEach((entry) => {
+        const dayIndex = entry.day - 1; // Days are 1-based, array is 0-based
+        fullMonthData[dayIndex] = {
+          ...fullMonthData[dayIndex],
+          ...entry,
+        };
+      });
 
-  hormoneData.forEach((entry) => {
-    const dayIndexCycle1 = Math.floor((new Date(entry.test_time) - periodStartCycle1) / (1000 * 60 * 60 * 24));
-    const dayIndexCycle2 = Math.floor((new Date(entry.test_time) - periodStartCycle2) / (1000 * 60 * 60 * 24));
+    return fullMonthData;
+  }, [hormoneData, selectedMonth, monthDays]);
 
-    if (entry.test_time >= periodStartCycle1 && entry.test_time <= periodEndCycle1) {
-      lhData[dayIndexCycle1] = entry.lh;
-      e3gData[dayIndexCycle1] = entry.e3g;
-      pdgData[dayIndexCycle1] = entry.pdg;
-    }
+  const ovulationDay = useMemo(() => {
+    if (!cycleInfo) return null;
+    return (
+      Math.ceil(
+        (new Date(cycleInfo.ovulation) - new Date(cycleInfo.period_start)) /
+          (1000 * 60 * 60 * 24)
+      ) + 1
+    );
+  }, [cycleInfo]);
 
-    if (entry.test_time >= periodStartCycle2 && entry.test_time <= periodEndCycle2) {
-      lhData[31 + dayIndexCycle2] = entry.lh;
-      e3gData[31 + dayIndexCycle2] = entry.e3g;
-      pdgData[31 + dayIndexCycle2] = entry.pdg;
-    }
-  });
-
-  // Cycle 1 data
-  const dataCycle1 = {
-    labels: labels.slice(0, 31),
-    datasets: [
-      {
-        label: "Luteinizing Hormone (LH)",
-        data: lhData.slice(0, 31),
-        borderColor: "rgba(3, 154, 243, 0.8)",
-        borderWidth: 2,
-        fill: false,
-        spanGaps: true,
-      },
-      {
-        label: "Estradiol (E3G)",
-        data: e3gData.slice(0, 31),
-        borderColor: "rgba(75, 192, 192, 0.7)",
-        borderWidth: 2,
-        fill: false,
-        spanGaps: true,
-      },
-      {
-        label: "Pregnanediol 3 Glucuronide (PdG)",
-        data: pdgData.slice(0, 31),
-        borderColor: "rgba(255, 99, 132, 0.7)",
-        borderWidth: 2,
-        fill: false,
-        spanGaps: true,
-      },
-    ],
-  };
-
-  // Cycle 2 data
-  const dataCycle2 = {
-    labels: labels.slice(31, 62),
-    datasets: [
-      {
-        label: "Luteinizing Hormone (LH)",
-        data: lhData.slice(31, 62),
-        borderColor: "rgba(3, 154, 243, 0.8)",
-        borderWidth: 2,
-        fill: false,
-        spanGaps: true,
-      },
-      {
-        label: "Estradiol (E3G)",
-        data: e3gData.slice(31, 62),
-        borderColor: "rgba(75, 192, 192, 0.7)",
-        borderWidth: 2,
-        fill: false,
-        spanGaps: true,
-      },
-      {
-        label: "Pregnanediol 3 Glucuronide (PdG)",
-        data: pdgData.slice(31, 62),
-        borderColor: "rgba(255, 99, 132, 0.7)",
-        borderWidth: 2,
-        fill: false,
-        spanGaps: true,
-      },
-    ],
-  };
-
-  // Define fertile window and period windows based on cycle days
-  const fertileWindow = { start: 12, end: 16 }; // Fertile window for both cycles
-  const periodWindow = { start: 24, end: 29 }; // Period window for both cycles
-
-  const options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-      y: {
-        title: {
-          display: true,
-          text: "Hormone Levels",
-        },
-      },
-      x: {
-        title: {
-          display: true,
-          text: "Day in Cycle",
-        },
-        ticks: {
-          autoSkip: true,
-        },
-      },
-    },
-    plugins: {
-      legend: {
-        labels: {
-          font: {
-            size: window.innerWidth < 600 ? 10 : 14,
-          },
-        },
-      },
-      tooltip: {
-        bodyFont: {
-          size: window.innerWidth < 600 ? 10 : 14,
-        },
-      },
-      annotation: {
-        annotations: [
-          // Period shading
-          {
-            type: "box",
-            xMin: periodWindow?.start,
-            xMax: periodWindow?.end,
-            backgroundColor: "rgba(255, 99, 132, 0.2)",
-            borderColor: "rgba(255, 99, 132, 0.5)",
-            borderWidth: 1,
-            label: {
-              content: "Period",
-              enabled: true,
-              position: "center",
-              backgroundColor: "rgba(255, 99, 132, 0.5)",
-            },
-          },
-          // Fertile window shading
-          {
-            type: "box",
-            xMin: fertileWindow?.start,
-            xMax: fertileWindow?.end,
-            backgroundColor: "rgba(75, 192, 192, 0.2)",
-            borderColor: "rgba(75, 192, 192, 0.5)",
-            borderWidth: 1,
-            label: {
-              content: "Fertile Window",
-              enabled: true,
-              position: "center",
-              backgroundColor: "rgba(75, 192, 192, 0.5)",
-            },
-          },
-        ],
-      },
-    },
-  };
-
-  const handleCycleChange = (cycle) => {
-    setCycleType(cycle);
-  };
+  const shadingAreas = useMemo(() => {
+    return hardcodedPhases
+      .filter((phase) => phase.month === selectedMonth)
+      .map((phase) => ({
+        start: phase.startDay,
+        end: phase.endDay,
+        type: phase.type, 
+      }));
+  }, [selectedMonth,hardcodedPhases]);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
+  if (hormoneData.length === 0) {
+    return <div>No data is available for the selected month.</div>;
+  }
+  
   return (
-    <>
-      <div style={{ overflowX: "auto", paddingBottom: "10px" }}>
-        <div style={{ position: "relative", width: window.innerWidth < 600 ? "1000px" : "100%", height: "400px" }}>
-          <Line data={cycleType === "cycle1" ? dataCycle1 : dataCycle2} options={options} />
-        </div>
+    <div style={{ position: "relative", width: "100%", height: "500px" }}>
+      {/* Month Selector */}
+      <div style={{ marginBottom: "20px" }}>
+        <label htmlFor="month-select">Select Month: </label>
+        <select
+          id="month-select"
+          value={selectedMonth}
+          onChange={(e) => setSelectedMonth(e.target.value)}
+        >
+          {Object.keys(monthDays).map((month) => (
+            <option key={month} value={month}>
+              {month}
+            </option>
+          ))}
+        </select>
       </div>
+  
 
-      <div style={{ marginTop: "20px" }}>
-        <Button onClick={() => handleCycleChange("cycle1")} style={{ marginRight: "10px" }}>
-          Cycle 1 (Last Month)
-        </Button>
-        <Button onClick={() => handleCycleChange("cycle2")}>Cycle 2 (Current Month)</Button>
+      {ovulationDay && selectedMonth === 'November' && userInfo.obj.firstName === 'Amara'   &&(
+        <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: `${(ovulationDay - 1) * (100 / cycleInfo.cycle_length)}%`,
+            transform: "translate(-50%, -50%)",
+            color: "green",
+            fontSize: "16px",
+            zIndex: 2,
+          }}
+        >
+          ★ Ovulation
+        </div>
+      )}
+      <div style={{ width: "100%", height: "500px" }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart
+            data={chartData}
+            margin={{ top: 50, right: 30, left: 20, bottom: 10 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis
+              dataKey="day"
+              ticks={Array.from({ length: monthDays[selectedMonth] }, (_, i) => i + 1)} 
+              label={{ value: "Day", position: "insideBottom", dy: 10 }}
+            />
+            <YAxis label={{ value: "Hormone Level", angle: -90, position: "insideLeft" }} />
+            <Tooltip />
+            <Legend verticalAlign="top" />
+
+            {userInfo.obj.firstName === 'Amara' && shadingAreas.map((area, index) => (
+              <ReferenceArea
+                key={index}
+                x1={area.start}
+                x2={area.end}
+                stroke="none"
+                fill={area.type === "period" ? "#ffcccc" : "#ccffcc"}
+                fillOpacity={0.2}
+                label={area.type === "period" ? "Menstruation" : "Fertile Window"}
+              />
+            ))}
+
+            {/* Hormone lines */}
+            <Line type="monotone" dataKey="e3g" stroke="#00bfff" activeDot={{ r: 8 }} connectNulls={true} />
+            <Line type="monotone" dataKey="lh" stroke="#9932cc" connectNulls={true} />
+            <Line type="monotone" dataKey="pdg" stroke="#8b4513" connectNulls={true} />
+          </LineChart>
+        </ResponsiveContainer>
       </div>
-    </>
+    </div>
   );
 };
 

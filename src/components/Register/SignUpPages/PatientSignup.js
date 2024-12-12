@@ -75,7 +75,8 @@ const PatientSignup = () => {
     IAgreeToReceiveInformation: false,
     isAcceptTermsAndCondition: false,
     AgreeToUseData: false,
-    DigitalSignature: "",
+    DigitalSignature: false,
+    DigitalSignatureName: null,
     ExistOnMira: false,
     isAssessor: false,
     licenseDocument: null,
@@ -92,6 +93,8 @@ const PatientSignup = () => {
     "isSendResultToEmail",
     "isAgreeToShareInformation",
     "isAcceptTermsAndCondition",
+    "DigitalSignature",
+    "DigitalSignatureName",
     "IAgreeToReceiveInformation",
   ];
   const countries = [
@@ -232,6 +235,9 @@ const PatientSignup = () => {
       .required("Please accept to share personal health information")
       .oneOf([true], "Please accept to share personal health information"),
     isAcceptTermsAndCondition: Yup.boolean()
+      .required("Please accept terms and conditions")
+      .oneOf([true], "Please accept terms and conditions"),
+      DigitalSignature: Yup.boolean()
       .required("Please accept terms and conditions")
       .oneOf([true], "Please accept terms and conditions"),
   });

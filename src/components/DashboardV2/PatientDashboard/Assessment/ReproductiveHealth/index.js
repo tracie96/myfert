@@ -13,7 +13,7 @@ import {
   DatePicker,
   Space,
 } from "antd";
-import { useNavigate } from "react-router-dom"; // useNavigate for react-router v6
+import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { completeCard } from "../../../../redux/assessmentSlice";
 import FormWrapper from "../FormWrapper";
@@ -137,7 +137,7 @@ const questions = [
       },
       {
         question:
-          "How long have you been using fertility awareness based method(s)?",
+        "How long have you been using fertility awareness based method(s)?",
         type: "select_two",
       },
     ],

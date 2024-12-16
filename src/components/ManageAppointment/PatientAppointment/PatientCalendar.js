@@ -11,7 +11,7 @@ import axios from "axios";
 import { useMediaQuery } from "react-responsive";
 import moment from "moment-timezone";
 
-import { addAppointment } from "../../redux/patientSlice";
+import { addAppointment, getUpcomingAppointments } from "../../redux/patientSlice";
 import {
   CalendarTwoTone,
   EnvironmentOutlined,
@@ -134,6 +134,7 @@ const PatientCalendar = ({ selectedProviders }) => {
       prevDateRange.current = newDateRange;
 
       fetchAndSetAvailability(startYear, startMonth);
+      getUpcomingAppointments();
     }
   };
 
@@ -204,6 +205,7 @@ const PatientCalendar = ({ selectedProviders }) => {
         const startMonth = currentDate.getMonth() + 1;
         const startYear = currentDate.getFullYear();
         fetchAndSetAvailability(startYear, startMonth);
+        dispatch(getUpcomingAppointments());
       } else {
         message.error(result.error.message || "Failed to set appointment");
       }
@@ -623,9 +625,7 @@ const PatientCalendar = ({ selectedProviders }) => {
                             }}
                           >
                             <div>
-                              <Text strong>Appointment ID:</Text>{" "}
-                              {appointment.appointmentId}
-                              <br />
+                             
                               <Text strong>Time:</Text>{" "}
                               {`${formatTime(
                                 appointment.start.hour,

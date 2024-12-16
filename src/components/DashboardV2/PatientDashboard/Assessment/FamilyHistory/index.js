@@ -27,6 +27,7 @@ const questions = [
     question: "(Check box and provide number if applicable)",
     title: "Obstetric History",
     type: "checkbox_with_select",
+    name: "general",
     options: [
       {
         label: "Pregnancies",
@@ -389,11 +390,22 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
 
   const validateQuestion = () => {
     const question = questions[currentQuestionIndex];
-
-    return (
-      answers[question.name] !== undefined && answers[question.name] !== ""
-    );
+  
+    if (question.type === "checkbox_with_select") {
+      return question.options.some((option) => {
+        const checkboxChecked = answers[option.name];
+        const selectValid = option.selectName
+          ? answers[option.selectName] !== undefined && answers[option.selectName] !== ""
+          : true;
+  
+        return checkboxChecked && selectValid;
+      });
+    }
+  
+    return answers[question.name] !== undefined && answers[question.name] !== "";
   };
+  
+
   const handleExit = () => {
     navigate("/assessment");
   };
@@ -469,35 +481,28 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
     ));
   };
 
-  const handleSelectCheckChange = (
-    checked,
-    name,
-    inputName = null,
-    options = [],
-  ) => {
-    const newAnswers = { ...answers };
-
-    if (inputName) {
-      newAnswers[inputName] = checked ? answers[inputName] : "";
-    }
-
-    if (checked) {
-      // Uncheck all other checkboxes in the group
-      options.forEach((option) => {
-        if (option.name !== name) {
-          newAnswers[option.name] = false;
-          if (option.inputName) {
-            newAnswers[option.inputName] = "";
-          }
+  const handleSelectCheckChange = (checked, checkboxName, selectName) => {
+    setAnswers((prevAnswers) => {
+      const updatedAnswers = { ...prevAnswers };
+      if (checked) {
+        updatedAnswers[checkboxName] = true;
+      } else {
+        delete updatedAnswers[checkboxName];
+        if (selectName) {
+          delete updatedAnswers[selectName];
         }
-      });
-    }
+      }
 
-    newAnswers[name] = checked;
-
-    setAnswers(newAnswers);
+      return updatedAnswers;
+    });
   };
 
+  const handleSelectChange = (value, selectName) => {
+    setAnswers((prevAnswers) => ({
+      ...prevAnswers,
+      [selectName]: value, // Update the `selectName` field with the selected value
+    }));
+  };
   const renderInput = (question) => {
     switch (question.type) {
       case "date":
@@ -681,11 +686,9 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
                     <Select
                       name={option.selectName}
                       value={answers[option.selectName] || undefined}
-                      onChange={(value) =>
-                        handleSelectCheckChange(value, option.selectName)
-                      }
+                      onChange={(value) => handleSelectChange(value, option.selectName)} // Use the new handler
                       style={{ width: "100%" }}
-                      disabled={!answers[option.name]}
+                      disabled={!answers[option.name]} // Disabled unless checkbox is checked
                     >
                       {option.selectOptions.map((selectOption, idx) => (
                         <Option key={idx} value={selectOption}>
@@ -695,6 +698,7 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
                     </Select>
                   </div>
                 )}
+
               </React.Fragment>
             ))}
           </div>
@@ -948,12 +952,12 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
           strokeColor={progressColor}
         />
         <h3 style={{ margin: "20px 0", color: "#F2AA93" }}>
-          {label}
+        
           {questions[currentQuestionIndex].title}
         </h3>
 
-        <h3 style={{ margin: "20px 0", color: "#000", fontWeight:"600", fontSize: "15px" }}>
-          {questions[currentQuestionIndex].question}
+        <h3 style={{ margin: "20px 0", color: "#000", fontWeight: "600", fontSize: "15px" }}>
+        {label} {questions[currentQuestionIndex].question}
         </h3>
         {renderInput(questions[currentQuestionIndex])}
 

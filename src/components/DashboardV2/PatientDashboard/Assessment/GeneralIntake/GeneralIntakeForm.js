@@ -166,6 +166,10 @@ const GeneralIntakeForm = ({ onComplete }) => {
   };
 
   const handleSubmit = async () => {
+    if (!validateQuestion()) {
+      message.error("Please answer the current question before saving.");
+      return;
+    }
     const transformedData = {
       geneticBackground: answers["geneticBackground"] || "",
       lastMedicalCare: answers["where_and_where_received_medical_care"] || "",

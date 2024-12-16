@@ -50,7 +50,6 @@ const PatientAppointment = () => {
       prevState.map((visible, i) => (i === index ? !visible : visible))
     );
   };
-  console.log({ upcomingPatientAppointment })
   const handleOk = () => {
     setIsFilterModalVisible(false);
   };

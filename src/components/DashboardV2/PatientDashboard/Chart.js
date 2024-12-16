@@ -101,8 +101,7 @@ const HormoneChart = () => {
     if (!cycleInfo) return null;
     return (
       Math.ceil(
-        (new Date(cycleInfo?.ovulation) - new Date(cycleInfo?.period_start)) /
-          (1000 * 60 * 60 * 24)
+        (new Date(cycleInfo?.ovulation)) 
       ) + 1
     );
   }, [cycleInfo]);

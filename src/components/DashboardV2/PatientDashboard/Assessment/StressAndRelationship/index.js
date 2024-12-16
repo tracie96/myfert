@@ -11,6 +11,7 @@ import {
   InputNumber,
   message,
   Checkbox,
+  Form,
 } from "antd";
 import { useNavigate } from "react-router-dom"; // useNavigate for react-router v6
 import { useDispatch } from "react-redux";
@@ -54,8 +55,8 @@ const questions = [
     question:
       "How much stress do each of the following cause on a daily basis? :",
     type: "rating_scale",
-    sub: "Sport",
-    name: "health_stress_sport",
+    sub: "Social",
+    name: "health_stress_social",
   },
   {
     question:
@@ -161,6 +162,10 @@ const questions = [
     type: "long_textarea",
     name: "current_occupation",
   },
+
+
+ 
+
   {
     question: "Previous occupation:",
     type: "long_textarea",
@@ -220,11 +225,29 @@ const StressAndRelationship = ({ onComplete }) => {
 
   const validateQuestion = () => {
     const question = questions[currentQuestionIndex];
-    return (
-      answers[question.name] !== undefined && answers[question.name] !== ""
-    );
+      if (!answers[question.name] || answers[question.name] === "") {
+      return false;
+    }
+  
+    if (question.subQuestions && Array.isArray(question.subQuestions)) {
+      for (const subQuestion of question.subQuestions) {
+        if (
+          answers[question.name] === "Yes" && 
+          (!answers[subQuestion.name] || answers[subQuestion.name] === "")
+        ) {
+          return false;
+        }
+      }
+    }
+  
+    return true;
   };
-
+  
+  const label = (
+    <span>
+      <span style={{ color: "red" }}>* </span>
+    </span>
+  );
   const handleSave = () => {
     if (!validateQuestion()) {
       message.error("Please answer the current question before saving.");
@@ -264,12 +287,20 @@ const StressAndRelationship = ({ onComplete }) => {
       <div key={index} style={{ marginTop: "20px" }}>
         <p>{subQuestion.type !== "text" && subQuestion.question}</p>
         {subQuestion.type === "text" && (
-          <Input
-            placeholder={subQuestion.question}
-            value={answers[subQuestion.name] || ""}
-            onChange={(e) => handleChange(e.target.value, subQuestion.name)}
-            className="input_questtionnaire"
-          />
+         <Form.Item
+         name={subQuestion.name}
+         rules={[
+           { required: true, message: "This field is required." },
+         ]}
+       >
+         <Input
+           placeholder={subQuestion.question}
+           value={answers[subQuestion.name] || ""}
+           onChange={(e) => handleChange(e.target.value, subQuestion.name)}
+           className="input_questtionnaire"
+         />
+       </Form.Item>
+       
         )}
         {subQuestion.type === "inputNumber" && (
           <InputNumber
@@ -525,9 +556,10 @@ const StressAndRelationship = ({ onComplete }) => {
           percent={Math.round(progressPercentage)}
           strokeColor={progressColor}
         />
-        <h3 style={{ margin: "20px 0", color: "#F2AA93" }}>
+        <h3 style={{ margin: "20px 0", color: "#F2AA93" }}>   
+        {label}
           {questions[currentQuestionIndex].title
-            ? questions[currentQuestionIndex].title
+            ?  questions[currentQuestionIndex].title
             : "Stress"}
         </h3>
 

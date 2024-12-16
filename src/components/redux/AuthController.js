@@ -241,6 +241,20 @@ export const updateEmail = createAsyncThunk(
     }
   },
 );
+export const sendEmailOtp = createAsyncThunk(
+  "auth/sendEmailOtp",
+  async ({ email, session }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`${baseUrl}Auth/ResendEmailOtp`, {
+        email,
+        session,
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  },
+);  
 export const validateUsername = createAsyncThunk(
   "user/validateUsername",
   async (username, { rejectWithValue }) => {

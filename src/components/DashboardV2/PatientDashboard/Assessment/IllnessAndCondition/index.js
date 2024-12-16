@@ -516,11 +516,23 @@ const IllnessAndCondition = ({ onComplete }) => {
   };
   const validateQuestion = () => {
     const question = questions[currentQuestionIndex];
-
-    return (
-      answers[question.name] !== undefined && answers[question.name] !== ""
-    );
+  
+    if (question.type === "multi_yes_no") {
+      const hasValidAnswer = question.subQuestions.some(
+        (subQuestion) =>
+          answers[subQuestion.name] === "yes" || answers[subQuestion.name] === "no"
+      );
+  
+      const hasOthersAnswer =
+        answers[`${question.name}_others`] !== undefined &&
+        answers[`${question.name}_others`] !== "";
+  
+      return hasValidAnswer || hasOthersAnswer;
+    }
+  
+    return answers[question.name] !== undefined && answers[question.name] !== "";
   };
+  
   const handleSave = () => {
     if (!validateQuestion()) {
       message.error("Please answer the current question before saving.");
@@ -753,8 +765,14 @@ const IllnessAndCondition = ({ onComplete }) => {
                 </div>
               </div>
             ))}
-            <Input placeholder="Others" style={{ marginTop: 20 }}></Input>
-          </div>
+<Input
+  placeholder="Others"
+  style={{ marginTop: 20 }}
+  value={answers[`${question.name}_others`] || ""}
+  onChange={(e) =>
+    handleChange(e.target.value.trim(), `${question.name}_others`)
+  }
+/>          </div>
         );
 
       default:

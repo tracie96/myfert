@@ -664,15 +664,39 @@ const SymptomReview = ({ onComplete }) => {
       setAnswers(savedAnswers);
     }
   }, []);
+// ToDo: alternate implementation, will remove this after complete testing
+  // useEffect(() => {
+  //   const initialAnswers = {};
+  //   questions.forEach((q) => {
+  //     if (q.subQuestions) {
+  //       q.subQuestions.forEach((sub) => {
+  //         initialAnswers[sub.name] = ""; // or some default value
+  //       });
+  //     } else {
+  //       initialAnswers[q.name] = "";
+  //     }
+  //   });
+  //   setAnswers(initialAnswers);
+  // }, []);
 
   const handleExit = () => {
     navigate("/assessment");
   };
+  // ToDo: old implementation, will remove this after complete testing
+  // const validateQuestion = () => {
+  //   const question = questions[currentQuestionIndex];
+  //   return (
+  //     answers[question.name] !== undefined && answers[question.name] !== ""
+  //   );
+  // };
   const validateQuestion = () => {
     const question = questions[currentQuestionIndex];
-    return (
-      answers[question.name] !== undefined && answers[question.name] !== ""
-    );
+    if (question.subQuestions) {
+      return question.subQuestions.every(
+        (sub) => answers[sub.name] !== undefined && answers[sub.name] !== ""
+      );
+    }
+    return answers[question.name] !== undefined && answers[question.name] !== "";
   };
 
   const handleSave = () => {

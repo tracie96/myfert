@@ -53,7 +53,7 @@ const questions = [
     name: "health_stress_6",
   },
   {
-    sub: "How confident are you of your ability to organize and follow through on the above health-related activities?",
+    title: "How confident are you of your ability to organize and follow through on the previous question’s health-related activities?",
     type: "confidence_scale_with_textarea",
     question:
       "Rate on a scale of 5 (very confident), to 1 (not confident at all):",
@@ -66,30 +66,57 @@ const questions = [
       "At the present time, how supportive do you think the people in your household will be to your implementing the above changes?",
     name: "health_stress_7",
   },
-
   {
-    question:
-      "When, where and from whom did you last receive medical or health care?",
-    type: "long_textarea",
-    name: "where_and_where_received_medical_care",
-  },
-
-  {
-    question:
-      "With whom do you live? (Include children, parents, relatives, friends, pets)",
-    type: "long_textarea",
-    name: "who_do_you_live_with",
-  },
-
-  {
-    question: "Current occupation:",
-    type: "long_textarea",
-    name: "current_occupation",
+    title: "How much ongoing support (e.g., telephone consults, email correspondence) from our professional staff would be helpful to you as you implement your personal health program?",
+    type: "rating_scale",
+    question: "Rate on a scale of 5 (very willing), to 1 (not willing):",
+    name: "confidence_follow_through",
   },
   {
-    question: "Previous occupation:",
+    title: "Comments",
     type: "long_textarea",
-    name: "previous_occupation",
+    name: "add_commnets"
+  },
+  {
+    title: "What do you hope to achieve in your visit with us?",
+    type: "long_textarea",
+    name: "achieve_your_goals"
+  },
+  {
+    title: "When was the last time you felt well?",
+    type: "long_textarea",
+    name: "felt_well_last_time"
+  },
+  {
+    title: "Did something trigger your change in health?",
+    type: "long_textarea",
+    name: "health_issue"
+  },
+  {
+    title: "What makes you feel better?",
+    type: "long_textarea",
+    name: "feel_better"
+  },
+  
+  {
+    title: "What makes you feel worse?",
+    type: "long_textarea",
+    name: "feel_worse"
+  },
+  {
+    title: "How does your condition affect you?",
+    type: "long_textarea",
+    name: "current_state"
+  },
+  {
+    title: "What do you think is happening and why?",
+    type: "long_textarea",
+    name: "happening_and_why"
+  },
+  {
+    title: "What do you feel needs to happen for you to get better?",
+    type: "long_textarea",
+    name: "get_better"
   },
 ];
 
@@ -176,7 +203,7 @@ const Readiness = ({ onComplete }) => {
               </p>
             ) : (
               <p style={{ marginBottom: "10px", color: "#000" }}>
-                {question.title}
+                {/* {question.title} */}
               </p>
             )}
             <br />
@@ -269,7 +296,7 @@ const Readiness = ({ onComplete }) => {
                 </div>
               ))}
             </div>
-            <p style={{ marginTop: "10px", color: "#000" }}>
+            <p style={{ marginTop: "10px", color: "#000", fontWeight:"600", }}>
               If you are not confident of your ability, what aspects of yourself
               or your life lead you to question your capacity to follow through?
             </p>
@@ -307,9 +334,12 @@ const Readiness = ({ onComplete }) => {
         <h3 style={{ margin: "20px 0", color: "#F2AA93" }}>
           Readiness Assessment
         </h3>
-        <h3 style={{ margin: "20px 0", color: "#000", fontWeight:"600", fontSize: "15px" }}>
-          {label} {questions[currentQuestionIndex].question}
-        </h3>
+        <i style={{ margin: "20px 0", color: "#000", fontWeight:"400", fontSize: "15px" }}>
+          {questions[currentQuestionIndex].question}
+        </i>
+        <h5 style={{ margin: "20px 0", color: "#000", fontWeight:"600", fontSize: "15px" }}>
+          {label}{questions[currentQuestionIndex]?.title}
+        </h5>
         {renderInput(questions[currentQuestionIndex])}
         <div
           style={{ margin: "20px 0", marginTop: isMobile ? 50 : 200 }}

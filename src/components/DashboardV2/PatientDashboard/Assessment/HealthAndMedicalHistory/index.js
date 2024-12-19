@@ -623,32 +623,52 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
             )}
           </Radio.Group>
         );
-      case "rating_scale":
-        return (
-          <div style={{ padding: "0 10px" }}>
-            <div style={{ marginTop: "10px" }}>
-              <Slider
-                min={1}
-                max={10}
-                marks={{
-                  1: "1",
-                  2: "2",
-                  3: "3",
-                  4: "4",
-                  5: "5",
-                  6: "6",
-                  7: "7",
-                  8: "8",
-                  9: "9",
-                  10: "10",
-                }}
-                value={answers[question.name] || 1}
-                onChange={(value) => handleChange(value, question.name)}
-                style={{ width: isMobile ? "100%" : "50%" }}
-              />
+        case "rating_scale":
+          return (
+            <div style={{ padding: "0 10px" }}>
+              <div style={{ marginTop: "10px" }}>
+                <Row gutter={[16, 16]}>
+                  <Col span={12}>
+                    <Slider
+                      min={1}
+                      max={10}
+                      value={answers[question.name] || 1}
+                      onChange={(value) => handleChange(value, question.name)}
+                      style={{ width: isMobile ? "100%" : "80%" }}
+                      disabled={answers[`${question.name}_na`] || false} 
+                    />
+                  </Col>
+                  <Col span={4}>
+                    <InputNumber
+                      min={1}
+                      max={10}
+                      value={answers[question.name] || 1}
+                      onChange={(value) => handleChange(value, question.name)}
+                      style={{ width: "100%" }}
+                      disabled={answers[`${question.name}_na`] || false} 
+                    />
+                  </Col>
+                </Row>
+                <Row style={{ marginTop: "10px" }}>
+                  <Col>
+                    <Checkbox
+                      checked={answers[`${question.name}_na`] || false}
+                      onChange={(e) => {
+                        const isChecked = e.target.checked;
+                        handleChange(isChecked, `${question.name}_na`);
+                        if (isChecked) {
+                          handleChange(null, question.name);
+                        }
+                      }}
+                    >
+                      N/A
+                    </Checkbox>
+                  </Col>
+                </Row>
+              </div>
             </div>
-          </div>
-        );
+          );
+        
 
       case "long_textarea":
         return (
@@ -861,7 +881,25 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
       <span style={{ color: "red" }}>* </span>
     </span>
   );
+  const HighlightedQuestion = ({ question }) => {
+    const highlightWords = ['poorly', 'fine', 'very well', 'N/A'];
+    const regex = new RegExp(`\\b(${highlightWords.join('|')})\\b`, 'gi');
+  
+    const highlightedQuestion = question.split(regex).map((part, index) => {
+      if (highlightWords.includes(part.toLowerCase())) {
+        return (
+          <i key={index} style={{ color: '#335CAD', fontWeight: 'bold' }}>
+            {part}
+          </i>
+        );
+      }
+      return part;
+    });
+  
+    return <p>{highlightedQuestion}</p>;
+  };
 
+  
   const progressColor =
     currentQuestionIndex === totalQuestions - 1 ? "#01ACEE" : "#C2E6F8";
   const progressPercentage =
@@ -879,13 +917,21 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
           Parent’s Birth/Childhood History
         </h3>
 
-        <h3 style={{ margin: "20px 0", color: "#000", fontWeight:"600", fontSize: "15px" }}>
-          {label}
-          {questions[currentQuestionIndex].question}
-          <i style={{ color: "#335CAD", fontWeight: "bold" }}>
-            {questions[currentQuestionIndex]?.sub}
-          </i>
-        </h3>
+        <h3 style={{ margin: "20px 0", color: "#000", fontWeight: "600", fontSize: "15px" }}>
+  {label && (
+    <span>
+      {label}
+      {questions[currentQuestionIndex]?.sub && (
+        <span style={{ color: "#335CAD", fontWeight: "bold" }}>
+          {questions[currentQuestionIndex]?.sub}
+        </span>
+      )}
+      <br />
+    </span>
+  )}
+<HighlightedQuestion question={questions[currentQuestionIndex].question} />
+</h3>
+
         {renderInput(questions[currentQuestionIndex])}
 
         <div

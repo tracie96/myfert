@@ -17,6 +17,9 @@ import EmailVerificationModal from "./OTPModal";
 import ReactInputMask from "react-input-mask";
 import moment from "moment/moment";
 import dayjs from 'dayjs';
+import { useMediaQuery } from "react-responsive";
+import fertilityImage from "../../../assets/images/auth/fertilityImage.svg";
+import { NavLink } from "react-router-dom";
 
 const PatientSignup = () => {
 
@@ -31,6 +34,7 @@ const PatientSignup = () => {
   const [password, setPassword] = useState("");
   const [passwordFocused, setPasswordFocused] = useState(false);
   let confirmPassword = "";
+  const isMobile = useMediaQuery({ maxWidth: 767 });
   const [email, setEmail] = useState(null);
   const [usernameCheck, setUsernameCheck] = useState("");
   const [emailCheck, setEmailCheck] = useState(null);
@@ -116,7 +120,6 @@ const PatientSignup = () => {
   const [heightOfPatient, setHeightOfPatient] = useState('');
   const [weightOfPatient, setWeightOfPatient] = useState('');
   const [currentStep, setCurrentStep] = useState(0);
-  const { Step } = Steps;
   const startYear = 2007;
 
   const states = {
@@ -237,7 +240,7 @@ const PatientSignup = () => {
     isAcceptTermsAndCondition: Yup.boolean()
       .required("Please accept terms and conditions")
       .oneOf([true], "Please accept terms and conditions"),
-      DigitalSignature: Yup.boolean()
+    DigitalSignature: Yup.boolean()
       .required("Please accept terms and conditions")
       .oneOf([true], "Please accept terms and conditions"),
   });
@@ -297,7 +300,6 @@ const PatientSignup = () => {
   };
 
   const handleFinish = async (values) => {
-    // Merge current form values with the ones accumulated in the state
     const allFormValues = { ...formValues, ...values };
 
     if (
@@ -309,7 +311,7 @@ const PatientSignup = () => {
     }
 
     try {
-      setShowSpinner(true); 
+      setShowSpinner(true);
 
       setTimeout(() => {
         setEmailVerificationVisible(true);
@@ -321,7 +323,7 @@ const PatientSignup = () => {
         stateProvince: selectedState.label,
         isAssessor: false,
         ExistOnMira: false,
-        height: parseFloat(allFormValues.Height) || 0, 
+        height: parseFloat(allFormValues.Height) || 0,
         weight: parseFloat(allFormValues.Weight) || 0,
         MetricImperial: unit === "Metric",
         Pronouns: selectedPronoun?.value,
@@ -348,7 +350,7 @@ const PatientSignup = () => {
         "There was an error submitting the form. Please try again.",
       );
     } finally {
-      setShowSpinner(false); 
+      setShowSpinner(false);
     }
   };
 
@@ -494,21 +496,97 @@ const PatientSignup = () => {
             ></Col>
             <Col span={20} className="column-2">
               <div className="form-scrollable">
+           
                 <div className="col-xl-9 col-lg-10 col-md-12">
+                <nav className="navbar mt-3">
+                <img
+                  className="float-left"
+                  src={fertilityImage}
+                  alt="loginImage"
+                  style={{ width: "150px" }}
+                />
+                <form className="d-flex" role="search">
+                  <NavLink
+                    to="/"
+                    className="btn btn-primary btn-user btn-block"
+                    style={{background:'#00ADEF', border:'none'}}
+                  >
+                    <span>Sign In</span>
+                  </NavLink>
+                </form>
+              </nav>
                   <div className="card o-hidden border-0  my-3">
                     <div className="card-body p-5">
                       <div className="row">
                         <div className="col-lg-12">
                           <div className="">
-                            <p
-                              style={{
-                                fontSize: 20,
-                                fontWeight: 700,
-                                color: "#000",
-                              }}
-                            >
-                              Let's get started
-                            </p>
+                            <div>
+                            {currentStep === 0 && <p
+                                style={{
+                                  fontSize: 20,
+                                  fontWeight: 700,
+                                  color: "#000",
+                                  textAlign:'center'
+                                }}
+                              >
+                                Personal Information    </p>}
+                                {currentStep === 1 && <p
+                                style={{
+                                  fontSize: 20,
+                                  fontWeight: 700,
+                                  color: "#000",                                  textAlign:'center'
+
+                                }}
+                              >
+                                Partner Information (Optional)
+                              </p>}
+                              
+                              {currentStep === 2 && <p
+                                style={{
+                                  fontSize: 20,
+                                  fontWeight: 700,
+                                  color: "#000",                                  textAlign:'center'
+
+                                }}
+                              >
+                                Agreements
+                              </p>}
+                            </div>
+                            <div
+  style={{
+    display: "flex",
+    gap: "10px",
+    alignItems: "center",
+    width: "200px",
+    margin: "0 auto", 
+  }}
+>
+  <div
+    style={{
+      height: "2px",
+      backgroundColor: currentStep === 0 ? "#01ACEE" : "gray",
+      flex: 1,
+    }}
+  ></div>
+
+  <div
+    style={{
+      height: "2px",
+      backgroundColor: currentStep === 1 ? "#01ACEE" : "gray",
+      flex: 1,
+    }}
+  ></div>
+
+  <div
+    style={{
+      height: "2px",
+      backgroundColor: currentStep === 2 ? "#01ACEE" : "gray",
+      flex: 1,
+    }}
+  ></div>
+</div>
+
+
                             <Form
                               layout="vertical"
                               form={form}
@@ -516,7 +594,6 @@ const PatientSignup = () => {
                               requiredMark={customizeRequiredMark}
                               initialValues={values}
                               autoComplete="off"
-                              style={{ marginTop: -50 }}
                               onValuesChange={(changedValues, allValues) => {
                                 setButtonDisabled(
                                   !checkRequiredFields(allValues),
@@ -525,11 +602,10 @@ const PatientSignup = () => {
                             >
                               <Steps
                                 current={currentStep}
-                                style={{ marginTop: 100,height:30 }}
+                                style={{ marginTop: 10, height: 30 }}
+                                direction={"horizontal"}
+
                               >
-                                <Step title="Personal Information" />
-                                <Step title="Partner Information (Optional)" />
-                                <Step title="Agreements" />
                               </Steps>
 
                               <FormItem
@@ -608,7 +684,7 @@ const PatientSignup = () => {
                                               style={{
                                                 color:
                                                   usernameCheck.statusCode ===
-                                                  "200"
+                                                    "200"
                                                     ? "green"
                                                     : "red",
                                               }}
@@ -628,13 +704,13 @@ const PatientSignup = () => {
                                   </div>
                                   <div className="row">
                                     <div className="col-lg-3 col-sm-3">
-                                      <FormItem label="Sex" name="gender"  rules={[
-                                          {
-                                            required: true,
-                                            message:
-                                              "! Please enter your Sex",
-                                          },
-                                        ]}>
+                                      <FormItem label="Sex" name="gender" rules={[
+                                        {
+                                          required: true,
+                                          message:
+                                            "! Please enter your Sex",
+                                        },
+                                      ]}>
                                         <Select
                                           onChange={(selectedOption) => {
                                             form.setFieldsValue({
@@ -801,8 +877,8 @@ const PatientSignup = () => {
                                               value === password
                                                 ? Promise.resolve()
                                                 : Promise.reject(
-                                                    "Passwords do not match",
-                                                  ),
+                                                  "Passwords do not match",
+                                                ),
                                           },
                                         ]}
                                       >
@@ -824,7 +900,7 @@ const PatientSignup = () => {
                                               style={{
                                                 color:
                                                   emailCheck.statusCode ===
-                                                  "200"
+                                                    "200"
                                                     ? "green"
                                                     : "red",
                                                 fontSize: "12px",
@@ -921,7 +997,7 @@ const PatientSignup = () => {
                                       <FormItem
                                         label="Apartment, Suite, etc"
                                         name="appartmentOrSuite"
-                                       
+
                                       >
                                         <Input placeholder="Enter Apartment Or Suite" />
                                       </FormItem>
@@ -947,15 +1023,15 @@ const PatientSignup = () => {
                                             (option) =>
                                               option.value ===
                                               selectedCountry?.value,
-                                          )} 
+                                          )}
                                           onChange={(selectedOption) => {
-                                            setSelectedCountry(selectedOption); 
+                                            setSelectedCountry(selectedOption);
                                             form.setFieldsValue({
                                               country: selectedOption,
                                             });
-                                            setSelectedState(null); 
+                                            setSelectedState(null);
                                             form.setFieldsValue({
-                                              stateProvince: null, 
+                                              stateProvince: null,
                                             });
                                           }}
                                         />
@@ -983,7 +1059,7 @@ const PatientSignup = () => {
                                             (option) =>
                                               option.value ===
                                               selectedState?.value,
-                                          )} 
+                                          )}
                                           onChange={(selectedOption) => {
                                             setSelectedState(selectedOption);
                                             form.setFieldsValue({
@@ -1054,7 +1130,7 @@ const PatientSignup = () => {
                                       </FormItem>
                                     </div>
                                   </div>
-                       
+
                                   <div className="row">
                                     <div className="col-lg-12 col-sm-12">
                                       <Form.Item
@@ -1070,7 +1146,7 @@ const PatientSignup = () => {
                                       >
                                         <DatePicker
                                           disabledDate={disableBefore2006}
-                                          defaultPickerValue={dayjs(`${startYear}-01-01`)} 
+                                          defaultPickerValue={dayjs(`${startYear}-01-01`)}
                                           style={{
                                             width: "100%",
                                             height: "42px",
@@ -1122,15 +1198,38 @@ const PatientSignup = () => {
                                               }
                                               const isValid = unit === "Metric"
                                                 ? value >= 50 && value <= 250
-                                                : value >= 20 && value <= 100;
+                                                : value >= 1 && value <= 8;
                                               return isValid
                                                 ? Promise.resolve()
-                                                : Promise.reject(`Height must be valid for ${unit}, should be between 
-                                                ${unit === "Metric" ? "50 cm and 250 cm" : "20 inches and 100 inches"}
-                                                `);
+                                                : Promise.reject(
+                                                  `Height must be valid for ${unit}, should be between ${unit === "Metric" ? "50 cm and 250 cm" : "1 ft and 8 ft"
+                                                  }`
+                                                );
                                             },
                                           },
                                         ]}
+                                      // ToDo: remove this code after testing
+                                      // rules={[
+                                      //   {
+                                      //     required: true,
+                                      //     message: "Please enter your height",
+                                      //   },
+                                      //   {
+                                      //     validator: (_, value) => {
+                                      //       if (!value) {
+                                      //         return Promise.reject("Height is required");
+                                      //       }
+                                      //       const isValid = unit === "Metric"
+                                      //         ? value >= 50 && value <= 250
+                                      //         : value >= 20 && value <= 100;
+                                      //       return isValid
+                                      //         ? Promise.resolve()
+                                      //         : Promise.reject(`Height must be valid for ${unit}, should be between 
+                                      //         ${unit === "Metric" ? "50 cm and 250 cm" : "20 inches and 100 inches"}
+                                      //         `);
+                                      //     },
+                                      //   },
+                                      // ]}
                                       >
                                         <div
                                           style={{
@@ -1143,11 +1242,11 @@ const PatientSignup = () => {
                                             className="input_questionnaire"
                                             placeholder="Enter Height"
                                             value={heightOfPatient}
-                                            onChange={(e)=>setHeightOfPatient(e.target.value)}
+                                            onChange={(e) => setHeightOfPatient(e.target.value)}
                                             style={{ marginRight: "10px" }}
                                           />
                                           <span>
-                                            {unit === "Metric" ? "cm" : "inches"}
+                                            {unit === "Metric" ? "cm" : "ft."}
                                           </span>
                                         </div>
                                       </Form.Item>
@@ -1187,7 +1286,7 @@ const PatientSignup = () => {
                                             className="input_questionnaire"
                                             placeholder="Enter Weight"
                                             value={weightOfPatient}
-                                            onChange={(e)=>setWeightOfPatient(e.target.value)}
+                                            onChange={(e) => setWeightOfPatient(e.target.value)}
                                             style={{ marginRight: "10px" }}
                                           />
                                           <span>
@@ -1497,13 +1596,13 @@ const PatientSignup = () => {
                                     </div>
 
                                     <Form.Item
-                                    name="DigitalSignatureName"
-                                    rules={[
-                                      {
-                                        required: true,
-                                        message: "! Please confirm",
-                                      },
-                                    ]}
+                                      name="DigitalSignatureName"
+                                      rules={[
+                                        {
+                                          required: true,
+                                          message: "! Please confirm",
+                                        },
+                                      ]}
                                     >
                                       <div
                                         style={{
@@ -1542,7 +1641,7 @@ const PatientSignup = () => {
                                   <Button
                                     type="primary"
                                     style={{
-                                      width: "200px",
+                                      width: isMobile?"":"200px",
                                       height: "46.42px",
                                       borderRadius: 10,
                                       backgroundColor: "rgb(1, 173, 240)",
@@ -1559,7 +1658,7 @@ const PatientSignup = () => {
                                     htmlType="submit"
                                     disabled={buttonDisabled}
                                     style={{
-                                      width: "200px",
+                                      width: isMobile?"":"200px",
                                       height: "46.42px",
                                       backgroundColor: "rgb(1, 173, 240)",
                                       float: "right",
@@ -1571,7 +1670,7 @@ const PatientSignup = () => {
                                 {currentStep >= 1 && (
                                   <Button
                                     style={{
-                                      width: "200px",
+                                      width: isMobile?"":"200px",
                                       height: "46.42px",
                                     }}
                                     onClick={() => prevStep()}
@@ -1606,7 +1705,7 @@ const PatientSignup = () => {
                               ]}
                             >
                               <p>
-                              Would you like us to create an account for you on Mira using the same email you plan to use for MFL?
+                                Would you like us to create an account for you on Mira using the same email you plan to use for MFL?
                               </p>
                             </Modal>
                           </div>

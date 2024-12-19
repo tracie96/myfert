@@ -43,10 +43,22 @@ const questions = [
     ],
   },
   {
+    question: "What are your reasons for following your specific diet or nutrition program?",
+    type: "long_textarea",
+    name: "diet_detail_lunch",
+  },
+  {
     question: "Do you have sensitivities to certain foods?",
     type: "radio",
     name: "sensitive_food",
     options: ["Yes", "No"],
+    subQuestions: [
+      {
+        question: "If Yes: list food and symptoms",
+        type: "text",
+        name: "sensitive_food_info",
+      },
+    ]
   },
   {
     question: "Do you have an aversion to certain foods?",
@@ -109,6 +121,10 @@ const questions = [
       "Dislike healthy foods",
       "Time constraints",
       "Travel frequently",
+      "Eat more than 50% of meals away from home",
+      "Healthy foods not readily available",
+      "Poor snack choices",
+      "Signifcant other or family members don’t like healthy foods",
       "Signifcant other or family members have special dietary needs",
       "Love to eat",
       "Eat because I have to",
@@ -126,24 +142,52 @@ const questions = [
     type: "long_textarea",
     sub: "Breakfast",
     name: "diet_detail_breakfast",
+    subQuestion: [
+      {
+        type: "time_select",
+        label: "Time of Breakfast",
+        name: "breakfast_time",
+      },
+    ],
   },
   {
     question: "Please record what you eat in a typical day:",
     type: "long_textarea",
     sub: "Lunch",
     name: "diet_detail_lunch",
+    subQuestion: [
+      {
+        type: "time_select",
+        label: "Time of Breakfast",
+        name: "breakfast_time",
+      },
+    ],
   },
   {
     question: "Please record what you eat in a typical day:",
     type: "long_textarea",
     sub: "Dinner",
     name: "diet_detail_dinner",
+    subQuestion: [
+      {
+        type: "time_select",
+        label: "Time of Breakfast",
+        name: "breakfast_time",
+      },
+    ],
   },
   {
     question: "Please record what you eat in a typical day:",
     type: "long_textarea",
     sub: "Snacks",
     name: "diet_detail_snacks",
+    subQuestion: [
+      {
+        type: "time_select",
+        label: "Time of Breakfast",
+        name: "breakfast_time",
+      },
+    ],
   },
   {
     question: "Please record what you eat in a typical day:",
@@ -288,9 +332,16 @@ const Nutrition = ({ onComplete }) => {
   };
   const validateQuestion = () => {
     const question = questions[currentQuestionIndex];
+    const isTimeFieldValid =
+    question.subQuestion && question.subQuestion.some(sub => {
+      return answers[sub.name] !== undefined && answers[sub.name] !== "";
+    });
+
+    const isCheckboxValid = question.type === "checkbox" && 
+    (Array.isArray(answers[question.name]) && answers[question.name].length > 0 && answers[question.name] !== undefined);
 
     return (
-      answers[question.name] !== undefined && answers[question.name] !== ""
+      answers[question.name] !== undefined && answers[question.name] !== "" && (isCheckboxValid || isTimeFieldValid)
     );
   };
 
@@ -369,6 +420,10 @@ const Nutrition = ({ onComplete }) => {
   };
 
   const handleSubmit = () => {
+    if (!validateQuestion()) {
+      message.error("Please answer the current question before saving.");
+      return;
+    }
     const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
     const token = userInfo.obj.token || "";
 
@@ -455,10 +510,10 @@ const Nutrition = ({ onComplete }) => {
             </Radio.Group>
 
             {answers[question.name] === "Yes" &&
-              question.name === "sensitive_food_caffeine" && (
+              (question.name === "sensitive_food_caffeine" || question.name === "sensitive_food") && (
                 <Input
                   className="input_questtionnaire"
-                  placeholder="If Yes, Please explain"
+                  placeholder={question.name === "sensitive_food" ? "If Yes: list food and symptoms" : "If Yes, Please explain"}
                   value={answers[`${question.name}_other`] || ""}
                   onChange={(e) =>
                     handleChange(e.target.value, `${question.name}_other`)
@@ -514,7 +569,7 @@ const Nutrition = ({ onComplete }) => {
             name={question.name}
             onChange={(e) => handleChange(e.target.value, question.name)}
             value={answers[question.name]}
-            style={{ width: "100%" }}
+            style={{ width: "100%", overflow: "visible" }}
           >
             {question.options.map((option, index) => (
               <Radio
@@ -526,28 +581,64 @@ const Nutrition = ({ onComplete }) => {
               </Radio>
             ))}
             {answers[question.name] === "No" && (
-              <Select
-                placeholder="Please specify"
-                value={answers[`${question.name}_detail`] || ""}
-                onChange={(value) =>
-                  handleChange(value, `${question.name}_detail`)
-                }
-                style={{ width: "100%", marginTop: "10px" }}
-              >
-                <Option value="1">1</Option>
-                <Option value="2">2</Option>
-                <Option value="3">3</Option>
-                <Option value="4">4</Option>
-                <Option value="5">5</Option>
-                <Option value="6">6</Option>
-              </Select>
+              <>
+                <div style={{ marginTop: "10px", color: "#000", fontWeight: "600", fontSize: "15px"  }}>If no, how many?</div>
+                <Select
+                  placeholder="Please specify"
+                  value={answers[`${question.name}_detail`] || ""}
+                  onChange={(value) =>
+                    handleChange(value, `${question.name}_detail`)
+                  }
+                  style={{ width: "100%", marginTop: "10px" }}
+                >
+                  <Option value="1">1</Option>
+                  <Option value="2">2</Option>
+                  <Option value="3">3</Option>
+                  <Option value="4">4</Option>
+                  <Option value="5">5</Option>
+                  <Option value="6">6</Option>
+                </Select>
+              </>
             )}
           </Radio.Group>
         );
+        case "time_select":
+  const timeOptions = Array.from({ length: 24 }, (_, i) => {
+    const hour = i < 10 ? `0${i}` : i;
+    return `${hour}:00`;
+  });
+
+  return (
+    <div style={{ flexDirection: "column", marginTop: "10px" }}>
+      <label style={{ marginBottom: "10px", fontWeight: "bold" }}>
+        {question.label || "Select Time"}
+      </label>
+      <Select
+        placeholder="Select time"
+        className="select_time_dropdown"
+        value={answers[question.name] || ""}
+        onChange={(value) => handleChange(value, question.name)}
+        style={{ width: "100%" }}
+      >
+        {timeOptions.map((time) => (
+          <Option key={time} value={time}>
+            {time}
+          </Option>
+        ))}
+      </Select>
+    </div>
+  );
+
       case "long_textarea":
         return (
           <div style={{ flexDirection: "column" }}>
             <br />
+            {question.subQuestion &&
+        question.subQuestion.map((sub, index) => (
+          <div key={index}>
+            {renderInput(sub)}
+          </div>
+        ))}
             <Input.TextArea
               className="input_questtionnaire"
               name={question.name}

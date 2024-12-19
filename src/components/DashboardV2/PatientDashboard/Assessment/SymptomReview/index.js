@@ -689,21 +689,21 @@ const SymptomReview = ({ onComplete }) => {
   //     answers[question.name] !== undefined && answers[question.name] !== ""
   //   );
   // };
-  const validateQuestion = () => {
-    const question = questions[currentQuestionIndex];
-    if (question.subQuestions) {
-      return question.subQuestions.every(
-        (sub) => answers[sub.name] !== undefined && answers[sub.name] !== ""
-      );
-    }
-    return answers[question.name] !== undefined && answers[question.name] !== "";
-  };
+  // const validateQuestion = () => {
+  //   const question = questions[currentQuestionIndex];
+  //   if (question.subQuestions) {
+  //     return question.subQuestions.every(
+  //       (sub) => answers[sub.name] !== undefined && answers[sub.name] !== ""
+  //     );
+  //   }
+  //   return answers[question.name] !== undefined && answers[question.name] !== "";
+  // };
 
   const handleSave = () => {
-    if (!validateQuestion()) {
-      message.error("Please answer the current question before saving.");
-      return;
-    }
+    // if (!validateQuestion()) {
+    //   message.error("Please answer the current question before saving.");
+    //   return;
+    // }
     localStorage.setItem("currentQuestionIndex9", 0);
     localStorage.setItem("answers", JSON.stringify(answers));
     if (currentQuestionIndex < totalQuestions - 1) {
@@ -1069,7 +1069,7 @@ const SymptomReview = ({ onComplete }) => {
       case "long_radio":
         return (
           <div style={{ flexDirection: "column" }}>
-            <Button
+            <div
               type="primary"
               style={{
                 background: "#335CAD",
@@ -1079,7 +1079,7 @@ const SymptomReview = ({ onComplete }) => {
               }}
             >
               {question.sub}
-            </Button>
+            </div>
 
             <Radio.Group
               name={question.name}
@@ -1106,11 +1106,6 @@ const SymptomReview = ({ onComplete }) => {
         return null;
     }
   };
-  const label = (
-    <span>
-      <span style={{ color: "red" }}>* </span>
-    </span>
-  );
 
   const progressColor =
     currentQuestionIndex === totalQuestions - 1 ? "#01ACEE" : "#C2E6F8";
@@ -1126,7 +1121,6 @@ const SymptomReview = ({ onComplete }) => {
           strokeColor={progressColor}
         />
         <h3 style={{ margin: "20px 0", color: "#F2AA93" }}>
-          {label}
           {questions[currentQuestionIndex].title}
         </h3>
 

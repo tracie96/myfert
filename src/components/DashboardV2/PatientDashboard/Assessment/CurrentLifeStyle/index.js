@@ -42,7 +42,7 @@ const questions = [
     options: ["Yes", "No"],
   },
   {
-    question: "",
+    question: "Please list allergies below:",
     type: "allergies",
     sub: "Allergies",
     name: "allergies",
@@ -258,7 +258,7 @@ const questions = [
       {
         type: "select",
         label: "Time/Duration (Minutes)",
-        options: Array.from({ length: 48 }, (_, i) => 1 + i),
+        options: Array.from({ length: 60 }, (_, i) => i<59 ? i+1 : '60+'),
         name: "sport_participated_in_time_duration",
       },
     ],
@@ -469,6 +469,8 @@ const CurrentLifeStyle = ({ onComplete }) => {
 
       render: (text, record) =>
         isEditing(record) ? (
+          <>
+          <i>Example: Post Nasal Drip</i>
           <Input
             value={tempConcern.problem || ""}
             onChange={(e) => handleChangeTempConcern("problem", e.target.value)}
@@ -476,9 +478,12 @@ const CurrentLifeStyle = ({ onComplete }) => {
             style={{
               width: "100%",
               borderColor: tempConcern.problem ? undefined : "red",
+              marginTop: "14px"
             }}
             required
           />
+          </>
+          
         ) : (
           <span data-label="problem">
             {isMobile && (
@@ -494,21 +499,25 @@ const CurrentLifeStyle = ({ onComplete }) => {
       editable: true,
       render: (text, record) =>
         isEditing(record) ? (
-          <Select
-            value={tempConcern.severity || ""}
-            onChange={(value) => handleChangeTempConcern("severity", value)}
-            placeholder="Select Severity"
-            style={{
-              width: "100%",
-              height: 40,
-              borderColor: tempConcern.severity ? undefined : "red",
-            }}
-            required
-          >
-            <Option value="Mild">Mild</Option>
-            <Option value="Moderate">Moderate</Option>
-            <Option value="Severe">Severe</Option>
-          </Select>
+          <>
+            <i>Moderate</i>
+            <Select
+              value={tempConcern.severity || ""}
+              onChange={(value) => handleChangeTempConcern("severity", value)}
+              placeholder="Select Severity"
+              style={{
+                width: "100%",
+                height: 40,
+                borderColor: tempConcern.severity ? undefined : "red",
+                marginTop: "14px"
+              }}
+              required
+            >
+              <Option value="Mild">Mild</Option>
+              <Option value="Moderate">Moderate</Option>
+              <Option value="Severe">Severe</Option>
+            </Select>
+          </>
         ) : (
           <span data-label="severity">
             {isMobile && <i style={{ fontWeight: "bold" }}>Severity : </i>}
@@ -522,16 +531,19 @@ const CurrentLifeStyle = ({ onComplete }) => {
       editable: true,
       render: (text, record) =>
         isEditing(record) ? (
-          <Input
-            value={tempConcern.priorTreatment || ""}
-            onChange={(e) =>
-              handleChangeTempConcern("priorTreatment", e.target.value)
-            }
-            placeholder="Prior Treatment"
-            data-label="Prior Treatment"
-            style={{ width: "100%", borderColor: text ? undefined : "red" }}
-            required
-          />
+          <>
+            <i>Elimination Diet</i>
+            <Input
+              value={tempConcern.priorTreatment || ""}
+              onChange={(e) =>
+                handleChangeTempConcern("priorTreatment", e.target.value)
+              }
+              placeholder="Prior Treatment"
+              data-label="Prior Treatment"
+              style={{ width: "100%", borderColor: text ? undefined : "red", marginTop: "14px" }}
+              required
+            />
+          </>
         ) : (
           <span data-label="Prior Treatment">
             {isMobile && (
@@ -547,22 +559,26 @@ const CurrentLifeStyle = ({ onComplete }) => {
       editable: true,
       render: (text, record) =>
         isEditing(record) ? (
-          <Select
-            value={tempConcern.success || ""}
-            onChange={(value) => handleChangeTempConcern("success", value)}
-            placeholder="Select Success"
-            data-label="Success"
-            style={{
-              width: "100%",
-              height: 40,
-              borderColor: text ? undefined : "red",
-            }}
-            required
-          >
-            <Option value="Good">Good</Option>
-            <Option value="Excellent">Excellent</Option>
-            <Option value="Fair">Fair</Option>
-          </Select>
+          <>
+            <i>Excellent</i>
+            <Select
+              value={tempConcern.success || ""}
+              onChange={(value) => handleChangeTempConcern("success", value)}
+              placeholder="Select Success"
+              data-label="Success"
+              style={{
+                width: "100%",
+                height: 40,
+                borderColor: text ? undefined : "red",
+                marginTop: "14px"
+              }}
+              required
+            >
+              <Option value="Good">Good</Option>
+              <Option value="Excellent">Excellent</Option>
+              <Option value="Fair">Fair</Option>
+            </Select>
+          </>
         ) : (
           <span data-label="Success">
             {isMobile && (

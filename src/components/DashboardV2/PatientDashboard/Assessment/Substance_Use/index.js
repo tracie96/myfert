@@ -58,7 +58,7 @@ const questions = [
     ],
   },
   {
-    question: "If you smoked previously:",
+    question: "Have you smoked previously:",
     type: "smoked_previously",
     sub: "Smoking",
     name: "smoked_previously",
@@ -168,11 +168,29 @@ const SubstanceUse = ({ onComplete }) => {
       setAnswers(savedAnswers);
     }
   }, []);
+  // ToDo: remove this commented code after testing
+  // const validateQuestion = () => {
+  //   const question = questions[currentQuestionIndex];
+  //   return (
+  //     answers[question.name] !== undefined && answers[question.name] !== ""
+  //   );
+  // };
   const validateQuestion = () => {
     const question = questions[currentQuestionIndex];
-    return (
-      answers[question.name] !== undefined && answers[question.name] !== ""
-    );
+    const isMainQuestionValid =
+      answers[question.name] !== undefined && answers[question.name] !== "";
+    const areSubQuestionsValid =
+      answers[question.name] === "Yes" &&
+      question.subQuestions?.every((sub) => {
+        const answer = answers[sub.name];
+        if (sub.type === "inputNumber") {
+          // Allow default value of 0 for number inputs
+          return answer !== undefined;
+        }
+        // For other types, validate as non-empty
+        return answer !== undefined && answer !== "";
+      });
+    return isMainQuestionValid && (!question.subQuestions || areSubQuestionsValid);
   };
   const handleExit = () => {
     navigate("/assessment");
@@ -336,6 +354,7 @@ const SubstanceUse = ({ onComplete }) => {
           <InputNumber
             name={subQuestion.name}
             value={answers[subQuestion.name] || 0}
+            min={0}
             onChange={(value) => handleChange(value, subQuestion.name)}
             className="select_questtionnaire"
             style={{
@@ -376,6 +395,7 @@ const SubstanceUse = ({ onComplete }) => {
           <InputNumber
             name={subQuestion.name}
             value={answers[subQuestion.name] || 0}
+            min={0}
             onChange={(value) => handleChange(value, subQuestion.name)}
             className="select_questtionnaire"
           />
@@ -490,20 +510,21 @@ const SubstanceUse = ({ onComplete }) => {
   const progressPercentage =
     ((currentQuestionIndex + 1) / totalQuestions) * 100;
 
+    const percentProgressBar = Math.round(100/totalQuestions);
   return (
     <Row gutter={16} style={{ padding: "0 5%" }}>
       <Col xs={24} sm={24} md={16} lg={24} xl={24}>
         <FormWrapper name="FEMALE INTAKE QUESTIONNAIRE" />
         <Progress
-          percent={Math.round(progressPercentage)}
+          percent={Math.round(progressPercentage)- percentProgressBar}
           strokeColor={progressColor}
         />
         <h3 style={{ margin: "20px 0", fontSize:"15px", fontWeight:"600", color: "#F2AA93" }}>
-          {label}
           {questions[currentQuestionIndex].sub}
         </h3>
 
         <h3 style={{ margin: "20px 0", color: "#000", fontWeight:"600", fontSize: "15px" }}>
+          {label}
           {questions[currentQuestionIndex].question}
         </h3>
         {renderInput(questions[currentQuestionIndex])}

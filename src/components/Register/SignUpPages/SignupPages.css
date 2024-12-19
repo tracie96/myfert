@@ -105,9 +105,7 @@ a .image-container {
     max-width: 100%;
     flex: 0 0 100%;
   }
-  .form-scrollable {
-    margin: auto;
-  }
+
   .right-section,
   .left-section {
     width: 100%;

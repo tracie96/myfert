@@ -119,6 +119,30 @@ export const getZohoClientID = createAsyncThunk(
     }
   },
 );
+export const acceptAppointment = createAsyncThunk(
+  "doctor/acceptAppointment",
+  async ({ appointmentId, status }, { rejectWithValue, getState }) => {
+    const user = getState()?.authentication?.userAuth;
+
+    const config = {
+      headers: {
+        Accept: "text/plain", 
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+
+    try {
+      const response = await axios.get(
+        `${baseUrl}Doctor/AcceptAppointment/${appointmentId}/${status}`, 
+        config
+      );
+      return response.data; // Return the response data to be used by reducers
+    } catch (error) {
+      
+      return rejectWithValue(error?.response?.data);
+    }
+  }
+);
 export const increaseUserStep = createAsyncThunk(
   "doctor/increaseUserStep",
   async ({ patientId, step }, { rejectWithValue, getState, dispatch }) => {

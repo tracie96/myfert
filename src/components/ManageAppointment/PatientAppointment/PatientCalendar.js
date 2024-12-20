@@ -140,32 +140,55 @@ const PatientCalendar = ({ selectedProviders }) => {
 
   const updateCalendarEvents = useCallback(
     (availability, startYear, startMonth) => {
+      const uniqueEvents = new Map();
       const events = availability.flatMap((slot) => {
+        if (!slot || !slot.roleName || !slot.date) {
+          console.error('Invalid slot data:', slot);
+          return []; // Skip invalid slot data
+        }
+  
+        // Construct a unique key for each event based on roleName and date
+        const eventKey = `${slot.roleName}-${slot.date}`;
+  
+        // If this event has already been processed, skip it
+        if (uniqueEvents.has(eventKey)) {
+          return []; // Skip duplicate events
+        }
+  
+        // Add the event key to the set to track that it's been processed
+        uniqueEvents.set(eventKey, true);
+  
         const backgroundColor = roleColorMap[slot.roleId] || "gray";
+  
+        // Return the event
         return slot.free
           ? [
-            {
-              id: `${slot.date}_${slot.roleId}`,
-              title: slot.roleName,
-              start: new Date(slot.date),
-              end: new Date(slot.date),
-              classNames: `fc-event-${backgroundColor}`,
-              textColor: "white",
-            },
-          ]
+              {
+                id: `${slot.date}_${slot.roleId}`,
+                title: slot.roleName, // Using the distinct role name as the label
+                start: new Date(slot.date),
+                end: new Date(slot.date),
+                classNames: `fc-event-${backgroundColor}`,
+                textColor: "white",
+              },
+            ]
           : [
-            {
-              id: `${slot.date}_${slot.roleId}`,
-              title: `Booked`,
-              start: new Date(slot.date),
-              end: new Date(slot.date),
-              classNames: "fc-event-green",
-              textColor: "white",
-            },
-          ];
+              {
+                id: `${slot.date}_${slot.roleId}`,
+                title: `Booked`,
+                start: new Date(slot.date),
+                end: new Date(slot.date),
+                classNames: "fc-event-green",
+                textColor: "white",
+              },
+            ];
       });
-
+  
+      // Log the generated events to check what is being returned
+      console.log('Generated events:', events);
+  
       setApptEvents((prevEvents) => {
+        // Only update events if they are different from the previous state
         if (JSON.stringify(prevEvents) !== JSON.stringify(events)) {
           return events;
         }
@@ -174,7 +197,10 @@ const PatientCalendar = ({ selectedProviders }) => {
     },
     [roleColorMap, setApptEvents]
   );
-
+  
+  
+  
+  
   const fetchAndSetAvailability = useCallback(
     async (startYear, startMonth) => {
       try {

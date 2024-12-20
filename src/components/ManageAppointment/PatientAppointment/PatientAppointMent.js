@@ -90,9 +90,9 @@ const PatientAppointment = () => {
   const handleJoinCall = (appointment) => {
     localStorage.setItem("currentStep", 3)
     console.log('join the call', appointment)
-    const { zohoLink } = appointment
-    if (zohoLink) {
-      window.open(zohoLink, '_blank');
+    const { meetingLink } = appointment
+    if (meetingLink) {
+      window.open(meetingLink, '_blank');
     } else {
       alert('Meeting link is not yet ready.')
     }
@@ -398,10 +398,10 @@ const PatientAppointment = () => {
                                   <Button
                                     type="primary"
                                     icon={<VideoCameraOutlined />}
-                                    disabled={!appointment.zohoLink}
+                                    disabled={!appointment.meetingLink}
                                     style={{
                                       marginBottom: "10px",
-                                      backgroundColor: `${!appointment.zohoLink ? '#808080' : '#1E90FF'}`,
+                                      backgroundColor: `${!appointment.meetingLink ? '#808080' : '#1E90FF'}`,
                                       borderRadius: "5px",
                                       padding: "10px 20px",
                                     }}

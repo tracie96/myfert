@@ -950,32 +950,7 @@ const PatientSignup = () => {
                                     </div>
 
                                     <div className="col-lg-12 col-sm-12">
-                                      <FormItem
-                                        name="isAgreeToReceiveJaneApp"
-                                        valuePropName="checked"
-                                        rules={[
-                                          {
-                                            required: true,
-                                            message: "! Please confirm",
-                                          },
-                                        ]}
-                                      >
-                                        <Checkbox>
-                                          I confirm that the email provided
-                                          above matches the one I used for{" "}
-                                          <span
-                                            style={{
-                                              color: "#02BFCC",
-                                              fontWeight: "bold",
-                                            }}
-                                          >
-                                            Jane App
-                                          </span>
-                                          <span style={{ color: "red" }}>
-                                            *
-                                          </span>
-                                        </Checkbox>
-                                      </FormItem>
+                                   
                                     </div>
 
                                     <div className="col-lg-12 col-sm-12">

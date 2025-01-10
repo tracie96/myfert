@@ -927,30 +927,6 @@ const PatientSignup = () => {
                                       </Form.Item>
                                     </div>
 
-                                    <div
-                                      style={{
-                                        color: "#335CAD",
-                                        borderRadius: 10,
-                                        marginBottom: 10,
-                                        marginTop: 15,
-                                      }}
-                                    >
-                                      Is this email same as that of MIRA
-                                    </div>
-
-                                    <div>
-                                      <Radio.Group
-                                        onChange={handleRadioChange}
-                                        name="ExistOnMira"
-                                        value={radioValue}
-                                      >
-                                        <Radio value="Yes">Yes</Radio>
-                                        <Radio defaultChecked value="No">
-                                          No
-                                        </Radio>
-                                      </Radio.Group>
-                                    </div>
-
                                    
 
                                     <div className="col-lg-12 col-sm-12">

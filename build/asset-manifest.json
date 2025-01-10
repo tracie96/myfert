@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.76eec6d6.css",
-    "main.js": "/static/js/main.09d7858f.js",
+    "main.js": "/static/js/main.dcc4e6fd.js",
     "static/js/787.28637dfb.chunk.js": "/static/js/787.28637dfb.chunk.js",
     "static/media/learn.png": "/static/media/learn.4b147d39002e13a19010.png",
     "static/media/pharmacist_clinician.jpeg": "/static/media/pharmacist_clinician.fba42df8bf00c9e71db3.jpeg",
@@ -35,16 +35,17 @@
     "static/media/2.svg": "/static/media/2.86ebdce8cbd8ac5fd89a96d1d0366480.svg",
     "static/media/9.svg": "/static/media/9.94975e5bf217fe38252b4dff13ebce33.svg",
     "static/media/user1.jpg": "/static/media/user1.f3714f3391c9a5903799.jpg",
+    "static/media/mira_error.png": "/static/media/mira_error.d89a7c6d0d211bce1fbf.png",
     "static/media/subscription_home-logo.png": "/static/media/subscription_home-logo.8c4d7c8360f10ff9f1fc.png",
     "static/media/edit_icon.png": "/static/media/edit_icon.75b0fd055492784d81e7.png",
     "static/media/mirabutton.svg": "/static/media/mirabutton.8c4bb1d4eb9d220526aaa72f0a3946ac.svg",
     "index.html": "/index.html",
     "main.76eec6d6.css.map": "/static/css/main.76eec6d6.css.map",
-    "main.09d7858f.js.map": "/static/js/main.09d7858f.js.map",
+    "main.dcc4e6fd.js.map": "/static/js/main.dcc4e6fd.js.map",
     "787.28637dfb.chunk.js.map": "/static/js/787.28637dfb.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.76eec6d6.css",
-    "static/js/main.09d7858f.js"
+    "static/js/main.dcc4e6fd.js"
   ]
 }

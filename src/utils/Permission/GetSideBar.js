@@ -14,6 +14,7 @@ import {
   FileAddTwoTone,
   OrderedListOutlined,
   InfoCircleTwoTone,
+  ContactsTwoTone 
 } from "@ant-design/icons";
 import { useMediaQuery } from "react-responsive";
 
@@ -41,15 +42,17 @@ export const GetSideBar = () => {
       case "/chart":
         return "3";
       case "/patient/appointment":
-        return "6";
+        return "10";
       case "/plans":
         return "7";
       case "/second-plan":
         return "8";
       case "/pre-plan":
         return "9";
+      case "/calendar":
+        return "6";
       default:
-        return "1"; 
+        return "1";
     }
   };
 
@@ -62,14 +65,14 @@ export const GetSideBar = () => {
       case "/doctor/appointments":
         return "3";
       default:
-        return "1"; 
+        return "1";
     }
   };
   const menuItems = (
     <Menu
       theme="light"
       selectedKeys={[getSelectedKey()]}
-            mode="inline"
+      mode="inline"
       onClick={onClose}
     >
       <Menu.Item key="1" icon={<QrcodeOutlined />}>
@@ -87,15 +90,16 @@ export const GetSideBar = () => {
           <span className="no-underline">CHART</span>
         </NavLink>
       </Menu.Item>
-      <Menu.Item key="4" icon={<PieChartTwoTone />}>
-        <NavLink to="/newchart" style={{ textDecoration: "none" }}>
-          <span className="no-underline">NEW CHART (PROG...)</span>
-        </NavLink>
-      </Menu.Item>
+
       <Menu.Item key="5" icon={<MedicineBoxTwoTone />}>
         <span>MEDS</span>
       </Menu.Item>
       <Menu.Item key="6" icon={<CalendarTwoTone />}>
+        <NavLink to="/patient/calendar" style={{ textDecoration: "none" }}>
+          <span className="no-underline">CALENDAR</span>
+        </NavLink>
+      </Menu.Item>
+      <Menu.Item key="6" icon={<ContactsTwoTone style={{ fontSize: '16px'}} />}>
         <NavLink to="/patient/appointment" style={{ textDecoration: "none" }}>
           <span className="no-underline">APPOINTMENT</span>
         </NavLink>
@@ -110,7 +114,7 @@ export const GetSideBar = () => {
           <span className="no-underline">LEARN</span>
         </NavLink>
       </Menu.Item>
-   
+
     </Menu>
   );
   const doctorMenuItems = (
@@ -270,19 +274,19 @@ export const GetSideBar = () => {
           {isMobile ? (
             <>
               <Button
-              type="primary"
-              onClick={showDrawer}
-              className="sidebar-toggle"
-              style={{
-                marginBottom: 16,
-                position: "absolute",
-                top: 30,
-                left: 30,
-                zIndex: 9,
-                background:"none",
-                color:"#00ADEF"
-              }}
-            >
+                type="primary"
+                onClick={showDrawer}
+                className="sidebar-toggle"
+                style={{
+                  marginBottom: 16,
+                  position: "absolute",
+                  top: 30,
+                  left: 30,
+                  zIndex: 9,
+                  background: "none",
+                  color: "#00ADEF"
+                }}
+              >
                 <MenuOutlined />
               </Button>
               <Drawer
@@ -432,8 +436,8 @@ export const GetSideBar = () => {
                 top: 30,
                 left: 30,
                 zIndex: 9,
-                background:"none",
-                color:"#00ADEF"
+                background: "none",
+                color: "#00ADEF"
               }}
             >
               <MenuOutlined />

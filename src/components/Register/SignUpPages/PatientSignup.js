@@ -29,6 +29,8 @@ const PatientSignup = () => {
     useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [showShowPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [feet, setFeet] = useState('');
+  const [inches, setInches] = useState('');
   const [form] = Form.useForm();
   const { Item: FormItem } = Form;
   const [password, setPassword] = useState("");
@@ -949,9 +951,7 @@ const PatientSignup = () => {
                                       </Radio.Group>
                                     </div>
 
-                                    <div className="col-lg-12 col-sm-12">
                                    
-                                    </div>
 
                                     <div className="col-lg-12 col-sm-12">
                                       <FormItem
@@ -1159,6 +1159,72 @@ const PatientSignup = () => {
                                     </div>
                                     <div className="col-lg-4 col-sm-4">
                                       <Form.Item
+                                        name="Height"
+                                        label=""
+                                        rules={[
+                                          {
+                                            required: true,
+                                            message: "Please enter your height",
+                                          },
+                                          {
+                                            validator: (_, value) => {
+                                              
+                                              const isValid =
+                                                unit === "Metric"
+                                                  ? value >= 50 && value <= 250
+                                                  : feet >= 1 && feet <= 8 && inches >= 0 && inches <= 11;
+                                              return isValid
+                                                ? Promise.resolve()
+                                                : Promise.reject(
+                                                  `Height must be valid for ${unit}, ${unit === "Metric"
+                                                    ? "between 50 cm and 250 cm"
+                                                    : "between 1 ft and 8 ft, with inches between 0 and 11"
+                                                  }`
+                                                );
+                                            },
+                                          },
+                                        ]}
+                                      >
+                                        {unit === "Metric" ? (
+                                          <div style={{ display: "flex", alignItems: "center" }}>
+                                            <Input
+                                              type="number"
+                                              className="input_questionnaire"
+                                              placeholder="Enter Height"
+                                              value={heightOfPatient}
+                                              min={0}
+                                              onChange={(e) => setHeightOfPatient(e.target.value)}
+                                              style={{ marginRight: "10px" }}
+                                            />
+                                            <span>cm</span>
+                                          </div>
+                                        ) : (
+                                          <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                                            <Input
+                                              type="number"
+                                              className="input_questionnaire"
+                                              placeholder="ft."
+                                              value={feet}
+                                              onChange={(e) => setFeet(e.target.value)}
+                                              min={0}
+                                             
+                                            />
+                                            <span>ft</span>
+                                            <Input
+                                              type="number"
+                                              className="input_questionnaire"
+                                              placeholder="in."
+                                              value={inches}
+                                              min={0}
+                                              onChange={(e) => setInches(e.target.value)}
+                                           
+                                            />
+                                            <span>in</span>
+                                          </div>
+                                        )}
+                                      </Form.Item>
+                                      {/* Do Not remove the below code without proper testing */}
+                                      {/* <Form.Item
                                         label=""
                                         name="Height"
                                         rules={[
@@ -1224,7 +1290,7 @@ const PatientSignup = () => {
                                             {unit === "Metric" ? "cm" : "ft."}
                                           </span>
                                         </div>
-                                      </Form.Item>
+                                      </Form.Item> */}
                                     </div>
                                     <div className="col-lg-4 col-sm-4">
                                       <Form.Item
@@ -1237,9 +1303,7 @@ const PatientSignup = () => {
                                           },
                                           {
                                             validator: (_, value) => {
-                                              if (!value) {
-                                                return Promise.reject("Weight is required");
-                                              }
+                                            
                                               const isValid = unit === "Metric"
                                                 ? value >= 10 && value <= 200
                                                 : value >= 20 && value <= 500;

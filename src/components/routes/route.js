@@ -241,6 +241,7 @@ import LearnInfo from "../DashboardV2/PatientDashboard/Learning";
 import SettingsPage from "../DashboardV2/Settings";
 import NewHormoneChart from "../DashboardV2/PatientDashboard/NewChart";
 import LabScreen from "../DashboardV2/PatientDashboard/Lab";
+import PatientAppointmentList from "../DashboardV2/PatientDashboard/AppontmentList";
 
 //#endregion
 
@@ -348,7 +349,9 @@ const getRouter = createBrowserRouter(
         <Route path="settings" element={<SettingsPage />} />
 
         #endregion #region Appointment
-        <Route path="patient/appointment" element={<PatientAppointment />} />
+        <Route path="patient/calendar" element={<PatientAppointment />} />
+        <Route path="patient/appointment" element={<PatientAppointmentList />} />
+
         <Route path="doctor/appointments" element={<AppointmentList />} />
 
         <Route path="appointment" element={<PatientAppointment />} />

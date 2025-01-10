@@ -2,12 +2,14 @@ import React, { useEffect, useState } from "react";
 import { Row, Col, Button, Spin, Steps, Avatar, Divider, Modal } from "antd";
 // import PeriodCycleTracker from "../../../screens/PatientDashboard/Cycle/cycle";
 import { useDispatch } from "react-redux";
-import { getMiraInfo } from "../../redux/AuthController"; // Ensure this path is correct
+import { getMiraInfo } from "../../redux/AuthController";
 import { LoadingOutlined } from "@ant-design/icons";
 import "../dashboard.css";
 import { useSelector } from "react-redux";
 import { useMediaQuery } from "react-responsive";
 import MiraButton from "../../../assets/images/mirabutton.svg";
+import IFM from "../../../assets/images/mira_error.png";
+
 import {
   CalendarOutlined,
   ClockCircleOutlined,
@@ -109,7 +111,7 @@ export default function PatDash() {
   const [currentStep, setCurrentStep] = useState(0);
   const [userCurrentStep] = useState(0);
   const { userAuth } = useSelector((state) => state.authentication);
-  const { status} = useSelector((state) => state.patient);
+  const { status } = useSelector((state) => state.patient);
   const [error, setError] = useState(null);
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const [viewAll, setViewAll] = useState(false);
@@ -138,11 +140,11 @@ export default function PatDash() {
   };
   useEffect(() => {
     let intervalId;
-  
+
     // Fetch patient status only if user is authenticated
     if (userAuth?.obj?.token) {
       dispatch(getPatientStatus());
-    
+
       // Fetch status only if it needs updating based on the statLevel
       if (status?.statLevel <= 1 || status?.statLevel === '' || status?.statLevel === undefined) {
         intervalId = setInterval(() => {
@@ -150,7 +152,7 @@ export default function PatDash() {
         }, 10000);
       }
     }
-  
+
     return () => {
       // Clear the interval if set
       if (intervalId) {
@@ -169,7 +171,7 @@ export default function PatDash() {
 
         const resultAction = await dispatch(getMiraInfo());
 
-        console.log(resultAction, "Result Action"); 
+        console.log(resultAction, "Result Action");
 
         if (getMiraInfo.fulfilled.match(resultAction)) {
           setCycleInfo(resultAction.payload);
@@ -177,7 +179,7 @@ export default function PatDash() {
           setError(resultAction.payload || "Failed to fetch Mira Info");
         }
       } catch (err) {
-        console.error("Error occurred:", err); 
+        console.error("Error occurred:", err);
         setError("An unexpected error occurred");
       } finally {
         setLoading(false);
@@ -277,7 +279,7 @@ export default function PatDash() {
                           handleStepChange(2);
                           navigate("/patient/appointment");
                         }}
-                        disabled={currentStep !==1 && currentStep !==2}
+                        disabled={currentStep !== 1 && currentStep !== 2}
                         style={{
                           backgroundColor: "#C2E6F8",
                           borderColor: "none",
@@ -302,7 +304,7 @@ export default function PatDash() {
                         onClick={() => {
                           navigate("/plans");
                         }}
-                        disabled={status?.statLevel !==1 || status?.statLevel === null}
+                        disabled={status?.statLevel !== 1 || status?.statLevel === null}
                         style={{
                           backgroundColor: "#C2E6F8",
                           borderColor: "none",
@@ -374,7 +376,7 @@ export default function PatDash() {
                       <Button
                         type="primary"
                         onClick={() => {
-                        navigate("/learn");
+                          navigate("/learn");
                         }}
                         style={{
                           backgroundColor: "#C2E6F8",
@@ -392,7 +394,7 @@ export default function PatDash() {
               },
               {
                 title: (
-                  <div style={{ textAlign: "left", fontSize: isMobile ? '12px' : '14px', display: "flex", flexDirection: "column", height: "100%"}}>
+                  <div style={{ textAlign: "left", fontSize: isMobile ? '12px' : '14px', display: "flex", flexDirection: "column", height: "100%" }}>
                     <ul>
                       <li>Book appt #1 with Fertility Coach</li>
                       <li>Book 1 hour appt with Clinician</li>
@@ -826,7 +828,16 @@ export default function PatDash() {
             {cycleInfo && cycleInfo.cycleInfo ? (
               <CircleWithArc cycleInfo={cycleInfo} dummyInfo={cycleData} />
             ) : (
-              <p>No cycle information available.</p>
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+                  <p style={{ textAlign: "center", color: "red", width: '70%' }}>
+                    It looks like your Mira account hasn't been set up yet, or the email you used for Mira doesn't match the one for MFL.
+                  </p>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <img src={IFM} alt="ifm" style={{ width: "50%", margin: 'auto' }} />
+                </div>
+              </div>
             )}
           </Modal>
         </> :
@@ -839,32 +850,49 @@ export default function PatDash() {
               alignItems: "center",
             }}
           >
-            <div style={{ width: "100%" }}>
+            <div style={{ width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               {loading ? (
                 <Spin
                   indicator={
                     <LoadingOutlined
                       style={{
                         fontSize: 100,
-                        alignItems: "center",
-                        margin: "auto",
                       }}
                       spin
                     />
                   }
                 />
               ) : error ? (
-                <p style={{ color: "red" }}>Error: {error}</p>
-              ) : cycleInfo && cycleInfo.cycleInfo ?    <CircleWithArc cycleInfo={cycleInfo} /> 
-              : (
-                <p style={{ textAlign: "center" }}>
-                  No cycle information available.
-                </p>
-              )}
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'center',width: '100%', marginTop:-80 }}>
+                    <p style={{ textAlign: "center", color: "#FF0000", width: '70%' }}>
+                      It looks like your Mira account hasn't been set up yet, or the email you used for Mira doesn't match the one for MFL.
+                    </p>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <img src={IFM} alt="ifm" style={{ width: "50%", margin: 'auto' }} />
+                  </div>
+                </div>
+
+
+              ) : cycleInfo && cycleInfo.cycleInfo ? <CircleWithArc cycleInfo={cycleInfo} />
+                : (
+                  <div>
+                  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+                    <p style={{ textAlign: "center", color: "red", width: '70%' }}>
+                      It looks like your Mira account hasn't been set up yet, or the email you used for Mira doesn't match the one for MFL.
+                    </p>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <img src={IFM} alt="ifm" style={{ width: "50%", margin: 'auto' }} />
+                  </div>
+                </div>
+              
+                )}
             </div>
           </Col>}
       </Row>
-  
+
     </div>
   );
 }

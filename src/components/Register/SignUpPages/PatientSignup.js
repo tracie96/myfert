@@ -1145,7 +1145,7 @@ const PatientSignup = () => {
                                           {
                                             validator: (_, value) => {
                                               
-                                              const isValid =
+                                              const isValid = 
                                                 unit === "Metric"
                                                   ? value >= 50 && value <= 250
                                                   : feet >= 1 && feet <= 8 && inches >= 0 && inches <= 11;
@@ -1281,8 +1281,8 @@ const PatientSignup = () => {
                                             validator: (_, value) => {
                                             
                                               const isValid = unit === "Metric"
-                                                ? value >= 10 && value <= 200
-                                                : value >= 20 && value <= 500;
+                                                ? value >= 10 && value <= 500
+                                                : value >= 10 && value <= 500;
                                               return isValid
                                                 ? Promise.resolve()
                                                 : Promise.reject(`Weight must be valid for ${unit}`);

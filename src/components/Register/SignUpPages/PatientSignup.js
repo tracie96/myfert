@@ -928,6 +928,30 @@ const PatientSignup = () => {
                                     </div>
 
                                    
+                                    <div
+                                      style={{
+                                        color: "#335CAD",
+                                        borderRadius: 10,
+                                        marginBottom: 10,
+                                        marginTop: 15,
+                                      }}
+                                    >
+If you already have an account on the Mira app, please provide the same email address you used to register.
+                                    </div>
+
+                                    <div>
+                                      <Radio.Group
+                                        onChange={handleRadioChange}
+                                        name="ExistOnMira"
+                                        value={radioValue}
+                                      >
+                                        <Radio value="Yes">Yes</Radio>
+                                        <Radio defaultChecked value="No">
+                                          No
+                                        </Radio>
+                                      </Radio.Group>
+                                    </div>
+
 
                                     <div className="col-lg-12 col-sm-12">
                                       <FormItem

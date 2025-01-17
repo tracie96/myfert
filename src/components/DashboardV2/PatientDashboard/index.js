@@ -834,6 +834,7 @@ export default function PatDash() {
                     It looks like your Mira account hasn't been set up yet, or the email you used for Mira doesn't match the one for MFL.
                   </p>
                 </div>
+                
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                   <img src={IFM} alt="ifm" style={{ width: "50%", margin: 'auto' }} />
                 </div>

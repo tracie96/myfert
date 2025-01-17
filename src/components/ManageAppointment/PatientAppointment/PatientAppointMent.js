@@ -304,170 +304,188 @@ const PatientAppointment = () => {
                     </div>
 
                     <div
-                      style={{
-                        padding: "16px 24px",
-                        borderRadius: "12px",
-                        borderWidth: "1px",
-                        width: "90%",
-                        backgroundColor: "#fff",
-                        borderColor: "#C2E6F8",
-                        borderStyle: "solid",
-                        marginTop: "-10px",
-                      }}
-                    >
-                     {upcomingPatientAppointment?.length > 0 ? (
-  <div>
-    {upcomingPatientAppointment
-      .filter((appointment) => {
+  style={{
+    padding: "16px 24px",
+    borderRadius: "12px",
+    borderWidth: "1px",
+    width: "90%",
+    backgroundColor: "#fff",
+    borderColor: "#C2E6F8",
+    borderStyle: "solid",
+    marginTop: "-10px",
+  }}
+>
+<div
+  style={{
+    padding: "16px 24px",
+    borderRadius: "12px",
+    borderWidth: "1px",
+    width: "90%",
+    backgroundColor: "#fff",
+    borderColor: "#C2E6F8",
+    borderStyle: "solid",
+    marginTop: "-10px",
+  }}
+>
+  {upcomingPatientAppointment?.length > 0 ? (
+    <div>
+      {(() => {
+        const filteredAppointments = upcomingPatientAppointment.filter((appointment) => {
+          const appointmentDateTime = moment(
+            `${appointment.appointDate} ${appointment.startTime}`,
+            "DD-MM-YYYY HH:mm"
+          );
+          return appointmentDateTime.isSameOrAfter(moment());
+        });
+
+        if (filteredAppointments.length === 0) {
+          return <p>You have no upcoming appointments.</p>;
+        }
+
+        return filteredAppointments.map((appointment, index) => {
+          const formattedStartTime = moment(
+            appointment.startTime,
+            "DD-MM-YYYY HH:mm"
+          ).format("h:mm A");
+          const formattedEndTime = moment(
+            appointment.endTime,
+            "DD-MM-YYYY HH:mm"
+          ).format("h:mm A");
+
+          return (
+            <div
+              key={index}
+              style={{
+                borderBottom: "1px solid #00000033",
+                marginBottom: "15px",
+                paddingBottom: "15px",
+                fontSize: "14px",
+                backgroundColor: "#f9f9f9",
+                borderRadius: "8px",
+                padding: "15px",
+              }}
+            >
+              {moreVisible[index] ? (
+                <MoreOutlined
+                  style={{ fontSize: "20px", float: "right", color: "#1E90FF" }}
+                  onClick={() => toggleMore(index)}
+                />
+              ) : (
+                <DeleteOutlined
+                  style={{
+                    fontSize: "20px",
+                    color: "#ff4d4f",
+                    float: "right",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => handleCancelAppointment(appointment)}
+                />
+              )}
+
+              <p style={{ fontSize: "12px", marginTop: "20px" }}>
+                <Avatar
+                  style={{
+                    marginRight: "8px",
+                  }}
+                  icon={<UserOutlined />}
+                />
+                <strong>{appointment.name}</strong>
+              </p>
+
+              <p style={{ fontSize: "12px" }}>
+                <Avatar
+                  style={{
+                    marginRight: "8px",
+                  }}
+                  icon={<CalendarOutlined />}
+                />
+                <strong>
+                  {moment(appointment.appointDate, "DD-MM-YYYY")
+                    .local()
+                    .format("dddd, MMMM Do YYYY")}
+                </strong>
+              </p>
+
+              <p style={{ fontSize: "12px" }}>
+                <Avatar
+                  style={{
+                    marginRight: "8px",
+                  }}
+                  icon={<ClockCircleOutlined />}
+                />
+                <strong>{formattedStartTime}</strong> -{" "}
+                <strong>{formattedEndTime}</strong>
+              </p>
+
+              <p style={{ fontSize: "12px" }}>
+                <Avatar
+                  style={{
+                    marginRight: "8px",
+                  }}
+                  icon={<EnvironmentOutlined />}
+                />
+                <strong>Virtual or In-person</strong>
+              </p>
+
+              <div style={{ width: "90%", marginLeft: "10%", position: "relative" }}>
+                <Button
+                  type="primary"
+                  icon={<VideoCameraOutlined />}
+                  disabled={!appointment.meetingLink}
+                  style={{
+                    marginBottom: "10px",
+                    backgroundColor: `${!appointment.meetingLink ? "#808080" : "#1E90FF"}`,
+                    borderRadius: "5px",
+                    padding: "10px 20px",
+                  }}
+                  onClick={() => handleJoinCall(appointment)}
+                >
+                  Join
+                </Button>
+
+                <p style={{ fontSize: "12px", color: "#555" }}>
+                  Ongoing Care Plan - Initial Care Team Appointment
+                </p>
+              </div>
+            </div>
+          );
+        });
+      })()}
+
+      {upcomingPatientAppointment.filter((appointment) => {
         const appointmentDateTime = moment(
           `${appointment.appointDate} ${appointment.startTime}`,
           "DD-MM-YYYY HH:mm"
         );
-        return appointmentDateTime.isAfter(moment());
-      })
-      .map((appointment, index) => {
-        const formattedStartTime = moment(
-          appointment?.startTime,
-          "DD-MM-YYYY HH:mm"
-        ).format("h:mm A");
-        const formattedEndTime = moment(
-          appointment?.endTime,
-          "DD-MM-YYYY HH:mm"
-        ).format("h:mm A");
-
-        return (
-          <div
-            key={index}
-            style={{
-              borderBottom: "1px solid #00000033",
-              marginBottom: "15px",
-              paddingBottom: "15px",
-              fontSize: "14px",
-              backgroundColor: "#f9f9f9",
-              borderRadius: "8px",
-              padding: "15px",
-            }}
-          >
-            {moreVisible[index] ? (
-              <MoreOutlined
-                style={{ fontSize: "20px", float: "right", color: "#1E90FF" }}
-                onClick={() => toggleMore(index)}
-              />
-            ) : (
-              <DeleteOutlined
-                style={{
-                  fontSize: "20px",
-                  color: "#ff4d4f",
-                  float: "right",
-                  cursor: "pointer",
-                }}
-                onClick={() => handleCancelAppointment(appointment)}
-              />
-            )}
-
-            <p style={{ fontSize: "12px", marginTop: "20px" }}>
-              <Avatar
-                style={{
-                  marginRight: "8px",
-                }}
-                icon={<UserOutlined />}
-              />
-              <strong>Doctor Doctor</strong>
-            </p>
-
-            <p style={{ fontSize: "12px" }}>
-              <Avatar
-                style={{
-                  marginRight: "8px",
-                }}
-                icon={<CalendarOutlined />}
-              />
-              <strong>
-                {moment(
-                  appointment.appointDate,
-                  "DD-MM-YYYY"
-                ).local().format("dddd, MMMM Do YYYY")}
-              </strong>
-            </p>
-
-            <p style={{ fontSize: "12px" }}>
-              <Avatar
-                style={{
-                  marginRight: "8px",
-                }}
-                icon={<ClockCircleOutlined />}
-              />
-              <strong>{formattedStartTime}</strong> -{" "}
-              <strong>{formattedEndTime}</strong>
-            </p>
-
-            <p style={{ fontSize: "12px" }}>
-              <Avatar
-                style={{
-                  marginRight: "8px",
-                }}
-                icon={<EnvironmentOutlined />}
-              />
-              <strong>Virtual or In-person</strong>
-            </p>
-
-            <div style={{ width: "90%", marginLeft: "10%", position: "relative" }}>
-              <Button
-                type="primary"
-                icon={<VideoCameraOutlined />}
-                disabled={!appointment.meetingLink}
-                style={{
-                  marginBottom: "10px",
-                  backgroundColor: `${
-                    !appointment.meetingLink ? "#808080" : "#1E90FF"
-                  }`,
-                  borderRadius: "5px",
-                  padding: "10px 20px",
-                }}
-                onClick={() => handleJoinCall(appointment)}
-              >
-                Join
-              </Button>
-
-              <p style={{ fontSize: "12px", color: "#555" }}>
-                Ongoing Care Plan - Initial Care Team Appointment
-              </p>
-            </div>
-          </div>
-        );
-      }).length === 0 && ( // Display message if no upcoming appointments
-        <div>
-          <p>You have no upcoming appointments.</p>
+        return appointmentDateTime.isSameOrAfter(moment());
+      }).length > 2 && (
+        <div
+          onClick={handleViewAll}
+          style={{
+            color: "#1E90FF",
+            cursor: "pointer",
+            textAlign: "center",
+            padding: "10px 0",
+          }}
+        >
+          {viewAll ? (
+            <UpOutlined style={{ marginRight: "10px" }} />
+          ) : (
+            <DownOutlined style={{ marginRight: "10px" }} />
+          )}
+          {viewAll ? "View Less" : "View All"}
         </div>
       )}
+    </div>
+  ) : (
+    <div>
+      <p>No appointments found.</p>
+    </div>
+  )}
+</div>
 
-    {filteredAppointments.length > 2 && (
-      <div
-        onClick={handleViewAll}
-        style={{
-          color: "#1E90FF",
-          cursor: "pointer",
-          textAlign: "center",
-          padding: "10px 0",
-        }}
-      >
-        {viewAll ? (
-          <UpOutlined style={{ marginRight: "10px" }} />
-        ) : (
-          <DownOutlined style={{ marginRight: "10px" }} />
-        )}
-        {viewAll ? "View Less" : "View All"}
-      </div>
-    )}
-  </div>
-) : (
-  <div>
-    <p>No appointments found.</p>
-  </div>
-)}
+</div>
 
-
-                    </div>
                   </div>
 
                   <div style={{ marginBottom: 20 }}>

@@ -316,14 +316,8 @@ const PatientAppointment = () => {
   }}
 >
 <div
-  style={{
-    padding: "16px 24px",
-    borderRadius: "12px",
-    borderWidth: "1px",
-    width: "90%",
+  style={{    
     backgroundColor: "#fff",
-    borderColor: "#C2E6F8",
-    borderStyle: "solid",
     marginTop: "-10px",
   }}
 >

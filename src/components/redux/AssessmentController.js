@@ -62,7 +62,7 @@ export const getCurrentHealthLifestyle = createAsyncThunk(
   async (id, { getState }) => {
     const user = getState()?.authentication?.userAuth;
     const token = user?.obj?.token;
-
+    const responseData = []
     const config = {
       headers: {
         accept: "text/plain",
@@ -75,7 +75,7 @@ export const getCurrentHealthLifestyle = createAsyncThunk(
         `${baseUrl}/Doctor/GetHealthLifestyle/${id}`,
         config,
       );
-      return response.data;
+      return responseData.push(response.data);
     } catch (error) {
       console.log({ error });
       return handleApiError(error);

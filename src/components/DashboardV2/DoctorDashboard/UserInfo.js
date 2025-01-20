@@ -22,7 +22,7 @@ export default function UserInfo() {
   const [visibleModal, setVisibleModal] = useState(null);
   const generalInfo = useSelector((state) => state.intake?.generalInfo);
   const currentHealth = useSelector((state) => state.intake?.healthLifestyle);
-  const nutrition = useSelector((state) => state.intake?.nutritionInfo);
+  const nutrition = useSelector((state) => state.intake.nuritionInfo);
   const substance = useSelector((state) => state.intake?.substanceInfo);
   const stress = useSelector((state) => state.intake?.stressInfo);
   const healthMedical = useSelector((state) => state.intake?.healthMedicalInfo);
@@ -470,24 +470,24 @@ function SwitchContent({
           {" "}
           <Row gutter={16}>
             <Col xs={24} md={12}>
-              <Descriptions title="Dietary Information" column={1}>
+              {nutrition && <Descriptions title="Dietary Information" column={1}>
                 <Descriptions.Item label="Special Diet Program">
                   {nutrition.specialDietProgram || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Sensitive to Food">
-                  {nutrition.sensitiveToFood || "N/A"}
+                  {nutrition.sensitiveToFood?.yesNo ? nutrition.sensitiveToFood.describe : "No" || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Aversion to Food">
-                  {nutrition.aversionToFood || "N/A"}
+                  {nutrition.aversionToFood?.yesNo ? nutrition.aversionToFood.describe : "No" || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Adverse List">
                   {nutrition.adverseList || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Any Food Craving">
-                  {nutrition.anyFoodCraving || "N/A"}
+                  {nutrition.anyFoodCraving?.yesNo ? nutrition.anyFoodCraving.describe : "No" || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Have 3 Meals a Day">
-                  {nutrition.have3MealADay ? "Yes" : "No"}
+                  {nutrition.have3MealADay?.yesNo ? nutrition.have3MealADay.level : "No"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Skipping a Meal">
                   {nutrition.skippingAMeal ? "Yes" : "No"}
@@ -495,12 +495,12 @@ function SwitchContent({
                 <Descriptions.Item label="How Many Eat Out Per Week">
                   {nutrition.howManyEatOutPerWeek || "N/A"}
                 </Descriptions.Item>
-              </Descriptions>
+              </Descriptions>}
             </Col>
 
             {/* Second Row */}
             <Col xs={24} md={12}>
-              <Descriptions title="Eating Habits" column={1}>
+              {nutrition && <Descriptions title="Eating Habits" column={1}>
                 <Descriptions.Item label="Eating Habits">
                   {nutrition.eatingHabits || "N/A"}
                 </Descriptions.Item>
@@ -570,7 +570,7 @@ function SwitchContent({
                 <Descriptions.Item label="Reaction to Caffeine">
                   {nutrition.reactionToCaffeine || "N/A"}
                 </Descriptions.Item>
-              </Descriptions>
+              </Descriptions>}
             </Col>
           </Row>
         </div>

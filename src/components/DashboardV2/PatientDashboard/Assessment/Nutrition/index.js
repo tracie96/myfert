@@ -330,18 +330,39 @@ const Nutrition = ({ onComplete }) => {
   const handleExit = () => {
     navigate("/assessment");
   };
+  // const validateQuestion = () => {
+  //   const question = questions[currentQuestionIndex];
+  //   const isTimeFieldValid =
+  //   question.subQuestion && question.subQuestion.some(sub => {
+  //     return answers[sub.name] !== undefined && answers[sub.name] !== "";
+  //   });
+
+  //   const isCheckboxValid = question.type === "checkbox" && 
+  //   (Array.isArray(answers[question.name]) && answers[question.name].length > 0 && answers[question.name] !== undefined);
+
+  //   return (
+  //     answers[question.name] !== undefined && answers[question.name] !== "" && (isCheckboxValid || isTimeFieldValid)
+  //   );
+  // };
+
   const validateQuestion = () => {
     const question = questions[currentQuestionIndex];
     const isTimeFieldValid =
     question.subQuestion && question.subQuestion.some(sub => {
       return answers[sub.name] !== undefined && answers[sub.name] !== "";
     });
-
-    const isCheckboxValid = question.type === "checkbox" && 
+ 
+    const isCheckboxValid = question.type === "checkbox" &&
     (Array.isArray(answers[question.name]) && answers[question.name].length > 0 && answers[question.name] !== undefined);
-
+ 
+    const istextAreaValid = question.type === "long_textarea" &&
+    (typeof answers[question.name] === "string" && answers[question.name] !== undefined);
+ 
+    const isRadioValid = (question.type === "radio" || question.type === "radiowithselect" || question.type === "long_select" || question.type === "long_radio") &&
+    ((typeof answers[question.name] === "string" || typeof answers[question.name] === "number") && answers[question.name] !== undefined);
+ 
     return (
-      answers[question.name] !== undefined && answers[question.name] !== "" && (isCheckboxValid || isTimeFieldValid)
+      answers[question.name] !== undefined && answers[question.name] !== "" && (isCheckboxValid || isTimeFieldValid || istextAreaValid || isRadioValid)
     );
   };
 

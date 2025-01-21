@@ -803,9 +803,8 @@ const CurrentLifeStyle = ({ onComplete }) => {
 
   const handleSubmit = () => {
     const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
-    const token = userInfo.obj.token || "";
-    console.log({ currentAllergies });
-    const transformedData = {
+ const token = userInfo.obj.token || "";
+     const transformedData = {
       ongoingHealth: currentConcern ? currentConcern : [],
       allergies: currentAllergies ? currentAllergies : [],
       sleepHours: parseInt(answers["sleep_hours"], 10) || 0,

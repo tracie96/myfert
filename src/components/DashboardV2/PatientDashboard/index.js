@@ -703,7 +703,6 @@ export default function PatDash() {
                   >
                     <div
                       style={{ color: "white", textDecoration: "none" }}
-                      onClick={() => navigate('/patient/appointment')}
                     >
                       Book Appointment
                     </div>

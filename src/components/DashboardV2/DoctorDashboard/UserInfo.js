@@ -36,7 +36,6 @@ export default function UserInfo() {
   const loading = useSelector((state) => state.user?.loading);
 
   const modalContent = [
-    "Reproductive Health",
     "General Information",
     "Current Health & Lifestyle",
     "Nutrition & Dietary Habits",
@@ -47,7 +46,6 @@ export default function UserInfo() {
     "Illness & Conditions",
     "Symptom Review & Medications",
     "Readiness & Health Goals",
-    "Additional Inquiries",
   ];
 
   console.log(useSelector((state) => state.intake));

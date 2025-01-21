@@ -286,15 +286,40 @@ export const getReadiness = createAsyncThunk(
     try {
       const response = await axios.get(
         `${baseUrl}/Doctor/GetReadiness/${id}`,
-        config,
+        config
       );
+
+      const data = {
+        modifyDiet: 0,
+        takeDailySupplement: 0,
+        recordEverythingEat: 0,
+        modifyLifestyle: 0,
+        practiceRelaxation: 0,
+        engageRegularExercise: 0,
+        readinessConfident: {
+          level: 0,
+          name: "string",
+        },
+        readinessSupportive: 0,
+        readinessFrequency: 0,
+        comment: "string",
+        healthAchieve: "string",
+        healthLastTime: "string",
+        healthChangeTrigger: "string",
+        healthFeelBetter: "string",
+        healthFeelWorse: "string",
+        healthCondition: "string",
+        healthThinkHappening: "string",
+        healthHappenGetBetter: "string",
+      };
+
       console.log(response.data);
-      return response.data;
+      return response.data || data; 
     } catch (error) {
-      console.log({ error });
-      return handleApiError(error);
+      console.error("API Error:", error);
+      return handleApiError(error); // Call the error handler
     }
-  },
+  }
 );
 
 const initialState = {

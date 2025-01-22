@@ -175,11 +175,65 @@ const Readiness = ({ onComplete }) => {
     });
   };
 
+  const transformReadinessData = (answers) => {
+    console.log('baibhav-answer', answers)
+    return {
+      modifyDiet: answers.health_stress_one || 0,
+      takeDailySupplement: answers.health_stress_two || 0,
+      recordEverythingEat: answers.health_stress_3 || 0,
+      modifyLifestyle: answers.health_stress_4 || 0,
+      practiceRelaxation: answers.health_stress_5 || 0,
+      engageRegularExercise: answers.health_stress_6 || 0,
+      readinessConfident: {
+        level: answers.confidence_follow_through || 0,
+        name: answers.confidence_follow_through_details || ""
+      },
+      readinessSupportive: answers.health_stress_7 || 0,
+      readinessFrequency: answers.confidence_follow_through || 0,
+      comment: answers.add_commnets || "",
+      healthAchieve: answers.achieve_your_goals || "",
+      healthLastTime: answers.felt_well_last_time || "",
+      healthChangeTrigger: answers.health_issue || "",
+      healthFeelBetter: answers.feel_better || "",
+      healthFeelWorse: answers.feel_worse || "",
+      healthCondition: answers.current_state || "",
+      healthThinkHappening: answers.happening_and_why || "",
+      healthHappenGetBetter: answers.get_better || ""
+    };
+  };
+
   const handleSubmit = () => {
-    dispatch(completeCard("/questionnaire/10"));
     localStorage.setItem("currentQuestionIndex10", 0);
-    localStorage.setItem("answers", JSON.stringify(answers));
-    navigate("/assessment");
+    localStorage.setItem("answers-readiness", JSON.stringify(answers));
+    // const transformedData = localStorage.getItem("answers-readiness");
+    const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
+    const token = userInfo.obj.token || "";
+      const transformedData = transformReadinessData(answers)
+
+    fetch(
+      "https://myfertilitydevapi.azurewebsites.net/api/Patient/AddReadiness",
+      {
+        method: "POST",
+        headers: {
+          accept: "text/plain",
+          "Content-Type": "application/json",
+          Authorization: `${token}`,
+        },
+        body: JSON.stringify(transformedData),
+      },
+    )
+    .then((response)=>response.json())
+    .then((data)=>{
+      console.log("Transformed Readiness Data:", transformedData);
+      dispatch(completeCard("/questionnaire/10"));
+      localStorage.setItem("currentQuestionIndex10", 0);
+      localStorage.setItem("answers", JSON.stringify(answers));
+      navigate("/assessment");
+      console.log("Readiness Success:", data);
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
   };
   const label = (
     <span>

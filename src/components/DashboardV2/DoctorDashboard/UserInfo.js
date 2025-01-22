@@ -36,6 +36,7 @@ export default function UserInfo() {
   const loading = useSelector((state) => state.user?.loading);
 
   const modalContent = [
+    "Reproductive Health",
     "General Information",
     "Current Health & Lifestyle",
     "Nutrition & Dietary Habits",
@@ -46,6 +47,7 @@ export default function UserInfo() {
     "Illness & Conditions",
     "Symptom Review & Medications",
     "Readiness & Health Goals",
+    "Additional Inquiries",
   ];
 
   console.log(useSelector((state) => state.intake));
@@ -394,68 +396,68 @@ function SwitchContent({
           <Row gutter={16} justify="center">
             {/* First Row */}
             <Col xs={24} md={12}>
-              <Descriptions column={1}>
+               <Descriptions column={1}>
                 <Descriptions.Item label="Ongoing Health">
-                  {currentHealth.ongoingHealth || "N/A"}
+                  { currentHealth?.ongoingHealth?.map(health => health.problem) ?? "N/A"}
                 </Descriptions.Item>
-                <Descriptions.Item label="Allergies">
-                  {currentHealth.allergies || "N/A"}
+               <Descriptions.Item label="Allergies">
+               { currentHealth?.allergies?.map(allergies => allergies.reaction) ?? "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Sleep Hours">
-                  {currentHealth.sleepHours || "N/A"}
+                  {currentHealth?.sleepHours ?? "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Problem Sleeping">
-                  {currentHealth.problemSleeping ? "Yes" : "No"}
+                  {currentHealth?.problemSleeping ? "Yes" : "No"}
                 </Descriptions.Item>
-                <Descriptions.Item label="Staying Asleep">
-                  {currentHealth.stayingAsleep ? "Yes" : "No"}
+               <Descriptions.Item label="Staying Asleep">
+                  {currentHealth?.stayingAsleep ? "Yes" : "No"}
                 </Descriptions.Item>
-                <Descriptions.Item label="Insomnia">
-                  {currentHealth.insomnia ? "Yes" : "No"}
+                 <Descriptions.Item label="Insomnia">
+                  {currentHealth?.insomnia ? "Yes" : "No"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Do You Snore">
-                  {currentHealth.doYouSnore ? "Yes" : "No"}
+                  {currentHealth?.doYouSnore ? "Yes" : "No"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Rested Upon Awake">
-                  {currentHealth.restedUponAwake ? "Yes" : "No"}
+                  {currentHealth?.restedUponAwake ? "Yes" : "No"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Sleeping Aids">
-                  {currentHealth.sleepingAids || "N/A"}
+                  {currentHealth.sleepingAids?.yesNo ? currentHealth.sleepingAids.describe : "No" || "N/A"}
                 </Descriptions.Item>
-              </Descriptions>
+              </Descriptions> 
             </Col>
 
             {/* Second Row */}
             <Col xs={24} md={12}>
-              <Descriptions column={1}>
+               <Descriptions column={1}>
                 <Descriptions.Item label="Cardio">
-                  {currentHealth.cardio || "N/A"}
+                  {currentHealth?.cardio?.duration  ?? "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Strength">
-                  {currentHealth.strenght || "N/A"}
+                 {currentHealth?.strength?.duration  ?? "N/A"} 
                 </Descriptions.Item>
                 <Descriptions.Item label="Flexibility">
-                  {currentHealth.flexibility || "N/A"}
+                {currentHealth?.flexibility?.duration  ?? "N/A"} 
                 </Descriptions.Item>
                 <Descriptions.Item label="Balance">
-                  {currentHealth.balance || "N/A"}
+                {currentHealth?.balance?.duration  ?? "N/A"} 
                 </Descriptions.Item>
                 <Descriptions.Item label="Sport">
-                  {currentHealth.sport || "N/A"}
+                  {currentHealth?.sport?.duration  ?? "N/A"} 
                 </Descriptions.Item>
                 <Descriptions.Item label="Other">
-                  {currentHealth.other || "N/A"}
+                   {currentHealth?.other?.other?.duration  ?? "N/A"} 
                 </Descriptions.Item>
-                <Descriptions.Item label="Motivated to Exercise">
+               <Descriptions.Item label="Motivated to Exercise">
                   {currentHealth.motivatedToExercise || "N/A"}
                 </Descriptions.Item>
-                <Descriptions.Item label="Problems That Limit Exercise">
-                  {currentHealth.problemsThatLimitExercise || "N/A"}
+                 <Descriptions.Item label="Problems That Limit Exercise">
+                 {currentHealth.problemsThatLimitExercise?.yesNo ? currentHealth.problemsThatLimitExercise.describe : "No" || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Sore After Exercise">
-                  {currentHealth.soreAfterExercise ? "Yes" : "No"}
+                   {currentHealth.soreAfterExercise?.yesNo ? currentHealth.soreAfterExercise.describe : "No" || "N/A"}
                 </Descriptions.Item>
-              </Descriptions>
+              </Descriptions> 
             </Col>
           </Row>
         </div>
@@ -1090,8 +1092,83 @@ function SwitchContent({
           </Row>
         </div>
       );
+      case 10:
+      return loading ? (
+        <p>{stress}</p>
+      ) : (
+        <div>
+          <Row gutter={16}>
+            <Col xs={24} md={12}>
+              <Descriptions column={1}>
+                <Descriptions.Item label="Modify Diet">
+                  {readiness?.modifyDiet || "N/A"}
+                </Descriptions.Item>
+                 <Descriptions.Item label="Take Daily Supplement">
+                  {readiness?.takeDailySupplement || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Record Everything Eat">
+                  {readiness?.recordEverythingEat || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Modify Lifestyle">
+                  {readiness?.modifyLifestyle || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Practice Relaxation">
+                  {readiness?.practiceRelaxation || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Engage Regular Exercise">
+                  {readiness?.engageRegularExercise || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Health Achieve">
+                  {readiness?.healthAchieve || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Health Change Trigger">
+                  {readiness?.healthChangeTrigger || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Readiness Supportive">
+                  {readiness?.readinessSupportive || "N/A"}
+                </Descriptions.Item>
+              </Descriptions>
+            </Col>
+ 
+         <Col xs={24} md={12}>
+              <Descriptions column={1}>
+                  <Descriptions.Item label="Health Happen Get Better">
+                  {readiness?.healthHappenGetBetter || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Health Last Time">
+                  {readiness?.healthLastTime || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Health Think Happening">
+                  {readiness?.healthThinkHappening || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Health Condition">
+                  {readiness?.healthCondition || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Comment">
+                  {readiness?.comment || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Health Feel Better">
+                  {readiness?.healthFeelBetter || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Health Feel Worse">
+                  {readiness?.healthFeelWorse || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Readiness Confident Level">
+                  <div>{readiness?.readinessConfident?.level || 0}</div>
+                </Descriptions.Item>
+                <Descriptions.Item label="Readiness Confident">
+                  <div>{readiness?.readinessConfident?.name || "N/A"}</div>
+                </Descriptions.Item>
+                <Descriptions.Item label="Readiness Frequency">
+                  {readiness?.readinessFrequency || "N/A"}
+                </Descriptions.Item> 
+              </Descriptions>
+            </Col> 
+          </Row>
+        </div>
+      );
 
     default:
       return <p style={{ textAlign: "center" }}> No Record available</p>;
   }
-}
+}  

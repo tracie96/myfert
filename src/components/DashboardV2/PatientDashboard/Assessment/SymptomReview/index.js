@@ -723,14 +723,153 @@ const SymptomReview = ({ onComplete }) => {
     }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async() => {
+    const answers = JSON.parse(localStorage.getItem("answers")) || {};
+    const transformedData = {
+      general: Object.keys(answers)
+        .filter((key) => ["fatigue", "easy_bruising"].includes(key))
+        .map((key) => ({ name: key, level: mapSeverity(answers[key]) })),
+      headEyesEars: Object.keys(answers)
+        .filter((key) => ["eye_pain", "post_nasal_drip"].includes(key))
+        .map((key) => ({ name: key, level: mapSeverity(answers[key]) })),
+      musco: Object.keys(answers)
+        .filter((key) => ["muscle_stiffness"].includes(key))
+        .map((key) => ({ name: key, level: mapSeverity(answers[key]) })),
+      moodNerves: Object.keys(answers)
+        .filter((key) => ["anxiety", "stress"].includes(key))
+        .map((key) => ({ name: key, level: mapSeverity(answers[key]) })),
+      cardio: Object.keys(answers)
+        .filter((key) => ["chest_pain", "heart_palpitations"].includes(key))
+        .map((key) => ({ name: key, level: mapSeverity(answers[key]) })),
+      urinary: Object.keys(answers)
+        .filter((key) => ["frequent_urination"].includes(key))
+        .map((key) => ({ name: key, level: mapSeverity(answers[key]) })),
+      digestion: Object.keys(answers)
+        .filter((key) => ["constipation", "diarrhea"].includes(key))
+        .map((key) => ({ name: key, level: mapSeverity(answers[key]) })),
+      itchingSkin: Object.keys(answers)
+        .filter((key) => ["skin_itching"].includes(key))
+        .map((key) => ({ name: key, level: mapSeverity(answers[key]) })),
+      respiratory: Object.keys(answers)
+        .filter((key) => ["shortness_of_breath"].includes(key))
+        .map((key) => ({ name: key, level: mapSeverity(answers[key]) })),
+      nails: Object.keys(answers)
+        .filter((key) => ["brittle_nails"].includes(key))
+        .map((key) => ({ name: key, level: mapSeverity(answers[key]) })),
+      lymph: Object.keys(answers)
+        .filter((key) => ["swollen_lymph_nodes"].includes(key))
+        .map((key) => ({ name: key, level: mapSeverity(answers[key]) })),
+      skin: Object.keys(answers)
+        .filter((key) => ["skin_rashes"].includes(key))
+        .map((key) => ({ name: key, level: mapSeverity(answers[key]) })),
+      skinProblems: Object.keys(answers)
+        .filter((key) => ["acne", "eczema"].includes(key))
+        .map((key) => ({ name: key, level: mapSeverity(answers[key]) })),
+      skinProblemsContr: Object.keys(answers)
+        .filter((key) => ["flare_up"].includes(key))
+        .map((key) => ({ name: key, level: mapSeverity(answers[key]) })),
+      femaleReproductive: Object.keys(answers)
+        .filter((key) => ["painful_periods"].includes(key))
+        .map((key) => ({ name: key, level: mapSeverity(answers[key]) })),
+      femaleReproductiveCont: Object.keys(answers)
+        .filter((key) => ["irregular_periods"].includes(key))
+        .map((key) => ({ name: key, level: mapSeverity(answers[key]) })),
+      currentMedication: answers.current_medication || [
+        { medication: "", dosage: "", startDate: "", reason: "" },
+      ], // Provide default structure if no data exists
+      nutritionalSupplements: answers.nutritional_supplements || [
+        { medication: "", dosage: "", startDate: "", reason: "" },
+      ], // Same for nutritional supplements
+      supplementsCausedEffects: {
+        yesNo: answers.supplement_effects ? true : false,
+        describe: answers.supplement_effects_description || "",
+      },
+      usedRegularlyNsaid: answers.used_regularly_nsaid || false,
+      usedRegularlyTyienol: answers.used_regularly_tylenol || false,
+      usedRegularlyAcidBlocking: answers.used_regularly_acid_blocking || false,
+      antibioticsInfancy: {
+        value1: answers.antibiotics_infant ? "Yes" : "No",
+        value2: answers.antibiotics_infant_description || "",
+      },
+      antibioticsTeens: {
+        value1: answers.antibiotics_teen ? "Yes" : "No",
+        value2: answers.antibiotics_teen_description || "",
+      },
+      antibioticsAdult: {
+        value1: answers.antibiotics_adult ? "Yes" : "No",
+        value2: answers.antibiotics_adult_description || "",
+      },
+      takenAntibioticsForLong: {
+        yesNo: answers.long_term_antibiotics ? true : false,
+        describe: answers.long_term_antibiotics_description || "",
+      },
+      oralSteriodsInfancy: {
+        value1: answers.steroids_infant ? "Yes" : "No",
+        value2: answers.steroids_infant_description || "",
+      },
+      oralSteriodsTeen: {
+        value1: answers.steroids_teen ? "Yes" : "No",
+        value2: answers.steroids_teen_description || "",
+      },
+      oralSteriodsAdult: {
+        value1: answers.steroids_adult ? "Yes" : "No",
+        value2: answers.steroids_adult_description || "",
+      },
+    };
+
+  
+    function mapSeverity(level) {
+      switch (level.toLowerCase()) {
+        case "mild":
+          return 1;
+        case "moderate":
+          return 2;
+        case "severe":
+          return 3;
+        default:
+          return 0;
+      }
+    }
+    try {
+      const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
+      const token = userInfo.obj.token || "";
+  
+      fetch(
+        "https://myfertilitydevapi.azurewebsites.net/api/Patient/AddSymptoms",
+        {
+          method: "POST",
+          headers: {
+            accept: "text/plain",
+            "Content-Type": "application/json",
+            Authorization: `${token}`,
+          },
+          body: JSON.stringify(transformedData),
+        },
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Transformed Data:", transformedData);
+          dispatch(completeCard("/questionnaire/3"));
+          localStorage.setItem("currentQuestionIndex3", 0);
+          localStorage.setItem("answers", JSON.stringify(answers));
+          navigate("/assessment");
+          console.log("Success:", data);
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+     
+    } catch (error) {
+      console.log(error);
+    }
+
     message.success("Form submitted successfully!");
     dispatch(completeCard("/questionnaire/9"));
     localStorage.setItem("currentQuestionIndex9", 0);
-    localStorage.setItem("answers", JSON.stringify(answers));
+    localStorage.setItem("transformedAnswers", JSON.stringify(transformedData));
     navigate("/assessment");
   };
-
+  
   const addHospitalization = (name) => {
     setAnswers((prevAnswers) => ({
       ...prevAnswers,

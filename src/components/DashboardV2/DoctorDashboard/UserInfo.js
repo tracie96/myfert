@@ -55,43 +55,44 @@ console.log("General Info", symptom);
     if (visibleModal !== null) {
       console.log(`Modal ${visibleModal} is visible`);
       switch (visibleModal) {
-        case 1:
+        case 0:
           console.log("Dispatching getGeneralInformation");
           dispatch(getGeneralInformation(userInfo.id));
           break;
-        case 2:
+        case 1:
           console.log("Dispatching getCurrentHealthLifestyle");
           dispatch(getCurrentHealthLifestyle(userInfo.id));
           break;
-        case 3:
+        case 2:
           console.log("Dispatching getNutritionAndDietaryHabits");
           dispatch(getNutritionAndDietaryHabits(userInfo.id));
           break;
-        case 4:
+        case 3:
           console.log("Dispatching getSubstanceAbuse");
           dispatch(getSubstanceAbuse(userInfo.id));
           break;
-        case 5:
+          
+        case 4:
           console.log("Dispatching getSubstanceAbuse");
           dispatch(getGetStress(userInfo.id));
           break;
-        case 6:
+        case 5:
           console.log("Dispatching getSubstanceAbuse");
           dispatch(getHealthandMedical(userInfo.id));
           break;
-        case 7:
+        case 6:
           console.log("Dispatching getSubstanceAbuse");
           dispatch(getPersonalFamily(userInfo.id));
           break;
-        case 8:
+        case 7:
           console.log("Dispatching getSubstanceAbuse");
           dispatch(getIllnessCondition(userInfo.id));
           break;
-        case 9:
+        case 8:
           console.log("Dispatching getSubstanceAbuse");
           dispatch(getSymptomReview(userInfo.id));
           break;
-        case 10:
+        case 9:
           console.log("Dispatching getSubstanceAbuse");
           dispatch(getReadiness(userInfo.id));
           break;

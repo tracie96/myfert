@@ -345,52 +345,54 @@ function SwitchContent({
 }) {
   switch (index) {
     case 0: // General Information section
-      return loading ? (
-        <p>Loading...</p>
-      ) : (
-        <div>
-          <Row gutter={16}>
-            <Col xs={24} md={12}>
-              <Descriptions column={1}>
-                <Descriptions.Item label="Genetic Background">
-                  {generalInfo.geneticBackground || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Last Medical Care">
-                  {generalInfo.lastMedicalCare || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Emergency Contact">
-                  {generalInfo.emergencyContact || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Emergency Relationship">
-                  {generalInfo.emergencyRelationship || "N/A"}
-                </Descriptions.Item>
-              </Descriptions>
-            </Col>
-
-            <Col xs={24} md={12}>
-              <Descriptions column={1}>
-                <Descriptions.Item label="Emergency Phone (Home)">
-                  {generalInfo.emergencyPhoneHome || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Emergency Phone (Cell)">
-                  {generalInfo.emergencyPhoneCell || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Emergency Phone (Work)">
-                  {generalInfo.emergencyPhoneWork || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="How Did You Hear About Us?">
-                  {generalInfo.howDidHearAbout || "N/A"}
-                </Descriptions.Item>
-              </Descriptions>
-            </Col>
-          </Row>{" "}
-        </div>
-      );
+    return loading ? (
+      <p>Loading...</p>
+    ) : (
+      <div className="p-6 rounded-md shadow-md">
+        <Row gutter={16}>
+          {/* First Column */}
+          <Col xs={24} md={12}>
+            <Descriptions column={1} bordered>
+              <Descriptions.Item label="Genetic Background">
+                {generalInfo.geneticBackground || "N/A"}
+              </Descriptions.Item>
+              <Descriptions.Item label="Last Medical Care">
+                {generalInfo.lastMedicalCare || "N/A"}
+              </Descriptions.Item>
+              <Descriptions.Item label="Emergency Contact">
+                {generalInfo.emergencyContact || "N/A"}
+              </Descriptions.Item>
+              <Descriptions.Item label="Emergency Relationship">
+                {generalInfo.emergencyRelationship || "N/A"}
+              </Descriptions.Item>
+            </Descriptions>
+          </Col>
+  
+          <Col xs={24} md={12}>
+            <Descriptions column={1} bordered>
+              <Descriptions.Item label="Emergency Phone (Home)">
+                {generalInfo.emergencyPhoneHome || "N/A"}
+              </Descriptions.Item>
+              <Descriptions.Item label="Emergency Phone (Cell)">
+                {generalInfo.emergencyPhoneCell || "N/A"}
+              </Descriptions.Item>
+              <Descriptions.Item label="Emergency Phone (Work)">
+                {generalInfo.emergencyPhoneWork || "N/A"}
+              </Descriptions.Item>
+              <Descriptions.Item label="How Did You Hear About Us?">
+                {generalInfo.howDidHearAbout || "N/A"}
+              </Descriptions.Item>
+            </Descriptions>
+          </Col>
+        </Row>
+      </div>
+    );
+  
       case 1:
         return loading ? (
           <p>Loading...</p>
         ) : (
-          <div className="p-6 bg-gray-100 rounded-md shadow-md">
+          <div className="p-6 rounded-md shadow-md">
             <Row gutter={16} justify="center">
               {/* First Column */}
               <Col xs={24} md={12}>
@@ -465,7 +467,7 @@ function SwitchContent({
       return loading ? (
         <p>Loading...</p>
       ) : (
-        <div className="p-6 bg-gray-100 rounded-md shadow-md">
+        <div className="p-6 rounded-md shadow-md">
           <Row gutter={16}>
             {/* Dietary Information Column */}
             <Col xs={24} md={12}>
@@ -576,7 +578,7 @@ function SwitchContent({
         return loading ? (
           <p>Loading...</p>
         ) : (
-          <div className="p-6 bg-gray-100 rounded-md shadow-md">
+          <div className="p-6 rounded-md shadow-md">
             <Row gutter={16}>
               {/* First Column */}
               <Col xs={24} md={12}>
@@ -646,7 +648,7 @@ function SwitchContent({
         return loading ? (
           <p>{stress}</p>
         ) : (
-          <div className="p-6 bg-gray-100 rounded-md shadow-md">
+          <div className="p-6 rounded-md shadow-md">
             <Row gutter={16}>
               <Col xs={24} md={12}>
                 <Descriptions column={1} bordered>
@@ -734,7 +736,7 @@ function SwitchContent({
         return loading ? (
           <p>{stress}</p>
         ) : (
-          <div className="p-6 bg-gray-100 rounded-md shadow-md">
+          <div className="p-6 rounded-md shadow-md">
             <Row gutter={16}>
               <Col xs={24} md={12}>
                 <Descriptions column={1} bordered>
@@ -858,7 +860,7 @@ function SwitchContent({
         return loading ? (
           <p>{stress}</p>
         ) : (
-          <div className="p-6 bg-gray-100 rounded-md shadow-md">
+          <div className="p-6 rounded-md shadow-md">
             <Row gutter={16}>
               <Col xs={24} md={12}>
                 <Descriptions column={1} bordered>
@@ -893,7 +895,7 @@ function SwitchContent({
         return loading ? (
           <p>{stress}</p>
         ) : (
-          <div className="p-6 bg-gray-100 rounded-md shadow-md">
+          <div className="p-6 rounded-md shadow-md">
             <Row gutter={16}>
               <Col xs={24} md={12}>
                 <Descriptions column={1} bordered>
@@ -928,7 +930,7 @@ function SwitchContent({
           return loading ? (
             <p>{symptom}</p>
           ) : (
-            <div className="p-6 bg-gray-100 rounded-md shadow-md">
+            <div className="p-6 rounded-md shadow-md">
               <Row gutter={16}>
                 <Col xs={24} md={12}>
                   <Descriptions column={1} bordered>
@@ -959,82 +961,84 @@ function SwitchContent({
             </div>
           );
          
-        case 9:
-      return loading ? (
-        <p>{stress}</p>
-      ) : (
-        <div>
-          <Row gutter={16}>
-            <Col xs={24} md={12}>
-              <Descriptions column={1}>
-                <Descriptions.Item label="Modify Diet">
-                  {readiness?.modifyDiet || "N/A"}
-                </Descriptions.Item>
-                 <Descriptions.Item label="Take Daily Supplement">
-                  {readiness?.takeDailySupplement || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Record Everything Eat">
-                  {readiness?.recordEverythingEat || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Modify Lifestyle">
-                  {readiness?.modifyLifestyle || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Practice Relaxation">
-                  {readiness?.practiceRelaxation || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Engage Regular Exercise">
-                  {readiness?.engageRegularExercise || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Health Achieve">
-                  {readiness?.healthAchieve || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Health Change Trigger">
-                  {readiness?.healthChangeTrigger || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Readiness Supportive">
-                  {readiness?.readinessSupportive || "N/A"}
-                </Descriptions.Item>
-              </Descriptions>
-            </Col>
- 
-         <Col xs={24} md={12}>
-              <Descriptions column={1}>
-                  <Descriptions.Item label="Health Happen Get Better">
-                  {readiness?.healthHappenGetBetter || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Health Last Time">
-                  {readiness?.healthLastTime || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Health Think Happening">
-                  {readiness?.healthThinkHappening || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Health Condition">
-                  {readiness?.healthCondition || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Comment">
-                  {readiness?.comment || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Health Feel Better">
-                  {readiness?.healthFeelBetter || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Health Feel Worse">
-                  {readiness?.healthFeelWorse || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Readiness Confident Level">
-                  <div>{readiness?.readinessConfident?.level || 0}</div>
-                </Descriptions.Item>
-                <Descriptions.Item label="Readiness Confident">
-                  <div>{readiness?.readinessConfident?.name || "N/A"}</div>
-                </Descriptions.Item>
-                <Descriptions.Item label="Readiness Frequency">
-                  {readiness?.readinessFrequency || "N/A"}
-                </Descriptions.Item> 
-              </Descriptions>
-            </Col> 
-          </Row>
-        </div>
-      );
-
+          case 9:
+            return loading ? (
+              <p>{stress}</p>
+            ) : (
+              <div className="p-6 rounded-md shadow-md">
+                <Row gutter={16}>
+                  {/* First Column */}
+                  <Col xs={24} md={12}>
+                    <Descriptions column={1} bordered>
+                      <Descriptions.Item label="Modify Diet">
+                        {readiness?.modifyDiet || "N/A"}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Take Daily Supplement">
+                        {readiness?.takeDailySupplement || "N/A"}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Record Everything Eat">
+                        {readiness?.recordEverythingEat || "N/A"}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Modify Lifestyle">
+                        {readiness?.modifyLifestyle || "N/A"}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Practice Relaxation">
+                        {readiness?.practiceRelaxation || "N/A"}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Engage Regular Exercise">
+                        {readiness?.engageRegularExercise || "N/A"}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Health Achieve">
+                        {readiness?.healthAchieve || "N/A"}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Health Change Trigger">
+                        {readiness?.healthChangeTrigger || "N/A"}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Readiness Supportive">
+                        {readiness?.readinessSupportive || "N/A"}
+                      </Descriptions.Item>
+                    </Descriptions>
+                  </Col>
+          
+                  {/* Second Column */}
+                  <Col xs={24} md={12}>
+                    <Descriptions column={1} bordered>
+                      <Descriptions.Item label="Health Happen Get Better">
+                        {readiness?.healthHappenGetBetter || "N/A"}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Health Last Time">
+                        {readiness?.healthLastTime || "N/A"}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Health Think Happening">
+                        {readiness?.healthThinkHappening || "N/A"}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Health Condition">
+                        {readiness?.healthCondition || "N/A"}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Comment">
+                        {readiness?.comment || "N/A"}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Health Feel Better">
+                        {readiness?.healthFeelBetter || "N/A"}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Health Feel Worse">
+                        {readiness?.healthFeelWorse || "N/A"}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Readiness Confident Level">
+                        <div>{readiness?.readinessConfident?.level || 0}</div>
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Readiness Confident">
+                        <div>{readiness?.readinessConfident?.name || "N/A"}</div>
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Readiness Frequency">
+                        {readiness?.readinessFrequency || "N/A"}
+                      </Descriptions.Item> 
+                    </Descriptions>
+                  </Col> 
+                </Row>
+              </div>
+            );
+          
     default:
       return <p style={{ textAlign: "center" }}> No Record available</p>;
   }

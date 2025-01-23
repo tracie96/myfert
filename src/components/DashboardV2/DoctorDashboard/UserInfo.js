@@ -17,7 +17,7 @@ import {
 
 export default function UserInfo() {
   const location = useLocation();
-  const userInfo = location.state?.user;
+  const userInfo = location.state;
   const dispatch = useDispatch();
   const [visibleModal, setVisibleModal] = useState(null);
   const generalInfo = useSelector((state) => state.intake?.generalInfo);
@@ -34,7 +34,7 @@ export default function UserInfo() {
   const readiness = useSelector((state) => state.intake?.readinessInfo);
 
   const loading = useSelector((state) => state.user?.loading);
-console.log("General Info", symptom);
+console.log("Symptom Info", symptom);
   const modalContent = [
     "General Information",
     "Current Health & Lifestyle",
@@ -47,7 +47,7 @@ console.log("General Info", symptom);
     "Symptom Review & Medications",
     "Readiness & Health Goals",
   ];
-
+console.log({userInfo})
   console.log(useSelector((state) => state.intake));
   useEffect(() => {
     console.log("useEffect is running");
@@ -57,50 +57,50 @@ console.log("General Info", symptom);
       switch (visibleModal) {
         case 0:
           console.log("Dispatching getGeneralInformation");
-          dispatch(getGeneralInformation(userInfo.id));
+          dispatch(getGeneralInformation(userInfo?.user?.id));
           break;
         case 1:
           console.log("Dispatching getCurrentHealthLifestyle");
-          dispatch(getCurrentHealthLifestyle(userInfo.id));
+          dispatch(getCurrentHealthLifestyle(userInfo?.user?.id));
           break;
         case 2:
           console.log("Dispatching getNutritionAndDietaryHabits");
-          dispatch(getNutritionAndDietaryHabits(userInfo.id));
+          dispatch(getNutritionAndDietaryHabits(userInfo?.user?.id));
           break;
         case 3:
           console.log("Dispatching getSubstanceAbuse");
-          dispatch(getSubstanceAbuse(userInfo.id));
+          dispatch(getSubstanceAbuse(userInfo?.user?.id));
           break;
           
         case 4:
           console.log("Dispatching getSubstanceAbuse");
-          dispatch(getGetStress(userInfo.id));
+          dispatch(getGetStress(userInfo?.user?.id));
           break;
         case 5:
           console.log("Dispatching getSubstanceAbuse");
-          dispatch(getHealthandMedical(userInfo.id));
+          dispatch(getHealthandMedical(userInfo?.user?.id));
           break;
         case 6:
           console.log("Dispatching getSubstanceAbuse");
-          dispatch(getPersonalFamily(userInfo.id));
+          dispatch(getPersonalFamily(userInfo?.user?.id));
           break;
         case 7:
           console.log("Dispatching getSubstanceAbuse");
-          dispatch(getIllnessCondition(userInfo.id));
+          dispatch(getIllnessCondition(userInfo?.user?.id));
           break;
         case 8:
           console.log("Dispatching getSubstanceAbuse");
-          dispatch(getSymptomReview(userInfo.id));
+          dispatch(getSymptomReview(userInfo?.user?.id));
           break;
         case 9:
           console.log("Dispatching getSubstanceAbuse");
-          dispatch(getReadiness(userInfo.id));
+          dispatch(getReadiness(userInfo?.user?.id));
           break;
         default:
           break;
       }
     }
-  }, [visibleModal, dispatch, userInfo.id]);
+  }, [visibleModal, dispatch, userInfo]);
 
   const showModal = (index) => {
     setVisibleModal(index);
@@ -940,7 +940,27 @@ function SwitchContent({
                         label={key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
                         key={key}
                       >
-                        <span className="font-medium">{value !== null ? value : 'N/A'}</span>
+                        {Array.isArray(value) ? (
+                          value.length > 0 ? (
+                            value.map((item, index) => (
+                              <div key={index}>
+                                {item.name}: <span className="font-medium">{item.level}</span>
+                              </div>
+                            ))
+                          ) : (
+                            <span className="font-medium">N/A</span>
+                          )
+                        ) : typeof value === 'object' && value !== null ? (
+                          // Handle the specific object rendering
+                          <>
+                            <div>Yes/No: <span className="font-medium">{value.yesNo ? 'Yes' : 'No'}</span></div>
+                            {value.describe && (
+                              <div>Description: <span className="font-medium">{value.describe}</span></div>
+                            )}
+                          </>
+                        ) : (
+                          <span className="font-medium">{value !== null ? value : 'N/A'}</span>
+                        )}
                       </Descriptions.Item>
                     ))}
                   </Descriptions>
@@ -953,7 +973,26 @@ function SwitchContent({
                         label={key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
                         key={key}
                       >
-                        <span className="font-medium">{value !== null ? value : 'N/A'}</span>
+                        {Array.isArray(value) ? (
+                          value.length > 0 ? (
+                            value.map((item, index) => (
+                              <div key={index}>
+                                {item.name}: <span className="font-medium">{item.level}</span>
+                              </div>
+                            ))
+                          ) : (
+                            <span className="font-medium">N/A</span>
+                          )
+                        ) : typeof value === 'object' && value !== null ? (
+                          <>
+                            <div>Yes/No: <span className="font-medium">{value.yesNo ? 'Yes' : 'No'}</span></div>
+                            {value.describe && (
+                              <div>Description: <span className="font-medium">{value.describe}</span></div>
+                            )}
+                          </>
+                        ) : (
+                          <span className="font-medium">{value !== null ? value : 'N/A'}</span>
+                        )}
                       </Descriptions.Item>
                     ))}
                   </Descriptions>
@@ -961,7 +1000,7 @@ function SwitchContent({
               </Row>
             </div>
           );
-         
+        
           case 9:
             return loading ? (
               <p>{stress}</p>

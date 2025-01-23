@@ -260,6 +260,7 @@ export const getSymptomReview = createAsyncThunk(
         `${baseUrl}/Doctor/GetSymptoms/${id}`,
         config,
       );
+      console.log({ response});
       return response.data;
     } catch (error) {
       console.log({ error });

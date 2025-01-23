@@ -34,7 +34,6 @@ export default function UserInfo() {
   const readiness = useSelector((state) => state.intake?.readinessInfo);
 
   const loading = useSelector((state) => state.user?.loading);
-console.log("Symptom Info", symptom);
   const modalContent = [
     "General Information",
     "Current Health & Lifestyle",
@@ -46,6 +45,8 @@ console.log("Symptom Info", symptom);
     "Illness & Conditions",
     "Symptom Review & Medications",
     "Readiness & Health Goals",
+    "Reproductive Health",
+
   ];
 console.log({userInfo})
   console.log(useSelector((state) => state.intake));
@@ -96,6 +97,10 @@ console.log({userInfo})
           console.log("Dispatching getSubstanceAbuse");
           dispatch(getReadiness(userInfo?.user?.id));
           break;
+        case 10:
+            console.log("Dispatching Reproductive");
+            dispatch((userInfo?.user?.id));
+            break;
         default:
           break;
       }

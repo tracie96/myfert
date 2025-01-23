@@ -420,33 +420,41 @@ const ReproductiveHealth = ({ onComplete }) => {
     }
   }, []);
 
+  
   const validateQuestion = () => {
     const question = questions[currentQuestionIndex];
     const mainAnswer = answers[question.name];
   
+    // Handle "Other" selection with an additional input
     const isCheckbox = Array.isArray(mainAnswer);
     const isOtherSelected = isCheckbox
       ? mainAnswer.includes("Other")
       : mainAnswer === "Other";
-  
     const otherAnswerKey = `${question.name}_other`;
     const otherAnswer = answers[otherAnswerKey];
     if (isOtherSelected && (!otherAnswer || otherAnswer.trim() === "")) {
       return false;
     }
-
-    // Validate number_with_radio questions
+  
+    // Validate "number_with_radio" with multiple subQuestions
     if (question.type === "number_with_radio" && question.subQuestions) {
-      const subQuestion = question.subQuestions[0];
-      const subAnswer = answers[subQuestion.name];
+      for (const subQuestion of question.subQuestions) {
+        const subAnswer = answers[subQuestion.name];
+        const radioAnswer = answers[`${subQuestion.name}_radio`];
   
-      const isSubAnswered =
-        typeof subAnswer === "number" && subAnswer >= 0;
-  
-      return isSubAnswered;
+        if (subQuestion.type === "number_with_radio_sub") {
+          // Either the number input or "Unsure" must be selected
+          const isSubAnswered =
+            (typeof subAnswer === "number" && subAnswer >= 0) || radioAnswer === "Unsure";
+          if (!isSubAnswered) return false;
+        } else if (subQuestion.type === "radio") {
+          // Validate radio questions
+          if (!subAnswer || subAnswer.trim() === "") return false;
+        }
+      }
     }
   
-    // Validate subQuestions for "Yes" or other dependent answers
+    // Validate dependent subQuestions for "Yes" main answers
     if (question.subQuestions && mainAnswer === "Yes") {
       for (const subQuestion of question.subQuestions) {
         const subAnswer = answers[subQuestion.name];
@@ -462,8 +470,10 @@ const ReproductiveHealth = ({ onComplete }) => {
     if (typeof mainAnswer === "number") {
       return !isNaN(mainAnswer) && mainAnswer >= 0;
     }
-    return mainAnswer !== undefined && mainAnswer !== "";
+    return true;
   };
+  
+  
   
 
   // // ToDo: previous implementation, after successful testing of the applplication, this can be deleted. Handling number as well.
@@ -504,16 +514,34 @@ const ReproductiveHealth = ({ onComplete }) => {
 
   const handleSave = () => {
     const question = questions[currentQuestionIndex];
+  
+    // Allow skipping validation if "Unsure" is selected for subQuestions
+    if (
+      question.type === "number_with_radio" &&
+      question.subQuestions &&
+      answers[`${question.subQuestions[0].name}_radio`] === "Unsure"
+    ) {
+      localStorage.setItem("currentQuestionIndex5", currentQuestionIndex + 1);
+      localStorage.setItem("answers", JSON.stringify(answers));
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+      return; // Exit early
+    }
+  
+    // Validate the question before proceeding
     if (!validateQuestion() && question.name !== "info") {
       message.error("Please answer the current question before saving.");
       return;
     }
-    localStorage.setItem("currentQuestionIndex5", 0);
+  
+    localStorage.setItem("currentQuestionIndex5", currentQuestionIndex + 1);
     localStorage.setItem("answers", JSON.stringify(answers));
+    
     if (currentQuestionIndex < totalQuestions - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
   };
+  
+  
   const handlePrevious = () => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
@@ -540,106 +568,85 @@ const ReproductiveHealth = ({ onComplete }) => {
   );
   const handleSubmit = async () => {
     try {
-        // Add your form submission logic here
+      // Prepare the data for API request
+      const requestData = {
+        birthControl: answers.isUsingBirthControl === "Yes",
+        hormonalBirthControl: answers.hormonalBirthControl || "",
+        nonHormonalBirthControl: answers.nonHormonalBirthControl || "",
+        currentlyPregnant: answers.isPregnant === "Yes",
+        tryingToConceive: answers.is_trying_to_conceive === "Yes",
+        difficultyTryingToConceive: answers.is_difficulty_to_conceive === "Yes",
+        familyMemberWithReproductiveConcerns:
+          answers.is_family_health_concern === "Yes"
+            ? "Yes"
+            : answers.family_health_concern_details || "",
+        howLongTryingToConceive: answers.is_trying_to_conceive_time || "",
+        methodToConceive: answers.methods_trying_to_conceive || [],
+        chartingToConceive: answers.is_charting_cycles || [],
+        utilizingFertilityAwareness: answers.isUsingFertilityAwareness === "Yes",
+        methodFertilityAwareness: answers.fertilityAwarenessMethod || "",
+        intercouseDays: answers.intercourseDays || "",
+        intercouseEachCycle: answers.is_frequent_intercourse_cycle || "",
+        menstrualPainDuringPeriod: answers.is_menstrual_pain || [],
+        menstralBleedingPelvicPain: {
+          duration: answers.duration_per_cycle || "",
+          severity: answers.duration_per_cycle_severity || "",
+        },
+        experiencePelvicPain: answers.is_lower_back_pain === "Yes",
+        duringCirclePelvicPain: {
+          duration: answers.duration_per_mild_cycle || "",
+          severity: answers.duration_per_mild_cycle_severity || "",
+        },
+        doYouPmsSymptoms: answers.is_pms_symptom === "Yes",
+        pmsSymptoms: answers.pms_sympton || [],
+        pms: {
+          duration: answers.pms_sympton_duration || "",
+          severity: answers.pms_sympton_severity || "",
+        },
+        longestCycleLenght:  "",
+        averageCycleLenght: "",
+        midCycleSpotting: answers.is_mid_cycle_spotting === "Yes",
+        menstralCycleFrequency: answers.menstrualCycleFrequency || "",
+        menstralCycleDuration: answers.menstrualCycleDuration || "",
+        menstralCycleColour: answers.menstrualCycleColour || "",
+        chartBase64: answers.chartBase64 || "",
+      };
+  
+      const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
+      const token = userInfo.obj?.token || "";
+  
+      const response = await fetch(
+        "https://myfertilitydevapi.azurewebsites.net/api/Patient/AddReproductiveHealth",
+        {
+          method: "POST",
+          headers: {
+            Accept: "text/plain",
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(requestData),
+        }
+      );
+  
+      if (response.ok) {
+        const result = await response.json();
+        console.log("API response:", result);
         message.success("Form submitted successfully!");
         dispatch(completeCard("/questionnaire/11"));
         localStorage.setItem("currentQuestionIndex11", 0);
         localStorage.setItem("currentStep", 1);
         localStorage.setItem("answers", JSON.stringify(answers));
-
-        // Prepare the data for API request
-        const requestData = {
-            birthControl: true,
-            hormonalBirthControl: "string",
-            nonHormonalBirthControl: "string",
-            currentlyPregnant: true,
-            tryingToConceive: true,
-            difficultyTryingToConceive: true,
-            familyMemberWithReproductiveConcerns: "string",
-            howLongTryingToConceive: "string",
-            methodToConceive: ["string"],
-            chartingToConceive: ["string"],
-            utilizingFertilityAwareness: true,
-            methodFertilityAwareness: "string",
-            intercouseDays: "string",
-            intercouseEachCycle: "string",
-            menstrualPainDuringPeriod: ["string"],
-            menstralBleedingPelvicPain: {
-                duration: "string",
-                colour: "string"
-            },
-            experiencePelvicPain: true,
-            duringCirclePelvicPain: {
-                duration: "string",
-                colour: "string"
-            },
-            doYouPmsSymptoms: true,
-            pmsSymptoms: ["string"],
-            pms: {
-                duration: "string",
-                colour: "string"
-            },
-            longestCycleLenght: "string",
-            shortestCycleLenght: "string",
-            averageCycleLenght: "string",
-            midCycleSpotting: true,
-            menstralCycleFrequency: "string",
-            menstralCycleDuration: "string",
-            menstralCycleColour: "string",
-            cycleDischargeCreamy: {
-                duration: "string",
-                colour: "string"
-            },
-            cycleDischargeWatery: {
-                duration: "string",
-                colour: "string"
-            },
-            cycleDischargeEggWhite: {
-                duration: "string",
-                colour: "string"
-            },
-            cycleDischargePrePeriod: {
-                duration: "string",
-                colour: "string"
-            },
-            cycleDischargeMenstralBleeding: {
-                duration: "string",
-                colour: "string",
-                clots: "string"
-            },
-            cycleDischargeAfterPeriodSpotting: {
-                duration: "string",
-                colour: "string"
-            },
-            chartBase64: "string"
-        };
-        const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
-        const token = userInfo.obj.token || "";
-        const response = await fetch(
-            "https://myfertilitydevapi.azurewebsites.net/api/Patient/AddReproductiveHealth",
-            {
-                method: "POST",
-                headers: {
-                  accept: "text/plain",
-                  "Content-Type": "application/json", 
-                  Authorization: `Bearer ${token}`,
-              },
-                body: JSON.stringify(requestData)
-            }
-        );
-
-        if (response.ok) {
-            const result = await response.json();
-            console.log("API response:", result);
-        } else {
-            console.error("API error:", response.statusText);
-        }
+        navigate("/assessment");
+      } else {
+        console.error("API error:", response.statusText);
+        message.error("Failed to submit the form. Please try again.");
+      }
     } catch (error) {
-        console.error("Error during API call:", error);
+      console.error("Error during API call:", error);
+      message.error("An error occurred. Please try again.");
     }
-
-    navigate("/assessment");
-};
+  };
+  
 
   const renderSubQuestions = (subQuestions) => {
     return subQuestions.map((subQuestion, index) => (
@@ -983,7 +990,6 @@ const ReproductiveHealth = ({ onComplete }) => {
                 handleChange(e.target.checked, `${question.name}_checkbox`)
               }
             >
-              {/* Checkbox Label */}
               Unsure
             </Checkbox>
           </Col>
@@ -1011,7 +1017,8 @@ const ReproductiveHealth = ({ onComplete }) => {
             {renderSubQuestions(question.subQuestions)}
           </div>
         );
-      case "long_textarea":
+      
+        case "long_textarea":
         return (
           <div style={{ flexDirection: "column" }}>
             <Input.TextArea

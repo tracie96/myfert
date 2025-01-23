@@ -215,8 +215,9 @@ console.log({userInfo})
               key={index}
               title={`Details for ${modalContent[index]}`}
               visible={visibleModal === index}
-              onOk={() => setVisibleModal(null)}
+              // onOk={() => setVisibleModal(null)}
               width={"1000px"}
+              footer={null}
               onCancel={() => setVisibleModal(null)}
             >
               <SwitchContent

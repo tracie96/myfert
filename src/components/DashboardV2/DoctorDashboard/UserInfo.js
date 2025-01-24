@@ -125,19 +125,19 @@ console.log({userInfo})
             <Row gutter={16}>
               <Col span={12} md={6}>
                 <p>
-                  <strong>Client</strong> : {userInfo?.firstname || "N/A"}{" "}
-                  {userInfo?.lastname || "N/A"}
+                  <strong>Client</strong> : 
+                  {userInfo?.user?.lastname || "N/A"}
                 </p>
               </Col>
               <Col span={12} md={6}>
                 <p>
-                  <strong>Age</strong> : {userInfo?.age}
+                  <strong>Age</strong> : {userInfo?.user?.age}
                 </p>
               </Col>
               <Col span={12} md={6}>
                 <p>
                   <strong>Preferred Phone</strong> :{" "}
-                  {userInfo?.phoneNumber || "N/A"}
+                  {userInfo?.user?.phoneNumber || "N/A"}
                 </p>
               </Col>
               <Col span={12} md={6}>
@@ -220,7 +220,6 @@ console.log({userInfo})
               key={index}
               title={`Details for ${modalContent[index]}`}
               visible={visibleModal === index}
-              // onOk={() => setVisibleModal(null)}
               width={"1000px"}
               footer={null}
               onCancel={() => setVisibleModal(null)}
@@ -380,12 +379,8 @@ function SwitchContent({
               <Descriptions.Item label="Emergency Phone (Home)">
                 {generalInfo.emergencyPhoneHome || "N/A"}
               </Descriptions.Item>
-              <Descriptions.Item label="Emergency Phone (Cell)">
-                {generalInfo.emergencyPhoneCell || "N/A"}
-              </Descriptions.Item>
-              <Descriptions.Item label="Emergency Phone (Work)">
-                {generalInfo.emergencyPhoneWork || "N/A"}
-              </Descriptions.Item>
+
+          
               <Descriptions.Item label="How Did You Hear About Us?">
                 {generalInfo.howDidHearAbout || "N/A"}
               </Descriptions.Item>
@@ -395,81 +390,112 @@ function SwitchContent({
       </div>
     );
   
-      case 1:
-        return loading ? (
-          <p>Loading...</p>
-        ) : (
-          <div className="p-6 rounded-md shadow-md">
-            <Row gutter={16} justify="center">
-              {/* First Column */}
-              <Col xs={24} md={12}>
-                <Descriptions column={1} bordered>
-                  <Descriptions.Item label="Ongoing Health">
-                    {currentHealth?.ongoingHealth?.map(health => health.problem).join(', ') || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Allergies">
-                    {currentHealth?.allergies?.map(allergy => allergy.reaction).join(', ') || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Sleep Hours">
-                    {currentHealth?.sleepHours || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Problem Sleeping">
-                    {currentHealth?.problemSleeping ? "Yes" : "No"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Staying Asleep">
-                    {currentHealth?.stayingAsleep ? "Yes" : "No"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Insomnia">
-                    {currentHealth?.insomnia ? "Yes" : "No"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Do You Snore">
-                    {currentHealth?.doYouSnore ? "Yes" : "No"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Rested Upon Awake">
-                    {currentHealth?.restedUponAwake ? "Yes" : "No"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Sleeping Aids">
-                    {currentHealth.sleepingAids?.yesNo ? currentHealth.sleepingAids.describe : "No" || "N/A"}
-                  </Descriptions.Item>
-                </Descriptions>
-              </Col>
-      
-              {/* Second Column */}
-              <Col xs={24} md={12}>
-                <Descriptions column={1} bordered>
-                  <Descriptions.Item label="Cardio">
-                    {currentHealth?.cardio?.duration || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Strength">
-                    {currentHealth?.strength?.duration || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Flexibility">
-                    {currentHealth?.flexibility?.duration || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Balance">
-                    {currentHealth?.balance?.duration || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Sport">
-                    {currentHealth?.sport?.duration || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Other">
-                    {currentHealth?.other?.other?.duration || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Motivated to Exercise">
-                    {currentHealth.motivatedToExercise || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Problems That Limit Exercise">
-                    {currentHealth.problemsThatLimitExercise?.yesNo ? currentHealth.problemsThatLimitExercise.describe : "No" || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Sore After Exercise">
-                    {currentHealth.soreAfterExercise?.yesNo ? currentHealth.soreAfterExercise.describe : "No" || "N/A"}
-                  </Descriptions.Item>
-                </Descriptions>
-              </Col>
-            </Row>
-          </div>
-        );
-      
+case 1:
+  return loading ? (
+    <p>Loading...</p>
+  ) : (
+    <div className="p-6 rounded-md shadow-md">
+      <Row gutter={16} justify="center">
+        <Col xs={24} md={12}>
+          <Descriptions column={1} bordered>
+          <Descriptions.Item label="Ongoing Health">
+  {currentHealth?.ongoingHealth?.length > 0 ? (
+    currentHealth.ongoingHealth.map((health, index) => (
+      <div key={index}>
+        Problem: {health.problem || "N/A"} - Severity: {health.severity || "N/A"}, 
+        Prior Treatment: {health.priorTreatment || "N/A"}, 
+        Success: {health.success || "N/A"}
+      </div>
+    ))
+  ) : (
+    "N/A"
+  )}
+</Descriptions.Item>
+
+<Descriptions.Item label="Allergies">
+  {currentHealth?.allergies?.length > 0 ? (
+    currentHealth.allergies.map((allergy, index) => (
+      <div key={index}>
+        Food: {allergy.food || "N/A"}, Reaction: {allergy.reaction || "N/A"}
+      </div>
+    ))
+  ) : (
+    "N/A"
+  )}
+</Descriptions.Item>
+
+            <Descriptions.Item label="Sleep Hours">
+              {currentHealth?.sleepHours || "N/A"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Problem Sleeping">
+              {currentHealth?.problemSleeping ? "Yes" : "No"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Staying Asleep">
+              {currentHealth?.stayingAsleep ? "Yes" : "No"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Insomnia">
+              {currentHealth?.insomnia ? "Yes" : "No"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Do You Snore">
+              {currentHealth?.doYouSnore ? "Yes" : "No"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Rested Upon Awake">
+              {currentHealth?.restedUponAwake ? "Yes" : "No"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Sleeping Aids">
+              {currentHealth?.sleepingAids?.yesNo
+                ? currentHealth.sleepingAids.describe || "No Description"
+                : "No"}
+            </Descriptions.Item>
+          </Descriptions>
+        </Col>
+  
+        <Col xs={24} md={12}>
+          <Descriptions column={1} bordered>
+            <Descriptions.Item label="Cardio">
+              Type: {currentHealth?.cardio?.type || "Cardio"}, {currentHealth?.cardio?.timesWeek || 0}times per week,{" "}
+              {currentHealth?.cardio?.duration || 0} duration
+            </Descriptions.Item>
+            <Descriptions.Item label="Strength">
+              Type: {currentHealth?.strength?.type || "Strength"}, {currentHealth?.strength?.timesWeek || 0}times per week,{" "}
+              {currentHealth?.strength?.duration || 0} duration
+            </Descriptions.Item>
+            <Descriptions.Item label="Flexibility">
+              Type: {currentHealth?.flexibility?.type || "Flexibility"}, {currentHealth?.flexibility?.timesWeek || 0}times per week,{" "}
+              {currentHealth?.flexibility?.duration || 0} duration
+            </Descriptions.Item>
+            <Descriptions.Item label="Balance">
+              Type: {currentHealth?.balance?.type || "Balance"}, {currentHealth?.balance?.timesWeek || 0}times per week,{" "}
+              {currentHealth?.balance?.duration || 0} duration
+            </Descriptions.Item>
+            <Descriptions.Item label="Sport">
+              Type: {currentHealth?.sport?.type || "Sport"}, {currentHealth?.sport?.timesWeek || 0}times per week,{" "}
+              {currentHealth?.sport?.duration || 0} duration
+            </Descriptions.Item>
+            <Descriptions.Item label="Other">
+              Type: {currentHealth?.other?.type || "Other"}, {currentHealth?.other?.timesWeek || 0}times per week,{" "}
+              {currentHealth?.other?.duration || 0} duration
+            </Descriptions.Item>
+            <Descriptions.Item label="Motivated to Exercise">
+              {currentHealth?.motivatedToExercise || "N/A"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Problems That Limit Exercise">
+              {currentHealth?.problemsThatLimitExercise?.yesNo
+                ? currentHealth.problemsThatLimitExercise.describe || "No Description"
+                : "No"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Sore After Exercise">
+              {currentHealth?.soreAfterExercise?.yesNo
+                ? currentHealth.soreAfterExercise.describe || "No Description"
+                : "No"}
+            </Descriptions.Item>
+          </Descriptions>
+        </Col>
+      </Row>
+    </div>
+  );
+  
+
       case 2: // Nutrition & Dietary Habits section
       return loading ? (
         <p>Loading...</p>
@@ -498,8 +524,7 @@ function SwitchContent({
                   </Descriptions.Item>
                   <Descriptions.Item label="Any Food Craving">
                     {nutrition.anyFoodCraving?.yesNo
-                      ? nutrition.anyFoodCraving.describe
-                      : "No" || "N/A"}
+                     || "N/A"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Have 3 Meals a Day">
                     {nutrition.have3MealADay?.yesNo
@@ -520,9 +545,16 @@ function SwitchContent({
             <Col xs={24} md={12}>
               {nutrition && (
                 <Descriptions title="Eating Habits" column={1} bordered>
-                  <Descriptions.Item label="Eating Habits">
-                    {nutrition.eatingHabits || "N/A"}
-                  </Descriptions.Item>
+                 <Descriptions.Item label="Eating Habits">
+  {nutrition?.eatingHabits?.length > 0
+    ? nutrition.eatingHabits.map((habit, index) => (
+        <div key={index}>
+          {habit || "N/A"}
+        </div>
+      ))
+    : "N/A"}
+</Descriptions.Item>
+
                   <Descriptions.Item label="Typical Breakfast">
                     {nutrition.typicalBreakfast || "N/A"}
                   </Descriptions.Item>
@@ -538,10 +570,10 @@ function SwitchContent({
                   <Descriptions.Item label="Typical Fluid">
                     {nutrition.typicalFluid || "N/A"}
                   </Descriptions.Item>
-                  <Descriptions.Item label="No Typical Fruits">
+                  <Descriptions.Item label="Number of Fruits/Day">
                     {nutrition.noTypicalFruits || "N/A"}
                   </Descriptions.Item>
-                  <Descriptions.Item label="No Typical Vegetables">
+                  <Descriptions.Item label="Number of Typical Vegetables/Day">
                     {nutrition.noTypicalVegetables || "N/A"}
                   </Descriptions.Item>
                 </Descriptions>
@@ -552,27 +584,27 @@ function SwitchContent({
             <Col xs={24} md={12}>
               {nutrition && (
                 <Descriptions title="Additional Dietary Information" column={1} bordered>
-                  <Descriptions.Item label="No Typical Legumes">
+                  <Descriptions.Item label="Number of Typical Legumes">
                     {nutrition.noTypicalLegumes || "N/A"}
                   </Descriptions.Item>
-                  <Descriptions.Item label="No Typical Red Meat">
+                  <Descriptions.Item label="Number of Typical Red Meat">
                     {nutrition.noTypicalRedMeat || "N/A"}
                   </Descriptions.Item>
-                  <Descriptions.Item label="No Typical Fish">
+                  <Descriptions.Item label="Number of Typical Fish">
                     {nutrition.noTypicalFish || "N/A"}
                   </Descriptions.Item>
-                  <Descriptions.Item label="No Typical Dairy">
+                  <Descriptions.Item label="Number of Typical Dairy">
                     {nutrition.noTypicalDairy || "N/A"}
                   </Descriptions.Item>
-                  <Descriptions.Item label="No Typical Nuts">
+                  <Descriptions.Item label="Number of Typical Nuts">
                     {nutrition.noTypicalNuts || "N/A"}
                   </Descriptions.Item>
-                  <Descriptions.Item label="No Typical Fats">
+                  <Descriptions.Item label="Number of Typical Fats">
                     {nutrition.noTypicalFats || "N/A"}
                   </Descriptions.Item>
-                  <Descriptions.Item label="Caffeinated Beverages">
+                  {/* <Descriptions.Item label="Caffeinated Beverages">
                     {nutrition.caffeinatedBeverages || "N/A"}
-                  </Descriptions.Item>
+                  </Descriptions.Item> */}
                 </Descriptions>
               )}
             </Col>

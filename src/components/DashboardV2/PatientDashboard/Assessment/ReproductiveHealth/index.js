@@ -135,11 +135,11 @@ const questions = [
         type: "text",
         name: "charting_method",
       },
-      {
-        question:
-        "How long have you been using fertility awareness based method(s)?",
-        type: "select_two",
-      },
+      // {
+      //   question:
+      //   "How long have you been using fertility awareness based method(s)?",
+      //   type: "select_two",
+      // },
     ],
   },
 
@@ -739,41 +739,42 @@ const ReproductiveHealth = ({ onComplete }) => {
           </>
         )}
         {subQuestion.type === "select_two" && (
-          <Space size="large">
-            {/* Input for Years */}
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <InputNumber
-                min={0}
-                max={100}
-                onChange={(value) => handleChange(value, subQuestion.name)}
-                value={answers[subQuestion.name] || 0}
-                name="charting_years"
-                style={{
-                  height: 35,
-                  borderColor: "#00ADEF",
-                  width: isMobile ? "100%" : "50%",
-                }}
-              />
-              <span style={{ marginLeft: "8px" }}>Years</span>
-            </div>
-
-            {/* Input for Months */}
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <InputNumber
-                min={0}
-                max={11}
-                value={answers[subQuestion.name] || 0}
-                name="charting_months"
-                onChange={(value) => handleChange(value, subQuestion.name)}
-                style={{
-                  height: 35,
-                  borderColor: "#00ADEF",
-                  width: isMobile ? "100%" : "50%",
-                }}
-              />
-              <span style={{ marginLeft: "8px" }}>Months</span>
-            </div>
-          </Space>
+       <Space size="large">
+       {/* Input for Years */}
+       <div style={{ display: "flex", alignItems: "center" }}>
+         <InputNumber
+           min={0}
+           max={100}
+           onChange={(value) => handleChange(value || 0, `${subQuestion.name}_years`)}
+           value={answers[`${subQuestion.name}_years`] || ""}
+           name={`${subQuestion.name}_years`}
+           style={{
+             height: 35,
+             borderColor: "#00ADEF",
+             width: isMobile ? "100%" : "50%",
+           }}
+         />
+         <span style={{ marginLeft: "8px" }}>Years</span>
+       </div>
+     
+       {/* Input for Months */}
+       <div style={{ display: "flex", alignItems: "center" }}>
+         <InputNumber
+           min={0}
+           max={11}
+           onChange={(value) => handleChange(value || 0, `${subQuestion.name}_months`)}
+           value={answers[`${subQuestion.name}_months`] || ""}
+           name={`${subQuestion.name}_months`}
+           style={{
+             height: 35,
+             borderColor: "#00ADEF",
+             width: isMobile ? "100%" : "50%",
+           }}
+         />
+         <span style={{ marginLeft: "8px" }}>Months</span>
+       </div>
+     </Space>
+     
         )}
         {subQuestion.type === "date" && (
           <DatePicker

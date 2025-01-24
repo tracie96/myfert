@@ -158,8 +158,8 @@ const questions = [
     subQuestion: [
       {
         type: "time_select",
-        label: "Time of Breakfast",
-        name: "breakfast_time",
+        label: "Time of Lunch",
+        name: "lunch_time",
       },
     ],
   },
@@ -171,8 +171,8 @@ const questions = [
     subQuestion: [
       {
         type: "time_select",
-        label: "Time of Breakfast",
-        name: "breakfast_time",
+        label: "Time of Dinner",
+        name: "dinner_time",
       },
     ],
   },
@@ -185,7 +185,7 @@ const questions = [
       {
         type: "time_select",
         label: "Time of Breakfast",
-        name: "breakfast_time",
+        name: "typical_day_time",
       },
     ],
   },
@@ -430,9 +430,9 @@ const Nutrition = ({ onComplete }) => {
       noTypicalCanSoda: answers.diet_detail_soda || 0,
       noTypicalSweets: answers.diet_detail_sweets || 0,
       caffeinatedBeverages: answers.caffeinated_beverages === "Yes",
-      coffeeCups: "", // Assuming no data provided for coffee, tea, or soda cups
-      teaCups: "",
-      sodaCups: "",
+      coffeeCups: answers.coffee_amount, // Assuming no data provided for coffee, tea, or soda cups
+      teaCups: answers.tea_amount || "",
+      sodaCups: answers.soda_amount || "",
       adverseReactionToCoffee: answers.sensitive_food_caffeine === "Yes",
       explainAdverseReactionToCoffee:
         answers.sensitive_food_caffeine_feel || "",

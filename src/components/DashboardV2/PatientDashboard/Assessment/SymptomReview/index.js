@@ -1145,7 +1145,7 @@ const SymptomReview = ({ onComplete }) => {
         <p>{subQuestion.type !== "text" && subQuestion.question}</p>
         {subQuestion.type === "text" && (
           <Input
-            placeholder={subQuestion.name}
+            placeholder={subQuestion.question}
             value={answers[subQuestion.name] || ""}
             onChange={(e) => handleChange(e.target.value, subQuestion.name)}
             className="input_questtionnaire"
@@ -1377,7 +1377,7 @@ const SymptomReview = ({ onComplete }) => {
               onClick={() => addHospitalization(question.name)}
             >
               {" "}
-              + Add Hospitalization
+              + {question.name === 'current_medication'?'Add Hospitalization':'Add Nutrition' } 
             </Button>
           </div>
         );
@@ -1449,18 +1449,7 @@ const SymptomReview = ({ onComplete }) => {
       case "long_radio":
         return (
           <div style={{ flexDirection: "column" }}>
-            <div
-              type="primary"
-              style={{
-                background: "#335CAD",
-                padding: 20,
-                fontSize: "15px",
-                fontWeight: "bold",
-              }}
-            >
-              {question.sub}
-            </div>
-
+ 
             <Radio.Group
               name={question.name}
               onChange={(e) => handleChange(e.target.value, question.name)}

@@ -205,7 +205,6 @@ const Readiness = ({ onComplete }) => {
   const handleSubmit = () => {
     localStorage.setItem("currentQuestionIndex10", 0);
     localStorage.setItem("answers-readiness", JSON.stringify(answers));
-    // const transformedData = localStorage.getItem("answers-readiness");
     const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
     const token = userInfo.obj.token || "";
       const transformedData = transformReadinessData(answers)

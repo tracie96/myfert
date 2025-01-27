@@ -275,13 +275,65 @@ const StressAndRelationship = ({ onComplete }) => {
     navigate("/assessment");
   };
   const handleSubmit = () => {
-    // Handle form submission logic
-    message.success("Form submitted successfully!");
-    dispatch(completeCard("/questionnaire/5"));
-    localStorage.setItem("currentQuestionIndex5", 0);
-    localStorage.setItem("answers", JSON.stringify(answers));
-    navigate("/assessment");
+    // Map form data to API structure
+    const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
+    const token = userInfo.obj.token || "";
+    const mappedData = {
+      excessStress: answers.do_you_feel_stress === "Yes",
+      easyToHandleStress: answers.can_you_handle_stress === "Yes",
+      stressFromWork: answers.health_stress_work || 0,
+      stressFromFamily: answers.health_stress_family || 0,
+      stressFromSocial: answers.health_stress_social || 0,
+      stressFromFinances: answers.health_stress_financies || 0,
+      stressFromHealth: answers.health_stress_health || 0,
+      stressFromOther: answers.health_stress_other || 0,
+      relaxationTechniques: answers.relaxation_techniques === "Yes",
+      oftenRelaxationTechniques: answers.how_often_reaxation || "N/A",
+      typeRelaxationTechniques: answers.special_nutritional_program?.join(", ") || "N/A",
+      soughtCounselling: answers.have_you_sought_counselling === "Yes",
+      currentlyInTherapy: answers.current_therapy === "Yes",
+      describeTherapy: answers.where_and_where_received_medical_care || "N/A",
+      abused: answers.been_abused === "Yes",
+      hobbiesLeisure: "N/A", // Assuming this isn't part of your form
+      maritalStatus: answers.marital_status || "N/A",
+      whoDoYouLiveWith: answers.who_do_you_live_with || "N/A",
+      currentOccupation: answers.current_occupation?.trim() || "N/A",
+      previousOccupation: answers.previous_occupation?.trim() || "N/A",
+      emotionalSupport: answers.resourcces_for_emotional_support || [],
+      religiousPractice: answers.spiritual_practice === "Yes",
+      typeReligiousPractice: "N/A", // Assuming this isn't part of your form
+    };
+  
+    // Send data to API
+    fetch("https://myfertilitydevapi.azurewebsites.net/api/Patient/AddStress", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        accept: "text/plain",
+        Authorization: `${token}`,
+
+      },
+      body: JSON.stringify(mappedData),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to submit the form");
+        }
+        return response.json();
+      })
+      .then(() => {
+        message.success("Form submitted successfully!");
+        dispatch(completeCard("/questionnaire/5"));
+        localStorage.setItem("currentQuestionIndex5", 0);
+        localStorage.setItem("answers", JSON.stringify(answers));
+        navigate("/assessment");
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        message.error("Failed to submit the form. Please try again.");
+      });
   };
+  
   const renderSubQuestions = (subQuestions) => {
     return subQuestions.map((subQuestion, index) => (
       <div key={index} style={{ marginTop: "20px" }}>

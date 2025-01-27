@@ -11,6 +11,7 @@ import {
   getNutritionAndDietaryHabits,
   getPersonalFamily,
   getReadiness,
+  getReproductiveReview,
   getSubstanceAbuse,
   getSymptomReview,
 } from "../../redux/AssessmentController";
@@ -21,6 +22,7 @@ export default function UserInfo() {
   const dispatch = useDispatch();
   const [visibleModal, setVisibleModal] = useState(null);
   const generalInfo = useSelector((state) => state.intake?.generalInfo);
+  const reproductiveInfo = useSelector((state) => state.intake?.reproductiveInfo);
   const currentHealth = useSelector((state) => state.intake?.healthLifestyle);
   const nutrition = useSelector((state) => state.intake.nuritionInfo);
   const substance = useSelector((state) => state.intake?.substanceInfo);
@@ -99,7 +101,7 @@ console.log({substance})
           break;
         case 10:
             console.log("Dispatching Reproductive");
-            dispatch((userInfo?.user?.id));
+            dispatch(getReproductiveReview(userInfo?.user?.id));
             break;
         default:
           break;
@@ -237,6 +239,7 @@ console.log({substance})
                 illness={illness}
                 symptom={symptom}
                 readiness={readiness}
+                reproductiveInfo={reproductiveInfo}
                 loading={loading}
               />
             </Modal>
@@ -347,6 +350,7 @@ function SwitchContent({
   illness,
   symptom,
   readiness,
+  reproductiveInfo,
   loading,
 }) {
   switch (index) {
@@ -1101,6 +1105,128 @@ case 1:
                 </Row>
               </div>
             );
+            case 10:
+              return loading ? (
+                <p>{stress}</p>
+              ) : (
+                <div className="p-6 rounded-md shadow-md">
+                  <Row gutter={16}>
+                    {/* First Column */}
+                    <Col xs={24} md={12}>
+                       <Descriptions column={1} bordered>
+                        <Descriptions.Item label="Average Cycle Lenght">
+                          {reproductiveInfo?.averageCycleLenght || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Birth Control">
+                          {reproductiveInfo?.birthControl || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Charting To Conceive">
+                          {reproductiveInfo?.chartingToConceive || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Currently Pregnant">
+                          {reproductiveInfo?.currentlyPregnant || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Cycle Discharge After Period Spotting">
+                          {reproductiveInfo?.cycleDischargeAfterPeriodSpotting || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Cycle Discharge Creamy">
+                          {reproductiveInfo?.cycleDischargeCreamy || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Cycle Discharge Egg White">
+                          {reproductiveInfo?.cycleDischargeEggWhite || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Cycle Discharge Menstral Bleeding">
+                          {reproductiveInfo?.cycleDischargeMenstralBleeding || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Cycle Discharge Pre Period">
+                          {reproductiveInfo?.cycleDischargePrePeriod || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Cycle Discharge Watery">
+                          {reproductiveInfo?.cycleDischargeWatery || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Difficulty Trying To Conceive">
+                          {reproductiveInfo?.difficultyTryingToConceive || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Do You Pms Symptoms">
+                          {reproductiveInfo?.doYouPmsSymptoms || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="During Circle Pelvic Pain">
+                          {reproductiveInfo?.duringCirclePelvicPain || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Experience Pelvic Pain">
+                          {reproductiveInfo?.experiencePelvicPain || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Family Member With Reproductive Concerns">
+                          {reproductiveInfo?.familyMemberWithReproductiveConcerns || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Hormonal Birth Control">
+                          {reproductiveInfo?.hormonalBirthControl || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="How Long Trying To Conceive">
+                          {reproductiveInfo?.howLongTryingToConceive || "N/A"}
+                        </Descriptions.Item>
+                      </Descriptions> 
+                    </Col>
+            
+                    {/* Second Column */}
+                    <Col xs={24} md={12}>
+                      <Descriptions column={1} bordered>
+                        <Descriptions.Item label="Intercouse Days">
+                          {reproductiveInfo?.intercouseDays || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Intercouse Each Cycle">
+                          {reproductiveInfo?.intercouseEachCycle || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Longest Cycle Lenght">
+                          {reproductiveInfo?.longestCycleLenght || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Menstral Bleeding Pelvic Pain">
+                          {reproductiveInfo?.menstralBleedingPelvicPain || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Menstral Cycle Colour">
+                          {reproductiveInfo?.menstralCycleColour || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Menstral Cycle Duration">
+                          {reproductiveInfo?.menstralCycleDuration || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Menstral Cycle Frequency">
+                          {reproductiveInfo?.menstralCycleFrequency || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Menstrual Pain During Period">
+                          <div>{reproductiveInfo?.menstrualPainDuringPeriod || "N/A"}</div>
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Method Fertility Awareness">
+                          {reproductiveInfo?.methodFertilityAwareness || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Method To Conceive">
+                          {reproductiveInfo?.methodToConceive || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Mid Cycle Spotting">
+                          {reproductiveInfo?.midCycleSpotting || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Non Hormonal Birth Control">
+                          {reproductiveInfo?.nonHormonalBirthControl || "N/A"}
+                        </Descriptions.Item> 
+                        <Descriptions.Item label="pms">
+                          {reproductiveInfo?.pms || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="pms Symptoms">
+                          {reproductiveInfo?.pmsSymptoms || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Shortest Cycle Lenght">
+                          {reproductiveInfo?.shortestCycleLenght || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Trying To Conceive">
+                          {reproductiveInfo?.tryingToConceive || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Utilizing Fertility Awareness">
+                          {reproductiveInfo?.utilizingFertilityAwareness || "N/A"}
+                        </Descriptions.Item>
+                      </Descriptions>
+                    </Col> 
+                  </Row>
+                </div>
+              );
           
     default:
       return <p style={{ textAlign: "center" }}> No Record available</p>;

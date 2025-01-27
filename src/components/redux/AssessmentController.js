@@ -242,6 +242,33 @@ export const getIllnessCondition = createAsyncThunk(
   },
 );
 
+export const getReproductiveReview = createAsyncThunk(
+  "user/getReproductiveReview",
+  async (id, { getState }) => {
+    const user = getState()?.authentication?.userAuth;
+    const token = user?.obj?.token;
+
+    const config = {
+      headers: {
+        accept: "text/plain",
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    try {
+      const response = await axios.get(
+        `${baseUrl}/Doctor/GetReproductiveHealth/${id}`,
+        config,
+      );
+      console.log({ response});
+      return response.data;
+    } catch (error) {
+      console.log({ error });
+      return handleApiError(error);
+    }
+  },
+);
+
 export const getSymptomReview = createAsyncThunk(
   "user/getSymptomReview",
   async (id, { getState }) => {
@@ -331,6 +358,7 @@ const initialState = {
   personalFamilyInfo: {},
   illnessInfo: {},
   symptomInfo: {},
+  reproductiveInfo:{},
   readinessInfo: {},
   loading: false,
   error: null,
@@ -449,6 +477,20 @@ const intakeFormSlice = createSlice({
         state.symptomInfo = action.payload;
       })
       .addCase(getSymptomReview.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      });
+
+      builder
+      .addCase(getReproductiveReview.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getReproductiveReview.fulfilled, (state, action) => {
+        state.loading = false;
+        state.reproductiveInfo = action.payload;
+      })
+      .addCase(getReproductiveReview.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
       });

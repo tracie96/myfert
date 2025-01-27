@@ -48,7 +48,7 @@ export default function UserInfo() {
     "Reproductive Health",
 
   ];
-console.log({userInfo})
+console.log({substance})
   console.log(useSelector((state) => state.intake));
   useEffect(() => {
     console.log("useEffect is running");
@@ -618,69 +618,54 @@ case 1:
           <p>Loading...</p>
         ) : (
           <div className="p-6 rounded-md shadow-md">
+          {substance ? (
             <Row gutter={16}>
               {/* First Column */}
               <Col xs={24} md={12}>
                 <Descriptions column={1} bordered>
-                  <Descriptions.Item label="Smoke Presently">
-                    {substance?.smokePresently !== null
-                      ? substance.smokePresently
-                        ? "Yes"
-                        : "No"
-                      : "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Smoking Currently">
-                    {substance.smokingCurrently || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Attempted to Quit">
-                    {substance.attempedToQuit ? "Yes" : "No"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Smoked in Past">
-                    {substance.smokedInPast ? "Yes" : "No"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Exposed to 2nd Hand Smoke">
-                    {substance.exposedTo2ndSmoke ? "Yes" : "No"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="How Many Alcoholic Drinks per Week">
-                    {substance.howManyAlcoholWeek || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Ever Used Recreational Drugs">
-                    {substance.everUsedRecreationalDrugs ? "Yes" : "No"}
-                  </Descriptions.Item>
+                  {[
+                    { label: "Smoke Presently", value: substance.smokePresently !== null ? (substance.smokePresently ? "Yes" : "No") : "N/A" },
+                    { label: "Smoking Currently", value: substance.smokingCurrently ? `Packs/Day: ${substance.smokingCurrently.packsDay}, Years: ${substance.smokingCurrently.years}, Type: ${substance.smokingCurrently.type}` : "N/A" },
+                    { label: "Attempted to Quit", value: substance.attempedToQuit?.yesNo ? "Yes" : "No" },
+                    { label: "Describe Quit Attempt", value: substance.attempedToQuit?.describe || "N/A" },
+                    { label: "Smoked in Past", value: substance.smokedInPast ? `Packs/Day: ${substance.smokedInPast.packsDay}, Years: ${substance.smokedInPast.years}` : "N/A" },
+                    { label: "Exposed to 2nd Hand Smoke", value: substance.exposedTo2ndSmoke ? "Yes" : "No" },
+                    { label: "How Many Alcoholic Drinks per Week", value: substance.howManyAlcoholWeek || "N/A" },
+                    { label: "Ever Used Recreational Drugs", value: substance.everUsedRecreationalDrugs ? "Yes" : "No" },
+                  ].map((item, index) => (
+                    <Descriptions.Item key={index} label={item.label}>
+                      {item.value}
+                    </Descriptions.Item>
+                  ))}
                 </Descriptions>
               </Col>
-      
+        
               {/* Second Column */}
               <Col xs={24} md={12}>
                 <Descriptions column={1} bordered>
-                  <Descriptions.Item label="Previous Alcohol Intake">
-                    {substance.previousAlcoholIntake || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Problem with Alcohol">
-                    {substance.problemAlcohol ? "Yes" : "No"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Problem with Alcohol When">
-                    {substance.problemAlcoholWhen || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Explain Problem with Alcohol">
-                    {substance.problemAlcoholExplain || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Get Help for Drinking">
-                    {substance.getHelpForDrinking ? "Yes" : "No"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Currently Using Recreational Drugs">
-                    {substance.currentlyRecreationalDrugs ? "Yes" : "No"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Type of Recreational Drugs">
-                    {substance.currentlyRecreationalDrugsType || "N/A"}
-                  </Descriptions.Item>
+                  {[
+                    { label: "Previous Alcohol Intake", value: substance.previousAlcoholIntake?.yesNo ? "Yes" : "No" },
+                    { label: "Describe Previous Alcohol Intake", value: substance.previousAlcoholIntake?.describe || "N/A" },
+                    { label: "Problem with Alcohol", value: substance.problemAlcohol ? "Yes" : "No" },
+                    { label: "Problem with Alcohol When", value: substance.problemAlcoholWhen || "N/A" },
+                    { label: "Explain Problem with Alcohol", value: substance.problemAlcoholExplain || "N/A" },
+                    { label: "Get Help for Drinking", value: substance.getHelpForDrinking ? "Yes" : "No" },
+                    { label: "Currently Using Recreational Drugs", value: substance.currentlyRecreationalDrugs ? "Yes" : "No" },
+                    { label: "Type of Recreational Drugs", value: substance.currentlyRecreationalDrugsType || "N/A" },
+                  ].map((item, index) => (
+                    <Descriptions.Item key={index} label={item.label}>
+                      {item.value}
+                    </Descriptions.Item>
+                  ))}
                 </Descriptions>
               </Col>
-      
-          
-      
             </Row>
-          </div>
+          ) : (
+            <p>No substance information available.</p>
+          )}
+        </div>
+        
+        
         );
       
       case 4:

@@ -568,48 +568,73 @@ const ReproductiveHealth = ({ onComplete }) => {
   );
   const handleSubmit = async () => {
     try {
-      // Prepare the data for API request
       const requestData = {
-        birthControl: answers.isUsingBirthControl === "Yes",
-        hormonalBirthControl: answers.hormonalBirthControl || "",
-        nonHormonalBirthControl: answers.nonHormonalBirthControl || "",
+        birthControl: answers.do_you_have_current_health_concern === "Yes",
+        hormonalBirthControl: answers.how_often_hormonal_bc || "N/A",
+        nonHormonalBirthControl: answers.how_often_non_hormonal_bc || "N/A",
         currentlyPregnant: answers.isPregnant === "Yes",
         tryingToConceive: answers.is_trying_to_conceive === "Yes",
         difficultyTryingToConceive: answers.is_difficulty_to_conceive === "Yes",
-        familyMemberWithReproductiveConcerns:
+        familyMemberWithReproductiveConcerns: 
           answers.is_family_health_concern === "Yes"
             ? "Yes"
-            : answers.family_health_concern_details || "",
-        howLongTryingToConceive: answers.is_trying_to_conceive_time || "",
+            : answers.is_family_health_concern || "No",
+        howLongTryingToConceive: answers.is_trying_to_conceive_time || "Unknown",
         methodToConceive: answers.methods_trying_to_conceive || [],
         chartingToConceive: answers.is_charting_cycles || [],
-        utilizingFertilityAwareness: answers.isUsingFertilityAwareness === "Yes",
-        methodFertilityAwareness: answers.fertilityAwarenessMethod || "",
-        intercouseDays: answers.intercourseDays || "",
-        intercouseEachCycle: answers.is_frequent_intercourse_cycle || "",
-        menstrualPainDuringPeriod: answers.is_menstrual_pain || [],
+        utilizingFertilityAwareness: false, 
+        methodFertilityAwareness: answers.charting_method || "None",
+        intercouseDays: answers.intercouseDays || "Unknown",
+        intercouseEachCycle: answers.is_frequent_intercourse_cycle || "Unknown",
+        menstrualPainDuringPeriod: answers.is_menstrual_pain || ["None"],
         menstralBleedingPelvicPain: {
-          duration: answers.duration_per_cycle || "",
-          severity: answers.duration_per_cycle_severity || "",
+          duration: answers.duration_per_cycle || "N/A",
+          colour: answers.duration_per_cycle_severity, 
         },
         experiencePelvicPain: answers.is_lower_back_pain === "Yes",
         duringCirclePelvicPain: {
-          duration: answers.duration_per_mild_cycle || "",
-          severity: answers.duration_per_mild_cycle_severity || "",
+          duration: answers.duration_per_mild_cycle_radio || "N/A",
+          colour: "N/A",
         },
         doYouPmsSymptoms: answers.is_pms_symptom === "Yes",
-        pmsSymptoms: answers.pms_sympton || [],
+        pmsSymptoms: answers.pms_sympton || ["None"],
         pms: {
-          duration: answers.pms_sympton_duration || "",
-          severity: answers.pms_sympton_severity || "",
+          duration: "N/A", 
+          colour: answers.pms_sympton_severity || "Mild",
         },
-        longestCycleLenght:  "",
-        averageCycleLenght: "",
-        midCycleSpotting: answers.is_mid_cycle_spotting === "Yes",
-        menstralCycleFrequency: answers.menstrualCycleFrequency || "",
-        menstralCycleDuration: answers.menstrualCycleDuration || "",
-        menstralCycleColour: answers.menstrualCycleColour || "",
-        chartBase64: answers.chartBase64 || "",
+        longestCycleLenght: answers.longest_cycle_radio || "Unknown",
+        shortestCycleLenght: answers.shortest_cycle_radio || "Unknown",
+        averageCycleLenght: answers.average_cycle_radio || "Unknown",
+        midCycleSpotting: false,
+        menstralCycleFrequency: "Unknown", // Example default
+        menstralCycleDuration: "Unknown", // Example default
+        menstralCycleColour: "Unknown", // Example default
+        cycleDischargeCreamy: {
+          duration: "Unknown", // Example default
+          colour: "Unknown", // Example default
+        },
+        cycleDischargeWatery: {
+          duration: "Unknown", // Example default
+          colour: "Unknown", // Example default
+        },
+        cycleDischargeEggWhite: {
+          duration: "Unknown", // Example default
+          colour: "Unknown", // Example default
+        },
+        cycleDischargePrePeriod: {
+          duration: "Unknown", // Example default
+          colour: "Unknown", // Example default
+        },
+        cycleDischargeMenstralBleeding: {
+          duration: "Unknown", // Example default
+          colour: "Unknown", // Example default
+          clots: "Unknown", // Example default
+        },
+        cycleDischargeAfterPeriodSpotting: {
+          duration: "Unknown", // Example default
+          colour: "Unknown", // Example default
+        },
+        chartBase64: answers.charting_method || "",
       };
   
       const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
@@ -646,6 +671,8 @@ const ReproductiveHealth = ({ onComplete }) => {
       message.error("An error occurred. Please try again.");
     }
   };
+  
+  
   
 
   const renderSubQuestions = (subQuestions) => {

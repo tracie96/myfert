@@ -177,21 +177,26 @@ const SubstanceUse = ({ onComplete }) => {
   // };
   const validateQuestion = () => {
     const question = questions[currentQuestionIndex];
-    const isMainQuestionValid =
-      answers[question.name] !== undefined && answers[question.name] !== "";
-    const areSubQuestionsValid =
-      answers[question.name] === "Yes" &&
-      question.subQuestions?.every((sub) => {
-        const answer = answers[sub.name];
-        if (sub.type === "inputNumber") {
-          // Allow default value of 0 for number inputs
-          return answer !== undefined;
-        }
-        // For other types, validate as non-empty
-        return answer !== undefined && answer !== "";
-      });
-    return isMainQuestionValid && (!question.subQuestions || areSubQuestionsValid);
+    const mainAnswer = answers[question.name];
+    const isMainQuestionValid = mainAnswer !== undefined && mainAnswer !== "";
+  
+    // If the main question's answer does not require subquestions, skip their validation
+    if (!question.subQuestions || mainAnswer !== "Yes") {
+      return isMainQuestionValid;
+    }
+  
+    // Validate subquestions only if they are required
+    const areSubQuestionsValid = question.subQuestions.every((sub) => {
+      const subAnswer = answers[sub.name];
+      if (sub.type === "inputNumber") {
+        return subAnswer !== undefined; // Allow default value of 0 for number inputs
+      }
+      return subAnswer !== undefined && subAnswer !== ""; // Non-empty validation for other types
+    });
+  
+    return isMainQuestionValid && areSubQuestionsValid;
   };
+  
   const handleExit = () => {
     navigate("/assessment");
   };
@@ -476,7 +481,8 @@ const SubstanceUse = ({ onComplete }) => {
               renderSubQuestions(question.subQuestions)}
           </div>
         );
-      case "smoked_previously":
+     
+        case "smoked_previously":
         return (
           <div style={{ flexDirection: "column" }}>
             <Radio.Group

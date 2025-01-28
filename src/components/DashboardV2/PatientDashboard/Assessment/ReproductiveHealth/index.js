@@ -588,7 +588,7 @@ const ReproductiveHealth = ({ onComplete }) => {
         intercouseEachCycle: answers.is_frequent_intercourse_cycle || "Unknown",
         menstrualPainDuringPeriod: answers.is_menstrual_pain || ["None"],
         menstralBleedingPelvicPain: {
-          duration: answers.duration_per_cycle || "N/A",
+          duration: `${answers.duration_per_cycle}` || "N/A",
           colour: answers.duration_per_cycle_severity, 
         },
         experiencePelvicPain: answers.is_lower_back_pain === "Yes",

@@ -294,14 +294,14 @@ const StressAndRelationship = ({ onComplete }) => {
       currentlyInTherapy: answers.current_therapy === "Yes",
       describeTherapy: answers.where_and_where_received_medical_care || "N/A",
       abused: answers.been_abused === "Yes",
-      hobbiesLeisure: "N/A", // Assuming this isn't part of your form
+      hobbiesLeisure: "N/A", 
       maritalStatus: answers.marital_status || "N/A",
       whoDoYouLiveWith: answers.who_do_you_live_with || "N/A",
       currentOccupation: answers.current_occupation?.trim() || "N/A",
       previousOccupation: answers.previous_occupation?.trim() || "N/A",
       emotionalSupport: answers.resourcces_for_emotional_support || [],
       religiousPractice: answers.spiritual_practice === "Yes",
-      typeReligiousPractice: "N/A", // Assuming this isn't part of your form
+      typeReligiousPractice:answers.spiritual_practice_desciption || "N/A",
     };
   
     // Send data to API

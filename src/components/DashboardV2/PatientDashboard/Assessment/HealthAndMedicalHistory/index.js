@@ -123,7 +123,7 @@ const questions = [
       {
         question: "If Yes: Explain",
         type: "text",
-        name: "how_often_reaxation",
+        name: "birth_complications_details",
       },
     ],
   },

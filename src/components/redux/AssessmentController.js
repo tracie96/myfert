@@ -439,6 +439,20 @@ const intakeFormSlice = createSlice({
         state.error = action.error.message;
       });
 
+      builder
+      .addCase(getHealthandMedical.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getHealthandMedical.fulfilled, (state, action) => {
+        state.loading = false;
+        state.healthMedicalInfo = action.payload;
+      })
+      .addCase(getHealthandMedical.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      });
+
     builder
       .addCase(getPersonalFamily.pending, (state) => {
         state.loading = true;

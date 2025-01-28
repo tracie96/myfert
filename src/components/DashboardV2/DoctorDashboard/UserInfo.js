@@ -35,7 +35,6 @@ export default function UserInfo() {
   const illness = useSelector((state) => state.intake?.illnessInfo);
   const symptom = useSelector((state) => state.intake?.symptomInfo);
   const readiness = useSelector((state) => state.intake?.readinessInfo);
-
   const loading = useSelector((state) => state.user?.loading);
   const modalContent = [
     "General Information",
@@ -51,7 +50,6 @@ export default function UserInfo() {
     "Reproductive Health",
 
   ];
-  console.log({ substance })
   console.log(useSelector((state) => state.intake));
   useEffect(() => {
     console.log("useEffect is running");
@@ -192,8 +190,8 @@ export default function UserInfo() {
           <Row gutter={16}>
             {modalContent.map((_, index) => (
               <Col
-                xs={24} // Full width on extra small screens
-                sm={12} // Half width on small screens
+                xs={24}
+                sm={12}
                 md={8} // One-third width on medium screens
                 lg={6} // One-fourth width on large screens
                 xl={4} // One-sixth width on extra large screens
@@ -404,48 +402,48 @@ function SwitchContent({
             <Col xs={24} md={12}>
               <Descriptions column={1} bordered>
 
-<Descriptions.Item label="Ongoing Health">
-  {currentHealth?.ongoingHealth?.length > 0 ? (
-    currentHealth.ongoingHealth.map((health, index) => (
-      <div key={index} style={{ marginBottom: "8px" }}>
-        <strong>Problem:</strong> {health.problem || "N/A"} <br />
-        <strong>Severity:</strong>{" "}
-        {health.severity ? (
-          <Tag color={health.severity === "High" ? "red" : health.severity === "Medium" ? "orange" : "green"}>
-            {health.severity}
-          </Tag>
-        ) : (
-          "N/A"
-        )}
-        <br />
-        <strong>Prior Treatment:</strong> {health.priorTreatment || "N/A"} <br />
-        <strong>Success:</strong>{" "}
-        {health.success ? (
-          <Tag color={health.success === "Yes" ? "green" : "green"}>{health.success}</Tag>
-        ) : (
-          "N/A"
-        )}
-      </div>
-    ))
-  ) : (
-    "N/A"
-  )}
-</Descriptions.Item>
+                <Descriptions.Item label="Ongoing Health">
+                  {currentHealth?.ongoingHealth?.length > 0 ? (
+                    currentHealth.ongoingHealth.map((health, index) => (
+                      <div key={index} style={{ marginBottom: "8px" }}>
+                        <strong>Problem:</strong> {health.problem || "N/A"} <br />
+                        <strong>Severity:</strong>{" "}
+                        {health.severity ? (
+                          <Tag color={health.severity === "High" ? "red" : health.severity === "Medium" ? "orange" : "green"}>
+                            {health.severity}
+                          </Tag>
+                        ) : (
+                          "N/A"
+                        )}
+                        <br />
+                        <strong>Prior Treatment:</strong> {health.priorTreatment || "N/A"} <br />
+                        <strong>Success:</strong>{" "}
+                        {health.success ? (
+                          <Tag color={health.success === "Yes" ? "green" : "green"}>{health.success}</Tag>
+                        ) : (
+                          "N/A"
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    "N/A"
+                  )}
+                </Descriptions.Item>
 
-<Descriptions.Item label="Allergies">
-  {currentHealth?.allergies?.length > 0 ? (
-    currentHealth.allergies.map((allergy, index) => (
-      <div key={index} className="m-2">
-        <strong>Food:</strong>{" "}
-        <Tag color="magenta">{allergy.food || "N/A"}</Tag> <br />
-        <strong>Reaction:</strong>{" "}
-        <Tag color="volcano">{allergy.reaction || "N/A"}</Tag>
-      </div>
-    ))
-  ) : (
-    "N/A"
-  )}
-</Descriptions.Item>
+                <Descriptions.Item label="Allergies">
+                  {currentHealth?.allergies?.length > 0 ? (
+                    currentHealth.allergies.map((allergy, index) => (
+                      <div key={index} className="m-2">
+                        <strong>Food:</strong>{" "}
+                        <Tag color="magenta">{allergy.food || "N/A"}</Tag> <br />
+                        <strong>Reaction:</strong>{" "}
+                        <Tag color="volcano">{allergy.reaction || "N/A"}</Tag>
+                      </div>
+                    ))
+                  ) : (
+                    "N/A"
+                  )}
+                </Descriptions.Item>
 
                 <Descriptions.Item label="Sleep Hours">
                   {currentHealth?.sleepHours || "N/A"}
@@ -475,76 +473,76 @@ function SwitchContent({
 
             <Col xs={24} md={12}>
               <Descriptions column={1} bordered>
-              <Descriptions.Item label="Cardio">
-  <div style={{ marginBottom: "4px" }}>
-    <strong>Type:</strong> <Tag color="blue">{currentHealth?.cardio?.type || "Cardio"}</Tag>
-  </div>
-  <div style={{ marginBottom: "4px" }}>
-    <strong>Frequency:</strong> {currentHealth?.cardio?.timesWeek || 0} times per week
-  </div>
-  <div>
-    <strong>Duration:</strong> {currentHealth?.cardio?.duration || 0} minutes
-  </div>
-</Descriptions.Item>
-<Descriptions.Item label="Strength">
-  <div style={{ marginBottom: "4px" }}>
-    <strong>Type:</strong> <Tag color="green">{currentHealth?.strength?.type || "Strength"}</Tag>
-  </div>
-  <div style={{ marginBottom: "4px" }}>
-    <strong>Frequency:</strong> {currentHealth?.strength?.timesWeek || 0} times per week
-  </div>
-  <div>
-    <strong>Duration:</strong> {currentHealth?.strength?.duration || 0} minutes
-  </div>
-</Descriptions.Item>
+                <Descriptions.Item label="Cardio">
+                  <div style={{ marginBottom: "4px" }}>
+                    <strong>Type:</strong> <Tag color="blue">{currentHealth?.cardio?.type || "Cardio"}</Tag>
+                  </div>
+                  <div style={{ marginBottom: "4px" }}>
+                    <strong>Frequency:</strong> {currentHealth?.cardio?.timesWeek || 0} times per week
+                  </div>
+                  <div>
+                    <strong>Duration:</strong> {currentHealth?.cardio?.duration || 0} minutes
+                  </div>
+                </Descriptions.Item>
+                <Descriptions.Item label="Strength">
+                  <div style={{ marginBottom: "4px" }}>
+                    <strong>Type:</strong> <Tag color="green">{currentHealth?.strength?.type || "Strength"}</Tag>
+                  </div>
+                  <div style={{ marginBottom: "4px" }}>
+                    <strong>Frequency:</strong> {currentHealth?.strength?.timesWeek || 0} times per week
+                  </div>
+                  <div>
+                    <strong>Duration:</strong> {currentHealth?.strength?.duration || 0} minutes
+                  </div>
+                </Descriptions.Item>
 
-<Descriptions.Item label="Flexibility">
-  <div style={{ marginBottom: "4px" }}>
-    <strong>Type:</strong> <Tag color="purple">{currentHealth?.flexibility?.type || "Flexibility"}</Tag>
-  </div>
-  <div style={{ marginBottom: "4px" }}>
-    <strong>Frequency:</strong> {currentHealth?.flexibility?.timesWeek || 0} times per week
-  </div>
-  <div>
-    <strong>Duration:</strong> {currentHealth?.flexibility?.duration || 0} minutes
-  </div>
-</Descriptions.Item>
+                <Descriptions.Item label="Flexibility">
+                  <div style={{ marginBottom: "4px" }}>
+                    <strong>Type:</strong> <Tag color="purple">{currentHealth?.flexibility?.type || "Flexibility"}</Tag>
+                  </div>
+                  <div style={{ marginBottom: "4px" }}>
+                    <strong>Frequency:</strong> {currentHealth?.flexibility?.timesWeek || 0} times per week
+                  </div>
+                  <div>
+                    <strong>Duration:</strong> {currentHealth?.flexibility?.duration || 0} minutes
+                  </div>
+                </Descriptions.Item>
 
-<Descriptions.Item label="Balance">
-  <div style={{ marginBottom: "4px" }}>
-    <strong>Type:</strong> <Tag color="orange">{currentHealth?.balance?.type || "Balance"}</Tag>
-  </div>
-  <div style={{ marginBottom: "4px" }}>
-    <strong>Frequency:</strong> {currentHealth?.balance?.timesWeek || 0} times per week
-  </div>
-  <div>
-    <strong>Duration:</strong> {currentHealth?.balance?.duration || 0} minutes
-  </div>
-</Descriptions.Item>
+                <Descriptions.Item label="Balance">
+                  <div style={{ marginBottom: "4px" }}>
+                    <strong>Type:</strong> <Tag color="orange">{currentHealth?.balance?.type || "Balance"}</Tag>
+                  </div>
+                  <div style={{ marginBottom: "4px" }}>
+                    <strong>Frequency:</strong> {currentHealth?.balance?.timesWeek || 0} times per week
+                  </div>
+                  <div>
+                    <strong>Duration:</strong> {currentHealth?.balance?.duration || 0} minutes
+                  </div>
+                </Descriptions.Item>
 
-<Descriptions.Item label="Sport">
-  <div style={{ marginBottom: "4px" }}>
-    <strong>Type:</strong> <Tag color="red">{currentHealth?.sport?.type || "Sport"}</Tag>
-  </div>
-  <div style={{ marginBottom: "4px" }}>
-    <strong>Frequency:</strong> {currentHealth?.sport?.timesWeek || 0} times per week
-  </div>
-  <div>
-    <strong>Duration:</strong> {currentHealth?.sport?.duration || 0} minutes
-  </div>
-</Descriptions.Item>
+                <Descriptions.Item label="Sport">
+                  <div style={{ marginBottom: "4px" }}>
+                    <strong>Type:</strong> <Tag color="red">{currentHealth?.sport?.type || "Sport"}</Tag>
+                  </div>
+                  <div style={{ marginBottom: "4px" }}>
+                    <strong>Frequency:</strong> {currentHealth?.sport?.timesWeek || 0} times per week
+                  </div>
+                  <div>
+                    <strong>Duration:</strong> {currentHealth?.sport?.duration || 0} minutes
+                  </div>
+                </Descriptions.Item>
 
-<Descriptions.Item label="Other">
-  <div style={{ marginBottom: "4px" }}>
-    <strong>Type:</strong> <Tag color="grey">{currentHealth?.other?.type || "Other"}</Tag>
-  </div>
-  <div style={{ marginBottom: "4px" }}>
-    <strong>Frequency:</strong> {currentHealth?.other?.timesWeek || 0} times per week
-  </div>
-  <div>
-    <strong>Duration:</strong> {currentHealth?.other?.duration || 0} minutes
-  </div>
-</Descriptions.Item>
+                <Descriptions.Item label="Other">
+                  <div style={{ marginBottom: "4px" }}>
+                    <strong>Type:</strong> <Tag color="grey">{currentHealth?.other?.type || "Other"}</Tag>
+                  </div>
+                  <div style={{ marginBottom: "4px" }}>
+                    <strong>Frequency:</strong> {currentHealth?.other?.timesWeek || 0} times per week
+                  </div>
+                  <div>
+                    <strong>Duration:</strong> {currentHealth?.other?.duration || 0} minutes
+                  </div>
+                </Descriptions.Item>
 
                 <Descriptions.Item label="Motivated to Exercise">
                   {currentHealth?.motivatedToExercise || "N/A"}
@@ -698,9 +696,9 @@ function SwitchContent({
                   <Descriptions.Item label="Number of Typical Fats">
                     {nutrition.noTypicalFats || "N/A"}
                   </Descriptions.Item>
-                  {/* <Descriptions.Item label="Caffeinated Beverages">
+                  <Descriptions.Item label="Caffeinated Beverages">
                     {nutrition.caffeinatedBeverages || "N/A"}
-                  </Descriptions.Item> */}
+                  </Descriptions.Item>
                 </Descriptions>
               )}
             </Col>
@@ -856,62 +854,109 @@ function SwitchContent({
       ) : (
         <div className="p-6 rounded-md shadow-md">
           <Row gutter={16}>
+            {/* First Column */}
             <Col xs={24} md={12}>
               <Descriptions column={1} bordered>
                 <Descriptions.Item label="How Well Things Going Overall">
-                  {healthMedical.howWellThingsGoingOverall || "N/A"}
+                  {healthMedical?.howWellThingsGoingOverall || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="How Well Things Going in School">
-                  {healthMedical.howWellThingsGoingSchool || "N/A"}
+                  {healthMedical?.howWellThingsGoingSchool || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="How Well Things Going at Job">
-                  {healthMedical.howWellThingsGoingJob || "N/A"}
+                  {healthMedical?.howWellThingsGoingJob || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="How Well Things Going in Social Life">
-                  {healthMedical.howWellThingsGoingSocialLife || "N/A"}
+                  {healthMedical?.howWellThingsGoingSocialLife || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="How Well Things Going with Close Friends">
-                  {healthMedical.howWellThingsGoingCloseFriends || "N/A"}
+                  {healthMedical?.howWellThingsGoingCloseFriends || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="How Well Things Going with Sex">
-                  {healthMedical.howWellThingsGoingSex || "N/A"}
+                  {healthMedical?.howWellThingsGoingSex || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="How Well Things Going with Attitude">
-                  {healthMedical.howWellThingsGoingAttitude || "N/A"}
+                  {healthMedical?.howWellThingsGoingAttitude || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="How Well Things Going with Partner">
-                  {healthMedical.howWellThingsGoingPartner || "N/A"}
+                  {healthMedical?.howWellThingsGoingPartner || "N/A"}
                 </Descriptions.Item>
               </Descriptions>
             </Col>
 
+            {/* Second Column */}
             <Col xs={24} md={12}>
               <Descriptions column={1} bordered>
                 <Descriptions.Item label="How Well Things Going with Kids">
-                  {healthMedical.howWellThingsGoingKids || "N/A"}
+                  {healthMedical?.howWellThingsGoingKids || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="How Well Things Going with Parents">
-                  {healthMedical.howWellThingsGoingParents || "N/A"}
+                  {healthMedical?.howWellThingsGoingParents || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="How Well Things Going with Spouse">
-                  {healthMedical.howWellThingsGoingSpouse || "N/A"}
+                  {healthMedical?.howWellThingsGoingSpouse || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="How Were You Born">
-                  {healthMedical.howWereYouBorn || "N/A"}
+                  {healthMedical?.howWereYouBorn || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Were You Born With Complications">
-                  {healthMedical.wereYouBornWithComplication !== null
-                    ? healthMedical.wereYouBornWithComplication
+                  {healthMedical?.wereYouBornWithComplication?.yesNo !== null
+                    ? healthMedical?.wereYouBornWithComplication?.yesNo
                       ? "Yes"
                       : "No"
                     : "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Breast Fed and How Long">
-                  {healthMedical.breastFedHowLong || "N/A"}
+                  {healthMedical?.breastFedHowLong || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Breast Fed Formula">
-                  {healthMedical.breastFedFormula || "N/A"}
+                  {healthMedical?.breastFedFormula || "N/A"}
                 </Descriptions.Item>
+              </Descriptions>
+            </Col>
+            {/* Environmental and Exposure History */}
+            <Col xs={24} md={12}>
+              <Descriptions title="Environmental and Exposure History" column={1} bordered>
+                <Descriptions.Item label="Environmental Effects">
+                  {healthMedical.environmentEffect?.length > 0 ? (
+                    <ul>
+                      {healthMedical.environmentEffect.map((effect, index) => (
+                        <li key={index}>{effect}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    "N/A"
+                  )}
+                </Descriptions.Item>
+                <Descriptions.Item label="Environmental Exposures">
+                  {healthMedical.environmentExposed?.length > 0 ? (
+                    <ul>
+                      {healthMedical.environmentExposed.map((exposure, index) => (
+                        <li key={index}>{exposure}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    "N/A"
+                  )}
+                </Descriptions.Item>
+                <Descriptions.Item label="Exposed to Harmful Chemicals">
+                  {healthMedical.exposedHarmfulChemical ? "Yes" : "No"}
+                </Descriptions.Item>
+                {healthMedical.exposedHarmfulChemical && (
+                  <Descriptions.Item label="Details of Exposure">
+                    Chemical Name: {healthMedical.whenExposedHarmfulChemical?.chemicalName || "N/A"},
+                    Length of Exposure: {healthMedical.whenExposedHarmfulChemical?.lenghtExposure || "N/A"} days,
+                    Date of Exposure: {healthMedical.whenExposedHarmfulChemical?.dateExposure || "N/A"}
+                  </Descriptions.Item>
+                )}
+                <Descriptions.Item label="Pets or Farm Animals">
+                  {healthMedical.petsFarmAnimal ? "Yes" : "No"}
+                </Descriptions.Item>
+                {healthMedical.petsFarmAnimal && (
+                  <Descriptions.Item label="Where Animals Live">
+                    {healthMedical.petsAnimalLiveWhere || "N/A"}
+                  </Descriptions.Item>
+                )}
               </Descriptions>
             </Col>
 
@@ -919,29 +964,29 @@ function SwitchContent({
             <Col xs={24} md={12}>
               <Descriptions title="Diet and Feeding History" column={1} bordered>
                 <Descriptions.Item label="Don't Know Breast Food">
-                  {healthMedical.breastFoodDontKnow ? "Yes" : "No"}
+                  {healthMedical?.breastFoodDontKnow ? "Yes" : "No"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Age Introduction of Solid Food">
-                  {healthMedical.ageIntroductionSolidFood || "N/A"}
+                  {healthMedical?.ageIntroductionSolidFood || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Age Introduction of Wheat">
-                  {healthMedical.ageIntroductionWheat || "N/A"}
+                  {healthMedical?.ageIntroductionWheat || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Age Introduction of Dairy">
-                  {healthMedical.ageIntroductionDiary || "N/A"}
+                  {healthMedical?.ageIntroductionDiary || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Foods Avoided">
-                  {healthMedical.foodsAvoided !== null
-                    ? healthMedical.foodsAvoided
+                  {healthMedical?.foodsAvoided !== null
+                    ? healthMedical?.foodsAvoided
                       ? "Yes"
                       : "No"
                     : "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Foods Avoided Type and Symptoms">
-                  {healthMedical.foodsAvoidTypeSymptoms || "N/A"}
+                  {healthMedical?.foodsAvoidTypeSymptoms || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="A Lot of Sugar">
-                  {healthMedical.alotSugar ? "Yes" : "No"}
+                  {healthMedical?.alotSugar ? "Yes" : "No"}
                 </Descriptions.Item>
               </Descriptions>
             </Col>
@@ -950,22 +995,33 @@ function SwitchContent({
             <Col xs={24} md={12}>
               <Descriptions title="Dental and Environmental History" column={1} bordered>
                 <Descriptions.Item label="Dental History">
-                  {healthMedical.dentalHistory || "N/A"}
+                  {healthMedical.dentalHistory && healthMedical.dentalHistory.length > 0 ? (
+                    <ul>
+                      {healthMedical.dentalHistory.map((entry, index) => (
+                        <li key={index}>
+                          Level: {entry.level}, Name: {entry.name}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    "N/A"
+                  )}
                 </Descriptions.Item>
+
                 <Descriptions.Item label="Mercury Filling Removed">
-                  {healthMedical.mercuryFillingRemoved ? "Yes" : "No"}
+                  {healthMedical?.mercuryFillingRemoved ? "Yes" : "No"}
                 </Descriptions.Item>
                 <Descriptions.Item label="When Mercury Filling Removed">
-                  {healthMedical.mercuryFillingRemovedWhen || "N/A"}
+                  {healthMedical?.mercuryFillingRemovedWhen || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Fillings as Kid">
-                  {healthMedical.fillingsAsKid || "N/A"}
+                  {healthMedical?.fillingsAsKid || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Brush Regularly">
-                  {healthMedical.brushRegularly ? "Yes" : "No"}
+                  {healthMedical?.brushRegularly ? "Yes" : "No"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Floss Regularly">
-                  {healthMedical.flossRegularly ? "Yes" : "No"}
+                  {healthMedical?.flossRegularly ? "Yes" : "No"}
                 </Descriptions.Item>
               </Descriptions>
             </Col>
@@ -1195,155 +1251,155 @@ function SwitchContent({
           </Row>
         </div>
       );
-      case 10:
-        return loading ? (
-          <p>{stress}</p>
-        ) : (
-          <div className="p-6 rounded-md shadow-md">
-            <Row gutter={16}>
-              {/* First Column */}
-              <Col xs={24} md={12}>
-                 <Descriptions column={1} bordered>
-                  <Descriptions.Item label="Average Cycle Lenght">
-                    {reproductiveInfo?.averageCycleLenght || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Birth Control">
-                    {reproductiveInfo?.birthControl || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Charting To Conceive">
-                    {reproductiveInfo?.chartingToConceive || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Currently Pregnant">
-                    {reproductiveInfo?.currentlyPregnant || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Cycle Discharge After Period Spotting Duration">
-                    {reproductiveInfo?.cycleDischargeAfterPeriodSpotting?.duration || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Cycle Discharge After Period Spotting Color">
-                    {reproductiveInfo?.cycleDischargeAfterPeriodSpotting?.color || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Cycle Discharge Creamy Duration">
-                    {reproductiveInfo?.cycleDischargeCreamy?.duration || "N/A"}
-                  </Descriptions.Item> 
-                  <Descriptions.Item label="Cycle Discharge Creamy Colour">
-                    {reproductiveInfo?.cycleDischargeCreamy?.colour || "N/A"}
-                  </Descriptions.Item> 
-                  <Descriptions.Item label="Cycle Discharge Egg White Duration">
-                    {reproductiveInfo?.cycleDischargeEggWhite?.duration || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Cycle Discharge Egg White Colour">
-                    {reproductiveInfo?.cycleDischargeEggWhite?.colour || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Cycle Discharge Menstral Bleeding Duration">
-                    {reproductiveInfo?.cycleDischargeMenstralBleeding?.duration || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Cycle Discharge Menstral Bleeding Colour">
-                    {reproductiveInfo?.cycleDischargeMenstralBleeding?.colour || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Cycle Discharge Pre Period Duration">
-                    {reproductiveInfo?.cycleDischargePrePeriod?.duration || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Cycle Discharge Pre Period Colour">
-                    {reproductiveInfo?.cycleDischargePrePeriod?.colour || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Cycle Discharge Watery Duration">
-                    {reproductiveInfo?.cycleDischargeWatery?.duration || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Cycle Discharge Watery Colour">
-                    {reproductiveInfo?.cycleDischargeWatery?.colour || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Difficulty Trying To Conceive">
-                    {reproductiveInfo?.difficultyTryingToConceive || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Do You Pms Symptoms">
-                    {reproductiveInfo?.doYouPmsSymptoms || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="During Circle Pelvic Pain Duration">
-                    {reproductiveInfo?.duringCirclePelvicPain?.duration || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="During Circle Pelvic Pain Colour">
-                    {reproductiveInfo?.duringCirclePelvicPain?.colour || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Experience Pelvic Pain">
-                    {reproductiveInfo?.experiencePelvicPain || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Family Member With Reproductive Concerns">
-                    {reproductiveInfo?.familyMemberWithReproductiveConcerns || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Hormonal Birth Control">
-                    {reproductiveInfo?.hormonalBirthControl || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="How Long Trying To Conceive">
-                    {reproductiveInfo?.howLongTryingToConceive || "N/A"}
-                  </Descriptions.Item>
-                </Descriptions> 
-              </Col>
-      
-              {/* Second Column */}
-              <Col xs={24} md={12}>
-                <Descriptions column={1} bordered>
-                  <Descriptions.Item label="Intercouse Days">
-                    {reproductiveInfo?.intercouseDays || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Intercouse Each Cycle">
-                    {reproductiveInfo?.intercouseEachCycle || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Longest Cycle Lenght">
-                    {reproductiveInfo?.longestCycleLenght || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Menstral Bleeding Pelvic Pain Duration">
-                    {reproductiveInfo?.menstralBleedingPelvicPain?.duration || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Menstral Bleeding Pelvic Pain Colour">
-                    {reproductiveInfo?.menstralBleedingPelvicPain?.colour || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Menstral Cycle Colour">
-                    {reproductiveInfo?.menstralCycleColour || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Menstral Cycle Duration">
-                    {reproductiveInfo?.menstralCycleDuration || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Menstral Cycle Frequency">
-                    {reproductiveInfo?.menstralCycleFrequency || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Menstrual Pain During Period">
-                    {reproductiveInfo?.menstrualPainDuringPeriod || "N/A"}
-                  </Descriptions.Item>
-                 <Descriptions.Item label="Method Fertility Awareness">
-                    {reproductiveInfo?.methodFertilityAwareness || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Method To Conceive">
-                    {reproductiveInfo?.methodToConceive || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Mid Cycle Spotting">
-                    {reproductiveInfo?.midCycleSpotting || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Non Hormonal Birth Control">
-                    {reproductiveInfo?.nonHormonalBirthControl || "N/A"}
-                  </Descriptions.Item> 
-                  <Descriptions.Item label="pms Duration">
-                    {reproductiveInfo?.pms?.duration || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="pms Colour">
-                    {reproductiveInfo?.pms?.colour || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="pms Symptoms">
-                    {reproductiveInfo?.pmsSymptoms || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Shortest Cycle Lenght">
-                    {reproductiveInfo?.shortestCycleLenght || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Trying To Conceive">
-                    {reproductiveInfo?.tryingToConceive || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Utilizing Fertility Awareness">
-                    {reproductiveInfo?.utilizingFertilityAwareness || "N/A"}
-                  </Descriptions.Item>
-                </Descriptions>
-              </Col> 
-            </Row>
-          </div>
-        );
+    case 10:
+      return loading ? (
+        <p>{stress}</p>
+      ) : (
+        <div className="p-6 rounded-md shadow-md">
+          <Row gutter={16}>
+            {/* First Column */}
+            <Col xs={24} md={12}>
+              <Descriptions column={1} bordered>
+                <Descriptions.Item label="Average Cycle Lenght">
+                  {reproductiveInfo?.averageCycleLenght || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Birth Control">
+                  {reproductiveInfo?.birthControl || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Charting To Conceive">
+                  {reproductiveInfo?.chartingToConceive || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Currently Pregnant">
+                  {reproductiveInfo?.currentlyPregnant || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Cycle Discharge After Period Spotting Duration">
+                  {reproductiveInfo?.cycleDischargeAfterPeriodSpotting?.duration || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Cycle Discharge After Period Spotting Color">
+                  {reproductiveInfo?.cycleDischargeAfterPeriodSpotting?.color || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Cycle Discharge Creamy Duration">
+                  {reproductiveInfo?.cycleDischargeCreamy?.duration || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Cycle Discharge Creamy Colour">
+                  {reproductiveInfo?.cycleDischargeCreamy?.colour || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Cycle Discharge Egg White Duration">
+                  {reproductiveInfo?.cycleDischargeEggWhite?.duration || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Cycle Discharge Egg White Colour">
+                  {reproductiveInfo?.cycleDischargeEggWhite?.colour || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Cycle Discharge Menstral Bleeding Duration">
+                  {reproductiveInfo?.cycleDischargeMenstralBleeding?.duration || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Cycle Discharge Menstral Bleeding Colour">
+                  {reproductiveInfo?.cycleDischargeMenstralBleeding?.colour || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Cycle Discharge Pre Period Duration">
+                  {reproductiveInfo?.cycleDischargePrePeriod?.duration || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Cycle Discharge Pre Period Colour">
+                  {reproductiveInfo?.cycleDischargePrePeriod?.colour || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Cycle Discharge Watery Duration">
+                  {reproductiveInfo?.cycleDischargeWatery?.duration || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Cycle Discharge Watery Colour">
+                  {reproductiveInfo?.cycleDischargeWatery?.colour || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Difficulty Trying To Conceive">
+                  {reproductiveInfo?.difficultyTryingToConceive || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Do You Pms Symptoms">
+                  {reproductiveInfo?.doYouPmsSymptoms || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="During Circle Pelvic Pain Duration">
+                  {reproductiveInfo?.duringCirclePelvicPain?.duration || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="During Circle Pelvic Pain Colour">
+                  {reproductiveInfo?.duringCirclePelvicPain?.colour || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Experience Pelvic Pain">
+                  {reproductiveInfo?.experiencePelvicPain || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Family Member With Reproductive Concerns">
+                  {reproductiveInfo?.familyMemberWithReproductiveConcerns || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Hormonal Birth Control">
+                  {reproductiveInfo?.hormonalBirthControl || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="How Long Trying To Conceive">
+                  {reproductiveInfo?.howLongTryingToConceive || "N/A"}
+                </Descriptions.Item>
+              </Descriptions>
+            </Col>
+
+            {/* Second Column */}
+            <Col xs={24} md={12}>
+              <Descriptions column={1} bordered>
+                <Descriptions.Item label="Intercouse Days">
+                  {reproductiveInfo?.intercouseDays || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Intercouse Each Cycle">
+                  {reproductiveInfo?.intercouseEachCycle || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Longest Cycle Lenght">
+                  {reproductiveInfo?.longestCycleLenght || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Menstral Bleeding Pelvic Pain Duration">
+                  {reproductiveInfo?.menstralBleedingPelvicPain?.duration || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Menstral Bleeding Pelvic Pain Colour">
+                  {reproductiveInfo?.menstralBleedingPelvicPain?.colour || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Menstral Cycle Colour">
+                  {reproductiveInfo?.menstralCycleColour || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Menstral Cycle Duration">
+                  {reproductiveInfo?.menstralCycleDuration || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Menstral Cycle Frequency">
+                  {reproductiveInfo?.menstralCycleFrequency || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Menstrual Pain During Period">
+                  {reproductiveInfo?.menstrualPainDuringPeriod || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Method Fertility Awareness">
+                  {reproductiveInfo?.methodFertilityAwareness || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Method To Conceive">
+                  {reproductiveInfo?.methodToConceive || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Mid Cycle Spotting">
+                  {reproductiveInfo?.midCycleSpotting || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Non Hormonal Birth Control">
+                  {reproductiveInfo?.nonHormonalBirthControl || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="pms Duration">
+                  {reproductiveInfo?.pms?.duration || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="pms Colour">
+                  {reproductiveInfo?.pms?.colour || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="pms Symptoms">
+                  {reproductiveInfo?.pmsSymptoms || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Shortest Cycle Lenght">
+                  {reproductiveInfo?.shortestCycleLenght || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Trying To Conceive">
+                  {reproductiveInfo?.tryingToConceive || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Utilizing Fertility Awareness">
+                  {reproductiveInfo?.utilizingFertilityAwareness || "N/A"}
+                </Descriptions.Item>
+              </Descriptions>
+            </Col>
+          </Row>
+        </div>
+      );
 
     default:
       return <p style={{ textAlign: "center" }}> No Record available</p>;

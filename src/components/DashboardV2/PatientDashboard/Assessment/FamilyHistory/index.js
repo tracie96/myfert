@@ -431,12 +431,109 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
     }));
   };
 
-  const handleSubmit = () => {
-    dispatch(completeCard("/questionnaire/7"));
-    localStorage.setItem("currentQuestionIndex7", 0);
-    localStorage.setItem("answers", JSON.stringify(answers));
-    navigate("/assessment");
-  };
+  const handleSubmit = async () => {
+    // Prepare the API payload
+    const apiPayload = {
+        obstetricHistory: [
+            {
+                level: 0,
+                name: "", // Adjust based on your application's logic
+            },
+        ],
+        weightChild: {
+            metricImperialScale: true, // Default value, adjust as necessary
+            weightSmallest: 0, // Adjust based on answers if needed
+            weightLargest: 0, // Adjust based on answers if needed
+        },
+        problemsAfterPregnancy: answers.pregnancy_problems === "Yes",
+        problemsAfterPregnancyExplain: answers.pregnancy_problems || "",
+        ageStartMenstrual: answers.age_of_period || 0,
+        startDateLastMenstrual: answers.date_of_last_period || "string",
+        lenghtOfCycle: answers.length_of_cycle || 0,
+        timeBtwCycles: answers.times_between_of_cycle || 0,
+        cramping: answers.cramping === "Yes",
+        painInPeriod: answers.pain === "Yes",
+        everHadPreMenstrualProblems: {
+            yesNo: answers.premenstrual_problems === "Yes",
+            describe: answers.how_often_reaxation || "",
+        },
+        otherMenstrualProblems: {
+            yesNo: answers.other_premenstrual_problems === "Yes",
+            describe: answers.other_hormonal_problems_history || "",
+        },
+        hormonalBirthControlType: {
+            level: 0, // Adjust if applicable
+            name: answers.hormonal_birthcontrol_often || "string",
+        },
+        problemsWithHormonalBirthControl: {
+            yesNo: answers.other_hormonal_problems === "Yes",
+            describe: answers.other_hormonal_problems_history || "",
+        },
+        useContraception: {
+            yesNo: answers.use_of_contraception === "Yes",
+            describe: answers.hormonal_birthcontrol_long || "",
+        },
+        inMenopause: {
+            yesNo: answers.is_menopause === "Yes",
+            level: 0, // Adjust if applicable
+        },
+        surgicalMenopause: {
+            yesNo: answers.surgical_menopause === "Yes",
+            describe: answers.symptomatic_problems_menopause_history?.join(", ") || "",
+        },
+        symptomicProblems: answers.symptomatic_problems_menopause || [],
+        hormonalReplacement: {
+            yesNo: answers.hormone_replacement_therapy === "Yes",
+            describe: answers.hormone_replacement_therapy_sub || "",
+        },
+        gynSymptoms: answers.symptomatic_problems_menopause_other || [],
+        gynScreeningLastPapTest: {
+            date: "", // Adjust if applicable
+            value: "", // Adjust if applicable
+        },
+        gynScreeningLastMammo: {
+            date: "", // Adjust if applicable
+            value: "", // Adjust if applicable
+        },
+        gynScreeningLastBoneDesity: {
+            date: "", // Adjust if applicable
+            value: "", // Adjust if applicable
+        },
+        otherTest: answers.other_test_procedures || "none",
+    };
+    const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
+      const token = userInfo.obj?.token || "";
+    // Submit the API request
+    try {
+        const response = await fetch(
+            "https://myfertilitydevapi.azurewebsites.net/api/Patient/AddPersonalFamily",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "text/plain",
+                    Authorization: `Bearer ${token}`,
+
+                },
+                body: JSON.stringify(apiPayload),
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error("Failed to submit data");
+        }
+
+        // Handle success
+        dispatch(completeCard("/questionnaire/7"));
+        localStorage.setItem("currentQuestionIndex7", 0);
+        localStorage.setItem("answers", JSON.stringify(answers));
+        navigate("/assessment");
+    } catch (error) {
+        console.error("Error submitting the form:", error);
+        // Optionally show an error message to the user
+    }
+};
+
   
   const renderSubQuestions = (subQuestions) => {
     return subQuestions.map((subQuestion, index) => (

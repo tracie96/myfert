@@ -101,7 +101,7 @@ const questions = [
       {
         question: "If Yes:",
         type: "radio",
-        name: "packs_per_day",
+        name: "previous_packs_per_day",
         options: ["Mild", "Moderate", "High"],
       },
     ],
@@ -275,7 +275,7 @@ const SubstanceUse = ({ onComplete }) => {
           : {},
       attempedToQuit: {
         yesNo: answers.attempted_to_quit === "Yes",
-        describe: "",
+        describe: answers.methods_to_stop_smoking || '',
       },
       smokedInPast:
         answers.smoked_previously === "Yes"
@@ -289,7 +289,7 @@ const SubstanceUse = ({ onComplete }) => {
       howManyAlcoholWeek: answers.exposed_to_smoke || "",
       previousAlcoholIntake: {
         yesNo: answers.alcohol_problem === "Yes",
-        describe: "",
+        describe:answers.previous_packs_per_day || "",
       },
       problemAlcohol: answers.alcohol_problem === "Yes",
       problemAlcoholWhen: answers.problem_alcohol_when || "",

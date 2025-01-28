@@ -45,7 +45,7 @@ const questions = [
   {
     question: "What are your reasons for following your specific diet or nutrition program?",
     type: "long_textarea",
-    name: "diet_detail_lunch",
+    name: "special_diet_reason",
   },
   {
     question: "Do you have sensitivities to certain foods?",
@@ -185,7 +185,7 @@ const questions = [
       {
         type: "time_select",
         label: "Time of Breakfast",
-        name: "typical_day_time",
+        name: "snack_time",
       },
     ],
   },
@@ -199,21 +199,21 @@ const questions = [
     question: "How many servings do you eat in a typical week of these foods:",
     type: "long_select",
     sub: "Fruits (not juice)",
-    name: "diet_detail_fruits",
+    name: "diet_servings_fruits",
     selectOptions: Array.from({ length: 10 }, (_, i) => 0 + i),
   },
   {
     question: "How many servings do you eat in a typical week of these foods:",
     type: "long_select",
     sub: "Vegetables (not including white potatoes)",
-    name: "diet_detail_vegetables",
+    name: "diet_serving_vegetables",
     selectOptions: Array.from({ length: 10 }, (_, i) => 0 + i),
   },
   {
     question: "How many servings do you eat in a typical week of these foods:",
     type: "long_select",
     sub: "Legumes (beans, peas, etc)",
-    name: "diet_detail_legumes",
+    name: "diet_servings_legumes",
     selectOptions: Array.from({ length: 10 }, (_, i) => 0 + i),
   },
 
@@ -221,49 +221,49 @@ const questions = [
     question: "How many servings do you eat in a typical week of these foods:",
     type: "long_select",
     sub: "Red meat",
-    name: "diet_detail_red_meat",
+    name: "diet_servings_meat",
     selectOptions: Array.from({ length: 10 }, (_, i) => 0 + i),
   },
   {
     question: "How many servings do you eat in a typical week of these foods:",
     type: "long_select",
     sub: "Fish",
-    name: "diet_detail",
+    name: "diet_servings_fish",
     selectOptions: Array.from({ length: 10 }, (_, i) => 0 + i),
   },
   {
     question: "How many servings do you eat in a typical week of these foods:",
     type: "long_select",
     sub: "Dairy/ Alternatives",
-    name: "diet_detail_dairyalt",
+    name: "diet_servings_dairyalt",
     selectOptions: Array.from({ length: 10 }, (_, i) => 0 + i),
   },
   {
     question: "How many servings do you eat in a typical week of these foods:",
     type: "long_select",
     sub: "Nuts & Seeds",
-    name: "diet_detail_nuts",
+    name: "diet_servings_nuts",
     selectOptions: Array.from({ length: 10 }, (_, i) => 0 + i),
   },
   {
     question: "How many servings do you eat in a typical week of these foods:",
     type: "long_select",
     sub: "Fats & Oils",
-    name: "diet_detail_fatsandoil",
+    name: "diet_servings_fatsandoil",
     selectOptions: Array.from({ length: 10 }, (_, i) => 0 + i),
   },
   {
     question: "How many servings do you eat in a typical week of these foods:",
     type: "long_select",
     sub: "Cans of soda (regular or diet)",
-    name: "diet_detail_soda",
+    name: "diet_servings_soda",
     selectOptions: Array.from({ length: 10 }, (_, i) => 0 + i),
   },
   {
     question: "How many servings do you eat in a typical week of these foods:",
     type: "long_select",
     sub: "Sweets (candy, cookies, cake, ice cream, etc.)",
-    name: "diet_detail_sweets",
+    name: "diet_servings_sweets",
     selectOptions: Array.from({ length: 10 }, (_, i) => 0 + i),
   },
   {
@@ -419,18 +419,18 @@ const Nutrition = ({ onComplete }) => {
       typicalDinner: answers.diet_detail_dinner || "",
       typicalSnacks: answers.diet_detail_snacks || "",
       typicalFluid: answers.diet_detail_fluids || "",
-      noTypicalFruits: answers.diet_detail_fruits || 0,
-      noTypicalVegetables: answers.diet_detail_vegetables || 0,
-      noTypicalLegumes: answers.diet_detail_legumes || 0,
-      noTypicalRedMeat: answers.diet_detail_red_meat || 0,
-      noTypicalFish: answers.noTypicalFish || 0,
-      noTypicalDairy: answers.diet_detail_dairyalt || 0,
-      noTypicalNuts: answers.diet_detail_nuts || 0,
-      noTypicalFats: answers.diet_detail_fatsandoil || 0,
-      noTypicalCanSoda: answers.diet_detail_soda || 0,
-      noTypicalSweets: answers.diet_detail_sweets || 0,
+      noTypicalFruits: answers.diet_servings_fruits || 0,
+      noTypicalVegetables: answers.diet_serving_vegetables || 0,
+      noTypicalLegumes: answers.diet_servings_legumes || 0,
+      noTypicalRedMeat: answers.diet_servings_meat || 0,
+      noTypicalFish: answers.diet_servings_fish || 0,
+      noTypicalDairy: answers.diet_servings_dairyalt || 0,
+      noTypicalNuts: answers.diet_servings_nuts || 0,
+      noTypicalFats: answers.diet_servings_fatsandoil || 0,
+      noTypicalCanSoda: answers.diet_servings_soda || 0,
+      noTypicalSweets: answers.diet_servings_sweets || 0,
       caffeinatedBeverages: answers.caffeinated_beverages === "Yes",
-      coffeeCups: answers.coffee_amount, // Assuming no data provided for coffee, tea, or soda cups
+      coffeeCups: answers.coffee_amount, 
       teaCups: answers.tea_amount || "",
       sodaCups: answers.soda_amount || "",
       adverseReactionToCoffee: answers.sensitive_food_caffeine === "Yes",
@@ -446,8 +446,8 @@ const Nutrition = ({ onComplete }) => {
       return;
     }
     const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
-    const token = userInfo.obj.token || "";
-
+    const token = userInfo?.obj?.token || "";
+console.log(({userInfo}))
     const transformedData = transformNutritionData(answers);
 
     fetch(

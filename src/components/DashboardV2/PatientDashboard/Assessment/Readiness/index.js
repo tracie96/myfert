@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Progress, Button, Col, Row, Input, message } from "antd";
-import { useNavigate } from "react-router-dom"; // useNavigate for react-router v6
+import { useNavigate } from "react-router-dom"; 
 import { useDispatch } from "react-redux";
 import { completeCard } from "../../../../redux/assessmentSlice";
 import FormWrapper from "../FormWrapper";

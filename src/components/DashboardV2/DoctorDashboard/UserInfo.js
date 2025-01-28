@@ -1126,23 +1126,41 @@ case 1:
                         <Descriptions.Item label="Currently Pregnant">
                           {reproductiveInfo?.currentlyPregnant || "N/A"}
                         </Descriptions.Item>
-                        <Descriptions.Item label="Cycle Discharge After Period Spotting">
-                          {reproductiveInfo?.cycleDischargeAfterPeriodSpotting || "N/A"}
+                        <Descriptions.Item label="Cycle Discharge After Period Spotting Duration">
+                          {reproductiveInfo?.cycleDischargeAfterPeriodSpotting?.duration || "N/A"}
                         </Descriptions.Item>
-                        <Descriptions.Item label="Cycle Discharge Creamy">
-                          {reproductiveInfo?.cycleDischargeCreamy || "N/A"}
+                        <Descriptions.Item label="Cycle Discharge After Period Spotting Color">
+                          {reproductiveInfo?.cycleDischargeAfterPeriodSpotting?.color || "N/A"}
                         </Descriptions.Item>
-                        <Descriptions.Item label="Cycle Discharge Egg White">
-                          {reproductiveInfo?.cycleDischargeEggWhite || "N/A"}
+                        <Descriptions.Item label="Cycle Discharge Creamy Duration">
+                          {reproductiveInfo?.cycleDischargeCreamy?.duration || "N/A"}
+                        </Descriptions.Item> 
+                        <Descriptions.Item label="Cycle Discharge Creamy Colour">
+                          {reproductiveInfo?.cycleDischargeCreamy?.colour || "N/A"}
+                        </Descriptions.Item> 
+                        <Descriptions.Item label="Cycle Discharge Egg White Duration">
+                          {reproductiveInfo?.cycleDischargeEggWhite?.duration || "N/A"}
                         </Descriptions.Item>
-                        <Descriptions.Item label="Cycle Discharge Menstral Bleeding">
-                          {reproductiveInfo?.cycleDischargeMenstralBleeding || "N/A"}
+                        <Descriptions.Item label="Cycle Discharge Egg White Colour">
+                          {reproductiveInfo?.cycleDischargeEggWhite?.colour || "N/A"}
                         </Descriptions.Item>
-                        <Descriptions.Item label="Cycle Discharge Pre Period">
-                          {reproductiveInfo?.cycleDischargePrePeriod || "N/A"}
+                        <Descriptions.Item label="Cycle Discharge Menstral Bleeding Duration">
+                          {reproductiveInfo?.cycleDischargeMenstralBleeding?.duration || "N/A"}
                         </Descriptions.Item>
-                        <Descriptions.Item label="Cycle Discharge Watery">
-                          {reproductiveInfo?.cycleDischargeWatery || "N/A"}
+                        <Descriptions.Item label="Cycle Discharge Menstral Bleeding Colour">
+                          {reproductiveInfo?.cycleDischargeMenstralBleeding?.colour || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Cycle Discharge Pre Period Duration">
+                          {reproductiveInfo?.cycleDischargePrePeriod?.duration || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Cycle Discharge Pre Period Colour">
+                          {reproductiveInfo?.cycleDischargePrePeriod?.colour || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Cycle Discharge Watery Duration">
+                          {reproductiveInfo?.cycleDischargeWatery?.duration || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Cycle Discharge Watery Colour">
+                          {reproductiveInfo?.cycleDischargeWatery?.colour || "N/A"}
                         </Descriptions.Item>
                         <Descriptions.Item label="Difficulty Trying To Conceive">
                           {reproductiveInfo?.difficultyTryingToConceive || "N/A"}
@@ -1150,8 +1168,11 @@ case 1:
                         <Descriptions.Item label="Do You Pms Symptoms">
                           {reproductiveInfo?.doYouPmsSymptoms || "N/A"}
                         </Descriptions.Item>
-                        <Descriptions.Item label="During Circle Pelvic Pain">
-                          {reproductiveInfo?.duringCirclePelvicPain || "N/A"}
+                        <Descriptions.Item label="During Circle Pelvic Pain Duration">
+                          {reproductiveInfo?.duringCirclePelvicPain?.duration || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="During Circle Pelvic Pain Colour">
+                          {reproductiveInfo?.duringCirclePelvicPain?.colour || "N/A"}
                         </Descriptions.Item>
                         <Descriptions.Item label="Experience Pelvic Pain">
                           {reproductiveInfo?.experiencePelvicPain || "N/A"}
@@ -1180,8 +1201,11 @@ case 1:
                         <Descriptions.Item label="Longest Cycle Lenght">
                           {reproductiveInfo?.longestCycleLenght || "N/A"}
                         </Descriptions.Item>
-                        <Descriptions.Item label="Menstral Bleeding Pelvic Pain">
-                          {reproductiveInfo?.menstralBleedingPelvicPain || "N/A"}
+                        <Descriptions.Item label="Menstral Bleeding Pelvic Pain Duration">
+                          {reproductiveInfo?.menstralBleedingPelvicPain?.duration || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Menstral Bleeding Pelvic Pain Colour">
+                          {reproductiveInfo?.menstralBleedingPelvicPain?.colour || "N/A"}
                         </Descriptions.Item>
                         <Descriptions.Item label="Menstral Cycle Colour">
                           {reproductiveInfo?.menstralCycleColour || "N/A"}
@@ -1193,9 +1217,9 @@ case 1:
                           {reproductiveInfo?.menstralCycleFrequency || "N/A"}
                         </Descriptions.Item>
                         <Descriptions.Item label="Menstrual Pain During Period">
-                          <div>{reproductiveInfo?.menstrualPainDuringPeriod || "N/A"}</div>
+                          {reproductiveInfo?.menstrualPainDuringPeriod || "N/A"}
                         </Descriptions.Item>
-                        <Descriptions.Item label="Method Fertility Awareness">
+                       <Descriptions.Item label="Method Fertility Awareness">
                           {reproductiveInfo?.methodFertilityAwareness || "N/A"}
                         </Descriptions.Item>
                         <Descriptions.Item label="Method To Conceive">
@@ -1207,8 +1231,11 @@ case 1:
                         <Descriptions.Item label="Non Hormonal Birth Control">
                           {reproductiveInfo?.nonHormonalBirthControl || "N/A"}
                         </Descriptions.Item> 
-                        <Descriptions.Item label="pms">
-                          {reproductiveInfo?.pms || "N/A"}
+                        <Descriptions.Item label="pms Duration">
+                          {reproductiveInfo?.pms?.duration || "N/A"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="pms Colour">
+                          {reproductiveInfo?.pms?.colour || "N/A"}
                         </Descriptions.Item>
                         <Descriptions.Item label="pms Symptoms">
                           {reproductiveInfo?.pmsSymptoms || "N/A"}

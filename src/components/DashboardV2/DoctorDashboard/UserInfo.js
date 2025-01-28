@@ -222,7 +222,7 @@ console.log({substance})
               key={index}
               title={`Details for ${modalContent[index]}`}
               visible={visibleModal === index}
-              width={"1000px"}
+              width={"70%"}
               footer={null}
               onCancel={() => setVisibleModal(null)}
             >

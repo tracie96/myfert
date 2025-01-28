@@ -423,7 +423,7 @@ const Nutrition = ({ onComplete }) => {
       noTypicalVegetables: answers.diet_detail_vegetables || 0,
       noTypicalLegumes: answers.diet_detail_legumes || 0,
       noTypicalRedMeat: answers.diet_detail_red_meat || 0,
-      noTypicalFish: 0,
+      noTypicalFish: answers.noTypicalFish || 0,
       noTypicalDairy: answers.diet_detail_dairyalt || 0,
       noTypicalNuts: answers.diet_detail_nuts || 0,
       noTypicalFats: answers.diet_detail_fatsandoil || 0,

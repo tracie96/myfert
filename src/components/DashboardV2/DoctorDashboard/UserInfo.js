@@ -716,7 +716,6 @@ function SwitchContent({
         <div className="p-6 rounded-md shadow-md">
           {substance ? (
             <Row gutter={16}>
-              {/* First Column */}
               <Col xs={24} md={12}>
                 <Descriptions column={1} bordered>
                   {[

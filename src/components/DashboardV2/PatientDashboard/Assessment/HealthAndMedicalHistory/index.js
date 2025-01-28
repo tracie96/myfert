@@ -173,14 +173,14 @@ const questions = [
         question:
           "If yes, what foods and what symptoms? (Example: milk—gas and diarrhea)",
         type: "text",
-        name: "how_often_reaxation",
+        name: "food_avoided",
       },
     ],
   },
   {
     question: "Did you eat a lot of sugar or candy as a child?",
     type: "radio",
-    name: "do_you_feel_stress",
+    name: "eat_sugar_as_a_child",
     options: ["Yes", "No"],
   },
   {
@@ -235,7 +235,7 @@ const questions = [
       {
         question: "If yes, when?",
         type: "text",
-        name: "how_often_reaxation",
+        name: "mercury_fillings_removed",
       },
     ],
   },
@@ -303,30 +303,31 @@ const questions = [
       {
         question: "Chemical Name",
         type: "text",
-        name: "how_often_reaxation",
+        name: "harmful_chemical_exposure",
       },
       {
         question: "Length of Exposure",
         type: "select",
+        name: "harmful_chemical_exposure_length",
         options: Array.from({ length: 48 }, (_, i) => 13 + i),
       },
       {
         question: "Date:",
         type: "date",
-        name: "how_often_reaxation",
+        name: "harmful_chemical_exposure_date",
       },
     ],
   },
   {
     question: "Do you have any pets or farm animals?",
     type: "long_radio",
-    name: "resources_for_emotional_support",
+    name: "pets_or_animal",
     options: ["Yes", "No"],
     subQuestions: [
       {
         question: "If yes, do they live:",
         type: "radio",
-        name: "resources_list",
+        name: "where_they_live",
         options: ["Inside", "Outside", "Both inside and outside"],
       },
     ],
@@ -358,7 +359,27 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
   };
   const validateQuestion = () => {
     const question = questions[currentQuestionIndex];
-
+    if (question.type === "checkbox_with_select") {
+      return question.options.some((option) => {
+        const checkboxChecked = answers[option.name];
+        const selectValid = option.selectName
+          ? answers[option.selectName] !== undefined && answers[option.selectName] !== ""
+          : true;
+  
+        return checkboxChecked && selectValid;
+      });
+    }
+    if (question.type === "checkbox_with_input") {
+      return question.options.some((option) => {
+        const checkboxChecked = answers[option.name];
+        const inputValid = option.inputName
+          ? answers[option.inputName] !== undefined && answers[option.inputName] !== ""
+          : true;
+  
+        return checkboxChecked || inputValid; 
+      });
+    }
+  
     return (
       answers[question.name] !== undefined && answers[question.name] !== ""
     );
@@ -388,13 +409,94 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
     });
   };
 
-  const handleSubmit = () => {
-    dispatch(completeCard("/questionnaire/6"));
-    localStorage.setItem("currentQuestionIndex6", 0);
-    localStorage.setItem("answers", JSON.stringify(answers));
-    navigate("/assessment");
+  const handleSubmit = async () => {
+    try {
+      // Prepare the payload for the API
+      const payload = {
+        howWellThingsGoingOverall: answers.overll_wellbeing || 0,
+        howWellThingsGoingSchool: answers.school_wellbeing || 0,
+        howWellThingsGoingJob: answers.job_wellbeing || 0,
+        howWellThingsGoingSocialLife: answers.social_life_wellbeing || 0,
+        howWellThingsGoingCloseFriends: answers.close_friends_wellbeing || 0,
+        howWellThingsGoingSex: answers.sex_wellbeing || 0,
+        howWellThingsGoingAttitude: answers.attitude_wellbeing || 0,
+        howWellThingsGoingPartner: answers.relationship_wellbeing || 0,
+        howWellThingsGoingKids: answers.children_wellbeing || 0,
+        howWellThingsGoingParents: answers.parents_wellbeing || 0,
+        howWellThingsGoingSpouse: answers.spouse_wellbeing || 0,
+        howWereYouBorn: answers.mode_of_own_birth || "string",
+        wereYouBornWithComplication: {
+          yesNo: answers.birth_complications === "Yes",
+          describe: answers.birth_complications_details || "string",
+        },
+        breastFedHowLong: answers.breast_fed_duration || "string",
+        breastFedFormula: answers.bottle_fed_type || "string",
+        breastFoodDontKnow: answers.dont_know || false,
+        ageIntroductionSolidFood: answers.age_of_solid_food_intro || 0,
+        ageIntroductionWheat: answers.age_of_wheat_food_intro || 0,
+        ageIntroductionDiary: answers.age_of_diary_food_intro || 0,
+        foodsAvoided: answers.food_avoided === "Yes",
+        foodsAvoidTypeSymptoms: answers.allergic_food || "string",
+        alotSugar: answers.eat_sugar_as_a_child === "Yes",
+        dentalHistory: [
+          {
+            level: answers.fillings_removed || 0,
+            name: "string", // You can modify this if there's more specific data
+          },
+        ],
+        mercuryFillingRemoved: answers.mercury_filings === "Yes",
+        mercuryFillingRemovedWhen: answers.mercury_fillings_removed || "string",
+        fillingsAsKid: answers.fillings_removed || 0,
+        brushRegularly: answers.do_you_brush_regularly === "Yes",
+        flossRegularly: answers.do_you_floss_regularly === "Yes",
+        environmentEffect: answers.smoke_irritants || ["string"],
+        environmentExposed: answers.work_env_smoke_irritants || ["string"],
+        exposedHarmfulChemical: answers.harmful_chemicals === "Yes",
+        whenExposedHarmfulChemical: {
+          chemicalName: answers.harmful_chemical_exposure || "string",
+          lengthExposure: answers.harmful_chemical_exposure_length || 0,
+          dateExposure: answers.harmful_chemical_exposure_date || "string",
+        },
+        petsFarmAnimal: answers.pets_or_animal === "Yes",
+        petsAnimalLiveWhere: answers.where_they_live || "string",
+      };
+    const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
+    const token = userInfo.obj.token || "";
+      const response = await fetch(
+        "https://myfertilitydevapi.azurewebsites.net/api/Patient/AddHealthMedicalHistory",
+        {
+          method: "POST",
+          headers: {
+            "Accept": "text/plain",
+            "Content-Type": "application/json",
+            Authorization: `${token}`,
+
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+  
+      // Check for response status
+      if (!response.ok) {
+        throw new Error("Failed to submit data");
+      }
+  
+      const result = await response.json();
+      console.log("Successfully submitted:", result);
+  
+      // Proceed with navigation and localStorage updates
+      dispatch(completeCard("/questionnaire/6"));
+      localStorage.setItem("currentQuestionIndex6", 0);
+      localStorage.setItem("answers", JSON.stringify(answers));
+      navigate("/assessment");
+    } catch (error) {
+      console.error("Error submitting data:", error);
+      // Handle any errors, maybe show a message to the user
+    }
   };
-  const handleSelectCheckChange = (
+  
+
+  const handleSelectInputChange = (
     checked,
     name,
     inputName = null,
@@ -420,6 +522,28 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
     newAnswers[name] = checked;
 
     setAnswers(newAnswers);
+  };
+  const handleSelectCheckChange = (checked, checkboxName, selectName) => {
+    setAnswers((prevAnswers) => {
+      const updatedAnswers = { ...prevAnswers };
+      if (checked) {
+        updatedAnswers[checkboxName] = true;
+      } else {
+        delete updatedAnswers[checkboxName];
+        if (selectName) {
+          delete updatedAnswers[selectName];
+        }
+      }
+
+      return updatedAnswers;
+    });
+  };
+
+  const handleSelectChange = (value, selectName) => {
+    setAnswers((prevAnswers) => ({
+      ...prevAnswers,
+      [selectName]: value, // Update the `selectName` field with the selected value
+    }));
   };
 
   const renderSubQuestions = (subQuestions) => {
@@ -623,52 +747,52 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
             )}
           </Radio.Group>
         );
-        case "rating_scale":
-          return (
-            <div style={{ padding: "0 10px" }}>
-              <div style={{ marginTop: "10px" }}>
-                <Row gutter={[16, 16]}>
-                  <Col span={12}>
-                    <Slider
-                      min={1}
-                      max={10}
-                      value={answers[question.name] || 1}
-                      onChange={(value) => handleChange(value, question.name)}
-                      style={{ width: isMobile ? "100%" : "80%" }}
-                      disabled={answers[`${question.name}_na`] || false} 
-                    />
-                  </Col>
-                  <Col span={4}>
-                    <InputNumber
-                      min={1}
-                      max={10}
-                      value={answers[question.name] || 1}
-                      onChange={(value) => handleChange(value, question.name)}
-                      style={{ width: "100%" }}
-                      disabled={answers[`${question.name}_na`] || false} 
-                    />
-                  </Col>
-                </Row>
-                <Row style={{ marginTop: "10px" }}>
-                  <Col>
-                    <Checkbox
-                      checked={answers[`${question.name}_na`] || false}
-                      onChange={(e) => {
-                        const isChecked = e.target.checked;
-                        handleChange(isChecked, `${question.name}_na`);
-                        if (isChecked) {
-                          handleChange(null, question.name);
-                        }
-                      }}
-                    >
-                      N/A
-                    </Checkbox>
-                  </Col>
-                </Row>
-              </div>
+      case "rating_scale":
+        return (
+          <div style={{ padding: "0 10px" }}>
+            <div style={{ marginTop: "10px" }}>
+              <Row gutter={[16, 16]}>
+                <Col span={12}>
+                  <Slider
+                    min={1}
+                    max={10}
+                    value={answers[question.name] || 1}
+                    onChange={(value) => handleChange(value, question.name)}
+                    style={{ width: isMobile ? "100%" : "80%" }}
+                    disabled={answers[`${question.name}_na`] || false}
+                  />
+                </Col>
+                <Col span={4}>
+                  <InputNumber
+                    min={1}
+                    max={10}
+                    value={answers[question.name] || 1}
+                    onChange={(value) => handleChange(value, question.name)}
+                    style={{ width: "100%" }}
+                    disabled={answers[`${question.name}_na`] || false}
+                  />
+                </Col>
+              </Row>
+              <Row style={{ marginTop: "10px" }}>
+                <Col>
+                  <Checkbox
+                    checked={answers[`${question.name}_na`] || false}
+                    onChange={(e) => {
+                      const isChecked = e.target.checked;
+                      handleChange(isChecked, `${question.name}_na`);
+                      if (isChecked) {
+                        handleChange(0, question.name);
+                      }
+                    }}
+                  >
+                    N/A
+                  </Checkbox>
+                </Col>
+              </Row>
             </div>
-          );
-        
+          </div>
+        );
+
 
       case "long_textarea":
         return (
@@ -723,7 +847,7 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
                 <div style={{ display: "flex", alignItems: "center" }}>
                   <Checkbox
                     onChange={(e) =>
-                      handleSelectCheckChange(
+                      handleSelectInputChange(
                         e.target.checked,
                         option.name,
                         option.inputName,
@@ -741,7 +865,7 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
                       name={option.inputName}
                       value={answers[option.inputName] || ""}
                       onChange={(e) =>
-                        handleSelectCheckChange(
+                        handleSelectInputChange(
                           e.target.value,
                           option.inputName,
                         )
@@ -756,58 +880,56 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
           </div>
         );
 
-      case "checkbox_with_select":
-        return (
-          <div
-            style={{
-              marginTop: "20px",
-              display: "grid",
-              gridTemplateColumns: "1fr 2fr",
-              gap: "10px",
-            }}
-          >
-            <p style={{ gridColumn: "span 2" }}>{question.question}</p>
-            {question.options.map((option, idx) => (
-              <React.Fragment key={idx}>
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <Checkbox
-                    onChange={(e) =>
-                      handleSelectCheckChange(
-                        e.target.checked,
-                        option.name,
-                        option.selectName,
-                        question.options,
-                      )
-                    }
-                    checked={answers[option.name] || false}
-                  >
-                    {option.label}
-                  </Checkbox>
-                </div>
-                {option.selectName && (
+        case "checkbox_with_select":
+          return (
+            <div
+              style={{
+                marginTop: "20px",
+                display: "grid",
+                gridTemplateColumns: "1fr 2fr",
+                gap: "10px",
+              }}
+            >
+              {question.options.map((option, idx) => (
+                <React.Fragment key={idx}>
                   <div style={{ display: "flex", alignItems: "center" }}>
-                    <Select
-                      name={option.selectName}
-                      value={answers[option.selectName] || undefined}
-                      onChange={(value) =>
-                        handleSelectCheckChange(value, option.selectName)
+                    <Checkbox
+                      onChange={(e) =>
+                        handleSelectCheckChange(
+                          e.target.checked,
+                          option.name,
+                          option.selectName,
+                          question.options,
+                        )
                       }
-                      style={{ width: isMobile ? "100%" : "50%" }}
-                      disabled={!answers[option.name]}
+                      checked={answers[option.name] || false}
                     >
-                      {option.selectOptions.map((selectOption, idx) => (
-                        <Option key={idx} value={selectOption}>
-                          {selectOption}
-                        </Option>
-                      ))}
-                    </Select>
+                      {option.label}
+                    </Checkbox>
                   </div>
-                )}
-              </React.Fragment>
-            ))}
-          </div>
-        );
-
+                  {option.selectName && (
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      <Select
+                        name={option.selectName}
+                        value={answers[option.selectName] || undefined}
+                        onChange={(value) => handleSelectChange(value, option.selectName)} // Use the new handler
+                        style={{ width: "100%" }}
+                        disabled={!answers[option.name]} // Disabled unless checkbox is checked
+                      >
+                        {option.selectOptions.map((selectOption, idx) => (
+                          <Option key={idx} value={selectOption}>
+                            {selectOption}
+                          </Option>
+                        ))}
+                      </Select>
+                    </div>
+                  )}
+  
+                </React.Fragment>
+              ))}
+            </div>
+          );
+  
       case "checkbox":
         return (
           <Checkbox.Group
@@ -884,7 +1006,7 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
   const HighlightedQuestion = ({ question }) => {
     const highlightWords = ['poorly', 'fine', 'very well', 'N/A'];
     const regex = new RegExp(`\\b(${highlightWords.join('|')})\\b`, 'gi');
-  
+
     const highlightedQuestion = question.split(regex).map((part, index) => {
       if (highlightWords.includes(part.toLowerCase())) {
         return (
@@ -895,11 +1017,11 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
       }
       return part;
     });
-  
+
     return <p>{highlightedQuestion}</p>;
   };
 
-  
+
   const progressColor =
     currentQuestionIndex === totalQuestions - 1 ? "#01ACEE" : "#C2E6F8";
   const progressPercentage =
@@ -918,19 +1040,19 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
         </h3>
 
         <h3 style={{ margin: "20px 0", color: "#000", fontWeight: "600", fontSize: "15px" }}>
-  {label && (
-    <span>
-      {label}
-      {questions[currentQuestionIndex]?.sub && (
-        <span style={{ color: "#335CAD", fontWeight: "bold" }}>
-          {questions[currentQuestionIndex]?.sub}
-        </span>
-      )}
-      <br />
-    </span>
-  )}
-<HighlightedQuestion question={questions[currentQuestionIndex].question} />
-</h3>
+          {label && (
+            <span>
+              {label}
+              {questions[currentQuestionIndex]?.sub && (
+                <span style={{ color: "#335CAD", fontWeight: "bold" }}>
+                  {questions[currentQuestionIndex]?.sub}
+                </span>
+              )}
+              <br />
+            </span>
+          )}
+          <HighlightedQuestion question={questions[currentQuestionIndex].question} />
+        </h3>
 
         {renderInput(questions[currentQuestionIndex])}
 

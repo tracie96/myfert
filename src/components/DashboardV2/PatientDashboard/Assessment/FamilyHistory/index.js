@@ -439,6 +439,7 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
     localStorage.setItem("answers", JSON.stringify(answers));
     navigate("/assessment");
   };
+  
   const renderSubQuestions = (subQuestions) => {
     return subQuestions.map((subQuestion, index) => (
       <div key={index} style={{ marginTop: "20px" }}>

@@ -424,93 +424,89 @@ const ReproductiveHealth = ({ onComplete }) => {
   const validateQuestion = () => {
     const question = questions[currentQuestionIndex];
     const mainAnswer = answers[question.name];
-  
+
+    // Ensure the main question is answered
+    if (!mainAnswer) {
+        return false; // Prevent proceeding if the main question is empty
+    }
+
     // Handle "Other" selection with an additional input
     const isCheckbox = Array.isArray(mainAnswer);
     const isOtherSelected = isCheckbox
-      ? mainAnswer.includes("Other")
-      : mainAnswer === "Other";
+        ? mainAnswer.includes("Other")
+        : mainAnswer === "Other";
     const otherAnswerKey = `${question.name}_other`;
     const otherAnswer = answers[otherAnswerKey];
+
     if (isOtherSelected && (!otherAnswer || otherAnswer.trim() === "")) {
-      return false;
+        return false;
     }
-  
+
+    // Special Handling for Birth Control Question
+    if (question.name === "relaxation_techniques" && mainAnswer === "Yes") {
+        
+        const isHormonalAnswered = answers["how_often_hormonal_bc"]?.trim() !== "";
+        const isNonHormonalAnswered = answers["how_often_non_hormonal_bc"]?.trim() !== "";
+
+
+        if (!isHormonalAnswered && !isNonHormonalAnswered) {
+            return false;
+        }
+
+    }
+
     // Validate "number_with_radio" with multiple subQuestions
     if (question.type === "number_with_radio" && question.subQuestions) {
-      for (const subQuestion of question.subQuestions) {
-        const subAnswer = answers[subQuestion.name];
-        const radioAnswer = answers[`${subQuestion.name}_radio`];
-  
-        if (subQuestion.type === "number_with_radio_sub") {
-          // Either the number input or "Unsure" must be selected
-          const isSubAnswered =
-            (typeof subAnswer === "number" && subAnswer >= 0) || radioAnswer === "Unsure";
-          if (!isSubAnswered) return false;
-        } else if (subQuestion.type === "radio") {
-          // Validate radio questions
-          if (!subAnswer || subAnswer.trim() === "") return false;
+        for (const subQuestion of question.subQuestions) {
+            const subAnswer = answers[subQuestion.name];
+            const radioAnswer = answers[`${subQuestion.name}_radio`];
+
+            if (subQuestion.type === "number_with_radio_sub") {
+                // Either the number input or "Unsure" must be selected
+                const isSubAnswered =
+                    (typeof subAnswer === "number" && subAnswer >= 0) || radioAnswer === "Unsure";
+                if (!isSubAnswered) {
+                    return false;
+                }
+            } else if (subQuestion.type === "radio") {
+                // Validate radio questions
+                if (!subAnswer || subAnswer.trim() === "") {
+                    return false;
+                }
+            }
         }
-      }
     }
-  
-    // Validate dependent subQuestions for "Yes" main answers
+
+    // Validate Other Sub-Questions (for all other questions)
     if (question.subQuestions && mainAnswer === "Yes") {
-      for (const subQuestion of question.subQuestions) {
-        const subAnswer = answers[subQuestion.name];
-        if (!subAnswer || subAnswer.trim() === "") {
-          return false; // Fail validation if any sub-question is not answered
+        for (const subQuestion of question.subQuestions) {
+            const subAnswer = answers[subQuestion.name];
+
+            // Skip already validated birth control sub-questions
+            if (question.name === "relaxation_techniques") continue;
+
+            if (!subAnswer || subAnswer.trim() === "") {
+                return false;
+            }
         }
-      }
     }
-  
+
+    // Validate Checkbox Answers
     if (isCheckbox) {
-      return mainAnswer.length > 0;
+        return mainAnswer.length > 0;
     }
+
+    // Validate Number Inputs
     if (typeof mainAnswer === "number") {
-      return !isNaN(mainAnswer) && mainAnswer >= 0;
+        return !isNaN(mainAnswer) && mainAnswer >= 0;
     }
+
     return true;
-  };
-  
-  
-  
+};
 
-  // // ToDo: previous implementation, after successful testing of the applplication, this can be deleted. Handling number as well.
-  // const validateQuestion = () => {
-  //   const question = questions[currentQuestionIndex];
-  //   const mainAnswer = answers[question.name];
-  
-  //   const isCheckbox = Array.isArray(mainAnswer);
-  //   const isOtherSelected = isCheckbox
-  //     ? mainAnswer.includes("Other")
-  //     : mainAnswer === "Other";
-  
-  //   const otherAnswerKey = `${question.name}_other`;
-  //   const otherAnswer = answers[otherAnswerKey];
-  //   if (isOtherSelected && (!otherAnswer || otherAnswer.trim() === "")) {
-  //     return false;
-  //   }
 
-  //   if (question.type === "number_with_radio" && question.subQuestions) {
-  //     const subQuestion = question.subQuestions[0];
-  //     const subAnswer = answers[subQuestion.name];
-  
-  //     const isSubAnswered =
-  //       typeof subAnswer === "number" && subAnswer >= 0;
-  
-  //     return isSubAnswered;
-  //   }
-  //   if (isCheckbox) {
-  //     return mainAnswer.length > 0;
-  //   }
-  //   if (typeof mainAnswer === "number") {
-  //     return !isNaN(mainAnswer) && mainAnswer >= 0;
-  //   }
-  //   return mainAnswer !== undefined && mainAnswer !== "";
-  // };
-  
-  
+
+
 
   const handleSave = () => {
     const question = questions[currentQuestionIndex];
@@ -549,11 +545,63 @@ const ReproductiveHealth = ({ onComplete }) => {
   };
 
   const handleChange = (value, name) => {
-    setAnswers({
-      ...answers,
-      [name]: value,
-    });
-  };
+    const question = questions[currentQuestionIndex];
+    let updatedAnswers = { ...answers };
+
+    if (name === "relaxation_techniques") { 
+      // Main question: Are you currently using birth control?
+      if (value === "Yes") {
+          updatedAnswers[name] = "Yes";
+      } else {
+          updatedAnswers[name] = "No";
+          updatedAnswers["how_often_hormonal_bc"] = ""; 
+          updatedAnswers["how_often_non_hormonal_bc"] = "";
+      }
+  } 
+  else if (name === "how_often_hormonal_bc") {
+      // If the first subquestion is answered, clear the second
+      updatedAnswers["how_often_hormonal_bc"] = value;
+      updatedAnswers["how_often_non_hormonal_bc"] = "";
+  } 
+  else if (name === "how_often_non_hormonal_bc") {
+      // If the second subquestion is answered, clear the first
+      updatedAnswers["how_often_non_hormonal_bc"] = value;
+      updatedAnswers["how_often_hormonal_bc"] = "";
+  }
+  
+    if (Array.isArray(value)) {
+      // Check if "Unsure" or "None" is selected
+      const isUnsureOrNoneSelected = value.includes("Unsure") || value.includes("None");
+  
+      if (isUnsureOrNoneSelected) {
+        // Keep only "Unsure" or "None" and remove all other selections
+        updatedAnswers[name] = value.filter(opt => opt === "Unsure" || opt === "None");
+      } else {
+        // Otherwise, update normally
+        updatedAnswers[name] = value;
+      }
+    } 
+    else if (value === "Unsure" || value === "None") {
+      // If "Unsure" or "None" is selected, clear other answers
+      updatedAnswers = {
+        ...updatedAnswers,
+        [name]: value, // Keep the selected answer
+      };
+  
+      // Reset sub-answers and other inputs for this question
+      if (question.subQuestions) {
+        question.subQuestions.forEach(subQ => {
+          updatedAnswers[subQ.name] = subQ.type === "number" ? 0 : "";
+        });
+      }
+    } 
+    else {
+      // Normal case when selecting other options
+      updatedAnswers[name] = value;
+    }
+  
+    setAnswers(updatedAnswers);
+  }; 
   const handleExit = () => {
     navigate("/assessment");
   };
@@ -692,6 +740,7 @@ const ReproductiveHealth = ({ onComplete }) => {
             value={answers[subQuestion.name] || 0}
             onChange={(value) => handleChange(value, subQuestion.name)}
             className="input_questtionnaire"
+            disabled={answers[subQuestion.name] === "Unsure" || answers[subQuestion.name] === "None"}
           />
         )}
         {subQuestion.type === "number_with_radio_sub" && (
@@ -705,11 +754,13 @@ const ReproductiveHealth = ({ onComplete }) => {
                 value={answers[subQuestion.name] || 0}
                 onChange={(value) => handleChange(value, subQuestion.name)}
                 className="input_questtionnaire"
+                disabled={answers[`${subQuestion.name}_radio`] === "Unsure"}
                 />
 
               {/* Radio.Group should use a different key in the state */}
               <Radio.Group
                 name={`${subQuestion.name}_radio`} // Use a different key for the Radio.Group
+                className="radioGroup-baibhav"
                 value={answers[`${subQuestion.name}_radio`] || null} // Default selection or null
                 onChange={
                   (e) =>
@@ -731,11 +782,12 @@ const ReproductiveHealth = ({ onComplete }) => {
                 <div key={index}>
                   <label>{item.label}</label>
                   <InputNumber
-                    name={item.name}
+                    name={`${item.name}_input_questionnaire`}
                     value={answers[item.name] || 0}
                     onChange={(value) => handleChange(value, item.name)}
                     className="input_questionnaire"
                     style={{ width: "100%" }}
+                    disabled={answers[item.name] === "Unsure" || answers[item.name] === "None"}
                   />
                 </div>
               ))}
@@ -745,6 +797,7 @@ const ReproductiveHealth = ({ onComplete }) => {
                 <label>{subQuestion.subQuestions[4].label}</label>
                 <Radio.Group
                   name={`${subQuestion.subQuestions[4].name}_radio`}
+                  className="radioGroup-baibhav-1"
                   value={
                     answers[`${subQuestion.subQuestions[4].name}_radio`] || null
                   }
@@ -775,6 +828,7 @@ const ReproductiveHealth = ({ onComplete }) => {
            onChange={(value) => handleChange(value || 0, `${subQuestion.name}_years`)}
            value={answers[`${subQuestion.name}_years`] || ""}
            name={`${subQuestion.name}_years`}
+           disabled={answers[subQuestion.name] === "Unsure" || answers[subQuestion.name] === "None"}
            style={{
              height: 35,
              borderColor: "#00ADEF",
@@ -792,6 +846,7 @@ const ReproductiveHealth = ({ onComplete }) => {
            onChange={(value) => handleChange(value || 0, `${subQuestion.name}_months`)}
            value={answers[`${subQuestion.name}_months`] || ""}
            name={`${subQuestion.name}_months`}
+           disabled={answers[subQuestion.name] === "Unsure" || answers[subQuestion.name] === "None"}
            style={{
              height: 35,
              borderColor: "#00ADEF",
@@ -823,6 +878,7 @@ const ReproductiveHealth = ({ onComplete }) => {
         {subQuestion.type === "radio" && (
           <Radio.Group
             name={subQuestion.name}
+            className="radioGroup-baibhav-2"
             onChange={(e) => handleChange(e.target.value, subQuestion.name)}
             value={answers[subQuestion.name]}
             style={{ width: "100%" }}
@@ -884,15 +940,19 @@ const ReproductiveHealth = ({ onComplete }) => {
         return (
           <Radio.Group
             name={question.name}
+            className="radioGroup-baibhav-3"
             onChange={(e) => handleChange(e.target.value, question.name)}
             value={answers[question.name]}
             style={{ width: "100%" }}
           >
-            {question.options.map((option, index) => (
+            {question.options.map((option, index) => {
+              const isUnsureOrNoneSelected = answers[question.name] === "Unsure" || answers[question.name] === "None";
+              return (
               <Radio
                 key={index}
                 value={option}
                 style={{ display: "block", marginBottom: "10px" }}
+                // disabled={isUnsureOrNoneSelected && option !== "Unsure" && option !== "None"}
               >
                 {option === "Other" ? (
                   <>
@@ -918,7 +978,7 @@ const ReproductiveHealth = ({ onComplete }) => {
                   option
                 )}
               </Radio>
-            ))}
+            )})}
           </Radio.Group>
         );
       case "date":
@@ -969,18 +1029,22 @@ const ReproductiveHealth = ({ onComplete }) => {
           <Radio.Group
             name={question.name}
             onChange={(e) => handleChange(e.target.value, question.name)}
+            className="radioGroup-baibhav-4"
             value={answers[question.name]}
             style={{ width: "100%" }}
           >
-            {question.options.map((option, index) => (
+            {question.options.map((option, index) => {
+              const isUnsureOrNoneSelected = answers[question.name] === "Unsure" || answers[question.name] === "None";
+              return (
               <Radio
                 key={index}
                 value={option}
                 style={{ display: "block", marginBottom: "10px" }}
+                // disabled={isUnsureOrNoneSelected && option !== "Unsure" && option !== "None"}
               >
                 {option}
               </Radio>
-            ))}
+            )})}
             {answers[question.name] === "No" && (
               <Select
                 placeholder="Please specify"
@@ -1094,8 +1158,16 @@ const ReproductiveHealth = ({ onComplete }) => {
             value={answers[question.name] || []}
             className="checkbox-group"
           >
-            {question.options.map((option, index) => (
-              <Checkbox key={index} value={option} className="checkbox-item">
+            {question.options.map((option, index) => {
+              const isUnsureOrNoneSelected = (answers[question.name] || []).includes("Unsure") || 
+              (answers[question.name] || []).includes("None");
+              return (
+              <Checkbox 
+                key={index} 
+                value={option} 
+                disabled={isUnsureOrNoneSelected && option !== "Unsure" && option !== "None"}
+                className="checkbox-item"
+              >
                 {option === "Other" ? (
                   <>
                     {option}
@@ -1121,7 +1193,7 @@ const ReproductiveHealth = ({ onComplete }) => {
                   option
                 )}
               </Checkbox>
-            ))}
+            )})}
           </Checkbox.Group>
         );
       case "long_radio":
@@ -1129,19 +1201,26 @@ const ReproductiveHealth = ({ onComplete }) => {
           <div style={{ flexDirection: "column" }}>
             <Radio.Group
               name={question.name}
+              className="radioGroup-baibhav-5"
               onChange={(e) => handleChange(e.target.value, question.name)}
               value={answers[question.name]}
               style={{ width: "100%" }}
             >
-              {question.options.map((option, index) => (
+              {question.options.map((option, index) => {
+                const isUnsureOrNoneSelected = answers[question.name] === "Unsure" || answers[question.name] === "None";
+                const isBirthControlQuestion = question.name === "relaxation_techniques";
+                const isHormonalAnswered = answers["how_often_hormonal_bc"];
+                const isNonHormonalAnswered = answers["how_often_non_hormonal_bc"];
+                return (
                 <Radio
                   key={index}
                   value={option}
                   style={{ display: "block", marginBottom: "10px" }}
+                  // disabled={isUnsureOrNoneSelected && option !== "Unsure" && option !== "None"}
                 >
                   {option}
                 </Radio>
-              ))}
+              )})}
             </Radio.Group>
             {answers[question.name] === "Yes" &&
               renderSubQuestions(question.subQuestions)}

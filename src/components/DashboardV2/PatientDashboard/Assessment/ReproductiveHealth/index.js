@@ -444,9 +444,8 @@ const ReproductiveHealth = ({ onComplete }) => {
 
     // Special Handling for Birth Control Question
     if (question.name === "relaxation_techniques" && mainAnswer === "Yes") {
-        
-        const isHormonalAnswered = answers["how_often_hormonal_bc"]?.trim() !== "";
-        const isNonHormonalAnswered = answers["how_often_non_hormonal_bc"]?.trim() !== "";
+        const isHormonalAnswered = answers["how_often_hormonal_bc"] !== undefined && answers["how_often_hormonal_bc"]?.trim() !== "";
+        const isNonHormonalAnswered = answers["how_often_non_hormonal_bc"] !== undefined && answers["how_often_non_hormonal_bc"]?.trim() !== "";
 
 
         if (!isHormonalAnswered && !isNonHormonalAnswered) {

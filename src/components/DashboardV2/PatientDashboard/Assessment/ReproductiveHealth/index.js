@@ -946,7 +946,7 @@ const ReproductiveHealth = ({ onComplete }) => {
             style={{ width: "100%" }}
           >
             {question.options.map((option, index) => {
-              const isUnsureOrNoneSelected = answers[question.name] === "Unsure" || answers[question.name] === "None";
+              // const isUnsureOrNoneSelected = answers[question.name] === "Unsure" || answers[question.name] === "None";
               return (
               <Radio
                 key={index}
@@ -1034,7 +1034,7 @@ const ReproductiveHealth = ({ onComplete }) => {
             style={{ width: "100%" }}
           >
             {question.options.map((option, index) => {
-              const isUnsureOrNoneSelected = answers[question.name] === "Unsure" || answers[question.name] === "None";
+              // const isUnsureOrNoneSelected = answers[question.name] === "Unsure" || answers[question.name] === "None";
               return (
               <Radio
                 key={index}
@@ -1207,10 +1207,10 @@ const ReproductiveHealth = ({ onComplete }) => {
               style={{ width: "100%" }}
             >
               {question.options.map((option, index) => {
-                const isUnsureOrNoneSelected = answers[question.name] === "Unsure" || answers[question.name] === "None";
-                const isBirthControlQuestion = question.name === "relaxation_techniques";
-                const isHormonalAnswered = answers["how_often_hormonal_bc"];
-                const isNonHormonalAnswered = answers["how_often_non_hormonal_bc"];
+                // const isUnsureOrNoneSelected = answers[question.name] === "Unsure" || answers[question.name] === "None";
+                // const isBirthControlQuestion = question.name === "relaxation_techniques";
+                // const isHormonalAnswered = answers["how_often_hormonal_bc"];
+                // const isNonHormonalAnswered = answers["how_often_non_hormonal_bc"];
                 return (
                 <Radio
                   key={index}

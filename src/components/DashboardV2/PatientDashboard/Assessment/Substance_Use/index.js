@@ -27,7 +27,7 @@ const questions = [
     subQuestions: [
       {
         question: "Packs per day:",
-        type: "inputNumber",
+        type: "inputNumberX",
         name: "packs_per_day",
       },
       {
@@ -360,6 +360,20 @@ const SubstanceUse = ({ onComplete }) => {
             name={subQuestion.name}
             value={answers[subQuestion.name] || 0}
             min={0}
+            onChange={(value) => handleChange(value, subQuestion.name)}
+            className="select_questtionnaire"
+            style={{
+              height: 35,
+              borderColor: "#00ADEF",
+              width: isMobile ? "100%" : "50%",
+            }}
+          />
+        )}
+         {subQuestion.type === "inputNumberX" && (
+          <InputNumber
+            name={subQuestion.name}
+            value={answers[subQuestion.name] || 0}
+            min={-1}
             onChange={(value) => handleChange(value, subQuestion.name)}
             className="select_questtionnaire"
             style={{

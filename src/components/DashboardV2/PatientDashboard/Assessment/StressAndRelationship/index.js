@@ -610,8 +610,8 @@ const StressAndRelationship = ({ onComplete }) => {
         />
         <h3 style={{ margin: "20px 0", color: "#F2AA93" }}>   
         {label}
-          {questions[currentQuestionIndex].title
-            ?  questions[currentQuestionIndex].title
+          {questions[currentQuestionIndex]?.title
+            ?  questions[currentQuestionIndex]?.title
             : "Stress"}
         </h3>
 

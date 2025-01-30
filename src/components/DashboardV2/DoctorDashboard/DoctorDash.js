@@ -122,7 +122,7 @@ export default function DoctorDash() {
 
   const dataWithIds = useMemo(
     () =>
-      data.map((item) => ({
+      data?.map((item) => ({
         ...item,
         id: item.id,
       })),

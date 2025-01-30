@@ -214,7 +214,7 @@ export default function PatDash() {
       <div
         style={{
           background: "#F0F8FF",
-          padding: isMobile ? "8%" : "30px",
+          padding: isMobile ? "8%" : "10px",
           borderRadius: isMobile ? "0px" : "15px",
           marginRight: isMobile ? "-25px" : 0,
           marginLeft: isMobile ? "-25px" : 0,
@@ -236,7 +236,7 @@ export default function PatDash() {
             responsive={false}
             size="small"
             style={{
-              marginTop: "20px",
+              marginTop: "10px",
               display: "flex",
               flexDirection: isMobile ? "row" : "row",
               alignItems: isMobile ? "flex-start" : "center",
@@ -339,7 +339,7 @@ export default function PatDash() {
               flexDirection: isMobile ? "row" : "row",
               alignItems: isMobile ? "flex-start" : "",
               overflowX: "auto",
-              padding: isMobile ? 0 : '0 2%'
+              padding: isMobile ? 0 : '5px 2%'
             }}
             items={[
               {

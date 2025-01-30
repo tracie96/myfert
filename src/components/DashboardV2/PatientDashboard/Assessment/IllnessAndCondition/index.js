@@ -264,7 +264,7 @@ const questions = [
     name: "chest_X_ray",
     question: "Diagnostic Studies",
     sub: "Chest X-ray",
-    dateName: "chest_X-ray",
+    dateName: "chest_X_ray",
     title: "Medical History: Illnesses/Conditions",
     radioName: "chest_X_ray",
     radioOptions: [{ label: "comments", value: "Comments" }],
@@ -475,13 +475,11 @@ const questions = [
     name: "lastPapTest",
     question: "Diagnostic Studies",
     sub: "Last Pap Test",
-    dateName: "papTestDate",
+    dateName: "lastPapTest",
     title: "Gynecological Screening/Procedures",
-    radioName: "papTestResult",
-    radioOptions: [
-      { label: "Normal", value: "normal" },
-      { label: "Abnormal", value: "abnormal" },
-    ],
+    radioName: "lastPapTest",
+    radioOptions: [{ label: "comments", value: "Comments" }],
+
   },
   {
     type: "hospitalization",

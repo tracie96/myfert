@@ -121,7 +121,7 @@ const questions = [
     title: "Menstrual History",
     type: "select",
     name: "age_of_period",
-    options: Array.from({ length: 30 }, (_, i) => 0 + i),
+    options: Array.from({ length: 30 }, (_, i) => 7 + i),
   },
   {
     question: "Date of last menstrual period",
@@ -185,7 +185,7 @@ const questions = [
       {
         question: "If Yes: Please describe",
         type: "text",
-        name: "other_premenstrual_problems",
+        name: "other_hormonal_problems_history",
       },
     ],
   },
@@ -219,7 +219,7 @@ const questions = [
       {
         question: "If Yes: explain",
         type: "text",
-        name: "other_hormonal_problems_history",
+        name: "any_hormonal_problems_bc",
       },
     ],
   },
@@ -233,7 +233,7 @@ const questions = [
       {
         question: "If Yes:",
         type: "radio",
-        name: "use_of_contraception",
+        name: "use_of_contraception_sub",
         options: ["Condoms", "Diaphgram", "IUD", "Partner Vasectomy"],
       },
     ],
@@ -249,7 +249,7 @@ const questions = [
         question: "If Yes: age at last period",
         type: "select",
         name: "age_at_last_period",
-        options: Array.from({ length: 50 }, (_, i) => 0 + i),
+        options: Array.from({ length: 100 }, (_, i) => 40 + i),
       },
     ],
   },
@@ -263,7 +263,7 @@ const questions = [
       {
         question: "If Yes: explain surgery",
         type: "text",
-        name: "surgical_menopause",
+        name: "surgical_menopause_detail",
       },
     ],
   },
@@ -433,17 +433,27 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
 
   const handleSubmit = async () => {
     // Prepare the API payload
+    const obstetricCategories = [
+      "Pregnancy",
+      "Miscarriages",
+      "Abortions",
+      "Living children",
+      "Vaginal deliveries",
+      "Caesarean",
+      "Term births",
+      "Premature birth"
+    ];
+    
     const apiPayload = {
-        obstetricHistory: [
-            {
-                level: 0,
-                name: "", // Adjust based on your application's logic
-            },
-        ],
+      obstetricHistory: obstetricCategories.map((category) => ({
+        name: category,
+        level: answers[category.toLowerCase().replace(/\s+/g, "_")] || 0, 
+      })),
+
         weightChild: {
-            metricImperialScale: true, // Default value, adjust as necessary
-            weightSmallest: 0, // Adjust based on answers if needed
-            weightLargest: 0, // Adjust based on answers if needed
+            metricImperialScale: true, 
+            weightSmallest: 0,
+            weightLargest: 0, 
         },
         problemsAfterPregnancy: answers.pregnancy_problems === "Yes",
         problemsAfterPregnancyExplain: answers.pregnancy_problems || "",
@@ -455,7 +465,7 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
         painInPeriod: answers.pain === "Yes",
         everHadPreMenstrualProblems: {
             yesNo: answers.premenstrual_problems === "Yes",
-            describe: answers.how_often_reaxation || "",
+            describe: answers.premenstrual_problems_describe || "",
         },
         otherMenstrualProblems: {
             yesNo: answers.other_premenstrual_problems === "Yes",
@@ -467,21 +477,21 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
         },
         problemsWithHormonalBirthControl: {
             yesNo: answers.other_hormonal_problems === "Yes",
-            describe: answers.other_hormonal_problems_history || "",
+            describe: answers.any_hormonal_problems_bc || "",
         },
         useContraception: {
             yesNo: answers.use_of_contraception === "Yes",
-            describe: answers.hormonal_birthcontrol_long || "",
+            describe: answers.use_of_contraception_sub || "",
         },
         inMenopause: {
             yesNo: answers.is_menopause === "Yes",
-            level: 0, // Adjust if applicable
+            level: answers.age_at_last_period || 0, 
         },
         surgicalMenopause: {
             yesNo: answers.surgical_menopause === "Yes",
             describe: answers.symptomatic_problems_menopause_history?.join(", ") || "",
         },
-        symptomicProblems: answers.symptomatic_problems_menopause || [],
+        symptomicProblems: answers.symptomatic_problems_menopause_history || [],
         hormonalReplacement: {
             yesNo: answers.hormone_replacement_therapy === "Yes",
             describe: answers.hormone_replacement_therapy_sub || "",
@@ -555,6 +565,21 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
             className="input_questtionnaire"
           />
         )}
+
+        {subQuestion.type === "select" && (
+          <Select
+            className="select_questtionnaire"
+            name={subQuestion.name}
+            value={answers[subQuestion.name] || ""}
+            onChange={(value) => handleChange(value, subQuestion.name)}
+          >
+            {subQuestion.options.map((option, index) => (
+              <Option key={index} value={option}>
+                {option}
+              </Option>
+            ))}
+          </Select>)}
+
         {subQuestion.type === "radio" && (
           <Radio.Group
             name={subQuestion.name}
@@ -980,7 +1005,8 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
               renderSubQuestions(question.subQuestions)}
           </div>
         );
-      case "date_radio":
+      
+        case "date_radio":
         return (
           <div key={question.name} style={{ marginBottom: "20px" }}>
             <Button

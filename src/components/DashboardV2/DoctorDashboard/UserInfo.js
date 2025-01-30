@@ -1260,37 +1260,74 @@ function SwitchContent({
               {/* First Column */}
               <Col xs={24} md={12}>
                  <Descriptions column={1} bordered>
-                  <Descriptions.Item label="Average Cycle Lenght">
-                    {reproductiveInfo?.averageCycleLenght || "N/A"}
-                  </Descriptions.Item>
                   <Descriptions.Item label="Birth Control">
                     {reproductiveInfo.birthControl === null || reproductiveInfo.birthControl === undefined ? 'N/A' : (reproductiveInfo.birthControl ? 'Yes' : 'No')}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Charting To Conceive">
-                    {reproductiveInfo?.chartingToConceive || "N/A"}
+                    {reproductiveInfo?.hormonalBirthControl || ""}
+                    {reproductiveInfo?.nonHormonalBirthControl || ""}
                   </Descriptions.Item>
                   <Descriptions.Item label="Currently Pregnant">
                     {reproductiveInfo?.currentlyPregnant === null || reproductiveInfo.currentlyPregnant === undefined ? 'N/A' : (reproductiveInfo.currentlyPregnant ? 'Yes' : 'No')}
                   </Descriptions.Item>
-                  <Descriptions.Item label="Cycle Discharge After Period Spotting Duration">
+                  <Descriptions.Item label="Trying to conceive">
+                  {reproductiveInfo?.tryingToConceive === null || reproductiveInfo.tryingToConceive === undefined ? 'N/A' : (reproductiveInfo.tryingToConceive ? 'Yes' : 'No')}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Difficulty Trying To Conceive">
+                    {reproductiveInfo?.difficultyTryingToConceive === null || reproductiveInfo.difficultyTryingToConceive === undefined ? 'N/A' : (reproductiveInfo.difficultyTryingToConceive ? 'Yes' : 'No')}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Family Member With Reproductive Concerns">
+                    {reproductiveInfo?.familyMemberWithReproductiveConcerns || "N/A"}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="How Long Trying To Conceive">
+                    {reproductiveInfo?.howLongTryingToConceive || "N/A"}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Method To Conceive">
+                    {reproductiveInfo?.methodToConceive || "N/A"}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Charting To Conceive">
+                    {reproductiveInfo?.chartingToConceive || "N/A"}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Method Fertility Awareness">
+                    {reproductiveInfo?.methodFertilityAwareness || "N/A"}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Intercouse Each Cycle">
+                    {reproductiveInfo?.intercouseEachCycle || "N/A"}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Menstrual Pain During Period">
+                    {reproductiveInfo?.menstrualPainDuringPeriod || "N/A"}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Menstral Bleeding Pelvic Pain Duration">
+                    {reproductiveInfo?.menstralBleedingPelvicPain?.duration || "N/A"}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Menstral Bleeding Pelvic Pain Colour">
+                    {reproductiveInfo?.menstralBleedingPelvicPain?.colour || "N/A"}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Experience Pelvic Pain">
+                    {reproductiveInfo?.experiencePelvicPain === null || reproductiveInfo.experiencePelvicPain === undefined ? 'N/A' : (reproductiveInfo.experiencePelvicPain ? 'Yes' : 'No')}
+                  </Descriptions.Item>
+                  
+                 
+                  {/* <Descriptions.Item label="Utilizing Fertility Awareness">
+                    {reproductiveInfo?.utilizingFertilityAwareness === null || reproductiveInfo.utilizingFertilityAwareness === undefined ? 'N/A' : (reproductiveInfo.utilizingFertilityAwareness ? 'Yes' : 'No')}
+                  </Descriptions.Item> */}
+                  {/* <Descriptions.Item label="Cycle Discharge After Period Spotting Duration">
                     {reproductiveInfo?.cycleDischargeAfterPeriodSpotting?.duration || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Cycle Discharge After Period Spotting Color">
+                  </Descriptions.Item> */}
+                  {/* <Descriptions.Item label="Cycle Discharge After Period Spotting Color">
                     {reproductiveInfo?.cycleDischargeAfterPeriodSpotting?.color || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Cycle Discharge Creamy Duration">
+                  </Descriptions.Item> */}
+                  {/* <Descriptions.Item label="Cycle Discharge Creamy Duration">
                     {reproductiveInfo?.cycleDischargeCreamy?.duration || "N/A"}
-                  </Descriptions.Item> 
-                  <Descriptions.Item label="Cycle Discharge Creamy Colour">
+                  </Descriptions.Item>  */}
+                  {/* <Descriptions.Item label="Cycle Discharge Creamy Colour">
                     {reproductiveInfo?.cycleDischargeCreamy?.colour || "N/A"}
-                  </Descriptions.Item> 
-                  <Descriptions.Item label="Cycle Discharge Egg White Duration">
+                  </Descriptions.Item>  */}
+                  {/* <Descriptions.Item label="Cycle Discharge Egg White Duration">
                     {reproductiveInfo?.cycleDischargeEggWhite?.duration || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Cycle Discharge Egg White Colour">
+                  </Descriptions.Item> */}
+                  {/* <Descriptions.Item label="Cycle Discharge Egg White Colour">
                     {reproductiveInfo?.cycleDischargeEggWhite?.colour || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Cycle Discharge Menstral Bleeding Duration">
+                  </Descriptions.Item> */}
+                  {/* <Descriptions.Item label="Cycle Discharge Menstral Bleeding Duration">
                     {reproductiveInfo?.cycleDischargeMenstralBleeding?.duration || "N/A"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Cycle Discharge Menstral Bleeding Colour">
@@ -1307,52 +1344,67 @@ function SwitchContent({
                   </Descriptions.Item>
                   <Descriptions.Item label="Cycle Discharge Watery Colour">
                     {reproductiveInfo?.cycleDischargeWatery?.colour || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Difficulty Trying To Conceive">
-                    {reproductiveInfo?.difficultyTryingToConceive === null || reproductiveInfo.difficultyTryingToConceive === undefined ? 'N/A' : (reproductiveInfo.difficultyTryingToConceive ? 'Yes' : 'No')}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Do You Pms Symptoms">
-                    {reproductiveInfo?.doYouPmsSymptoms === null || reproductiveInfo.doYouPmsSymptoms === undefined ? 'N/A' : (reproductiveInfo.doYouPmsSymptoms ? 'Yes' : 'No')}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="During Circle Pelvic Pain Duration">
-                    {reproductiveInfo?.duringCirclePelvicPain?.duration || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="During Circle Pelvic Pain Colour">
-                    {reproductiveInfo?.duringCirclePelvicPain?.colour || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Experience Pelvic Pain">
-                    {reproductiveInfo?.experiencePelvicPain === null || reproductiveInfo.experiencePelvicPain === undefined ? 'N/A' : (reproductiveInfo.experiencePelvicPain ? 'Yes' : 'No')}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Family Member With Reproductive Concerns">
-                    {reproductiveInfo?.familyMemberWithReproductiveConcerns || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Hormonal Birth Control">
+                  </Descriptions.Item> */}
+                  
+                  {/* <Descriptions.Item label="Hormonal Birth Control">
                     {reproductiveInfo?.hormonalBirthControl || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="How Long Trying To Conceive">
-                    {reproductiveInfo?.howLongTryingToConceive || "N/A"}
-                  </Descriptions.Item>
+                  </Descriptions.Item> */}
+                  
                 </Descriptions> 
               </Col>
       
               {/* Second Column */}
               <Col xs={24} md={12}>
                 <Descriptions column={1} bordered>
-                  <Descriptions.Item label="Intercouse Days">
-                    {reproductiveInfo?.intercouseDays || "N/A"}
+                <Descriptions.Item label="During Circle Pelvic Pain Duration">
+                    {reproductiveInfo?.duringCirclePelvicPain?.duration || "N/A"}
                   </Descriptions.Item>
-                  <Descriptions.Item label="Intercouse Each Cycle">
-                    {reproductiveInfo?.intercouseEachCycle || "N/A"}
+                  <Descriptions.Item label="During Circle Pelvic Pain Colour">
+                    {reproductiveInfo?.duringCirclePelvicPain?.colour || "N/A"}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Do You Pms Symptoms">
+                    {reproductiveInfo?.doYouPmsSymptoms === null || reproductiveInfo.doYouPmsSymptoms === undefined ? 'N/A' : (reproductiveInfo.doYouPmsSymptoms ? 'Yes' : 'No')}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="pms Symptoms">
+                    {reproductiveInfo?.pmsSymptoms || "N/A"}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="pms Duration">
+                    {reproductiveInfo?.pms?.duration || "N/A"}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="pms Colour">
+                    {reproductiveInfo?.pms?.colour || "N/A"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Longest Cycle Lenght">
                     {reproductiveInfo?.longestCycleLenght || "N/A"}
                   </Descriptions.Item>
-                  <Descriptions.Item label="Menstral Bleeding Pelvic Pain Duration">
-                    {reproductiveInfo?.menstralBleedingPelvicPain?.duration || "N/A"}
+                  <Descriptions.Item label="Shortest Cycle Lenght">
+                    {reproductiveInfo?.shortestCycleLenght || "N/A"}
                   </Descriptions.Item>
-                  <Descriptions.Item label="Menstral Bleeding Pelvic Pain Colour">
-                    {reproductiveInfo?.menstralBleedingPelvicPain?.colour || "N/A"}
+                  <Descriptions.Item label="Average Cycle Lenght">
+                    {reproductiveInfo?.averageCycleLenght || "N/A"}
                   </Descriptions.Item>
+                   {/* <Descriptions.Item label="Who Do You Live With?">
+                  {reproductiveInfo.who_do_you_live_with || 'N/A'}
+                  </Descriptions.Item> */}
+                  <Descriptions.Item label="current occupation">
+                    {reproductiveInfo?.current_occupation || 'N/A'}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="previous occupation">
+                  {reproductiveInfo.previous_occupation || 'N/A'}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Resourcces For Emotional Support">
+                  {reproductiveInfo.resourcces_for_emotional_support || 'N/A'}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="spiritual practice">
+                  {reproductiveInfo.spiritual_practice || 'N/A'}
+                  </Descriptions.Item>
+
+
+
+
+                  
+                  {/* <Descriptions.Item label="Intercouse Days">
+                    {reproductiveInfo?.intercouseDays || "N/A"}
                   <Descriptions.Item label="Menstral Cycle Colour">
                     {reproductiveInfo?.menstralCycleColour || "N/A"}
                   </Descriptions.Item>
@@ -1362,39 +1414,16 @@ function SwitchContent({
                   <Descriptions.Item label="Menstral Cycle Frequency">
                     {reproductiveInfo?.menstralCycleFrequency || "N/A"}
                   </Descriptions.Item>
-                  <Descriptions.Item label="Menstrual Pain During Period">
-                    {reproductiveInfo?.menstrualPainDuringPeriod || "N/A"}
-                  </Descriptions.Item>
-                 <Descriptions.Item label="Method Fertility Awareness">
-                    {reproductiveInfo?.methodFertilityAwareness || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Method To Conceive">
-                    {reproductiveInfo?.methodToConceive || "N/A"}
-                  </Descriptions.Item>
                   <Descriptions.Item label="Mid Cycle Spotting">
                     {reproductiveInfo?.midCycleSpotting === null || reproductiveInfo.midCycleSpotting === undefined ? 'N/A' : (reproductiveInfo.midCycleSpotting ? 'Yes' : 'No')}
                   </Descriptions.Item>
                   <Descriptions.Item label="Non Hormonal Birth Control">
                     {reproductiveInfo?.nonHormonalBirthControl || "N/A"}
                   </Descriptions.Item> 
-                  <Descriptions.Item label="pms Duration">
-                    {reproductiveInfo?.pms?.duration || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="pms Colour">
-                    {reproductiveInfo?.pms?.colour || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="pms Symptoms">
-                    {reproductiveInfo?.pmsSymptoms || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Shortest Cycle Lenght">
-                    {reproductiveInfo?.shortestCycleLenght || "N/A"}
-                  </Descriptions.Item>
                   <Descriptions.Item label="Trying To Conceive">
                     {reproductiveInfo?.tryingToConceive === null || reproductiveInfo.tryingToConceive === undefined ? 'N/A' : (reproductiveInfo.tryingToConceive ? 'Yes' : 'No')}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Utilizing Fertility Awareness">
-                    {reproductiveInfo?.utilizingFertilityAwareness === null || reproductiveInfo.utilizingFertilityAwareness === undefined ? 'N/A' : (reproductiveInfo.utilizingFertilityAwareness ? 'Yes' : 'No')}
-                  </Descriptions.Item>
+                  </Descriptions.Item> */}
+                  
                 </Descriptions>
               </Col> 
             </Row>

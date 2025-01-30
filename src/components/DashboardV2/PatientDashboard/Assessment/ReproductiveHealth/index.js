@@ -148,7 +148,7 @@ const questions = [
     "How frequently do you have intercourse during your fertile window?",
     type: "number_with_radio",
     title: "Trying to Conceive",
-    name: "",
+    name: "intercourse_during_fertile",
     subQuestions: [
         {
           type: "number_with_radio_sub",
@@ -344,7 +344,7 @@ const questions = [
         type: "number_with_radio_sub",
         label: "",
         options: ["Unsure"],
-        name: "average_cycle",
+        name: "average_cycle_radio",
       },
     ],
   },
@@ -453,6 +453,18 @@ const ReproductiveHealth = ({ onComplete }) => {
         }
 
     }
+
+    // Special Handling for time of your period Question
+    if (question.name === "is_menstrual_pain" && mainAnswer === "Yes") {
+      const isHormonalAnswered = answers["how_often_hormonal_bc"] !== undefined && answers["how_often_hormonal_bc"]?.trim() !== "";
+      const isNonHormonalAnswered = answers["how_often_non_hormonal_bc"] !== undefined && answers["how_often_non_hormonal_bc"]?.trim() !== "";
+
+
+      if (!isHormonalAnswered && !isNonHormonalAnswered) {
+          return false;
+      }
+
+  }
 
     // Validate "number_with_radio" with multiple subQuestions
     if (question.type === "number_with_radio" && question.subQuestions) {
@@ -598,9 +610,25 @@ const ReproductiveHealth = ({ onComplete }) => {
       // Normal case when selecting other options
       updatedAnswers[name] = value;
     }
-  
+
+    //check for NO VALUE
+    if (Array.isArray(value) &&  name === "is_menstrual_pain" ) {
+      // Check if "Unsure" or "None" is selected
+
+      const isUnsureOrNoneSelected = value.includes("No");
+      if (isUnsureOrNoneSelected) {
+        // Keep only "Unsure" or "None" and remove all other selections
+        updatedAnswers[name] = value.filter(opt => opt === "No");
+      } else {
+        // Otherwise, update normally
+        updatedAnswers[name] = value;
+      }
+    } 
     setAnswers(updatedAnswers);
   }; 
+
+  
+
   const handleExit = () => {
     navigate("/assessment");
   };
@@ -616,7 +644,7 @@ const ReproductiveHealth = ({ onComplete }) => {
   const handleSubmit = async () => {
     try {
       const requestData = {
-        birthControl: answers.do_you_have_current_health_concern === "Yes",
+        birthControl: answers.relaxation_techniques === "Yes",
         hormonalBirthControl: answers.how_often_hormonal_bc || "N/A",
         nonHormonalBirthControl: answers.how_often_non_hormonal_bc || "N/A",
         currentlyPregnant: answers.isPregnant === "Yes",
@@ -629,19 +657,14 @@ const ReproductiveHealth = ({ onComplete }) => {
         howLongTryingToConceive: answers.is_trying_to_conceive_time || "Unknown",
         methodToConceive: answers.methods_trying_to_conceive || [],
         chartingToConceive: answers.is_charting_cycles || [],
-        utilizingFertilityAwareness: false, 
-        methodFertilityAwareness: answers.charting_method || "None",
-        intercouseDays: answers.intercouseDays || "Unknown",
+        currentTherapy:answers.current_therapy,
+        intercourse_during_fertile:answers.intercourse_during_fertile || "Unknown",
         intercouseEachCycle: answers.is_frequent_intercourse_cycle || "Unknown",
         menstrualPainDuringPeriod: answers.is_menstrual_pain || ["None"],
+        experiencePelvicPain: answers.is_lower_back_pain === "Yes",
         menstralBleedingPelvicPain: {
           duration: `${answers.duration_per_cycle}` || "N/A",
           colour: answers.duration_per_cycle_severity, 
-        },
-        experiencePelvicPain: answers.is_lower_back_pain === "Yes",
-        duringCirclePelvicPain: {
-          duration: answers.duration_per_mild_cycle_radio || "N/A",
-          colour: "N/A",
         },
         doYouPmsSymptoms: answers.is_pms_symptom === "Yes",
         pmsSymptoms: answers.pms_sympton || ["None"],
@@ -650,12 +673,28 @@ const ReproductiveHealth = ({ onComplete }) => {
           colour: answers.pms_sympton_severity || "Mild",
         },
         longestCycleLenght: answers.longest_cycle_radio || "Unknown",
-        shortestCycleLenght: answers.shortest_cycle_radio || "Unknown",
         averageCycleLenght: answers.average_cycle_radio || "Unknown",
+        shortestCycleLenght: answers.shortest_cycle_radio || "Unknown",
+        who_do_you_live_with: answers.who_do_you_live_with || 'N/A',
+        current_occupation: answers.current_occupation || 'N/A',
+        previous_occupation: answers.previous_occupation || 'N/A',
+        resourcces_for_emotional_support: answers.resourcces_for_emotional_support || [],
+        spiritual_practice:answers.spiritual_practice || 'N/A',
+
+        utilizingFertilityAwareness: false, 
+        methodFertilityAwareness: answers.charting_method || "None",
+        intercouseDays: answers.intercouseDays || "Unknown",
+        is_charting_cycles: answers.is_charting_cycles || 'N/A',
+        duringCirclePelvicPain: {
+          duration: answers.duration_per_mild_cycle_radio || "N/A",
+          colour: "N/A",
+        },
         midCycleSpotting: false,
-        menstralCycleFrequency: "Unknown", // Example default
-        menstralCycleDuration: "Unknown", // Example default
-        menstralCycleColour: "Unknown", // Example default
+        menstralCycleFrequency: answers.menstralCycleFrequency || "Unknown", // Example default
+        menstralCycleDuration: answers.menstralCycleDuration || "Unknown", // Example default
+        menstralCycleColour: answers.menstralCycleColour || "Unknown",
+        relaxation_techniques: answers.relaxation_techniques || 'N/A',
+        methods_trying_to_conceive: answers.methods_trying_to_conceive || [],
         cycleDischargeCreamy: {
           duration: "Unknown", // Example default
           colour: "Unknown", // Example default
@@ -686,6 +725,7 @@ const ReproductiveHealth = ({ onComplete }) => {
   
       const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
       const token = userInfo.obj?.token || "";
+      //console.log("userInfo--", userInfo);
   
       const response = await fetch(
         "https://myfertilitydevapi.azurewebsites.net/api/Patient/AddReproductiveHealth",
@@ -759,7 +799,7 @@ const ReproductiveHealth = ({ onComplete }) => {
               {/* Radio.Group should use a different key in the state */}
               <Radio.Group
                 name={`${subQuestion.name}_radio`} // Use a different key for the Radio.Group
-                className="radioGroup-baibhav"
+                className="radioGroup"
                 value={answers[`${subQuestion.name}_radio`] || null} // Default selection or null
                 onChange={
                   (e) =>
@@ -796,7 +836,7 @@ const ReproductiveHealth = ({ onComplete }) => {
                 <label>{subQuestion.subQuestions[4].label}</label>
                 <Radio.Group
                   name={`${subQuestion.subQuestions[4].name}_radio`}
-                  className="radioGroup-baibhav-1"
+                  className="radioGroup"
                   value={
                     answers[`${subQuestion.subQuestions[4].name}_radio`] || null
                   }
@@ -877,7 +917,7 @@ const ReproductiveHealth = ({ onComplete }) => {
         {subQuestion.type === "radio" && (
           <Radio.Group
             name={subQuestion.name}
-            className="radioGroup-baibhav-2"
+            className="radioGroup"
             onChange={(e) => handleChange(e.target.value, subQuestion.name)}
             value={answers[subQuestion.name]}
             style={{ width: "100%" }}
@@ -939,7 +979,7 @@ const ReproductiveHealth = ({ onComplete }) => {
         return (
           <Radio.Group
             name={question.name}
-            className="radioGroup-baibhav-3"
+            className="radioGroup"
             onChange={(e) => handleChange(e.target.value, question.name)}
             value={answers[question.name]}
             style={{ width: "100%" }}
@@ -1028,7 +1068,7 @@ const ReproductiveHealth = ({ onComplete }) => {
           <Radio.Group
             name={question.name}
             onChange={(e) => handleChange(e.target.value, question.name)}
-            className="radioGroup-baibhav-4"
+            className="radioGroup"
             value={answers[question.name]}
             style={{ width: "100%" }}
           >
@@ -1200,7 +1240,7 @@ const ReproductiveHealth = ({ onComplete }) => {
           <div style={{ flexDirection: "column" }}>
             <Radio.Group
               name={question.name}
-              className="radioGroup-baibhav-5"
+              className="radioGroup"
               onChange={(e) => handleChange(e.target.value, question.name)}
               value={answers[question.name]}
               style={{ width: "100%" }}

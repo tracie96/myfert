@@ -281,14 +281,15 @@ const questions = [
           "Poor Sleep",
           "Energy Increase",
           "Energy Decrease",
+          "Unsure"
         ],
       },
-      {
-        type: "number_with_radio_sub",
-        label: "",
-        options: ["Unsure"],
-        name: "pms_sympton_check",
-      },
+      // {
+      //   type: "number_with_radio_sub",
+      //   label: "",
+      //   options: ["Unsure"],
+      //   name: "pms_sympton_check",
+      // },
       {
         question: "PMS Severity",
         type: "radio",
@@ -422,14 +423,27 @@ const ReproductiveHealth = ({ onComplete }) => {
 
   
   const validateQuestion = () => {
+
     const question = questions[currentQuestionIndex];
-    const mainAnswer = answers[question.name];
+    const isUnsureChecked = answers[`${question.name}_unsure`];
+    let mainAnswer = answers[question.name];
+    let subQuestionUnsureChecked = false;
 
     // Ensure the main question is answered
-    if (!mainAnswer) {
-        return false; // Prevent proceeding if the main question is empty
+    if (!mainAnswer && question.subQuestions) {
+      for (const subQuestion of question.subQuestions) {
+        debugger
+        if (answers[`${subQuestion.name}_unsure`]) {
+          subQuestionUnsureChecked = true;
+        }
+        if (answers[subQuestion.name] !== undefined && answers[subQuestion.name] !== "" && !isNaN(answers[subQuestion.name])) {
+          mainAnswer = answers[subQuestion.name];
+          break;
+        }
+      }
+      return isUnsureChecked || subQuestionUnsureChecked || (mainAnswer !== undefined && mainAnswer !== "" && !isNaN(mainAnswer));
     }
-
+    
     // Handle "Other" selection with an additional input
     const isCheckbox = Array.isArray(mainAnswer);
     const isOtherSelected = isCheckbox
@@ -464,6 +478,7 @@ const ReproductiveHealth = ({ onComplete }) => {
           return false;
       }
 
+      return false;
   }
 
     // Validate "number_with_radio" with multiple subQuestions
@@ -624,6 +639,32 @@ const ReproductiveHealth = ({ onComplete }) => {
         updatedAnswers[name] = value;
       }
     } 
+    if (name.includes("_unsure")) {
+      updatedAnswers[name] = value;
+      if (value) {
+        updatedAnswers[name.replace("_unsure", "")] = "";
+      }
+    } else {
+      updatedAnswers[name] = value;
+      updatedAnswers[`${name}_unsure`] = false;
+    }
+
+    if (name === "is_menstrual_pain" && Array.isArray(value)) {
+      // If "No" is selected, remove all other selections
+      if (value.includes("No")) {
+        updatedAnswers[name] = ["No"];
+      } else {
+        updatedAnswers[name] = value;
+      }
+    } else if (name.includes("_unsure")) {
+      updatedAnswers[name] = value;
+      if (value) {
+        updatedAnswers[name.replace("_unsure", "")] = "";
+      }
+    } else {
+      updatedAnswers[name] = value;
+      updatedAnswers[`${name}_unsure`] = false;
+    }
     setAnswers(updatedAnswers);
   }; 
 
@@ -673,7 +714,7 @@ const ReproductiveHealth = ({ onComplete }) => {
           colour: answers.pms_sympton_severity || "Mild",
         },
         longestCycleLenght: answers.longest_cycle_radio || "Unknown",
-        averageCycleLenght: answers.average_cycle_radio || "Unknown",
+        averageCycleLenght: `${answers.average_cycle_radio}` || "Unknown",
         shortestCycleLenght: answers.shortest_cycle_radio || "Unknown",
         who_do_you_live_with: answers.who_do_you_live_with || 'N/A',
         current_occupation: answers.current_occupation || 'N/A',
@@ -788,26 +829,21 @@ const ReproductiveHealth = ({ onComplete }) => {
               style={{ display: "flex", flexDirection: "column", gap: "10px" }}
             >
               {/* InputNumber should have its own state key */}
-              <InputNumber
-                name={subQuestion.name}
-                value={answers[subQuestion.name] || 0}
-                onChange={(value) => handleChange(value, subQuestion.name)}
-                className="input_questtionnaire"
-                disabled={answers[`${subQuestion.name}_radio`] === "Unsure"}
+                <InputNumber
+                  name={subQuestion.name}
+                  value={answers[subQuestion.name] || undefined}
+                  onChange={(value) => handleChange(value, subQuestion.name)}
+                  disabled={answers[`${subQuestion.name}_unsure`]}
+                  className="input_questionnaire"
                 />
-
               {/* Radio.Group should use a different key in the state */}
-              <Radio.Group
-                name={`${subQuestion.name}_radio`} // Use a different key for the Radio.Group
-                className="radioGroup"
-                value={answers[`${subQuestion.name}_radio`] || null} // Default selection or null
-                onChange={
-                  (e) =>
-                    handleChange(e.target.value, `${subQuestion.name}_radio`) // Handle radio separately
-                }
+              <Checkbox
+                name={`${subQuestion.name}_unsure`}
+                checked={answers[`${subQuestion.name}_unsure`] || false}
+                onChange={(e) => handleChange(e.target.checked, `${subQuestion.name}_unsure`)}
               >
-                <Radio name="Unsure" value="Unsure">Unsure</Radio>
-              </Radio.Group>
+                Unsure
+            </Checkbox>
             </div>
           </>
         )}

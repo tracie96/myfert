@@ -26,6 +26,7 @@ const { Option } = Select;
 
 const questions = [
   {
+    title:"How well have things been going for you?",
     question:
       "(Enter score on scale of 1-10, with 1 being poorly, 5 being fine, and 10 being very well; choose N/A if not applicable) :",
     type: "rating_scale",
@@ -33,6 +34,7 @@ const questions = [
     name: "overll_wellbeing",
   },
   {
+    title:"How well have things been going for you?",
     question:
       "(Enter score on scale of 1-10, with 1 being poorly, 5 being fine, and 10 being very well; choose N/A if not applicable) :",
     type: "rating_scale",
@@ -40,6 +42,7 @@ const questions = [
     name: "school_wellbeing",
   },
   {
+    title:"How well have things been going for you?",
     question:
       "(Enter score on scale of 1-10, with 1 being poorly, 5 being fine, and 10 being very well; choose N/A if not applicable) :",
     type: "rating_scale",
@@ -47,6 +50,7 @@ const questions = [
     name: "job_wellbeing",
   },
   {
+    title:"How well have things been going for you?",
     question:
       "(Enter score on scale of 1-10, with 1 being poorly, 5 being fine, and 10 being very well; choose N/A if not applicable) :",
     type: "rating_scale",
@@ -55,6 +59,7 @@ const questions = [
   },
 
   {
+    title:"How well have things been going for you?",
     question:
       "(Enter score on scale of 1-10, with 1 being poorly, 5 being fine, and 10 being very well; choose N/A if not applicable) :",
     type: "rating_scale",
@@ -63,6 +68,7 @@ const questions = [
   },
 
   {
+    title:"How well have things been going for you?",
     question:
       "(Enter score on scale of 1-10, with 1 being poorly, 5 being fine, and 10 being very well; choose N/A if not applicable) :",
     type: "rating_scale",
@@ -71,6 +77,7 @@ const questions = [
   },
 
   {
+    title:"How well have things been going for you?",
     question:
       "(Enter score on scale of 1-10, with 1 being poorly, 5 being fine, and 10 being very well; choose N/A if not applicable) :",
     type: "rating_scale",
@@ -79,6 +86,7 @@ const questions = [
   },
 
   {
+    title:"How well have things been going for you?",
     question:
       "(Enter score on scale of 1-10, with 1 being poorly, 5 being fine, and 10 being very well; choose N/A if not applicable) :",
     type: "rating_scale",
@@ -87,6 +95,7 @@ const questions = [
   },
 
   {
+    title:"How well have things been going for you?",
     question:
       "(Enter score on scale of 1-10, with 1 being poorly, 5 being fine, and 10 being very well; choose N/A if not applicable) :",
     type: "rating_scale",
@@ -94,6 +103,7 @@ const questions = [
     name: "children_wellbeing",
   },
   {
+    title:"How well have things been going for you?",
     question:
       "(Enter score on scale of 1-10, with 1 being poorly, 5 being fine, and 10 being very well; choose N/A if not applicable) :",
     type: "rating_scale",
@@ -101,6 +111,7 @@ const questions = [
     name: "parents_wellbeing",
   },
   {
+    title:"How well have things been going for you?",
     question:
       "(Enter score on scale of 1-10, with 1 being poorly, 5 being fine, and 10 being very well; choose N/A if not applicable) :",
     type: "rating_scale",
@@ -189,45 +200,45 @@ const questions = [
     type: "checkbox_with_select",
     options: [
       {
-        label: "Silver mercury fllings",
-        name: "Silver_mercury_fllings",
-        selectName: "Silver_mercury_fllings",
-        selectOptions: Array.from({ length: 30 }, (_, i) => 0 + i),
+        label: "Silver mercury fillings",
+        name: "Silver_mercury_fillings",
+        selectName: "Silver_mercury_fillings",
+        selectOptions: Array.from({ length: 30 }, (_, i) => 1 + i),
       },
       {
-        label: "Gold fllings",
-        name: "Gold_fllings",
-        selectName: "Gold_fllings",
-        selectOptions: Array.from({ length: 30 }, (_, i) => 0 + i),
+        label: "Gold fillings",
+        name: "Gold_fillings",
+        selectName: "Gold_fillings",
+        selectOptions: Array.from({ length: 30 }, (_, i) => 1 + i),
       },
       {
         label: "Root canals",
         name: "Root_canals",
         selectName: "Root_canals",
-        selectOptions: Array.from({ length: 30 }, (_, i) => 0 + i),
+        selectOptions: Array.from({ length: 30 }, (_, i) => 1 + i),
       },
       {
         label: "Implants",
         name: "Implants",
         selectName: "Implants",
-        selectOptions: Array.from({ length: 30 }, (_, i) => 0 + i),
+        selectOptions: Array.from({ length: 30 }, (_, i) => 1 + i),
       },
       {
         label: "Caps/Crowns",
         name: "Caps/Crowns",
         selectName: "Caps/Crowns",
-        selectOptions: Array.from({ length: 30 }, (_, i) => 0 + i),
+        selectOptions: Array.from({ length: 30 }, (_, i) => 1 + i),
       },
       {
         label: "Tooth pain",
         name: "Tooth_pain",
         selectName: "Tooth_pain",
-        selectOptions: Array.from({ length: 30 }, (_, i) => 0 + i),
+        selectOptions: Array.from({ length: 30 }, (_, i) => 1 + i),
       },
     ],
   },
   {
-    question: "Have you had any mercury fllings removed?",
+    question: "Have you had any mercury fillings removed?",
     type: "long_radio",
     name: "mercury_filings",
     options: ["Yes", "No"],
@@ -240,10 +251,10 @@ const questions = [
     ],
   },
   {
-    question: "How many fllings did you have as a kid?",
+    question: "How many fillings did you have as a kid?",
     type: "select",
     name: "fillings_removed",
-    options: Array.from({ length: 48 }, (_, i) => 13 + i),
+    options: Array.from({ length: 48 }, (_, i) => 1 + i),
   },
   {
     question: "Do you brush regularly?",
@@ -309,7 +320,7 @@ const questions = [
         question: "Length of Exposure",
         type: "select",
         name: "harmful_chemical_exposure_length",
-        options: Array.from({ length: 48 }, (_, i) => 13 + i),
+        options: Array.from({ length: 48 }, (_, i) => 1 + i),
       },
       {
         question: "Date:",
@@ -411,7 +422,6 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
 
   const handleSubmit = async () => {
     try {
-      // Prepare the payload for the API
       const payload = {
         howWellThingsGoingOverall: answers.overll_wellbeing || 0,
         howWellThingsGoingSchool: answers.school_wellbeing || 0,
@@ -424,41 +434,41 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
         howWellThingsGoingKids: answers.children_wellbeing || 0,
         howWellThingsGoingParents: answers.parents_wellbeing || 0,
         howWellThingsGoingSpouse: answers.spouse_wellbeing || 0,
-        howWereYouBorn: answers.mode_of_own_birth || "string",
+        howWereYouBorn: answers.mode_of_own_birth ||"Not answered",
         wereYouBornWithComplication: {
           yesNo: answers.birth_complications === "Yes",
-          describe: answers.birth_complications_details || "string",
+          describe: answers.birth_complications_details || "Not answered",
         },
-        breastFedHowLong: answers.breast_fed_duration || "string",
-        breastFedFormula: answers.bottle_fed_type || "string",
+        breastFedHowLong: answers.breast_fed_duration ||"Not answered",
+        breastFedFormula: answers.bottle_fed_type || "Not answered",
         breastFoodDontKnow: answers.dont_know || false,
         ageIntroductionSolidFood: answers.age_of_solid_food_intro || 0,
         ageIntroductionWheat: answers.age_of_wheat_food_intro || 0,
         ageIntroductionDiary: answers.age_of_diary_food_intro || 0,
         foodsAvoided: answers.food_avoided === "Yes",
-        foodsAvoidTypeSymptoms: answers.allergic_food || "string",
+        foodsAvoidTypeSymptoms: answers.allergic_food || "Not answered",
         alotSugar: answers.eat_sugar_as_a_child === "Yes",
         dentalHistory: [
           {
             level: answers.fillings_removed || 0,
-            name: "string", // You can modify this if there's more specific data
+            name: "Not answered",
           },
         ],
         mercuryFillingRemoved: answers.mercury_filings === "Yes",
-        mercuryFillingRemovedWhen: answers.mercury_fillings_removed || "string",
+        mercuryFillingRemovedWhen: answers.mercury_fillings_removed || "Not answered",
         fillingsAsKid: answers.fillings_removed || 0,
         brushRegularly: answers.do_you_brush_regularly === "Yes",
         flossRegularly: answers.do_you_floss_regularly === "Yes",
-        environmentEffect: answers.smoke_irritants || ["string"],
-        environmentExposed: answers.work_env_smoke_irritants || ["string"],
+        environmentEffect: answers.smoke_irritants || ["Not answered"],
+        environmentExposed: answers.work_env_smoke_irritants || ["Not answered"],
         exposedHarmfulChemical: answers.harmful_chemicals === "Yes",
         whenExposedHarmfulChemical: {
-          chemicalName: answers.harmful_chemical_exposure || "string",
+          chemicalName: answers.harmful_chemical_exposure || "Not answered",
           lengthExposure: answers.harmful_chemical_exposure_length || 0,
-          dateExposure: answers.harmful_chemical_exposure_date || "string",
+          dateExposure: answers.harmful_chemical_exposure_date || "Not answered",
         },
         petsFarmAnimal: answers.pets_or_animal === "Yes",
-        petsAnimalLiveWhere: answers.where_they_live || "string",
+        petsAnimalLiveWhere: answers.where_they_live || "Not answered",
       };
     const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
     const token = userInfo.obj.token || "";
@@ -775,18 +785,20 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
               </Row>
               <Row style={{ marginTop: "10px" }}>
                 <Col>
-                  <Checkbox
-                    checked={answers[`${question.name}_na`] || false}
-                    onChange={(e) => {
-                      const isChecked = e.target.checked;
-                      handleChange(isChecked, `${question.name}_na`);
-                      if (isChecked) {
-                        handleChange(0, question.name);
-                      }
-                    }}
-                  >
-                    N/A
-                  </Checkbox>
+                <Checkbox
+  checked={answers[`${question.name}_na`] || false}
+  onChange={(e) => {
+    const isChecked = e.target.checked;
+    setAnswers((prev) => ({
+      ...prev,
+      [`${question.name}_na`]: isChecked,
+      [question.name]: isChecked ? 0 : prev[question.name], // Reset slider/input if checked
+    }));
+  }}
+>
+  N/A
+</Checkbox>
+
                 </Col>
               </Row>
             </div>
@@ -1004,6 +1016,7 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
     </span>
   );
   const HighlightedQuestion = ({ question }) => {
+    console.log({question})
     const highlightWords = ['poorly', 'fine', 'very well', 'N/A'];
     const regex = new RegExp(`\\b(${highlightWords.join('|')})\\b`, 'gi');
 
@@ -1017,9 +1030,14 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
       }
       return part;
     });
-
-    return <p>{highlightedQuestion}</p>;
-  };
+    return (
+      <p>
+        {!question?.includes("1-10") && label}
+        {highlightedQuestion}
+      </p>
+    );
+    
+      };
 
 
   const progressColor =
@@ -1036,11 +1054,11 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
           strokeColor={progressColor}
         />
         <h3 style={{ margin: "20px 0", color: "#F2AA93" }}>
-          Parent’s Birth/Childhood History
+         {questions[currentQuestionIndex]?.title ? questions[currentQuestionIndex]?.title :'Parent’s Birth/Childhood History' } 
         </h3>
 
         <h3 style={{ margin: "20px 0", color: "#000", fontWeight: "600", fontSize: "15px" }}>
-          {label && (
+          {questions[currentQuestionIndex]?.sub  && (
             <span>
               {label}
               {questions[currentQuestionIndex]?.sub && (
@@ -1048,6 +1066,7 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
                   {questions[currentQuestionIndex]?.sub}
                 </span>
               )}
+              
               <br />
             </span>
           )}

@@ -3,33 +3,13 @@ import { Col } from "antd";
 import QuestionnaireGrid from "./QuestionBox";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import GeneralIntakeIcon from "../../../../assets/images/assessment/1.svg";
-import LifeStyleIcon from "../../../../assets/images/assessment/2.svg";
-import DietaryIcon from "../../../../assets/images/assessment/3.svg";
-import SubstanceIcon from "../../../../assets/images/assessment/4.svg";
-import MedicalHistoryIcon from "../../../../assets/images/assessment/5.svg";
-import FamilyHistoryIcon from "../../../../assets/images/assessment/9.svg";
-import IllnessIcon from "../../../../assets/images/assessment/6.svg";
-import dummyIcon from "../../../../assets/images/assessment/8.svg";
-import ReproductiveIcon from "../../../../assets/images/assessment/11.svg";
-
 import "./assesment.css";
 
-const icons = {
-  GeneralIntakeIcon,
-  LifeStyleIcon,
-  DietaryIcon,
-  SubstanceIcon,
-  MedicalHistoryIcon,
-  FamilyHistoryIcon,
-  IllnessIcon,
-  dummyIcon,
-  ReproductiveIcon,
-};
+
 
 export default function Assessment() {
   const cards = useSelector((state) => state.assessment);
-  
+  console.log({cards})
   const navigate = useNavigate();
 
   const handleCardClick = (path) => {
@@ -63,8 +43,7 @@ export default function Assessment() {
         <div>
           <QuestionnaireGrid
             cards={cards.map((card) => ({
-              ...card,
-              icon: icons[card.icon],
+              ...card
             }))}
             onCardClick={handleCardClick}
           />

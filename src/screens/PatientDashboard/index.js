@@ -3,14 +3,14 @@ import { Row, Col, Card, Button } from "antd";
 import DashImg from "../../assets/images/dashboard.svg";
 import TestImg from "../../assets/images/test2.png";
 import PeriodCycleTracker from "./Cycle/cycle";
-import { NavLink } from "react-bootstrap";
+
 const customTitleStyle = {
   borderBottom: 0,
   borderTopLeftRadius: 12,
   borderTopRightRadius: 12,
   background: "#fafafa",
   padding: "12px 16px",
-  width: "100%", // Ensure the title section spans full width of the card
+  width: "100%", 
 };
 
 export default function DashboardPatient() {

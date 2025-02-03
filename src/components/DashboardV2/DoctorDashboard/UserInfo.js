@@ -1262,8 +1262,8 @@ function SwitchContent({
                  <Descriptions column={1} bordered>
                   <Descriptions.Item label="Birth Control">
                     {reproductiveInfo.birthControl === null || reproductiveInfo.birthControl === undefined ? 'N/A' : (reproductiveInfo.birthControl ? 'Yes' : 'No')}
-                    {reproductiveInfo.birthControl && reproductiveInfo?.hormonalBirthControl || ""}
-                    {reproductiveInfo.birthControl && reproductiveInfo?.nonHormonalBirthControl || ""}
+                    {(reproductiveInfo.birthControl && reproductiveInfo?.hormonalBirthControl) || ""}
+                    {(reproductiveInfo.birthControl && reproductiveInfo?.nonHormonalBirthControl) || ""}
                   </Descriptions.Item>
                   <Descriptions.Item label="Currently Pregnant">
                     {reproductiveInfo?.currentlyPregnant === null || reproductiveInfo.currentlyPregnant === undefined ? 'N/A' : (reproductiveInfo.currentlyPregnant ? 'Yes' : 'No')}

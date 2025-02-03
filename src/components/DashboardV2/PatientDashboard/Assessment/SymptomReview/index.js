@@ -709,7 +709,7 @@ const SymptomReview = ({ onComplete }) => {
     }));
   };
 
-  const handleSubmit = async() => {
+  const handleSubmit = async () => {
     const answers = JSON.parse(localStorage.getItem("answers")) || {};
     const apiFormat = {
       general: [],
@@ -729,11 +729,10 @@ const SymptomReview = ({ onComplete }) => {
       skinProblemsCont: [],
       itchingSkin: [],
       femaleReproductive: [],
-      femaleReproductiveCont: [],
       currentMedication: [],
       nutritionalSupplements: []
     };
-    
+
 
     const generalQuestions = [
       "cold_hands_and_feets",
@@ -751,7 +750,7 @@ const SymptomReview = ({ onComplete }) => {
       "cant_remember_dreams",
       "low_body_temperature",
     ];
-  
+
     const headEyesEarsQuestions = [
       "conjunctivitis",
       "distorted_sense_of_smell",
@@ -768,153 +767,278 @@ const SymptomReview = ({ onComplete }) => {
       "sensitivity_to_loud_noises",
       "vision_problems",
     ];
-  
-     
+
+    const lymphQuestions = [
+      "enlarged_neck",
+      "tender_neck",
+      "other_enlarged_tender_ly"]
+
     const muscoQuestions = [
       "back_muscle_spasm",
-         "calf_cramps" ,
-         "chest_tightness" ,
-         "foot_cramps",
-         "joint_deformity" ,
-         "joint_pain" ,
-        'joint_redness',
-         'joint_stiffness',
-         'muscle_pain',
-         'muscle_spasms',
-         'muscle_stiffness',
-         'muscle_twitches_eyes',
-         'muscle_twitches_arms_legs',
-         'muscle_weakness',
-         'neck_muscle_spasm',
-         'tendonitis',
-         'tension_headache'
-      ]
-    
-      const moodNervesSymptomsQuestions = [
-        "agoraphobia",
-        "anxiety",
-        "auditory_hallucinations",
-        "blackouts",
-        "depression",
-        {
-          name: 'difficulty_concentrating',
-          subOptions: [
-            { name: 'concentrating' },
-            { name: 'with_balance' },
-            { name: 'with_thinking' },
-            { name: 'with_judgment' },
-            { name: 'with_speech' },
-            { name: 'with_memory' }
-          ]
-        },
-        "dizziness",
-        "fainting",
-        "fearfulness",
-        "irritability",
-        "light_headedness",
-        "numbness",
-        "other_phobias",
-        "panic_attacks",
-        "paranoia",
-        "seizures",
-        "suicidal_thoughts",
-        "tremor_trembling",
-        "visual_hallucinations"
-      ];
-      
-      const cardiovascularSymptomsQuestions = [
-         "angina_chest_pain",  
-         "breathlessness",  
-         "heart_attack",  
-         "heart_murmur",  
-         "high_blood_pressure",  
-         "irregular_pulse",  
-         "mitral_valve_prolapse",  
-         "palpitations",  
-         "phlebitis",  
-         "swollen_ankles_feet",  
-         "varicose_veins"
-      ];
-      
-      const urinarySymptomsQuestions = [
-         "bed_wetting",  
-         "hesitancy",  
-         "infection",  
-         "kidney_disease",  
-         "kidney_stone",  
-         "leaking/incontinence",  
-         "pain/burning",  
-         "urgency"
-      ];
-      
-      const digestionIssuesQuestions = [
-         "anal_spasms",  
-         "bad_teeth",  
-         "bleeding_gums",  
-         "bloating_lower_abdomen",  
-         "bloating_whole_abdomen",  
-         "bloating_after_meals",  
-         "blood_in_stools",  
-         "burping",  
-         "canker_sores",  
-         "cold_sores",  
-         "constipation",  
-         "cracking_corner_of_lips",  
-         "dentures_poor_chewing",  
-         "diarrhea",  
-         "difficulty_swallowing",  
-         "dry_mouth",  
-         "farting",  
-         "fissures",  
-         "foods_repeat",     
-          "heartburn",     
-          "hemorrhoids"
-      ];
+      "calf_cramps",
+      "chest_tightness",
+      "foot_cramps",
+      "joint_deformity",
+      "joint_pain",
+      'joint_redness',
+      'joint_stiffness',
+      'muscle_pain',
+      'muscle_spasms',
+      'muscle_stiffness',
+      'muscle_twitches_eyes',
+      'muscle_twitches_arms_legs',
+      'muscle_weakness',
+      'neck_muscle_spasm',
+      'tendonitis',
+      'tension_headache'
+    ]
 
-      const digestionAdvancedIssuesQuestions = [
-        'intolerance_lactose',
-        'intolerance_all_dairy',
-        'intolerance_gluten',
-        'intolerance_corn',
-        'intolerance_eggs' ,
-         'intolerance_fatty_foods' ,
-        'intolerance_yeast',
-        'liver_disease_jaundice' ,
-      'lower_abdominal_pain' ,
-        'mucus_in_stools' ,
-         'nausea',
-        'periodontal_disease',
-        'sore_tongue' ,
-       'strong_stool_odor',
-        'undigested_food_in_stools',
-       'upper_abdominal_pain',
-         'vomiting' 
+    const moodNervesSymptomsQuestions = [
+      "agoraphobia",
+      "anxiety",
+      "auditory_hallucinations",
+      "blackouts",
+      "depression",
+      {
+        name: 'difficulty_concentrating',
+        subOptions: [
+          { name: 'concentrating' },
+          { name: 'with_balance' },
+          { name: 'with_thinking' },
+          { name: 'with_judgment' },
+          { name: 'with_speech' },
+          { name: 'with_memory' }
+        ]
+      },
+      "dizziness",
+      "fainting",
+      "fearfulness",
+      "irritability",
+      "light_headedness",
+      "numbness",
+      "other_phobias",
+      "panic_attacks",
+      "paranoia",
+      "seizures",
+      "suicidal_thoughts",
+      "tremor_trembling",
+      "visual_hallucinations"
+    ];
+
+    const cardiovascularSymptomsQuestions = [
+      "angina_chest_pain",
+      "breathlessness",
+      "heart_attack",
+      "heart_murmur",
+      "high_blood_pressure",
+      "irregular_pulse",
+      "mitral_valve_prolapse",
+      "palpitations",
+      "phlebitis",
+      "swollen_ankles_feet",
+      "varicose_veins"
+    ];
+
+    const urinarySymptomsQuestions = [
+      "bed_wetting",
+      "hesitancy",
+      "infection",
+      "kidney_disease",
+      "kidney_stone",
+      "leaking/incontinence",
+      "pain/burning",
+      "urgency"
+    ];
+
+    const respiratoryQuestions = [
+      "bad_breath",
+      "bad_odor_in_nose",
+      "cough_dry",
+      "cough_productive",
+      "hayfever_spring",
+      "hayfever_summer",
+      "hayfever_fall",
+      "hayfever_change_of_season",
+      "hoarseness",
+      "nasal_stuffiness",
+      "nose_bleeds",
+      "post_nasal_drip",
+      "sinus_fullness",
+      "sinus_infection",
+      "snoring",
+      "sore_throat",
+      "wheezing",
+      "winter_stuffiness"
+    ]
+
+    const digestionIssuesQuestions = [
+      "anal_spasms",
+      "bad_teeth",
+      "bleeding_gums",
+      "bloating_lower_abdomen",
+      "bloating_whole_abdomen",
+      "bloating_after_meals",
+      "blood_in_stools",
+      "burping",
+      "canker_sores",
+      "cold_sores",
+      "constipation",
+      "cracking_corner_of_lips",
+      "dentures_poor_chewing",
+      "diarrhea",
+      "difficulty_swallowing",
+      "dry_mouth",
+      "farting",
+      "fissures",
+      "foods_repeat",
+      "heartburn",
+      "hemorrhoids"
+    ];
+
+    const digestionAdvancedIssuesQuestions = [
+      'intolerance_lactose',
+      'intolerance_all_dairy',
+      'intolerance_gluten',
+      'intolerance_corn',
+      'intolerance_eggs',
+      'intolerance_fatty_foods',
+      'intolerance_yeast',
+      'liver_disease_jaundice',
+      'lower_abdominal_pain',
+      'mucus_in_stools',
+      'nausea',
+      'periodontal_disease',
+      'sore_tongue',
+      'strong_stool_odor',
+      'undigested_food_in_stools',
+      'upper_abdominal_pain',
+      'vomiting'
+    ];
+    const skin = [
+      "eyes_dryness",
+      "feet_dryness",
+      "feet_cracking",
+      "feet_peeling",
+      "hair_dryness",
+      "hair_unmanageable",
+      "hands_dryness",
+      "hands_cracking",
+      "hands_peeling",
+      "mouth_throat_dryness",
+      "scalp_dryness",
+      "scalp_dandruff",
+      "skin_general_dryness",
     ];
     
-    const eatingIssuesQuestions = [
-         'binge_eating' ,
-        'bulimia' ,
-        'cant_gain_weight' ,
-        'cant_lose_weight' ,
-        'carbohydrate_craving' ,
-        'carbohydrate_intolerance',
-         'poor_appetite',
-        'salt_cravings',
-        'frequent_dieting',
-        'sweet_cravings' ,
-         'caffeine_dependency' 
+    const skinProblems = [
+      "acne_back",
+      "acne_chest",
+      "acne_face",
+      "acne_shoulders",
+      "athletes_foot",
+      "bumps_upper_arms",
+      "cellulite",
+      "dark_circles_eyes",
+      "ears_red",
+      "easy_bruising",
+      "eczema",
+      "herpes_genital",
+      "hives",
+      "jock_itch",
+      "lackluster_skin",
     ];
+    
+    const skinProblemsContr = [
+      "moles_color_size_change",
+      "oily_skin",
+      "pale_skin",
+      "patchy_dullness",
+      "psoriasis",
+      "rash",
+      "red_face",
+      "sensitive_bites",
+      "sensitive_poison_ivy_oak",
+      "shingles",
+      "skin_cancer",
+      "skin_darkening",
+      "strong_body_odor",
+      "thick_calluses",
+      "vitiligo",
+    ];
+    
+    const itching = [
+      "itching_anus",
+      "itching_arms",
+      "itching_ear_canals",
+      "itching_eyes",
+      "itching_feet",
+      "itching_hands",
+      "itching_legs",
+      "itching_nipples",
+      "itching_nose",
+      "itching_genitals",
+      "itching_roof_of_mouth",
+      "itching_scalp",
+      "itching_skin_in_general",
+      "itching_throat",
+    ];
+    
+    const femaleReproductive = [
+      "breast_cysts",
+      "breast_lumps",
+      "breast_tenderness",
+      "ovarian_cysts",
+      "poor_libido",
+      "endometriosis",
+      "fibroids",
+      "infertility",
+      "vaginal_discharge",
+      "vaginal_odor",
+      "vaginal_itch",
+      "vaginal_pain",
+    ];
+    
+
+    const eatingIssuesQuestions = [
+      'binge_eating',
+      'bulimia',
+      'cant_gain_weight',
+      'cant_lose_weight',
+      'carbohydrate_craving',
+      'carbohydrate_intolerance',
+      'poor_appetite',
+      'salt_cravings',
+      'frequent_dieting',
+      'sweet_cravings',
+      'caffeine_dependency'
+    ];
+
+    const nailIssues = [
+      "bitten",
+      "brittle",
+      "curve_up",
+      "frayed",
+      "fungus_fingers",
+      "fungus_toes",
+      "pitting",
+      "ragged_cuticles",
+      "ridges",
+      "soft",
+      "thickening_fingernails",
+      "thickening_toenails",
+      "white_spots_lines"
+    ]
 
     const getLevel = (answer) => {
       switch (answer) {
         case 'mild':
-          return 1; 
+          return 1;
         case 'moderate':
-          return 2; 
+          return 2;
         case 'severe':
-          return 3; 
+          return 3;
         default:
-          return 0; 
+          return 0;
       }
     };
     generalQuestions.forEach((question) => {
@@ -925,7 +1049,7 @@ const SymptomReview = ({ onComplete }) => {
         });
       }
     });
-    
+
     headEyesEarsQuestions.forEach((question) => {
       if (answers[question]) {
         apiFormat.headEyesEars.push({
@@ -934,10 +1058,72 @@ const SymptomReview = ({ onComplete }) => {
         });
       }
     });
-    
+
     muscoQuestions.forEach((question) => {
       if (answers[question]) {
         apiFormat.musco.push({
+          level: getLevel(answers[question]),
+          name: question,
+        });
+      }
+    });
+    respiratoryQuestions.forEach((question) => {
+      if (answers[question]) {
+        apiFormat.respiratory.push({
+          level: getLevel(answers[question]),
+          name: question,
+        });
+      }
+    });
+
+    lymphQuestions.forEach((question) => {
+      if (answers[question]) {
+        apiFormat.lymph.push({
+          level: getLevel(answers[question]),
+          name: question,
+        });
+      }
+    });
+
+    skin.forEach((question) => {
+      if (answers[question]) {
+        apiFormat.skin.push({
+          level: getLevel(answers[question]),
+          name: question,
+        });
+      }
+    });
+    
+    skinProblems.forEach((question) => {
+      if (answers[question]) {
+        apiFormat.skinProblems.push({
+          level: getLevel(answers[question]),
+          name: question,
+        });
+      }
+    });
+    
+    skinProblemsContr.forEach((question) => {
+      if (answers[question]) {
+        apiFormat.skinProblemsCont.push({
+          level: getLevel(answers[question]),
+          name: question,
+        });
+      }
+    });
+    
+    itching.forEach((question) => {
+      if (answers[question]) {
+        apiFormat.itchingSkin.push({
+          level: getLevel(answers[question]),
+          name: question,
+        });
+      }
+    });
+    
+    femaleReproductive.forEach((question) => {
+      if (answers[question]) {
+        apiFormat.femaleReproductive.push({
           level: getLevel(answers[question]),
           name: question,
         });
@@ -950,7 +1136,7 @@ const SymptomReview = ({ onComplete }) => {
           level: getLevel(answers[question]),
           name: question,
         });
-        
+
         if (question.subOptions) {
           question.subOptions.forEach((subQuestion) => {
             if (answers[subQuestion.name]) {
@@ -960,9 +1146,10 @@ const SymptomReview = ({ onComplete }) => {
               });
             }
           });
-        }}
+        }
+      }
     });
-    
+
     cardiovascularSymptomsQuestions.forEach((question) => {
       if (answers[question]) {
         apiFormat.cardio.push({
@@ -971,7 +1158,7 @@ const SymptomReview = ({ onComplete }) => {
         });
       }
     });
-    
+
     urinarySymptomsQuestions.forEach((question) => {
       if (answers[question]) {
         apiFormat.urinary.push({
@@ -980,7 +1167,7 @@ const SymptomReview = ({ onComplete }) => {
         });
       }
     });
-    
+
     digestionIssuesQuestions.forEach((question) => {
       if (answers[question]) {
         apiFormat.digestion.push({
@@ -989,7 +1176,7 @@ const SymptomReview = ({ onComplete }) => {
         });
       }
     });
-    
+
     digestionAdvancedIssuesQuestions.forEach((question) => {
       if (answers[question]) {
         apiFormat.digestionCont.push({
@@ -998,7 +1185,7 @@ const SymptomReview = ({ onComplete }) => {
         });
       }
     });
-    
+
     eatingIssuesQuestions.forEach((question) => {
       if (answers[question]) {
         apiFormat.eating.push({
@@ -1007,17 +1194,25 @@ const SymptomReview = ({ onComplete }) => {
         });
       }
     });
-    
+    nailIssues.forEach((question) => {
+      if (answers[question]) {
+        apiFormat.nails.push({
+          level: getLevel(answers[question]),
+          name: question,
+        });
+      }
+    });
 
-    console.log({apiFormat})
+
     const transformedData = {
       general: apiFormat.general,
-      headEyesEars:apiFormat.headEyesEars,
-      musco: apiFormat.musco,           
+      headEyesEars: apiFormat.headEyesEars,
+      musco: apiFormat.musco,
       moodNerves: apiFormat.moodNerves,
       cardio: apiFormat.cardio,
-      urinary : apiFormat.urinary,
-      digestion:apiFormat.digestion,
+      urinary: apiFormat.urinary,
+      digestion: apiFormat.digestion,
+      eating: apiFormat.eating,
       itchingSkin: apiFormat.itchingSkin,
       respiratory: apiFormat.respiratory,
       nails: apiFormat.nails,
@@ -1025,14 +1220,25 @@ const SymptomReview = ({ onComplete }) => {
       skin: apiFormat.skin,
       skinProblems: apiFormat.skinProblems,
       skinProblemsContr: apiFormat.skinProblemsCont,
-      femaleReproductive:apiFormat.femaleReproductive,
+      femaleReproductive: apiFormat.femaleReproductive,
       femaleReproductiveCont: apiFormat.femaleReproductiveCont,
-      currentMedication: answers.current_medication || [
-        { medication: "", dosage: "", startDate: "", reason: "" },
-      ], // Provide default structure if no data exists
-      nutritionalSupplements: answers.nutritional_supplements || [
-        { medication: "", dosage: "", startDate: "", reason: "" },
-      ], // Same for nutritional supplements
+      currentMedication: answers.current_medication
+      ? answers.current_medication.map((med) => ({
+          medication: med.medication || "",
+          dosage: med.dosage || "",
+          startDate: med.date || "",
+          reason: med.reason || "",
+        }))
+      : [{ medication: "", dosage: "", startDate: "", reason: "" }],
+      nutritionalSupplements: answers.nutritional_supplements
+      ? answers.nutritional_supplements.map((supplement) => ({
+          medication: supplement.medication || "",
+          dosage: supplement.dosage || "",
+          startDate: supplement.date || "",
+          reason: supplement.reason || "",
+        }))
+      : [{ medication: "", dosage: "", startDate: "", reason: "" }],
+    
       supplementsCausedEffects: {
         yesNo: answers.supplement_effects ? true : false,
         describe: answers.supplement_effects_description || "",
@@ -1074,7 +1280,7 @@ const SymptomReview = ({ onComplete }) => {
     try {
       const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
       const token = userInfo.obj.token || "";
-  
+
       fetch(
         "https://myfertilitydevapi.azurewebsites.net/api/Patient/AddSymptoms",
         {
@@ -1099,7 +1305,7 @@ const SymptomReview = ({ onComplete }) => {
         .catch((error) => {
           console.error("Error:", error);
         });
-     
+
     } catch (error) {
       console.log(error);
     }
@@ -1110,7 +1316,7 @@ const SymptomReview = ({ onComplete }) => {
     localStorage.setItem("transformedAnswers", JSON.stringify(transformedData));
     navigate("/assessment");
   };
-  
+
   const addHospitalization = (name) => {
     setAnswers((prevAnswers) => ({
       ...prevAnswers,
@@ -1377,7 +1583,7 @@ const SymptomReview = ({ onComplete }) => {
               onClick={() => addHospitalization(question.name)}
             >
               {" "}
-              + {question.name === 'current_medication'?'Add Hospitalization':'Add Nutrition' } 
+              + {question.name === 'current_medication' ? 'Add Hospitalization' : 'Add Nutrition'}
             </Button>
           </div>
         );
@@ -1449,7 +1655,7 @@ const SymptomReview = ({ onComplete }) => {
       case "long_radio":
         return (
           <div style={{ flexDirection: "column" }}>
- 
+
             <Radio.Group
               name={question.name}
               onChange={(e) => handleChange(e.target.value, question.name)}
@@ -1493,7 +1699,7 @@ const SymptomReview = ({ onComplete }) => {
           {questions[currentQuestionIndex].title}
         </h3>
 
-        <h3 style={{ margin: "20px 0", color: "#000", fontWeight:"600", fontSize: "15px" }}>
+        <h3 style={{ margin: "20px 0", color: "#000", fontWeight: "600", fontSize: "15px" }}>
           {questions[currentQuestionIndex].question}
         </h3>
         {renderInput(questions[currentQuestionIndex])}

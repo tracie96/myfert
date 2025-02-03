@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { Row, Col, Card, Modal, Descriptions } from "antd";
+import { Row, Col, Card, Modal, Descriptions, Typography } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getCurrentHealthLifestyle,
@@ -1100,80 +1100,64 @@ function SwitchContent({
         </div>
       );
 
-    case 8:
-      return loading ? (
-        <p>{symptom}</p>
-      ) : (
-        <div className="p-6 rounded-md shadow-md">
+      case 8:
+        return loading ? (
+          <p>{symptom}</p>
+        ) : (
+          <div className="p-6 rounded-md shadow-md bg-white">
           <Row gutter={16}>
-            <Col xs={24} md={12}>
-              <Descriptions column={1} bordered>
-                {Object.entries(symptom).slice(0, Math.ceil(Object.entries(symptom).length / 2)).map(([key, value]) => (
-                  <Descriptions.Item
-                    label={key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-                    key={key}
-                  >
-                    {Array.isArray(value) ? (
-                      value.length > 0 ? (
-                        value.map((item, index) => (
-                          <div key={index}>
-                            {item.name}: <span className="font-medium">{item.level}</span>
-                          </div>
-                        ))
-                      ) : (
-                        <span className="font-medium">N/A</span>
-                      )
-                    ) : typeof value === 'object' && value !== null ? (
-                      // Handle the specific object rendering
-                      <>
-                        <div>Yes/No: <span className="font-medium">{value.yesNo ? 'Yes' : 'No'}</span></div>
-                        {value.describe && (
-                          <div>Description: <span className="font-medium">{value.describe}</span></div>
+            {[0, Math.ceil(Object.entries(symptom).length / 2)].map((startIndex, colIndex) => (
+              <Col xs={24} md={12} key={colIndex}>
+                <Descriptions column={1} bordered>
+                  {Object.entries(symptom)
+                    .slice(startIndex, startIndex + Math.ceil(Object.entries(symptom).length / 2))
+                    .map(([key, value]) => (
+                      <Descriptions.Item
+                        label={key.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase())}
+                        key={key}
+                      >
+                        {Array.isArray(value) ? (
+                          value.length > 0 ? (
+                            value.map((item, index) => (
+                              <div key={index} className="mb-2">
+                                {Object.entries(item).map(([subKey, subValue]) => (
+                                  <Tag color="blue" key={subKey} className="mr-2 mb-2">
+                                    <strong>
+                                      {subKey.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase())}:
+                                    </strong> {subValue}
+                                  </Tag>
+                                ))}
+                              </div>
+                            ))
+                          ) : (
+                            <Typography.Text type="secondary">N/A</Typography.Text>
+                          )
+                        ) : typeof value === "object" && value !== null ? (
+                          <>
+                            {value.yesNo ? (
+                              <Tag color="green">Yes</Tag>
+                            ) : (
+                              <Tag color="red">No</Tag>
+                            )}
+                            {value.describe && (
+                              <div>
+                                <Typography.Text strong>Description:</Typography.Text> {value.describe}
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          <Typography.Text strong>{value !== null ? value : "N/A"}</Typography.Text>
                         )}
-                      </>
-                    ) : (
-                      <span className="font-medium">{value !== null ? value : 'N/A'}</span>
-                    )}
-                  </Descriptions.Item>
-                ))}
-              </Descriptions>
-            </Col>
-
-            <Col xs={24} md={12}>
-              <Descriptions column={1} bordered>
-                {Object.entries(symptom).slice(Math.ceil(Object.entries(symptom).length / 2)).map(([key, value]) => (
-                  <Descriptions.Item
-                    label={key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-                    key={key}
-                  >
-                    {Array.isArray(value) ? (
-                      value.length > 0 ? (
-                        value.map((item, index) => (
-                          <div key={index}>
-                            {item.name}: <span className="font-medium">{item.level}</span>
-                          </div>
-                        ))
-                      ) : (
-                        <span className="font-medium">N/A</span>
-                      )
-                    ) : typeof value === 'object' && value !== null ? (
-                      <>
-                        <div>Yes/No: <span className="font-medium">{value.yesNo ? 'Yes' : 'No'}</span></div>
-                        {value.describe && (
-                          <div>Description: <span className="font-medium">{value.describe}</span></div>
-                        )}
-                      </>
-                    ) : (
-                      <span className="font-medium">{value !== null ? value : 'N/A'}</span>
-                    )}
-                  </Descriptions.Item>
-                ))}
-              </Descriptions>
-            </Col>
+                      </Descriptions.Item>
+                    ))}
+                </Descriptions>
+              </Col>
+            ))}
           </Row>
         </div>
-      );
-
+        
+        )
+        
     case 9:
       return loading ? (
         <p>{stress}</p>

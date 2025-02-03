@@ -14,14 +14,14 @@ const questions = [
     type: "rating_scale",
     title: "In order to improve your health, how willing are you to:",
     sub: "Signifcantly modify your diet",
-    name: "health_stress_one",
+    name: "modify_diet",
   },
   {
     question: "Rate on a scale of 5 (very willing), to 1 (not willing):",
     type: "rating_scale",
     title: "In order to improve your health, how willing are you to:",
     sub: "Take several nutritional supplements each day",
-    name: "health_stress_two",
+    name: "supplements",
   },
   {
     question: "Rate on a scale of 5 (very willing), to 1 (not willing):",
@@ -29,28 +29,28 @@ const questions = [
     title: "In order to improve your health, how willing are you to:",
 
     sub: "Keep a record of everything you eat each day",
-    name: "health_stress_3",
+    name: "keep_record_meal",
   },
   {
     question: "Rate on a scale of 5 (very willing), to 1 (not willing):",
     type: "rating_scale",
     title: "In order to improve your health, how willing are you to:",
     sub: "Modify your lifestyle (e.g., work demands, sleep habits)",
-    name: "health_stress_4",
+    name: "modify_lifestyle",
   },
   {
     question: "Rate on a scale of 5 (very willing), to 1 (not willing):",
     type: "rating_scale",
     title: "In order to improve your health, how willing are you to:",
     sub: "Practice a relaxation technique",
-    name: "health_stress_5",
+    name: "practice_relaxation",
   },
   {
     question: "Rate on a scale of 5 (very willing), to 1 (not willing):",
     type: "rating_scale",
     title: "In order to improve your health, how willing are you to:",
     sub: "Engage in regular exercise",
-    name: "health_stress_6",
+    name: "engage_in_regular_exercise",
   },
   {
     title: "How confident are you of your ability to organize and follow through on the previous question’s health-related activities?",
@@ -70,7 +70,7 @@ const questions = [
     title: "How much ongoing support (e.g., telephone consults, email correspondence) from our professional staff would be helpful to you as you implement your personal health program?",
     type: "rating_scale",
     question: "Rate on a scale of 5 (very willing), to 1 (not willing):",
-    name: "confidence_follow_through",
+    name: "ongoing_support",
   },
   {
     title: "Comments",
@@ -178,18 +178,18 @@ const Readiness = ({ onComplete }) => {
   const transformReadinessData = (answers) => {
     console.log('baibhav-answer', answers)
     return {
-      modifyDiet: answers.health_stress_one || 0,
-      takeDailySupplement: answers.health_stress_two || 0,
-      recordEverythingEat: answers.health_stress_3 || 0,
-      modifyLifestyle: answers.health_stress_4 || 0,
-      practiceRelaxation: answers.health_stress_5 || 0,
-      engageRegularExercise: answers.health_stress_6 || 0,
+      modifyDiet: answers.modify_diet || 0,
+      takeDailySupplement: answers.supplements || 0,
+      recordEverythingEat: answers.keep_record_meal || 0,
+      modifyLifestyle: answers.modify_lifestyle || 0,
+      practiceRelaxation: answers.practice_relaxation || 0,
+      engageRegularExercise: answers.engage_in_regular_exercise || 0,
       readinessConfident: {
         level: answers.confidence_follow_through || 0,
         name: answers.confidence_follow_through_details || ""
       },
       readinessSupportive: answers.health_stress_7 || 0,
-      readinessFrequency: answers.confidence_follow_through || 0,
+      readinessFrequency: answers.ongoing_support || 0,
       comment: answers.add_commnets || "",
       healthAchieve: answers.achieve_your_goals || "",
       healthLastTime: answers.felt_well_last_time || "",

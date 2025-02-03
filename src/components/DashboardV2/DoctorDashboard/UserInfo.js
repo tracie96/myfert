@@ -1261,9 +1261,14 @@ function SwitchContent({
               <Col xs={24} md={12}>
                  <Descriptions column={1} bordered>
                   <Descriptions.Item label="Birth Control">
-                    {reproductiveInfo.birthControl === null || reproductiveInfo.birthControl === undefined ? 'N/A' : (reproductiveInfo.birthControl ? 'Yes' : 'No')}
-                    {(reproductiveInfo.birthControl && reproductiveInfo?.hormonalBirthControl) || ""}
-                    {(reproductiveInfo.birthControl && reproductiveInfo?.nonHormonalBirthControl) || ""}
+                  {
+                    (reproductiveInfo.birthControl === null || reproductiveInfo.birthControl === undefined) ? '' :
+                      (
+                        (reproductiveInfo.birthControl ? 'Yes, ' : 'No') + '' +
+                        (reproductiveInfo?.birthControl && reproductiveInfo?.hormonalBirthControl !== "N/A" ? reproductiveInfo?.hormonalBirthControl : ' ') + '' +
+                        (reproductiveInfo?.birthControl && reproductiveInfo?.nonHormonalBirthControl !== "N/A" ? reproductiveInfo?.nonHormonalBirthControl : ' ')
+                      )
+                  }
                   </Descriptions.Item>
                   <Descriptions.Item label="Currently Pregnant">
                     {reproductiveInfo?.currentlyPregnant === null || reproductiveInfo.currentlyPregnant === undefined ? 'N/A' : (reproductiveInfo.currentlyPregnant ? 'Yes' : 'No')}
@@ -1281,10 +1286,10 @@ function SwitchContent({
                     {reproductiveInfo?.howLongTryingToConceive || "N/A"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Method To Conceive">
-                    {reproductiveInfo?.methodToConceive || "N/A"}
+                    {reproductiveInfo?.methodToConceive?.length ? reproductiveInfo.methodToConceive.join(', ') : "N/A"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Charting To Conceive">
-                    {reproductiveInfo?.chartingToConceive || "N/A"}
+                    {reproductiveInfo?.chartingToConceive?.length ? reproductiveInfo.chartingToConceive.join(', ') : "N/A"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Method Fertility Awareness">
                     {reproductiveInfo?.methodFertilityAwareness || "N/A"}

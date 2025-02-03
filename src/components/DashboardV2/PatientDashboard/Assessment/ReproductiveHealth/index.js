@@ -80,7 +80,7 @@ const questions = [
     options: ["Yes", "No", "Unsure"],
   },
   {
-    question: "For approximately how long have you been trying to conceive?",
+    question: "Since what date have you been trying to conceive?",
     type: "date",
     title: "Trying to Conceive",
     name: "is_trying_to_conceive_time",
@@ -153,7 +153,7 @@ const questions = [
         {
           type: "number_with_radio_sub",
           label: "",
-          name: "longest_cycle",
+          name: "intercourse_during_fertile_sub",
         },
       ],
   },
@@ -312,7 +312,7 @@ const questions = [
         type: "number_with_radio_sub",
         label: "",
         options: ["Unsure"],
-        name: "longest_cycle",
+        name: "longest_cycle_radio",
       },
     ],
   },
@@ -329,7 +329,7 @@ const questions = [
         type: "number_with_radio_sub",
         label: "",
         options: ["Unsure"],
-        name: "shortest_cycle",
+        name: "shortest_cycle_radio",
       },
     ],
   },
@@ -432,7 +432,6 @@ const ReproductiveHealth = ({ onComplete }) => {
     // Ensure the main question is answered
     if (!mainAnswer && question.subQuestions) {
       for (const subQuestion of question.subQuestions) {
-        debugger
         if (answers[`${subQuestion.name}_unsure`]) {
           subQuestionUnsureChecked = true;
         }
@@ -601,7 +600,8 @@ const ReproductiveHealth = ({ onComplete }) => {
   
       if (isUnsureOrNoneSelected) {
         // Keep only "Unsure" or "None" and remove all other selections
-        updatedAnswers[name] = value.filter(opt => opt === "Unsure" || opt === "None");
+        value = value.filter(opt => opt === "Unsure" || opt === "None");
+        updatedAnswers[name] = value;
       } else {
         // Otherwise, update normally
         updatedAnswers[name] = value;
@@ -699,7 +699,7 @@ const ReproductiveHealth = ({ onComplete }) => {
         methodToConceive: answers.methods_trying_to_conceive || [],
         chartingToConceive: answers.is_charting_cycles || [],
         currentTherapy:answers.current_therapy,
-        intercourse_during_fertile:answers.intercourse_during_fertile || "Unknown",
+        intercourse_during_fertile:answers.intercourse_during_fertile_sub || "Unknown",
         intercouseEachCycle: answers.is_frequent_intercourse_cycle || "Unknown",
         menstrualPainDuringPeriod: answers.is_menstrual_pain || ["None"],
         experiencePelvicPain: answers.is_lower_back_pain === "Yes",
@@ -713,9 +713,9 @@ const ReproductiveHealth = ({ onComplete }) => {
           duration: "N/A", 
           colour: answers.pms_sympton_severity || "Mild",
         },
-        longestCycleLenght: answers.longest_cycle_radio || "Unknown",
+        longestCycleLenght: `${answers.longest_cycle_radio}` || "Unknown",
         averageCycleLenght: `${answers.average_cycle_radio}` || "Unknown",
-        shortestCycleLenght: answers.shortest_cycle_radio || "Unknown",
+        shortestCycleLenght: `${answers.shortest_cycle_radio}` || "Unknown",
         who_do_you_live_with: answers.who_do_you_live_with || 'N/A',
         current_occupation: answers.current_occupation || 'N/A',
         previous_occupation: answers.previous_occupation || 'N/A',
@@ -828,14 +828,19 @@ const ReproductiveHealth = ({ onComplete }) => {
             <div
               style={{ display: "flex", flexDirection: "column", gap: "10px" }}
             >
-              {/* InputNumber should have its own state key */}
-                <InputNumber
-                  name={subQuestion.name}
-                  value={answers[subQuestion.name] || undefined}
-                  onChange={(value) => handleChange(value, subQuestion.name)}
-                  disabled={answers[`${subQuestion.name}_unsure`]}
-                  className="input_questionnaire"
-                />
+              <div style={{display: "flex", alignItems:"center"}}>
+                 {/* InputNumber should have its own state key */}
+                  {subQuestion.name === "intercourse_during_fertile_sub"?<span>Every&nbsp;</span>:""}
+                    <InputNumber
+                      name={subQuestion.name}
+                      value={answers[subQuestion.name] || undefined}
+                      onChange={(value) => handleChange(value, subQuestion.name)}
+                      disabled={answers[`${subQuestion.name}_unsure`]}
+                      className="input_questionnaire"
+                    />
+                    {subQuestion.name === "intercourse_during_fertile_sub"?<span>&nbsp;Days</span>:""}
+              </div>
+             
               {/* Radio.Group should use a different key in the state */}
               <Checkbox
                 name={`${subQuestion.name}_unsure`}

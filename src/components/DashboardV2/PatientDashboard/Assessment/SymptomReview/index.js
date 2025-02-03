@@ -1230,8 +1230,8 @@ const SymptomReview = ({ onComplete }) => {
           reason: med.reason || "",
         }))
       : [{ medication: "", dosage: "", startDate: "", reason: "" }],
-      nutritionalSupplements: answers.nutritional_supplements
-      ? answers.nutritional_supplements.map((supplement) => ({
+      nutritionalSupplements: answers.nutritional_supplement
+      ? answers.nutritional_supplement.map((supplement) => ({
           medication: supplement.medication || "",
           dosage: supplement.dosage || "",
           startDate: supplement.date || "",
@@ -1243,9 +1243,9 @@ const SymptomReview = ({ onComplete }) => {
         yesNo: answers.supplement_effects ? true : false,
         describe: answers.supplement_effects_description || "",
       },
-      usedRegularlyNsaid: answers.used_regularly_nsaid || false,
-      usedRegularlyTyienol: answers.used_regularly_tylenol || false,
-      usedRegularlyAcidBlocking: answers.used_regularly_acid_blocking || false,
+      usedRegularlyNsaid: answers.regular_long_term_use || false,
+      usedRegularlyTyienol: answers.regular_long_term_use_tylenol || false,
+      usedRegularlyAcidBlocking: answers.regular_long_term_use_acid_blocking_drugs || false,
       antibioticsInfancy: {
         value1: answers.antibiotics_infant ? "Yes" : "No",
         value2: answers.antibiotics_infant_description || "",

@@ -929,7 +929,7 @@ const SymptomReview = ({ onComplete }) => {
       "scalp_dandruff",
       "skin_general_dryness",
     ];
-    
+
     const skinProblems = [
       "acne_back",
       "acne_chest",
@@ -947,7 +947,7 @@ const SymptomReview = ({ onComplete }) => {
       "jock_itch",
       "lackluster_skin",
     ];
-    
+
     const skinProblemsContr = [
       "moles_color_size_change",
       "oily_skin",
@@ -965,7 +965,7 @@ const SymptomReview = ({ onComplete }) => {
       "thick_calluses",
       "vitiligo",
     ];
-    
+
     const itching = [
       "itching_anus",
       "itching_arms",
@@ -982,7 +982,7 @@ const SymptomReview = ({ onComplete }) => {
       "itching_skin_in_general",
       "itching_throat",
     ];
-    
+
     const femaleReproductive = [
       "breast_cysts",
       "breast_lumps",
@@ -997,7 +997,7 @@ const SymptomReview = ({ onComplete }) => {
       "vaginal_itch",
       "vaginal_pain",
     ];
-    
+
 
     const eatingIssuesQuestions = [
       'binge_eating',
@@ -1093,7 +1093,7 @@ const SymptomReview = ({ onComplete }) => {
         });
       }
     });
-    
+
     skinProblems.forEach((question) => {
       if (answers[question]) {
         apiFormat.skinProblems.push({
@@ -1102,7 +1102,7 @@ const SymptomReview = ({ onComplete }) => {
         });
       }
     });
-    
+
     skinProblemsContr.forEach((question) => {
       if (answers[question]) {
         apiFormat.skinProblemsCont.push({
@@ -1111,7 +1111,7 @@ const SymptomReview = ({ onComplete }) => {
         });
       }
     });
-    
+
     itching.forEach((question) => {
       if (answers[question]) {
         apiFormat.itchingSkin.push({
@@ -1120,7 +1120,7 @@ const SymptomReview = ({ onComplete }) => {
         });
       }
     });
-    
+
     femaleReproductive.forEach((question) => {
       if (answers[question]) {
         apiFormat.femaleReproductive.push({
@@ -1129,7 +1129,7 @@ const SymptomReview = ({ onComplete }) => {
         });
       }
     });
-    
+
     moodNervesSymptomsQuestions.forEach((question) => {
       if (answers[question]) {
         apiFormat.moodNerves.push({
@@ -1223,29 +1223,30 @@ const SymptomReview = ({ onComplete }) => {
       femaleReproductive: apiFormat.femaleReproductive,
       femaleReproductiveCont: apiFormat.femaleReproductiveCont,
       currentMedication: answers.current_medication
-      ? answers.current_medication.map((med) => ({
+        ? answers.current_medication.map((med) => ({
           medication: med.medication || "",
           dosage: med.dosage || "",
           startDate: med.date || "",
           reason: med.reason || "",
         }))
-      : [{ medication: "", dosage: "", startDate: "", reason: "" }],
+        : [{ medication: "", dosage: "", startDate: "", reason: "" }],
       nutritionalSupplements: answers.nutritional_supplement
-      ? answers.nutritional_supplement.map((supplement) => ({
+        ? answers.nutritional_supplement.map((supplement) => ({
           medication: supplement.medication || "",
           dosage: supplement.dosage || "",
           startDate: supplement.date || "",
           reason: supplement.reason || "",
         }))
-      : [{ medication: "", dosage: "", startDate: "", reason: "" }],
-    
+        : [{ medication: "", dosage: "", startDate: "", reason: "" }],
+
       supplementsCausedEffects: {
         yesNo: answers.supplement_effects ? true : false,
         describe: answers.supplement_effects_description || "",
       },
-      usedRegularlyNsaid: answers.regular_long_term_use || false,
-      usedRegularlyTyienol: answers.regular_long_term_use_tylenol || false,
-      usedRegularlyAcidBlocking: answers.regular_long_term_use_acid_blocking_drugs || false,
+      usedRegularlyNsaid: answers.regular_long_term_use === "Yes",
+      usedRegularlyTyienol: answers.regular_long_term_use_tylenol === "Yes",
+      usedRegularlyAcidBlocking: answers.regular_long_term_use_acid_blocking_drugs === "Yes",
+
       antibioticsInfancy: {
         value1: answers.antibiotics_infant ? "Yes" : "No",
         value2: answers.antibiotics_infant_description || "",
@@ -1445,44 +1446,51 @@ const SymptomReview = ({ onComplete }) => {
         );
       case "radio":
         return (
-          <Radio.Group
-            name={question.name}
-            onChange={(e) => handleChange(e.target.value, question.name)}
-            value={answers[question.name]}
-            style={{ width: "100%" }}
-          >
-            {question.options.map((option, index) => (
-              <Radio
-                key={index}
-                value={option}
-                style={{ display: "block", marginBottom: "10px" }}
-              >
-                {option === "Other" ? (
-                  <>
-                    {option}
-                    {answers[question.name] === "Other" && (
-                      <>
-                        <br />
-                        <Input
-                          className="input_questtionnaire"
-                          placeholder="Please specify"
-                          value={answers[`${question.name}_other`] || ""}
-                          onChange={(e) =>
-                            handleChange(
-                              e.target.value,
-                              `${question.name}_other`,
-                            )
-                          }
-                        />
-                      </>
-                    )}
-                  </>
-                ) : (
-                  option
-                )}
-              </Radio>
-            ))}
-          </Radio.Group>
+          <>
+            <Button
+              type="primary"
+              style={{ background: "#335CAD", padding: 20, marginBottom: 10 }}
+            >{question?.sub ? question.sub : ''}</Button>
+
+            <Radio.Group
+              name={question.name}
+              onChange={(e) => handleChange(e.target.value, question.name)}
+              value={answers[question.name]}
+              style={{ width: "100%" }}
+            >
+              {question.options.map((option, index) => (
+                <Radio
+                  key={index}
+                  value={option}
+                  style={{ display: "block", marginBottom: "10px" }}
+                >
+                  {option === "Other" ? (
+                    <>
+                      {option}
+                      {answers[question.name] === "Other" && (
+                        <>
+                          <br />
+                          <Input
+                            className="input_questtionnaire"
+                            placeholder="Please specify"
+                            value={answers[`${question.name}_other`] || ""}
+                            onChange={(e) =>
+                              handleChange(
+                                e.target.value,
+                                `${question.name}_other`,
+                              )
+                            }
+                          />
+                        </>
+                      )}
+                    </>
+                  ) : (
+                    option
+                  )}
+                </Radio>
+              ))}
+            </Radio.Group>
+          </>
         );
       case "hospitalization":
         return (
@@ -1655,7 +1663,10 @@ const SymptomReview = ({ onComplete }) => {
       case "long_radio":
         return (
           <div style={{ flexDirection: "column" }}>
-
+           {question?.sub?  <Button
+              type="primary"
+              style={{ background: "#335CAD", padding: 20, marginBottom: 10 }}
+            > {question.sub}</Button>:''}
             <Radio.Group
               name={question.name}
               onChange={(e) => handleChange(e.target.value, question.name)}

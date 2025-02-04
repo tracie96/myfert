@@ -40,14 +40,27 @@ const questions = [
       "Mediterranean",
       "Northern European",
       "Asian",
+      "Mid East",
       "Other",
     ],
   },
   {
     question:
-      "When, where and from whom did you last receive medical or health care?",
+      "When did you last receive medical or health care?",
     type: "text",
-    name: "where_and_where_received_medical_care",
+    name: "when_received_medical_care",
+  },
+  {
+    question:
+      "Where did you last receive medical or health care?",
+    type: "text",
+    name: "where_received_medical_care",
+  },
+  {
+    question:
+      "Whom did you last receive medical or health care?",
+    type: "text",
+    name: "whom_received_medical_care",
   },
   {
     question: "",
@@ -172,7 +185,9 @@ const GeneralIntakeForm = ({ onComplete }) => {
     }
     const transformedData = {
       geneticBackground: answers["geneticBackground"] || "",
-      lastMedicalCare: answers["where_and_where_received_medical_care"] || "",
+      whereMedicalCare:answers["where_received_medical_care"] || "",
+      whenMedicalCare:answers["when_received_medical_care"] || "",
+      whomMedicalCare: answers["whom_received_medical_care"] || "",
       emergencyContact: answers["emergency_contact"]?.contact || "",
       emergencyRelationship: answers["emergency_contact"]?.relationship || "",
       emergencyPhoneHome: answers["emergency_contact"]?.phoneHome || "",

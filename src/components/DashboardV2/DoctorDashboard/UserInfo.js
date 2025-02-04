@@ -50,6 +50,7 @@ export default function UserInfo() {
     "Reproductive Health",
 
   ];
+  console.log({personalFamily})
   console.log(useSelector((state) => state.intake));
   useEffect(() => {
     console.log("useEffect is running");
@@ -358,38 +359,49 @@ function SwitchContent({
         <p>Loading...</p>
       ) : (
         <div className="p-6 rounded-md shadow-md">
-          <Row gutter={16}>
-            {/* First Column */}
-            <Col xs={24} md={12}>
-              <Descriptions column={1} bordered>
-                <Descriptions.Item label="Genetic Background">
-                  {generalInfo.geneticBackground || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Last Medical Care">
-                  {generalInfo.lastMedicalCare || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Emergency Contact">
-                  {generalInfo.emergencyContact || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Emergency Relationship">
-                  {generalInfo.emergencyRelationship || "N/A"}
-                </Descriptions.Item>
-              </Descriptions>
-            </Col>
+       <Row gutter={16}>
+  {/* First Column */}
+  <Col xs={24} md={12}>
+    <Descriptions column={1} bordered>
+      <Descriptions.Item label="Genetic Background">
+        {generalInfo.geneticBackground || "N/A"}
+      </Descriptions.Item>
+      <Descriptions.Item label="Where Medical Care">
+        {generalInfo.whereMedicalCare || "N/A"}
+      </Descriptions.Item>
+      <Descriptions.Item label="When Medical Care">
+        {generalInfo.whenMedicalCare || "N/A"}
+      </Descriptions.Item>
+      <Descriptions.Item label="Whom Medical Care">
+        {generalInfo.whomMedicalCare || "N/A"}
+      </Descriptions.Item>
+      <Descriptions.Item label="Emergency Contact">
+        {generalInfo.emergencyContact || "N/A"}
+      </Descriptions.Item>
+      <Descriptions.Item label="Emergency Relationship">
+        {generalInfo.emergencyRelationship || "N/A"}
+      </Descriptions.Item>
+    </Descriptions>
+  </Col>
 
-            <Col xs={24} md={12}>
-              <Descriptions column={1} bordered>
-                <Descriptions.Item label="Emergency Phone (Home)">
-                  {generalInfo.emergencyPhoneHome || "N/A"}
-                </Descriptions.Item>
+  <Col xs={24} md={12}>
+    <Descriptions column={1} bordered>
+      <Descriptions.Item label="Emergency Phone (Home)">
+        {generalInfo.emergencyPhoneHome || "N/A"}
+      </Descriptions.Item>
+      <Descriptions.Item label="Emergency Phone (Cell)">
+        {generalInfo.emergencyPhoneCell || "N/A"}
+      </Descriptions.Item>
+      <Descriptions.Item label="Emergency Phone (Work)">
+        {generalInfo.emergencyPhoneWork || "N/A"}
+      </Descriptions.Item>
+      <Descriptions.Item label="How Did You Hear About Us?">
+        {generalInfo.howDidHearAbout || "N/A"}
+      </Descriptions.Item>
+    </Descriptions>
+  </Col>
+</Row>
 
-
-                <Descriptions.Item label="How Did You Hear About Us?">
-                  {generalInfo.howDidHearAbout || "N/A"}
-                </Descriptions.Item>
-              </Descriptions>
-            </Col>
-          </Row>
         </div>
       );
 
@@ -1032,7 +1044,7 @@ function SwitchContent({
 
     case 6:
       return loading ? (
-        <p>{stress}</p>
+        <p>{personalFamily}</p>
       ) : (
         <div className="p-6 rounded-md shadow-md">
           <Row gutter={16}>

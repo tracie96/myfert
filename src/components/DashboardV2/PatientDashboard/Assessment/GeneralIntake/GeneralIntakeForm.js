@@ -40,14 +40,14 @@ const questions = [
       "Mediterranean",
       "Northern European",
       "Asian",
-      "Mid East",
+      "Middle East",
       "Other",
     ],
   },
   {
     question:
       "When did you last receive medical or health care?",
-    type: "text",
+    type: "date",
     name: "when_received_medical_care",
   },
   {

@@ -34,7 +34,7 @@ const initialState = [
   {
     title: "Stress and Relationships",
     component: "/questionnaire/5",
-    icon: "https://res.cloudinary.com/tracysoft/image/upload/v1738258153/5_t3wt7n.svg",
+    icon: "https://res.cloudinary.com/tracysoft/image/upload/v1738258153/1_srz5zf.svg",
     isComplete: false,
   },
   {
@@ -52,7 +52,7 @@ const initialState = [
   {
     title: "Illness and Conditions",
     component: "/questionnaire/8",
-    icon: "https://res.cloudinary.com/tracysoft/image/upload/v1738258164/9_zb8ij3.svg",
+    icon: "https://res.cloudinary.com/tracysoft/image/upload/v1738258153/6_goxcxt.svg",
     isComplete: false,
   },
   {

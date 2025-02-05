@@ -1230,7 +1230,7 @@ const SymptomReview = ({ onComplete }) => {
           reason: med.reason || "",
         }))
         : [{ medication: "", dosage: "", startDate: "", reason: "" }],
-      nutritionalSupplements: answers.nutritional_supplement
+        nutrionalSupplements: answers.nutritional_supplement
         ? answers.nutritional_supplement.map((supplement) => ({
           medication: supplement.medication || "",
           dosage: supplement.dosage || "",

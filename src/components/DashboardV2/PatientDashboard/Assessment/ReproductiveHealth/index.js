@@ -349,42 +349,238 @@ const questions = [
       },
     ],
   },
-  //
+
   {
-    question:
-      "With whom do you live? (Include children, parents, relatives, friends, pets)",
-    type: "long_textarea",
-    title: "Relationships",
-    name: "who_do_you_live_with",
+    question: "Over the past year, have you experienced any mid cycle spotting?",
+    type: "long_radio",
+    isCyleSpotting: true,
+    title: "cycle spotting",
+    name: "mid_cycle_spotting",
+    options: ["Yes", "No"],
+    sub_question: "Duration per Cycle",
+    subQuestions: [
+      {
+        question: "Frequency",
+        type: "radio",
+        label: "Colour",
+        options: ["Once per cycle", "Once every 2-3 cycles", "Once every 4+ cycles", "unsure"],
+        name: "cycle_spotting_sub_frq",
+      },
+
+      {
+        type: "number_with_radio_sub",
+        name: "cycle_spotting_sub_number",
+      },
+     
+      {
+        question: "Colour",
+        type: "radio",
+        label: "Colour",
+        options: ["Pink", "Red", "brown", "black", "unsure"],
+        name: "cycle_spotting_sub",
+      },
+    ],
   },
 
   {
-    question: "Current occupation:",
-    title: "Relationships",
-    type: "long_textarea",
-    name: "current_occupation",
-  },
-  {
-    question: "Previous occupation:",
-    type: "long_textarea",
-    title: "Relationships",
-    name: "previous_occupation",
+    question: "",
+    type: "info_spotting",
+    title: "Cycle Information",
+    name: "infoSpotting",
   },
   {
     question:
-      "Do you have resources for emotional support? (Check all that apply)",
-    type: "checkbox",
-    title: "Relationships",
-    name: "resourcces_for_emotional_support",
-    options: [
-      "Spouse/Partner",
-      "Family",
-      "Friends",
-      "Religious/Spiritual",
-      "Pets",
-      "Other",
-    ],
+    "Discharge: Creamy, yogurt-like, or glue-like cervical mucus",
+    type: "number_with_radio",
+    name: "cervical_mucus",
+    subQuestions: [
+        {
+          type: "number_with_radio_sub",
+          label: "",
+          name: "cervical_mucus",
+        },
+        {
+          question: "Colour",
+          type: "radio",
+          label: "Colour",
+          options: ["None", "White"],
+          name: "cervical_mucus_sub",
+        },
+      ],
   },
+  {
+    question:
+    "Discharge: Watery, thin cervical mucus",
+    type: "number_with_radio",
+    title: "Duration(put 0 if you do not experience it)",
+    name: "Watery_mucus",
+    subQuestions: [
+        {
+          type: "number_with_radio_sub",
+          label: "",
+          name: "Watery_mucus_sub",
+        },
+        {
+          question: "Colour",
+          type: "radio",
+          label: "Colour",
+          options: ["None", "clear"],
+          name: "Watery_mucus_colour",
+        },
+      ],
+  },
+
+  {
+    question:
+    "Discharge: Egg white, long (>1”), slippery, stretchy cervical mucus",
+    type: "number_with_radio",
+    title: "Duration(put 0 if you do not experience it)",
+    name: "egg_white_mucus",
+    subQuestions: [
+        {
+          type: "number_with_radio_sub",
+          label: "",
+          name: "egg_white_mucus_sub",
+        },
+        {
+          question: "Colour",
+          type: "radio",
+          label: "Colour",
+          options: ["None", "clear"],
+          name: "egg_white_mucus_colour",
+        },
+      ],
+  },
+
+  {
+    question:
+    "Discharge: Pre-Period Spotting   ℹ️",
+    type: "number_with_radio",
+    title: "Duration(put 0 if you do not experience it)",
+    name: "pre_spotting",
+    subQuestions: [
+        {
+          type: "number_with_radio_sub",
+          label: "",
+          name: "pre_spotting_sub",
+        },
+        {
+          question: "Colour",
+          type: "radio",
+          label: "Colour",
+          options: ["None", "Pink", "Red", "Brown",  "Black"],
+          name: "pre_spotting_colour",
+        },
+      ],
+  },
+
+  {
+    question:
+    "Discharge: Menstrual Bleeding",
+    type: "number_with_radio",
+    title: "Duration(put 0 if you do not experience it)",
+    name: "menstrual_bleeding",
+    subQuestions: [
+        {
+          type: "number_with_radio_sub",
+          label: "",
+          name: "menstrual_bleeding_sub",
+        },
+        {
+          question: "Colour",
+          type: "radio",
+          label: "Colour",
+          options: ["None", "Pink", "Red", "Brown",  "Black"],
+          name: "menstrual_bleeding_sub_colour",
+        },
+        {
+          question: "Clots",
+          type: "radio",
+          label: "Colour",
+          options: ["Yes", "No"],
+          name: "menstrual_bleeding_sub_clots",
+        },
+      ],
+  },
+
+  {
+    question:
+    "Discharge: After Period Spotting   ℹ️",
+    type: "number_with_radio",
+    title: "Duration(put 0 if you do not experience it)",
+    name: "after_period_spot",
+    subQuestions: [
+        {
+          type: "number_with_radio_sub",
+          label: "",
+          name: "after_period_spot_sub",
+        },
+        {
+          question: "Colour",
+          type: "radio",
+          label: "Colour",
+          options: ["None", "Pink", "Red", "Brown",  "Black"],
+          name: "after_period_spot_colour",
+        },
+      ],
+  },
+
+
+  // {
+  //   question: "Discharge: Creamy, yogurt-like, or glue-like cervical mucus",
+  //   type: "long_radio",
+  //   isCyleSpotting: true,
+  //   title: "cycle spotting",
+  //   name: "mid_cycle_spotting",
+  //   options: ["Yes", "No"],
+  //   sub_question: "Duration per Cycle",
+  //   subQuestions: [
+  //     {
+  //       question: "Colour",
+  //       type: "radio",
+  //       label: "Colour",
+  //       options: ["None", "White"],
+  //       name: "duration_per_cycle_colour",
+  //     },
+  //   ],
+  // },
+  
+  //
+  // {
+  //   question:
+  //     "With whom do you live? (Include children, parents, relatives, friends, pets)",
+  //   type: "long_textarea",
+  //   title: "Relationships",
+  //   name: "who_do_you_live_with",
+  // },
+
+  // {
+  //   question: "Current occupation:",
+  //   title: "Relationships",
+  //   type: "long_textarea",
+  //   name: "current_occupation",
+  // },
+  // {
+  //   question: "Previous occupation:",
+  //   type: "long_textarea",
+  //   title: "Relationships",
+  //   name: "previous_occupation",
+  // },
+  // {
+  //   question:
+  //     "Do you have resources for emotional support? (Check all that apply)",
+  //   type: "checkbox",
+  //   title: "Relationships",
+  //   name: "resourcces_for_emotional_support",
+  //   options: [
+  //     "Spouse/Partner",
+  //     "Family",
+  //     "Friends",
+  //     "Religious/Spiritual",
+  //     "Pets",
+  //     "Other",
+  //   ],
+  // },
   {
     question: "Do you have a religious or spiritual practice?",
     type: "long_radio",
@@ -503,16 +699,14 @@ const ReproductiveHealth = ({ onComplete }) => {
     }
 
     // Validate Other Sub-Questions (for all other questions)
-    if (question.subQuestions && mainAnswer === "Yes") {
+    if (question.subQuestions && mainAnswer === "Yes" ) {
         for (const subQuestion of question.subQuestions) {
-            const subAnswer = answers[subQuestion.name];
-
+            // const subAnswer = answers[subQuestion.name];
             // Skip already validated birth control sub-questions
             if (question.name === "relaxation_techniques") continue;
-
-            if (!subAnswer || subAnswer.trim() === "") {
-                return false;
-            }
+            // if (!subAnswer || subAnswer.trim() === "") {
+            //     return false;
+            // }
         }
     }
 
@@ -830,7 +1024,7 @@ const ReproductiveHealth = ({ onComplete }) => {
             >
               <div style={{display: "flex", alignItems:"center"}}>
                  {/* InputNumber should have its own state key */}
-                  {subQuestion.name === "intercourse_during_fertile_sub"?<span>Every&nbsp;</span>:""}
+                  {subQuestion.name === "intercourse_during_fertile_sub"?<span style={{ fontWeight: "600", color:"#303030"}}>Every&nbsp;</span>:""}
                     <InputNumber
                       name={subQuestion.name}
                       value={answers[subQuestion.name] || undefined}
@@ -838,7 +1032,7 @@ const ReproductiveHealth = ({ onComplete }) => {
                       disabled={answers[`${subQuestion.name}_unsure`]}
                       className="input_questionnaire"
                     />
-                    {subQuestion.name === "intercourse_during_fertile_sub"?<span>&nbsp;Days</span>:""}
+                    {(subQuestion.name === "intercourse_during_fertile_sub" || subQuestion.name === "duration_per_cycle")?<span style={{ fontWeight: "600", color:"#303030"}}>&nbsp;Days</span>:""}
               </div>
              
               {/* Radio.Group should use a different key in the state */}
@@ -849,6 +1043,60 @@ const ReproductiveHealth = ({ onComplete }) => {
               >
                 Unsure
             </Checkbox>
+            </div>
+          </>
+        )}
+        {console.log("dd--", subQuestion.name)}
+         {subQuestion.type === "number_with_radio_sub" && subQuestion.name === "menstrual_bleeding_sub" && (
+          <>
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "10px" }}
+            >
+              <div style={{display: "flex", alignItems:"center"}}>
+                 {/* InputNumber should have its own state key */}
+                    <InputNumber
+                      name={subQuestion.name}
+                      value={answers[subQuestion.name] || undefined}
+                      onChange={(value) => handleChange(value, subQuestion.name)}
+                      disabled={answers[`${subQuestion.name}_unsure`]}
+                      className="input_questionnaire"
+                    />
+                    {subQuestion.name === "menstrual_bleeding_sub"?<span style={{ fontWeight: "600", color:"#303030"}}>days light bleeding&nbsp;</span>:""}
+              </div>
+              <div style={{display: "flex", alignItems:"center"}}>
+                 {/* InputNumber should have its own state key */}
+                    <InputNumber
+                      name={subQuestion.name}
+                      value={answers[subQuestion.name] || undefined}
+                      onChange={(value) => handleChange(value, subQuestion.name)}
+                      disabled={answers[`${subQuestion.name}_unsure`]}
+                      className="input_questionnaire"
+                    />
+                    {subQuestion.name === "menstrual_bleeding_sub"?<span style={{ fontWeight: "600", color:"#303030"}}>days moderate bleeding&nbsp;</span>:""}
+              </div>
+              <div style={{display: "flex", alignItems:"center"}}>
+                 {/* InputNumber should have its own state key */}
+                    <InputNumber
+                      name={subQuestion.name}
+                      value={answers[subQuestion.name] || undefined}
+                      onChange={(value) => handleChange(value, subQuestion.name)}
+                      disabled={answers[`${subQuestion.name}_unsure`]}
+                      className="input_questionnaire"
+                    />
+                    {subQuestion.name === "menstrual_bleeding_sub"?<span style={{ fontWeight: "600", color:"#303030"}}>days heavy bleeding&nbsp;</span>:""}
+              </div>
+              <div style={{display: "flex", alignItems:"center"}}>
+                 {/* InputNumber should have its own state key */}
+                    <InputNumber
+                      name={subQuestion.name}
+                      value={answers[subQuestion.name] || undefined}
+                      onChange={(value) => handleChange(value, subQuestion.name)}
+                      disabled={answers[`${subQuestion.name}_unsure`]}
+                      className="input_questionnaire"
+                    />
+                    {subQuestion.name === "menstrual_bleeding_sub"?<span style={{ fontWeight: "600", color:"#303030"}}>days very heavy bleeding &nbsp;</span>:""}
+              </div>
+              
             </div>
           </>
         )}
@@ -1024,7 +1272,7 @@ const ReproductiveHealth = ({ onComplete }) => {
             onChange={(e) => handleChange(e.target.value, question.name)}
             value={answers[question.name]}
             style={{ width: "100%" }}
-          >
+          > 
             {question.options.map((option, index) => {
               // const isUnsureOrNoneSelected = answers[question.name] === "Unsure" || answers[question.name] === "None";
               return (
@@ -1102,6 +1350,42 @@ const ReproductiveHealth = ({ onComplete }) => {
                 changes in appetite, acne, constipation, or diarrhea.
               </li>
             </ul>
+          </div>
+        );
+        case "info_spotting":
+        return (
+          <div className="info-box">
+            <div className="info-header">
+              <InfoCircleOutlined className="info-icon" />
+              <Title
+                level={5}
+                className="info-title"
+                style={{ color: "#335CAD" }}
+              >
+                Pre-Period Spotting: 
+              </Title>
+            </div>
+            
+            <Paragraph>
+            Pre-Period Spotting: 
+
+            This spotting happens just before menstrual bleeding begins. 
+            It is light and often serves as an early indicator that the period is about to start. 
+            It usually transitions into the regular menstrual flow shortly afterward.
+            </Paragraph>
+            <Paragraph>
+            After Period Spotting:
+
+            This may occur at the tail end of menstrual bleeding as the flow tapers off into lighter spotting.
+            </Paragraph>
+            <Paragraph>
+            ℹ️  Bleeding
+
+              Light: Tampons/Pads typically need to be changed every 7-8 hours. Menstrual cups can be worn for up to 12 hours.
+              Moderate: Tampons/Pads generally need to be changed every 5-6 hours. Menstrual cups can be left in place for 8-12 hours, depending on the flow.
+              Heavy: Tampons/Pads generally need to be changed every 3-4 hours. Menstrual cups can be left in place for up to 4-6 hours, depending on the flow.
+              Very Heavy: Tampons/Pads often need to be changed every 1-2 hours. Heavy bleeding is defined as soaking through one or more pads or tampons every 1-2 hours. Menstrual cups may need to be emptied more frequently, every 4 hours or more frequently, depending on the volume and heaviness of the flow.
+            </Paragraph>
           </div>
         );
       case "radiowithselect":
@@ -1189,6 +1473,31 @@ const ReproductiveHealth = ({ onComplete }) => {
             {renderSubQuestions(question.subQuestions)}
           </div>
         );
+        // case "radio":
+        // return (
+        //   <div className="input_container" style={{ marginBottom: "20px" }}>
+        //     {question.isCyleSpotting && (
+        //       <div className="info-box">
+        //         <Title
+        //           level={5}
+        //           className="info-title"
+        //           style={{ color: "#335CAD" }}
+        //         >
+        //           Cycle Length
+        //         </Title>
+        //         <Paragraph>
+        //         Light bleeding that occurs around the middle of the menstrual cycle, 
+        //         typically near ovulation. This spotting is brief, light, 
+        //         and usually only requires a panty liner for protection. 
+        //         There is no additional bleeding immediately before or after it.
+        //         </Paragraph>
+        //       </div>
+        //     )}
+        //     {/* <p>{question.sub_question}</p> */}
+        //     {/* <p>{question.sub_question}</p>
+        //     {renderSubQuestions(question.subQuestions)} */}
+        //   </div>
+        // );
       
         case "long_textarea":
         return (
@@ -1286,6 +1595,23 @@ const ReproductiveHealth = ({ onComplete }) => {
               value={answers[question.name]}
               style={{ width: "100%" }}
             >
+               {question.isCyleSpotting && (
+              <div className="info-box">
+                <Title
+                  level={5}
+                  className="info-title"
+                  style={{ color: "#335CAD" }}
+                >
+                  Mid Cycle Spotting:
+                </Title>
+                <Paragraph>
+                Light bleeding that occurs around the middle of the menstrual cycle, 
+                typically near ovulation. This spotting is brief, light, 
+                and usually only requires a panty liner for protection. 
+                There is no additional bleeding immediately before or after it.
+                </Paragraph>
+              </div>
+            )}
               {question.options.map((option, index) => {
                 // const isUnsureOrNoneSelected = answers[question.name] === "Unsure" || answers[question.name] === "None";
                 // const isBirthControlQuestion = question.name === "relaxation_techniques";

@@ -700,14 +700,14 @@ const ReproductiveHealth = ({ onComplete }) => {
 
     // Validate Other Sub-Questions (for all other questions)
     if (question.subQuestions && mainAnswer === "Yes" ) {
-        for (const subQuestion of question.subQuestions) {
-            // const subAnswer = answers[subQuestion.name];
-            // Skip already validated birth control sub-questions
-            if (question.name === "relaxation_techniques") continue;
-            // if (!subAnswer || subAnswer.trim() === "") {
-            //     return false;
-            // }
-        }
+        // for (const subQuestion of question.subQuestions) {
+        //     // const subAnswer = answers[subQuestion.name];
+        //     // Skip already validated birth control sub-questions
+        //     if (question.name === "relaxation_techniques") continue;
+        //     // if (!subAnswer || subAnswer.trim() === "") {
+        //     //     return false;
+        //     // }
+        // }
     }
 
     // Validate Checkbox Answers

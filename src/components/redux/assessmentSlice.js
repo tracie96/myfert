@@ -4,25 +4,25 @@ const initialState = [
   {
     title: "Reproductive Health",
     component: "/questionnaire/11",
-    icon: "https://res.cloudinary.com/tracysoft/image/upload/v1738258164/11_n4cnmu.svg",
+    icon: "https://res.cloudinary.com/tracysoft/image/upload/v1738773195/ovum_qzgay1.png",
     isComplete: false,
   },
   {
     title: "General Information",
     component: "/questionnaire/1",
-    icon: "https://res.cloudinary.com/tracysoft/image/upload/v1738258153/1_srz5zf.svg",
+    icon: "https://res.cloudinary.com/tracysoft/image/upload/v1738258152/2_qe7gb1.svg",
     isComplete: false,
   },
   {
     title: "Current Health and Lifestyle",
     component: "/questionnaire/2",
-    icon: "https://res.cloudinary.com/tracysoft/image/upload/v1738258152/2_qe7gb1.svg",
+    icon: "https://res.cloudinary.com/tracysoft/image/upload/v1738774038/self-care-health-concept_b56alw.png",
     isComplete: false,
   },
   {
     title: "Nutrition and Dietary Habits",
     component: "/questionnaire/3",
-    icon: "https://res.cloudinary.com/tracysoft/image/upload/v1738258156/3_mw2thv.svg",
+    icon: "https://res.cloudinary.com/tracysoft/image/upload/v1738258153/4_fqy114.svg",
     isComplete: false,
   },
   {
@@ -58,7 +58,7 @@ const initialState = [
   {
     title: "Symptom Review and Medications",
     component: "/questionnaire/9",
-    icon: "https://res.cloudinary.com/tracysoft/image/upload/v1738258164/11_n4cnmu.svg",
+    icon: "https://res.cloudinary.com/tracysoft/image/upload/v1738258156/8_xonkbe.svg",
     isComplete: false,
   },
   {

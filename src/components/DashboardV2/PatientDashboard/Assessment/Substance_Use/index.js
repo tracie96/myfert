@@ -282,7 +282,7 @@ const SubstanceUse = ({ onComplete }) => {
           ? {
               packsDay: answers.packs_per_day_previous || 0,
               years: answers.number_of_years_previous || 0,
-              type: "",
+              type: "not applicable" || 0,
             }
           : {},
       exposedTo2ndSmoke: answers.exposed_to_second_hand_smoke === "Yes",
@@ -292,8 +292,8 @@ const SubstanceUse = ({ onComplete }) => {
         describe:answers.previous_packs_per_day || "",
       },
       problemAlcohol: answers.alcohol_problem === "Yes",
-      problemAlcoholWhen: answers.problem_alcohol_when || "",
-      problemAlcoholExplain: answers.problem_alcohol_explain || "",
+      problemAlcoholWhen: answers.packs_per_day_when || "",
+      problemAlcoholExplain: answers.packs_per_day_expain || "",
       getHelpForDrinking: answers.considered_help_for_alcohol === "Yes",
       currentlyRecreationalDrugs: answers.using_recreational_drugs === "Yes",
       currentlyRecreationalDrugsType: "",

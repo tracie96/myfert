@@ -23,17 +23,12 @@ const HormoneChart = () => {
   const [error, setError] = useState(null);
 
   const monthDays = useMemo(() => ({
-    November: 30,
-    December: 31,
+    January: 30,
+    Febuary: 31,
   }), []);
   
   const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
 
-  const hardcodedPhases = useMemo(() => [
-    { month: "November", startDay: 19, endDay: 23, type: "period",label: "Menstruation", color: "#ffcccc" },
-    { month: "November", startDay: 29, endDay: 30, type: "fertile", label: "Fertile Window", color: "#ccffcc" },
-    { month: "December", startDay: 1, endDay: 5, type: "fertile",  label: "Fertile Window", color: "#ccffcc" },
-  ], []);
   console.log({userInfo})
   useEffect(() => {
     const fetchMiraInfo = async () => {
@@ -74,6 +69,32 @@ const HormoneChart = () => {
     fetchMiraInfo();
   }, [dispatch]);
 
+  const shadingAreas = useMemo(() => {
+    if (!hormoneData) return [];
+
+    const periodStart = new Date(hormoneData.period_start);
+    const periodEnd = new Date(hormoneData.period_end);
+    const fertileStart = new Date(hormoneData.fertile_window_start);
+    const fertileEnd = new Date(hormoneData.fertile_window_end);
+    
+    const startDayPeriod = periodStart.getDate();
+    const endDayPeriod = periodEnd.getDate();
+    const startDayFertile = fertileStart.getDate();
+    const endDayFertile = fertileEnd.getDate();
+
+    return [
+      {
+        start: startDayPeriod,
+        end: endDayPeriod,
+        type: "period",
+      },
+      {
+        start: startDayFertile,
+        end: endDayFertile,
+        type: "fertile",
+      }
+    ];
+  }, [hormoneData]);
   // Generate full data for the selected month
   const chartData = useMemo(() => {
     const numberOfDays = monthDays[selectedMonth];
@@ -106,22 +127,14 @@ const HormoneChart = () => {
     );
   }, [cycleInfo]);
 
-  const shadingAreas = useMemo(() => {
-    return hardcodedPhases
-      .filter((phase) => phase.month === selectedMonth)
-      .map((phase) => ({
-        start: phase.startDay,
-        end: phase.endDay,
-        type: phase.type, 
-      }));
-  }, [selectedMonth,hardcodedPhases]);
+
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
-  if (hormoneData.length === 0) {
-    return <div>No data is available for the selected month.</div>;
-  }
+  // if (hormoneData.length === 0) {
+  //   return <div>No data is available for the selected month.</div>;
+  // }
   
   return (
     <div style={{ position: "relative", width: "100%", height: "500px" }}>
@@ -140,9 +153,9 @@ const HormoneChart = () => {
           ))}
         </select>
       </div>
-  
 
-      {ovulationDay && selectedMonth === 'November' && userInfo.obj.firstName === 'Amara'   &&(
+      {/* Ovulation Marker */}
+      {ovulationDay && selectedMonth === 'November' && userInfo.obj.firstName === 'Amara' && (
         <div
           style={{
             position: "absolute",
@@ -157,6 +170,8 @@ const HormoneChart = () => {
           ★ Ovulation
         </div>
       )}
+
+      {/* Chart Rendering */}
       <div style={{ width: "100%", height: "500px" }}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
@@ -166,18 +181,19 @@ const HormoneChart = () => {
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
               dataKey="day"
-              ticks={Array.from({ length: monthDays[selectedMonth] }, (_, i) => i + 1)} 
+              ticks={Array.from({ length: monthDays[selectedMonth] }, (_, i) => i + 1)}
               label={{ value: "Day", position: "insideBottom", dy: 10 }}
             />
             <YAxis label={{ value: "Hormone Level", angle: -90, position: "insideLeft" }} />
             <Tooltip />
             <Legend verticalAlign="top" />
 
+            {/* Dynamic Shading Areas */}
             {userInfo.obj.firstName === 'Amara' && shadingAreas.map((area, index) => (
               <ReferenceArea
                 key={index}
-                x1={area?.start}
-                x2={area?.end}
+                x1={area.start}
+                x2={area.end}
                 stroke="none"
                 fill={area.type === "period" ? "#ffcccc" : "#ccffcc"}
                 fillOpacity={0.2}
@@ -185,7 +201,7 @@ const HormoneChart = () => {
               />
             ))}
 
-            {/* Hormone lines */}
+            {/* Hormone Lines */}
             <Line type="monotone" dataKey="e3g" stroke="#00bfff" activeDot={{ r: 8 }} connectNulls={true} />
             <Line type="monotone" dataKey="lh" stroke="#9932cc" connectNulls={true} />
             <Line type="monotone" dataKey="pdg" stroke="#8b4513" connectNulls={true} />

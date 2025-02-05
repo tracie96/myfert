@@ -755,7 +755,7 @@ function SwitchContent({
                     { label: "Explain Problem with Alcohol", value: substance.problemAlcoholExplain || "N/A" },
                     { label: "Get Help for Drinking", value: substance.getHelpForDrinking ? "Yes" : "No" },
                     { label: "Currently Using Recreational Drugs", value: substance.currentlyRecreationalDrugs ? "Yes" : "No" },
-                    { label: "Type of Recreational Drugs", value: substance.currentlyRecreationalDrugsType || "N/A" },
+                    // { label: "Type of Recreational Drugs", value: substance.currentlyRecreationalDrugsType || "N/A" },
                   ].map((item, index) => (
                     <Descriptions.Item key={index} label={item.label}>
                       {item.value}

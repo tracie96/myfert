@@ -386,12 +386,7 @@ function SwitchContent({
 
   <Col xs={24} md={12}>
     <Descriptions column={1} bordered>
-      <Descriptions.Item label="Emergency Phone (Home)">
-        {generalInfo.emergencyPhoneHome || "N/A"}
-      </Descriptions.Item>
-      <Descriptions.Item label="Emergency Phone (Cell)">
-        {generalInfo.emergencyPhoneCell || "N/A"}
-      </Descriptions.Item>
+
       <Descriptions.Item label="Emergency Phone (Work)">
         {generalInfo.emergencyPhoneWork || "N/A"}
       </Descriptions.Item>

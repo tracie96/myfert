@@ -519,7 +519,7 @@ const PatientAppointment = () => {
                         marginTop: "-10px",
                       }}
                     >
-                      {status === null ? (
+                      {status.statLevel === 0 ? (
                         <div>Initial Accessers</div>
                       ) : (
                         <>

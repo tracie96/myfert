@@ -16,20 +16,16 @@ import { getMiraInfo } from "../../redux/AuthController";
 const HormoneChart = () => {
   const dispatch = useDispatch();
   const [hormoneData, setHormoneData] = useState([]);
-  const [selectedMonth, setSelectedMonth] = useState("November"); 
+  const [selectedMonth, setSelectedMonth] = useState("November");
   const [loading, setLoading] = useState(false);
   const [cycleInfo, setCycleInfo] = useState(null);
-
   const [error, setError] = useState(null);
 
   const monthDays = useMemo(() => ({
-    January: 30,
-    Febuary: 31,
+    November: 30,
+    December: 31,
   }), []);
-  
-  const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
 
-  console.log({userInfo})
   useEffect(() => {
     const fetchMiraInfo = async () => {
       setLoading(true);
@@ -44,14 +40,8 @@ const HormoneChart = () => {
             lh: parseFloat(hormone.lh) || 0,
             e3g: parseFloat(hormone.e3g) || 0,
             pdg: parseFloat(hormone.pdg) || 0,
-            day: hormone.test_time
-              ? new Date(hormone.test_time).getDate()
-              : 0, 
-            month: hormone.test_time
-              ? new Date(hormone.test_time).toLocaleString("default", {
-                  month: "long",
-                })
-              : "", 
+            day: new Date(hormone.test_time).getDate(),
+            month: new Date(hormone.test_time).toLocaleString("default", { month: "long" }),
           }));
           setCycleInfo(resultAction.payload.cycleInfo);
           setHormoneData(parsedHormones);
@@ -70,32 +60,57 @@ const HormoneChart = () => {
   }, [dispatch]);
 
   const shadingAreas = useMemo(() => {
-    if (!hormoneData) return [];
-
-    const periodStart = new Date(hormoneData.period_start);
-    const periodEnd = new Date(hormoneData.period_end);
-    const fertileStart = new Date(hormoneData.fertile_window_start);
-    const fertileEnd = new Date(hormoneData.fertile_window_end);
-    
-    const startDayPeriod = periodStart.getDate();
-    const endDayPeriod = periodEnd.getDate();
-    const startDayFertile = fertileStart.getDate();
-    const endDayFertile = fertileEnd.getDate();
-
-    return [
+    if (!cycleInfo) return [];
+  
+    // const periodMonth = new Date(cycleInfo.period_start).getMonth();
+    const fertileStartMonth = new Date(cycleInfo.fertile_window_start).getMonth();
+    const fertileEndMonth = new Date(cycleInfo.fertile_window_end).getMonth();
+  
+    const periodStart = new Date(cycleInfo.period_start).getDate();
+    const periodEnd = new Date(cycleInfo.period_end).getDate();
+    const fertileStart = new Date(cycleInfo.fertile_window_start).getDate();
+    const fertileEnd = new Date(cycleInfo.fertile_window_end).getDate();
+  
+    let areas = [
       {
-        start: startDayPeriod,
-        end: endDayPeriod,
+        start: periodStart,
+        end: periodEnd,
         type: "period",
+        month: new Date(cycleInfo.period_start).toLocaleString("default", { month: "long" }),
       },
-      {
-        start: startDayFertile,
-        end: endDayFertile,
-        type: "fertile",
-      }
     ];
-  }, [hormoneData]);
-  // Generate full data for the selected month
+  
+    // Handle fertile window across months correctly
+    if (fertileStartMonth === fertileEndMonth) {
+      // Fertile window is within a single month
+      areas.push({
+        start: fertileStart,
+        end: fertileEnd,
+        type: "fertile",
+        month: new Date(cycleInfo.fertile_window_start).toLocaleString("default", { month: "long" }),
+      });
+    } else {
+      // Fertile window starts in November and ends in December
+      areas.push({
+        start: fertileStart,
+        end: 30, // Up to the end of November
+        type: "fertile",
+        month: "November",
+      });
+      areas.push({
+        start: 1, // Starts from 1st in December
+        end: fertileEnd,
+        type: "fertile",
+        month: "December",
+      });
+    }
+  
+    return areas;
+  }, [cycleInfo]);
+  
+  
+
+  // Generate full month data including placeholders for missing days
   const chartData = useMemo(() => {
     const numberOfDays = monthDays[selectedMonth];
     const fullMonthData = Array.from({ length: numberOfDays }, (_, i) => ({
@@ -108,34 +123,16 @@ const HormoneChart = () => {
     hormoneData
       .filter((entry) => entry.month === selectedMonth)
       .forEach((entry) => {
-        const dayIndex = entry.day - 1; // Days are 1-based, array is 0-based
-        fullMonthData[dayIndex] = {
-          ...fullMonthData[dayIndex],
-          ...entry,
-        };
+        const dayIndex = entry.day - 1;
+        fullMonthData[dayIndex] = { ...fullMonthData[dayIndex], ...entry };
       });
 
     return fullMonthData;
   }, [hormoneData, selectedMonth, monthDays]);
 
-  const ovulationDay = useMemo(() => {
-    if (!cycleInfo) return null;
-    return (
-      Math.ceil(
-        (new Date(cycleInfo?.ovulation)) 
-      ) + 1
-    );
-  }, [cycleInfo]);
-
-
-
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
-  // if (hormoneData.length === 0) {
-  //   return <div>No data is available for the selected month.</div>;
-  // }
-  
   return (
     <div style={{ position: "relative", width: "100%", height: "500px" }}>
       {/* Month Selector */}
@@ -154,30 +151,10 @@ const HormoneChart = () => {
         </select>
       </div>
 
-      {/* Ovulation Marker */}
-      {ovulationDay && selectedMonth === 'November' && userInfo.obj.firstName === 'Amara' && (
-        <div
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: `${(ovulationDay - 1) * (100 / cycleInfo.cycle_length)}%`,
-            transform: "translate(-50%, -50%)",
-            color: "green",
-            fontSize: "16px",
-            zIndex: 2,
-          }}
-        >
-          ★ Ovulation
-        </div>
-      )}
-
       {/* Chart Rendering */}
       <div style={{ width: "100%", height: "500px" }}>
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart
-            data={chartData}
-            margin={{ top: 50, right: 30, left: 20, bottom: 10 }}
-          >
+          <LineChart data={chartData} margin={{ top: 50, right: 30, left: 20, bottom: 10 }}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
               dataKey="day"
@@ -188,18 +165,25 @@ const HormoneChart = () => {
             <Tooltip />
             <Legend verticalAlign="top" />
 
-            {/* Dynamic Shading Areas */}
-            {userInfo.obj.firstName === 'Amara' && shadingAreas.map((area, index) => (
-              <ReferenceArea
-                key={index}
-                x1={area.start}
-                x2={area.end}
-                stroke="none"
-                fill={area.type === "period" ? "#ffcccc" : "#ccffcc"}
-                fillOpacity={0.2}
-                label={area.type === "period" ? "Menstruation" : "Fertile Window"}
-              />
-            ))}
+            {/* Shading Areas */}
+            {shadingAreas
+              .filter((area) => area.month === selectedMonth)
+              .map((area, index) => (
+                <ReferenceArea
+                  key={index}
+                  x1={area.start}
+                  x2={area.end}
+                  stroke="none"
+                  fill={area.type === "period" ? "#ffcccc" : "#ccffcc"}
+                  fillOpacity={0.3} // Adjusted for better visibility
+                  label={{
+                    value: area.type === "period" ? "Menstruation" : "Fertile Window",
+                    position: "insideTop",
+                    fill: "#666",
+                    fontSize: 12,
+                  }}
+                />
+              ))}
 
             {/* Hormone Lines */}
             <Line type="monotone" dataKey="e3g" stroke="#00bfff" activeDot={{ r: 8 }} connectNulls={true} />

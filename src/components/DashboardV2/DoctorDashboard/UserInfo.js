@@ -1383,17 +1383,47 @@ function SwitchContent({
                    {/* <Descriptions.Item label="Who Do You Live With?">
                   {reproductiveInfo.who_do_you_live_with || 'N/A'}
                   </Descriptions.Item> */}
-                  <Descriptions.Item label="current occupation">
-                    {reproductiveInfo?.current_occupation || 'N/A'}
+                  <Descriptions.Item label="Mid Cycle Spotting">
+                  {reproductiveInfo?.midCycleSpotting ? "Yes" : "No"}
                   </Descriptions.Item>
-                  <Descriptions.Item label="previous occupation">
-                  {reproductiveInfo.previous_occupation || 'N/A'}
+                  <Descriptions.Item label="Cycle Discharge Creamy Duration">
+                  {reproductiveInfo?.cycleDischargeCreamy?.duration || 'N/A'}
                   </Descriptions.Item>
-                  <Descriptions.Item label="Resourcces For Emotional Support">
-                  {reproductiveInfo.resourcces_for_emotional_support || 'N/A'}
+                  <Descriptions.Item label="Cycle Discharge Creamy Colour">
+                  {reproductiveInfo?.cycleDischargeCreamy?.colour || 'N/A'}
                   </Descriptions.Item>
-                  <Descriptions.Item label="spiritual practice">
-                  {reproductiveInfo.spiritual_practice || 'N/A'}
+                  <Descriptions.Item label="Cycle Discharge Watery Duration">
+                  {reproductiveInfo?.cycleDischargeWatery?.duration || 'N/A'}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Cycle Discharge Watery Colour">
+                  {reproductiveInfo?.cycleDischargeWatery?.colour || 'N/A'}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Cycle Discharge Egg White Duration">
+                  {reproductiveInfo?.cycleDischargeEggWhite?.duration || 'N/A'}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Cycle Discharge Egg White Colour">
+                  {reproductiveInfo?.cycleDischargeEggWhite?.colour || 'N/A'}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Cycle Discharge Pre Period Duration">
+                  {reproductiveInfo?.cycleDischargePrePeriod?.duration || 'N/A'}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Cycle Discharge Pre Period Colour">
+                  {reproductiveInfo?.cycleDischargePrePeriod?.colour || 'N/A'}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Cycle Discharge Menstral Bleeding Duration">
+                  {reproductiveInfo?.cycleDischargeMenstralBleeding?.duration || 'N/A'}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Cycle Discharge Menstral Bleeding Colour">
+                  {reproductiveInfo?.cycleDischargeMenstralBleeding?.colour || 'N/A'}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Cycle Discharge Menstral Bleeding Clots">
+                  {reproductiveInfo?.cycleDischargeMenstralBleeding?.clots ? "Yes" : "No"}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Cycle Discharge After Period Spotting Duration">
+                  {reproductiveInfo?.cycleDischargeAfterPeriodSpotting?.duration || 'N/A'}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Cycle Discharge After Period Spotting">
+                  {reproductiveInfo?.cycleDischargeAfterPeriodSpotting?.colour || 'N/A'}
                   </Descriptions.Item>
 
 

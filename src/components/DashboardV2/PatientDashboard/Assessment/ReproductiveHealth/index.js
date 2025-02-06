@@ -581,20 +581,20 @@ const questions = [
   //     "Other",
   //   ],
   // },
-  {
-    question: "Do you have a religious or spiritual practice?",
-    type: "long_radio",
-    title: "Relationships",
-    name: "spiritual_practice",
-    options: ["Yes", "No"],
-    subQuestions: [
-      {
-        question: "If Yes: what kind",
-        type: "text",
-        name: "spiritual_practice_desciption",
-      },
-    ],
-  },
+  // {
+  //   question: "Do you have a religious or spiritual practice?",
+  //   type: "long_radio",
+  //   title: "Relationships",
+  //   name: "spiritual_practice",
+  //   options: ["Yes", "No"],
+  //   subQuestions: [
+  //     {
+  //       question: "If Yes: what kind",
+  //       type: "text",
+  //       name: "spiritual_practice_desciption",
+  //     },
+  //   ],
+  // },
 ];
 
 const ReproductiveHealth = ({ onComplete }) => {
@@ -877,6 +877,7 @@ const ReproductiveHealth = ({ onComplete }) => {
     </span>
   );
   const handleSubmit = async () => {
+    console.log("answers-", answers)
     try {
       const requestData = {
         birthControl: answers.relaxation_techniques === "Yes",
@@ -924,36 +925,36 @@ const ReproductiveHealth = ({ onComplete }) => {
           duration: answers.duration_per_mild_cycle_radio || "N/A",
           colour: "N/A",
         },
-        midCycleSpotting: false,
+        midCycleSpotting: answers.mid_cycle_spotting === "Yes",
         menstralCycleFrequency: answers.menstralCycleFrequency || "Unknown", // Example default
         menstralCycleDuration: answers.menstralCycleDuration || "Unknown", // Example default
         menstralCycleColour: answers.menstralCycleColour || "Unknown",
         relaxation_techniques: answers.relaxation_techniques || 'N/A',
         methods_trying_to_conceive: answers.methods_trying_to_conceive || [],
         cycleDischargeCreamy: {
-          duration: "Unknown", // Example default
-          colour: "Unknown", // Example default
+          duration: `${answers.cervical_mucus}` || "N/A", // Example default
+          colour: answers.cervical_mucus_sub || "N/A", // Example default
         },
         cycleDischargeWatery: {
-          duration: "Unknown", // Example default
-          colour: "Unknown", // Example default
+          duration: `${answers.Watery_mucus_sub}` || "N/A", // Example default
+          colour: answers.Watery_mucus_colour || "N/A", // Example default
         },
         cycleDischargeEggWhite: {
-          duration: "Unknown", // Example default
-          colour: "Unknown", // Example default
+          duration: `${answers.egg_white_mucus_sub}` || "N/A", // Example default
+          colour: answers.egg_white_mucus_colour || "N/A", // Example default
         },
         cycleDischargePrePeriod: {
-          duration: "Unknown", // Example default
-          colour: "Unknown", // Example default
+          duration: `${answers.pre_spotting_sub}` || "N/A", // Example default
+          colour: answers.pre_spotting_colour || "N/A", // Example default
         },
         cycleDischargeMenstralBleeding: {
-          duration: "Unknown", // Example default
-          colour: "Unknown", // Example default
-          clots: "Unknown", // Example default
+          duration: `${answers.menstrual_bleeding_sub}` || "N/A", // Example default
+          colour: answers.menstrual_bleeding_sub_colour || "N/A", // Example default
+          clots: answers.menstrual_bleeding_sub_clots || "N/A", // Example default
         },
         cycleDischargeAfterPeriodSpotting: {
-          duration: "Unknown", // Example default
-          colour: "Unknown", // Example default
+          duration: `${answers.after_period_spot_sub}` || "N/A", // Example default
+          colour: answers.after_period_spot_colour || "N/A", // Example default
         },
         chartBase64: answers.charting_method || "",
       };

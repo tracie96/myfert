@@ -31,8 +31,8 @@ const questions = [
     options: [
       {
         label: "Pregnancies",
-        name: "pregnancies",
-        selectName: "pregnancies",
+        name: "pregnancy",
+        selectName: "pregnancy",
         selectOptions: Array.from({ length: 30 }, (_, i) => 0 + i),
       },
       {

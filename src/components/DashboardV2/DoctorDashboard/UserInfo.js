@@ -1043,6 +1043,119 @@ function SwitchContent({
       ) : (
         <div className="p-6 rounded-md shadow-md">
           <Row gutter={16}>
+          <Col xs={24} md={12}>
+            {/* First Column */}
+            <Descriptions column={1} bordered>
+            { Object.entries(personalFamily?.obstetricHistory || {}).map(([key, value]) => {
+                  console.log("baibhav--", 'key',key,value);
+                  return (value.level > 0 && <Descriptions.Item
+                        label={value.name}
+                        key={key}
+                      >
+                        {value.level || 'N/A'}
+                        {/* <span className="font-medium">{value.name || 'N/A'}</span> */}
+                      </Descriptions.Item>)
+                })
+                }
+             
+
+
+                 <Descriptions.Item label="Problems After Pregnancy">
+                  {personalFamily?.problemsAfterPregnancy ? "Yes" : "No"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Problems After Pregnancy Explain">
+                  {personalFamily?.problemsAfterPregnancyExplain || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Age Start Menstrual">
+                  {personalFamily?.ageStartMenstrual || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Start Date Last Menstrual">
+                  {personalFamily?.startDateLastMenstrual || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Lenght Of Cycle">
+                  {personalFamily?.lenghtOfCycle || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Time Between Cycles">
+                  {personalFamily?.timeBtwCycles || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Cramping">
+                  {personalFamily?.cramping ? "Yes" : "No"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Pain In Period">
+                  {personalFamily?.painInPeriod ? "Yes" : "No"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Ever Had Pre Menstrual Problems">
+                  {personalFamily?.everHadPreMenstrualProblems?.yesNo
+                    ? personalFamily.everHadPreMenstrualProblems.describe || "No Description"
+                    : "No"}
+                </Descriptions.Item> 
+              </Descriptions>
+            </Col>
+
+            {/* Second Column */}
+            <Col xs={24} md={12}>
+               <Descriptions column={1} bordered>
+                <Descriptions.Item label="Other Menstrual Problems">
+                {personalFamily?.otherMenstrualProblems?.yesNo
+                    ? personalFamily.otherMenstrualProblems.describe || "No Description"
+                    : "No"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Health Last Time">
+                {personalFamily?.everHadPreMenstrualProblems?.yesNo
+                    ? personalFamily?.everHadPreMenstrualProblems?.describe || "No Description"
+                    : "No"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Hormonal Birth Control Type">
+                  {personalFamily?.hormonalBirthControlType?.name || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Problems With Hormonal Birth Control">
+                {personalFamily?.problemsWithHormonalBirthControl?.yesNo
+                    ? personalFamily.problemsWithHormonalBirthControl.describe || "No Description"
+                    : "No"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Use Contraception">
+                {personalFamily?.useContraception?.yesNo
+                    ? personalFamily.useContraception.describe || "No Description"
+                    : "No"}
+                </Descriptions.Item>
+                <Descriptions.Item label="In Menopause">
+                {personalFamily?.inMenopause?.yesNo
+                    ? personalFamily.inMenopause.level || "No level"
+                    : "No"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Surgical Menopause">
+                {personalFamily?.surgicalMenopause?.yesNo
+                    ? personalFamily.surgicalMenopause.describe || "No describe"
+                    : "No"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Symptomic Problems">
+                  <div>{personalFamily?.symptomicProblems || "N/A"}</div>
+                </Descriptions.Item>
+                <Descriptions.Item label="Hormonal Replacement">
+                {personalFamily?.hormonalReplacement?.yesNo
+                    ? personalFamily.hormonalReplacement.describe || "No describe"
+                    : "No"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Gyn Symptoms">
+                {personalFamily?.gynSymptoms || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Gyn Screening Last Pap Test">
+                {personalFamily?.gynScreeningLastPapTest?.date || "N/A"}
+                {personalFamily?.gynScreeningLastPapTest?.value || ""}
+                </Descriptions.Item>
+                <Descriptions.Item label="Gyn Screening Last Mammo">
+                {personalFamily?.gynScreeningLastMammo?.date || "N/A"}
+                {personalFamily?.gynScreeningLastMammo?.value || ""}
+                </Descriptions.Item>
+                <Descriptions.Item label="Gyn Screening Last Bone Desity">
+                {personalFamily?.gynScreeningLastBoneDesity?.date || "N/A"}
+                {personalFamily?.gynScreeningLastBoneDesity?.value || ""}
+                </Descriptions.Item>
+               
+              </Descriptions> 
+            </Col>
+          </Row>
+          {/* <Row gutter={16}>
             <Col xs={24} md={12}>
               <Descriptions column={1} bordered>
                 {Object.entries(personalFamily).map(([key, value]) => (
@@ -1068,7 +1181,7 @@ function SwitchContent({
                 ))}
               </Descriptions>
             </Col>
-          </Row>
+          </Row> */}
         </div>
       );
 

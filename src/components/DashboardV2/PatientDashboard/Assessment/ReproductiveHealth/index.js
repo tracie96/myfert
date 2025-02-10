@@ -877,7 +877,6 @@ const ReproductiveHealth = ({ onComplete }) => {
     </span>
   );
   const handleSubmit = async () => {
-    console.log("answers-", answers)
     try {
       const requestData = {
         birthControl: answers.relaxation_techniques === "Yes",

@@ -833,7 +833,7 @@ const ReproductiveHealth = ({ onComplete }) => {
         updatedAnswers[name] = value;
       }
     } 
-    if (name.includes("_unsure")) {
+    if (name && name.includes("_unsure")) {
       updatedAnswers[name] = value;
       if (value) {
         updatedAnswers[name.replace("_unsure", "")] = "";
@@ -850,7 +850,7 @@ const ReproductiveHealth = ({ onComplete }) => {
       } else {
         updatedAnswers[name] = value;
       }
-    } else if (name.includes("_unsure")) {
+    } else if (name && name.includes("_unsure")) {
       updatedAnswers[name] = value;
       if (value) {
         updatedAnswers[name.replace("_unsure", "")] = "";
@@ -948,7 +948,7 @@ const ReproductiveHealth = ({ onComplete }) => {
           colour: answers.pre_spotting_colour || "N/A", // Example default
         },
         cycleDischargeMenstralBleeding: {
-          duration: `${answers.menstrual_bleeding_sub}` || "N/A", // Example default
+          duration: `${answers.menstrual_bleeding_sub+ ", " +answers.days_light_bleeding+ ", " +answers.days_moderate_bleeding+ ", " +answers.days_heavy_bleeding+ ", " +answers.days_very_heavy_bleeding}` || "N/A", // Example default
           colour: answers.menstrual_bleeding_sub_colour || "N/A", // Example default
           clots: answers.menstrual_bleeding_sub_clots || "N/A", // Example default
         },
@@ -996,7 +996,12 @@ const ReproductiveHealth = ({ onComplete }) => {
   };
   
   
-  
+  const subQuestions_question = [
+    { name: 'days light bleeding' },
+    { name: 'days moderate bleeding' },
+    { name: 'days heavy bleeding' },
+    { name: 'days very heavy bleeding' }
+  ];
 
   const renderSubQuestions = (subQuestions) => {
     return subQuestions.map((subQuestion, index) => (
@@ -1027,7 +1032,7 @@ const ReproductiveHealth = ({ onComplete }) => {
                  {/* InputNumber should have its own state key */}
                   {subQuestion.name === "intercourse_during_fertile_sub"?<span style={{ fontWeight: "600", color:"#303030"}}>Every&nbsp;</span>:""}
                     <InputNumber
-                      name={subQuestion.name}
+                      name={`${subQuestion.name}_menstrual_bleeding`}
                       value={answers[subQuestion.name] || undefined}
                       onChange={(value) => handleChange(value, subQuestion.name)}
                       disabled={answers[`${subQuestion.name}_unsure`]}
@@ -1047,58 +1052,27 @@ const ReproductiveHealth = ({ onComplete }) => {
             </div>
           </>
         )}
-        {console.log("dd--", subQuestion.name)}
-         {subQuestion.type === "number_with_radio_sub" && subQuestion.name === "menstrual_bleeding_sub" && (
+        { subQuestion.type === "number_with_radio_sub" && subQuestion.name === "menstrual_bleeding_sub" && (
           <>
-            <div
-              style={{ display: "flex", flexDirection: "column", gap: "10px" }}
-            >
-              <div style={{display: "flex", alignItems:"center"}}>
-                 {/* InputNumber should have its own state key */}
-                    <InputNumber
-                      name={subQuestion.name}
-                      value={answers[subQuestion.name] || undefined}
-                      onChange={(value) => handleChange(value, subQuestion.name)}
-                      disabled={answers[`${subQuestion.name}_unsure`]}
-                      className="input_questionnaire"
-                    />
-                    {subQuestion.name === "menstrual_bleeding_sub"?<span style={{ fontWeight: "600", color:"#303030"}}>days light bleeding&nbsp;</span>:""}
-              </div>
-              <div style={{display: "flex", alignItems:"center"}}>
-                 {/* InputNumber should have its own state key */}
-                    <InputNumber
-                      name={subQuestion.name}
-                      value={answers[subQuestion.name] || undefined}
-                      onChange={(value) => handleChange(value, subQuestion.name)}
-                      disabled={answers[`${subQuestion.name}_unsure`]}
-                      className="input_questionnaire"
-                    />
-                    {subQuestion.name === "menstrual_bleeding_sub"?<span style={{ fontWeight: "600", color:"#303030"}}>days moderate bleeding&nbsp;</span>:""}
-              </div>
-              <div style={{display: "flex", alignItems:"center"}}>
-                 {/* InputNumber should have its own state key */}
-                    <InputNumber
-                      name={subQuestion.name}
-                      value={answers[subQuestion.name] || undefined}
-                      onChange={(value) => handleChange(value, subQuestion.name)}
-                      disabled={answers[`${subQuestion.name}_unsure`]}
-                      className="input_questionnaire"
-                    />
-                    {subQuestion.name === "menstrual_bleeding_sub"?<span style={{ fontWeight: "600", color:"#303030"}}>days heavy bleeding&nbsp;</span>:""}
-              </div>
-              <div style={{display: "flex", alignItems:"center"}}>
-                 {/* InputNumber should have its own state key */}
-                    <InputNumber
-                      name={subQuestion.name}
-                      value={answers[subQuestion.name] || undefined}
-                      onChange={(value) => handleChange(value, subQuestion.name)}
-                      disabled={answers[`${subQuestion.name}_unsure`]}
-                      className="input_questionnaire"
-                    />
-                    {subQuestion.name === "menstrual_bleeding_sub"?<span style={{ fontWeight: "600", color:"#303030"}}>days very heavy bleeding &nbsp;</span>:""}
-              </div>
-              
+            <div>
+              {subQuestions_question && subQuestions_question.map((subQuestion, index) => {
+                let nameSubQuestion = subQuestion.name.replace(/ /g, '_');
+                return(
+                <div key={nameSubQuestion || index} className="question-container">
+                  <InputNumber
+                    name={nameSubQuestion}
+                    value={answers[nameSubQuestion] || undefined}
+                    onChange={(value) => handleChange(value, nameSubQuestion)}
+                    disabled={answers[`${subQuestion.name}_unsure`]}
+                    className="input_questionnaire"
+                  />
+                  <span className="question-text">
+                    {subQuestion.name || 'Default Name'} {/* Example text for the span */}
+                  </span>
+                </div>
+                )})}
             </div>
+
           </>
         )}
 
@@ -1234,11 +1208,17 @@ const ReproductiveHealth = ({ onComplete }) => {
               }
               value={answers[subQuestion.name] || []}
             >
-              {subQuestion.options.map((option, idx) => (
-                <div key={idx} style={{ marginBottom: "10px" }}>
+              {subQuestion.options.map((option, idx) => {
+                const isUnsureOrNoneSelected = (answers[subQuestion.name] || []).includes("Unsure") || 
+                (answers[subQuestion.name] || []).includes("None");
+                return (
+               <div key={idx} style={{ marginBottom: "10px" }}>
                   {" "}
                   {/* Ensure consistent spacing */}
-                  <Checkbox value={option}>{option}</Checkbox>
+                  <Checkbox 
+                  value={option}
+                  disabled={isUnsureOrNoneSelected && option !== "Unsure" && option !== "None"}
+                  >{option}</Checkbox>
                   {option === "Other" &&
                     answers[subQuestion.name]?.includes("Other") && (
                       <Input
@@ -1255,7 +1235,7 @@ const ReproductiveHealth = ({ onComplete }) => {
                       />
                     )}
                 </div>
-              ))}
+                )})}
             </Checkbox.Group>
           </Col>
         )}
@@ -1318,6 +1298,7 @@ const ReproductiveHealth = ({ onComplete }) => {
             name={question.name}
             value={answers[question.name] || ""}
             onChange={(e) => handleChange(e.target.value, question.name)}
+            max={new Date().toISOString().split('T')[0]} 
           />
         );
       case "info":

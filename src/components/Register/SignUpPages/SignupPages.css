@@ -19,7 +19,7 @@
 .ant-input {
   height: 42px;
   text-align: left;
-  border-color: #000;
+  /* border-color: #000; */
 }
 .ant-form-item-required {
   margin-left: 20%;

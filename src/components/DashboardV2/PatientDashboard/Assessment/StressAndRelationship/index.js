@@ -225,23 +225,78 @@ const StressAndRelationship = ({ onComplete }) => {
 
   const validateQuestion = () => {
     const question = questions[currentQuestionIndex];
-      if (!answers[question.name] || answers[question.name] === "") {
-      return false;
-    }
   
-    if (question.subQuestions && Array.isArray(question.subQuestions)) {
-      for (const subQuestion of question.subQuestions) {
-        if (
-          answers[question.name] === "Yes" && 
-          (!answers[subQuestion.name] || answers[subQuestion.name] === "")
-        ) {
+    switch (question.type) {
+      case "checkbox": {
+        if (!answers[question.name] || answers[question.name].length === 0) {
+          return false; // No checkbox selected
+        }
+  
+        // Check if "Other" is selected and the "Other" input is filled
+        if (answers[question.name].includes("Other")) {
+          const otherInputName = `${question.name}_other`;
+          if (!answers[otherInputName] || answers[otherInputName] === "") {
+            console.log("Validation Failed: Other is checked, but input field is empty.");
+            return false;
+          }
+        }
+  
+        return true;
+      }
+      case "checkbox_with_select":
+        break;
+  
+      case "radio": {
+        if (answers[question.name] === undefined) {
           return false;
         }
-      }
-    }
   
-    return true;
+        if (answers[question.name] === "Yes" && (
+          question.name === "do_you_use_sleeping_aids" ||
+          question.name === "problems_limiting_exercise" ||
+          question.name === "sore_after_exercise"
+        )) {
+          const inputFieldName = `${question.name}_other`;
+          if (!answers[inputFieldName] || answers[inputFieldName] === "") {
+            console.log(`Validation Failed: ${question.name} is Yes, but input field is empty.`);
+            return false;
+          }
+        }
+  
+        return true;
+      }
+  
+      case "long_radio": {
+        if (answers[question.name] === undefined) {
+          return false; 
+        }
+  
+        if (answers[question.name] === "Yes") {
+          if (!question.subQuestions) return true; 
+  
+          for (const subQuestion of question.subQuestions) {
+            if (answers[subQuestion.name] === undefined || answers[subQuestion.name] === "") {
+              console.log(
+                `Validation Failed: Sub-question ${subQuestion.name} is not answered.`
+              );
+              return false; 
+            }
+          }
+        }
+  
+        return true; 
+      }
+  
+      case "long_textarea":
+        return (
+          answers[question.name] !== undefined && answers[question.name] !== ""
+        );
+  
+      default:
+        return true;
+    }
   };
+  
   
   const label = (
     <span>
@@ -566,7 +621,8 @@ const StressAndRelationship = ({ onComplete }) => {
             ))}
           </Checkbox.Group>
         );
-      case "long_radio":
+      
+        case "long_radio":
         return (
           <div style={{ flexDirection: "column" }}>
             <Radio.Group
@@ -616,7 +672,7 @@ const StressAndRelationship = ({ onComplete }) => {
         </h3>
 
         <h3 style={{ margin: "20px 0", color: "#000", fontWeight:"600", fontSize: "15px" }}>
-          {questions[currentQuestionIndex].question}
+          {questions[currentQuestionIndex]?.question}
           <i style={{ color: "#335CAD", fontWeight: "bold" }}>
             {" "}
             {questions[currentQuestionIndex]?.sub}

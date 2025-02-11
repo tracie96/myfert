@@ -258,7 +258,7 @@ const questions = [
       {
         type: "select",
         label: "Time/Duration (Minutes)",
-        options: Array.from({ length: 60 }, (_, i) => i<59 ? i+1 : '60+'),
+        options: Array.from({ length: 60 }, (_, i) => i < 59 ? i + 1 : '60+'),
         name: "sport_participated_in_time_duration",
       },
     ],
@@ -327,16 +327,66 @@ const CurrentLifeStyle = ({ onComplete }) => {
   const validateQuestion = () => {
     const question = questions[currentQuestionIndex];
 
-    // Skip validation for these question types
-    if (question.name === "health_concerns" || question.name === "allergies") {
-      return true;
-    }
+    switch (question.type) {
+      case "checkbox_with_select":
+        break;
+        case "radio": {
+          if (answers[question.name] === undefined) {
+            return false; 
+          }
+    
+          if (answers[question.name] === "Yes" && (
+            question.name === "do_you_use_sleeping_aids" ||
+            question.name === "problems_limiting_exercise" ||
+            question.name === "sore_after_exercise"
+          )) {
+            const inputFieldName = `${question.name}_other`;
+            if (!answers[inputFieldName] || answers[inputFieldName] === "") {
+              console.log(`Validation Failed: ${question.name} is Yes, but input field is empty.`);
+              return false;
+            }
+          }
+    
+          return true;
+        }
 
-    // Validate for all other question types
-    return (
-      answers[question.name] !== undefined && answers[question.name] !== ""
-    );
+      case "long_radio": {
+        if (answers[question.name] === undefined) {
+          return false; // Radio button must be selected
+        }
+
+        if (answers[question.name] === "Yes") {
+          if (!question.subQuestions) return true; // no subquestions, then valid
+
+          for (const subQuestion of question.subQuestions) {
+            if (answers[subQuestion.name] === undefined || answers[subQuestion.name] === "") {
+              console.log(
+                `Validation Failed: Sub-question ${subQuestion.name} is not answered.`
+              );
+              return false; // A sub-question is not answered
+            }
+          }
+        }
+
+        return true; 
+      }
+
+      case "checkbox":
+        // (previous logic for checkbox)
+        break; // Placeholder: Implement correct validation for this later
+
+      case "long_textarea":
+        return (
+          answers[question.name] !== undefined && answers[question.name] !== ""
+        );
+
+      default:
+        return true;
+    }
   };
+
+
+
 
   const label = (
     <span>
@@ -470,20 +520,20 @@ const CurrentLifeStyle = ({ onComplete }) => {
       render: (text, record) =>
         isEditing(record) ? (
           <>
-          <i>Example: Post Nasal Drip</i>
-          <Input
-            value={tempConcern.problem || ""}
-            onChange={(e) => handleChangeTempConcern("problem", e.target.value)}
-            placeholder="Describe Problem"
-            style={{
-              width: "100%",
-              borderColor: tempConcern.problem ? undefined : "red",
-              marginTop: "14px"
-            }}
-            required
-          />
+            <i>Example: Post Nasal Drip</i>
+            <Input
+              value={tempConcern.problem || ""}
+              onChange={(e) => handleChangeTempConcern("problem", e.target.value)}
+              placeholder="Describe Problem"
+              style={{
+                width: "100%",
+                borderColor: tempConcern.problem ? undefined : "red",
+                marginTop: "14px"
+              }}
+              required
+            />
           </>
-          
+
         ) : (
           <span data-label="problem">
             {isMobile && (
@@ -803,8 +853,8 @@ const CurrentLifeStyle = ({ onComplete }) => {
 
   const handleSubmit = () => {
     const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
- const token = userInfo.obj.token || "";
-     const transformedData = {
+    const token = userInfo.obj.token || "";
+    const transformedData = {
       ongoingHealth: currentConcern ? currentConcern : [],
       allergies: currentAllergies ? currentAllergies : [],
       sleepHours: parseInt(answers["sleep_hours"], 10) || 0,
@@ -1000,6 +1050,8 @@ const CurrentLifeStyle = ({ onComplete }) => {
               )}
           </>
         );
+
+
       case "long_radio":
         return (
           <div style={{ flexDirection: "column" }}>
@@ -1023,6 +1075,7 @@ const CurrentLifeStyle = ({ onComplete }) => {
               renderSubQuestions(question.subQuestions)}
           </div>
         );
+
       case "ranking":
         return (
           <>
@@ -1150,7 +1203,7 @@ const CurrentLifeStyle = ({ onComplete }) => {
           {questions[currentQuestionIndex].sub}
         </h3>
 
-        <h3 style={{ margin: "20px 0", fontWeight:"600", color: "#000", fontSize: "15px" }}>
+        <h3 style={{ margin: "20px 0", fontWeight: "600", color: "#000", fontSize: "15px" }}>
           {label}
           {questions[currentQuestionIndex].question}{" "}
           {questions[currentQuestionIndex].postname && (
@@ -1161,7 +1214,7 @@ const CurrentLifeStyle = ({ onComplete }) => {
         </h3>
         {renderInput(questions[currentQuestionIndex])}
         <div
-          style={{ margin: "20px 0", marginTop: isMobile ? 50 : 200,height:40 ,position:'fixedp'}}
+          style={{ margin: "20px 0", marginTop: isMobile ? 50 : 200, height: 40, position: 'fixedp' }}
           className="button_group"
         >
           {isMobile ? (
@@ -1170,7 +1223,7 @@ const CurrentLifeStyle = ({ onComplete }) => {
               className="back-button"
               disabled={currentQuestionIndex === 0}
             >
-             {backBtnTxt}
+              {backBtnTxt}
             </Button>
           ) : (
             <Button onClick={handleExit} className="previous-button">
@@ -1196,7 +1249,7 @@ const CurrentLifeStyle = ({ onComplete }) => {
                   className="back-button"
                   disabled={currentQuestionIndex === 0}
                 >
-                 {backBtnTxt}
+                  {backBtnTxt}
                 </Button>
               )}
             </>
@@ -1219,7 +1272,7 @@ const CurrentLifeStyle = ({ onComplete }) => {
                   className="back-button"
                   disabled={currentQuestionIndex === 0}
                 >
-                 {backBtnTxt}
+                  {backBtnTxt}
                 </Button>
               )}
             </span>

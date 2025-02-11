@@ -668,28 +668,42 @@ const SymptomReview = ({ onComplete }) => {
   const handleExit = () => {
     navigate("/assessment");
   };
-  // ToDo: old implementation, will remove this after complete testing
-  // const validateQuestion = () => {
-  //   const question = questions[currentQuestionIndex];
-  //   return (
-  //     answers[question.name] !== undefined && answers[question.name] !== ""
-  //   );
-  // };
-  // const validateQuestion = () => {
-  //   const question = questions[currentQuestionIndex];
-  //   if (question.subQuestions) {
-  //     return question.subQuestions.every(
-  //       (sub) => answers[sub.name] !== undefined && answers[sub.name] !== ""
-  //     );
-  //   }
-  //   return answers[question.name] !== undefined && answers[question.name] !== "";
-  // };
+
+  const validateQuestion = () => {
+    const question = questions[currentQuestionIndex];
+  
+    if (question.type === "multi_yes_no") {
+      const hasValidAnswer = question.subQuestions.some(
+        (subQuestion) =>
+          answers[subQuestion.name] === "mild" || answers[subQuestion.name] === "moderate" || answers[subQuestion.name] === "severe"
+      );
+  
+      const hasOthersAnswer =
+        answers[`${question.name}_others`] !== undefined &&
+        answers[`${question.name}_others`] !== "";
+  
+      return hasValidAnswer || hasOthersAnswer;
+    }
+  
+    if (question.subQuestions && Array.isArray(question.subQuestions)) {
+      for (const subQuestion of question.subQuestions) {
+        if (
+          answers[question.name] === "Yes" && 
+          (!answers[subQuestion.name] || answers[subQuestion.name] === "")
+        ) {
+          return false;
+        }
+      }
+    }
+    return answers[question.name] !== undefined && answers[question.name] !== "";
+  };
+  
 
   const handleSave = () => {
-    // if (!validateQuestion()) {
-    //   message.error("Please answer the current question before saving.");
-    //   return;
-    // }
+    if (!validateQuestion()) {
+      message.error("Please answer the current question before saving.");
+      return;
+    }
     localStorage.setItem("currentQuestionIndex9", 0);
     localStorage.setItem("answers", JSON.stringify(answers));
     if (currentQuestionIndex < totalQuestions - 1) {
@@ -730,7 +744,8 @@ const SymptomReview = ({ onComplete }) => {
       itchingSkin: [],
       femaleReproductive: [],
       currentMedication: [],
-      nutritionalSupplements: []
+      nutritionalSupplements: [],
+      femaleReproductiveCont:[]
     };
 
 
@@ -998,6 +1013,8 @@ const SymptomReview = ({ onComplete }) => {
       "vaginal_pain",
     ];
 
+ 
+
 
     const eatingIssuesQuestions = [
       'binge_eating',
@@ -1221,7 +1238,7 @@ const SymptomReview = ({ onComplete }) => {
       skinProblems: apiFormat.skinProblems,
       skinProblemsContr: apiFormat.skinProblemsCont,
       femaleReproductive: apiFormat.femaleReproductive,
-      femaleReproductiveCont: apiFormat.femaleReproductiveCont,
+      // femaleReproductiveCont: apiFormat.femaleReproductiveCont,
       currentMedication: answers.current_medication
         ? answers.current_medication.map((med) => ({
           medication: med.medication || "",

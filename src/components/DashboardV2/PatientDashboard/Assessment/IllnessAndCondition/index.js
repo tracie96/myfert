@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Progress, Button, Radio, Col, Row, Input, message } from "antd";
+import { Progress, Button, Radio, Col, Row, Input, message, Checkbox } from "antd";
 import { useNavigate } from "react-router-dom"; // useNavigate for react-router v6
 import { useDispatch } from "react-redux";
 import { completeCard } from "../../../../redux/assessmentSlice";
@@ -515,21 +515,50 @@ const IllnessAndCondition = ({ onComplete }) => {
   const validateQuestion = () => {
     const question = questions[currentQuestionIndex];
   
-    if (question.type === "multi_yes_no") {
-      const hasValidAnswer = question.subQuestions.some(
-        (subQuestion) =>
-          answers[subQuestion.name] === "yes" || answers[subQuestion.name] === "no"
-      );
+    switch (question.type) {
+      case "multi_yes_no":
+        const hasValidAnswer = question.subQuestions.some(
+          (subQuestion) =>
+            answers[subQuestion.name] === "yes" || answers[subQuestion.name] === "no"
+        );
   
-      const hasOthersAnswer =
-        answers[`${question.name}_others`] !== undefined &&
-        answers[`${question.name}_others`] !== "";
+        const hasOthersAnswer =
+          answers[`${question.name}_others`] !== undefined &&
+          answers[`${question.name}_others`] !== "";
   
-      return hasValidAnswer || hasOthersAnswer;
+        return hasValidAnswer || hasOthersAnswer;
+  
+        case "date_radio": {
+          const naCheckboxName = `${question.name}_na`;
+          const isNAChecked = answers[naCheckboxName] === true;
+  
+          if (isNAChecked) {
+            return true; 
+          }
+  
+          const dateValue = answers[question.dateName];
+          if (!dateValue || dateValue === "") {
+            console.log("Validation Failed: Date is empty.");
+            return false;
+          }
+  
+          if (question.radioOptions && question.radioOptions.length > 0) {
+            const commentName = `${question.radioName}_${question.radioOptions[0].value}`;
+            const commentValue = answers[commentName];
+            if (!commentValue || commentValue === "") {
+              console.log("Validation Failed: Comment is empty.");
+              return false;
+            }
+          }
+  
+          return true; 
+        }
+  
+      default:
+        return answers[question.name] !== undefined && answers[question.name] !== "";
     }
-  
-    return answers[question.name] !== undefined && answers[question.name] !== "";
   };
+  
   
   const handleSave = () => {
     if (!validateQuestion()) {
@@ -589,7 +618,9 @@ const IllnessAndCondition = ({ onComplete }) => {
 
   const renderInput = (question) => {
     switch (question.type) {
-      case "date_radio":
+      case "date_radio": {
+        const isNA = answers[`${question.name}_na`] === true;
+
         return (
           <div key={question.name} style={{ marginBottom: "20px" }}>
             <Button
@@ -610,6 +641,12 @@ const IllnessAndCondition = ({ onComplete }) => {
             >
               {question.sub}
             </p>
+              <Checkbox
+                checked={isNA}
+                onChange={(e) => handleChange(e.target.checked, `${question.name}_na`)}
+              >
+                N/A
+              </Checkbox>
             <div style={{ marginBottom: "10px" }}>
               <label>Date:</label>
               <br />
@@ -622,6 +659,7 @@ const IllnessAndCondition = ({ onComplete }) => {
                   handleChange(e.target.value, question.dateName)
                 }
                 style={{ width: "200px" }}
+                disabled={isNA}
               />
             </div>
             <div style={{ marginBottom: "10px" }}>
@@ -643,13 +681,16 @@ const IllnessAndCondition = ({ onComplete }) => {
                       )
                     }
                     style={{ width: "200px" }}
+                    disabled={isNA}
                   />
                 </div>
               ))}
             </div>
           </div>
         );
-      case "hospitalization":
+}
+
+        case "hospitalization":
         return (
           <div key={question.name} style={{ marginBottom: "20px" }}>
             {answers[question.name]?.map((entry, index) => (
@@ -757,7 +798,7 @@ const IllnessAndCondition = ({ onComplete }) => {
                       checked={answers[subQuestion.name] === "no"}
                       onChange={() => handleChange("no", subQuestion.name)}
                     >
-                      No
+                      Past
                     </Radio>
                   </div>
                 </div>

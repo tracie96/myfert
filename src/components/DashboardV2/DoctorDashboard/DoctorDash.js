@@ -153,6 +153,12 @@ export default function DoctorDash() {
         sorter: true,
       },
       {
+        title: "Email",
+        dataIndex: "email",
+        key: "email",
+        sorter: true,
+      },
+      {
         title: "Flag",
         dataIndex: "flag",
         key: "flag",

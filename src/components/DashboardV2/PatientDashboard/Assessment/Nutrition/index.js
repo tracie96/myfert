@@ -347,24 +347,88 @@ const Nutrition = ({ onComplete }) => {
 
   const validateQuestion = () => {
     const question = questions[currentQuestionIndex];
-    const isTimeFieldValid =
-    question.subQuestion && question.subQuestion.some(sub => {
-      return answers[sub.name] !== undefined && answers[sub.name] !== "";
-    });
- 
-    const isCheckboxValid = question.type === "checkbox" &&
-    (Array.isArray(answers[question.name]) && answers[question.name].length > 0 && answers[question.name] !== undefined);
- 
-    const istextAreaValid = question.type === "long_textarea" &&
-    (typeof answers[question.name] === "string" && answers[question.name] !== undefined);
- 
-    const isRadioValid = (question.type === "radio" || question.type === "radiowithselect" || question.type === "long_select" || question.type === "long_radio") &&
-    ((typeof answers[question.name] === "string" || typeof answers[question.name] === "number") && answers[question.name] !== undefined);
- 
-    return (
-      answers[question.name] !== undefined && answers[question.name] !== "" && (isCheckboxValid || isTimeFieldValid || istextAreaValid || isRadioValid)
-    );
+
+    switch (question.type) {
+      case "checkbox_with_select":
+        for (const option of question.options) {
+          const checkboxChecked = answers[option.name] || false;
+          const selectName = option.selectName;
+
+          if (checkboxChecked && selectName) {
+            const selectValue = answers[selectName];
+            if (selectValue === undefined || selectValue === "") {
+              console.log(`Validation Failed: Checkbox ${option.name} is checked, but select ${selectName} is empty.`);
+              return false; // Validation fails if a checked checkbox has an empty select
+            }
+          }
+        }
+        console.log("Validation Passed: All checked checkboxes have filled selects.");
+        return true;
+
+      case "long_radio":
+        if (question.subQuestions) {
+          // For long_radio, validate subquestions only if the main radio is "Yes"
+          if (answers[question.name] === "Yes") {
+            for (const subQuestion of question.subQuestions) {
+              if (!answers[subQuestion.name] || answers[subQuestion.name] === "") {
+                console.log(`Validation Failed: long_radio subquestion ${subQuestion.name} is empty.`);
+                return false;
+              }
+            }
+          }
+        }
+        return answers[question.name] !== undefined; // Validate the main radio
+
+      case "radio": {
+        if (answers[question.name] === undefined) {
+          return false;  // Radio button must be selected
+        }
+        if (question.name === "sensitive_food" && answers[question.name] === "Yes") {
+          if (!answers[`${question.name}_other`] || answers[`${question.name}_other`] === "") {
+            console.log("Validation Failed: sensitive_food is Yes, but input field is empty.");
+            return false; 
+          }
+        }
+        if (question.name === "sensitive_food_caffeine" && answers[question.name] === "Yes") {
+          if (!answers[`${question.name}_other`] || answers[`${question.name}_other`] === "") {
+            console.log("Validation Failed: sensitive_food is Yes, but input field is empty.");
+            return false; 
+          }
+        }
+        else if(answers[question.name] === "Yes"){
+          if (!answers[`${question.name}_other`] || answers[`${question.name}_other`] === "") {
+            console.log("Validation Failed: sensitive_food is Yes, but input field is empty.");
+            return false; 
+          }
+        }
+        return true; 
+      }
+
+      case "checkbox": {
+        if (!answers[question.name] || answers[question.name].length === 0) {
+          console.log(`Validation Failed: No checkboxes selected for ${question.name}`);
+          return false; // At least one checkbox MUST be selected
+        }
+  
+        // Check if "Other" is selected and if the corresponding input is filled
+        if (answers[question.name].includes("Other")) {
+          if (!answers[`${question.name}_other`] || answers[`${question.name}_other`] === "") {
+            console.log(`Validation Failed: "Other" checkbox selected for ${question.name}, but input is empty.`);
+            return false; // Input field must be filled if "Other" is selected
+          }
+        }
+  
+        return true; // Checkbox selection is valid
+      }
+  
+      case "long_textarea":
+        return answers[question.name] !== undefined && answers[question.name] !== "";
+
+      default:
+        return true; // If no specific validation, consider it valid
+    }
   };
+
 
   const handleSave = () => {
     if (!validateQuestion()) {
@@ -430,7 +494,7 @@ const Nutrition = ({ onComplete }) => {
       noTypicalCanSoda: answers.diet_servings_soda || 0,
       noTypicalSweets: answers.diet_servings_sweets || 0,
       caffeinatedBeverages: answers.caffeinated_beverages === "Yes",
-      coffeeCups: answers.coffee_amount, 
+      coffeeCups: answers.coffee_amount,
       teaCups: answers.tea_amount || "",
       sodaCups: answers.soda_amount || "",
       adverseReactionToCoffee: answers.sensitive_food_caffeine === "Yes",
@@ -447,7 +511,7 @@ const Nutrition = ({ onComplete }) => {
     }
     const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
     const token = userInfo?.obj?.token || "";
-console.log(({userInfo}))
+    console.log(({ userInfo }))
     const transformedData = transformNutritionData(answers);
 
     fetch(
@@ -530,20 +594,21 @@ console.log(({userInfo}))
               ))}
             </Radio.Group>
 
-            {answers[question.name] === "Yes" &&
-              (question.name === "sensitive_food_caffeine" || question.name === "sensitive_food") && (
-                <Input
-                  className="input_questtionnaire"
-                  placeholder={question.name === "sensitive_food" ? "If Yes: list food and symptoms" : "If Yes, Please explain"}
-                  value={answers[`${question.name}_other`] || ""}
-                  onChange={(e) =>
-                    handleChange(e.target.value, `${question.name}_other`)
-                  }
-                  style={{ marginTop: "10px" }}
-                />
-              )}
+            {answers[question.name] === "Yes" && (
+              <Input
+                className="input_questtionnaire"
+                required
+                placeholder={question.name === "sensitive_food" ? "If Yes: list food and symptoms" : "If Yes, Please explain"}
+                value={answers[`${question.name}_other`] || ""}
+                onChange={(e) =>
+                  handleChange(e.target.value, `${question.name}_other`)
+                }
+                style={{ marginTop: "10px" }}
+              />
+            )}
           </>
         );
+
       case "checkbox":
         return (
           <Checkbox.Group
@@ -584,7 +649,8 @@ console.log(({userInfo}))
             ))}
           </Checkbox.Group>
         );
-      case "radiowithselect":
+      
+        case "radiowithselect":
         return (
           <Radio.Group
             name={question.name}
@@ -603,7 +669,7 @@ console.log(({userInfo}))
             ))}
             {answers[question.name] === "No" && (
               <>
-                <div style={{ marginTop: "10px", color: "#000", fontWeight: "600", fontSize: "15px"  }}>If no, how many?</div>
+                <div style={{ marginTop: "10px", color: "#000", fontWeight: "600", fontSize: "15px" }}>If no, how many?</div>
                 <Select
                   placeholder="Please specify"
                   value={answers[`${question.name}_detail`] || ""}
@@ -623,43 +689,43 @@ console.log(({userInfo}))
             )}
           </Radio.Group>
         );
-        case "time_select":
-  const timeOptions = Array.from({ length: 24 }, (_, i) => {
-    const hour = i < 10 ? `0${i}` : i;
-    return `${hour}:00`;
-  });
+      case "time_select":
+        const timeOptions = Array.from({ length: 24 }, (_, i) => {
+          const hour = i < 10 ? `0${i}` : i;
+          return `${hour}:00`;
+        });
 
-  return (
-    <div style={{ flexDirection: "column", marginTop: "10px" }}>
-      <label style={{ marginBottom: "10px", fontWeight: "bold" }}>
-        {question.label || "Select Time"}
-      </label>
-      <Select
-        placeholder="Select time"
-        className="select_time_dropdown"
-        value={answers[question.name] || ""}
-        onChange={(value) => handleChange(value, question.name)}
-        style={{ width: "100%" }}
-      >
-        {timeOptions.map((time) => (
-          <Option key={time} value={time}>
-            {time}
-          </Option>
-        ))}
-      </Select>
-    </div>
-  );
+        return (
+          <div style={{ flexDirection: "column", marginTop: "10px" }}>
+            <label style={{ marginBottom: "10px", fontWeight: "bold" }}>
+              {question.label || "Select Time"}
+            </label>
+            <Select
+              placeholder="Select time"
+              className="select_time_dropdown"
+              value={answers[question.name] || ""}
+              onChange={(value) => handleChange(value, question.name)}
+              style={{ width: "100%" }}
+            >
+              {timeOptions.map((time) => (
+                <Option key={time} value={time}>
+                  {time}
+                </Option>
+              ))}
+            </Select>
+          </div>
+        );
 
       case "long_textarea":
         return (
           <div style={{ flexDirection: "column" }}>
             <br />
             {question.subQuestion &&
-        question.subQuestion.map((sub, index) => (
-          <div key={index}>
-            {renderInput(sub)}
-          </div>
-        ))}
+              question.subQuestion.map((sub, index) => (
+                <div key={index}>
+                  {renderInput(sub)}
+                </div>
+              ))}
             <Input.TextArea
               className="input_questtionnaire"
               name={question.name}
@@ -732,7 +798,7 @@ console.log(({userInfo}))
         />
         <h3 style={{ margin: "20px 0", color: "#F2AA93" }}>Nutrition</h3>
 
-        <h3 style={{ margin: "20px 0", fontWeight:"600", color: "#000", fontSize: "15px" }}>
+        <h3 style={{ margin: "20px 0", fontWeight: "600", color: "#000", fontSize: "15px" }}>
           {label}
           {questions[currentQuestionIndex].question}{" "}
           <i style={{ color: "#335CAD", fontWeight: "bold" }}>

@@ -26,7 +26,7 @@ const { Option } = Select;
 
 const questions = [
   {
-    title:"How well have things been going for you?",
+    title: "How well have things been going for you?",
     question:
       "(Enter score on scale of 1-10, with 1 being poorly, 5 being fine, and 10 being very well; choose N/A if not applicable) :",
     type: "rating_scale",
@@ -34,7 +34,7 @@ const questions = [
     name: "overll_wellbeing",
   },
   {
-    title:"How well have things been going for you?",
+    title: "How well have things been going for you?",
     question:
       "(Enter score on scale of 1-10, with 1 being poorly, 5 being fine, and 10 being very well; choose N/A if not applicable) :",
     type: "rating_scale",
@@ -42,7 +42,7 @@ const questions = [
     name: "school_wellbeing",
   },
   {
-    title:"How well have things been going for you?",
+    title: "How well have things been going for you?",
     question:
       "(Enter score on scale of 1-10, with 1 being poorly, 5 being fine, and 10 being very well; choose N/A if not applicable) :",
     type: "rating_scale",
@@ -50,7 +50,7 @@ const questions = [
     name: "job_wellbeing",
   },
   {
-    title:"How well have things been going for you?",
+    title: "How well have things been going for you?",
     question:
       "(Enter score on scale of 1-10, with 1 being poorly, 5 being fine, and 10 being very well; choose N/A if not applicable) :",
     type: "rating_scale",
@@ -59,7 +59,7 @@ const questions = [
   },
 
   {
-    title:"How well have things been going for you?",
+    title: "How well have things been going for you?",
     question:
       "(Enter score on scale of 1-10, with 1 being poorly, 5 being fine, and 10 being very well; choose N/A if not applicable) :",
     type: "rating_scale",
@@ -68,7 +68,7 @@ const questions = [
   },
 
   {
-    title:"How well have things been going for you?",
+    title: "How well have things been going for you?",
     question:
       "(Enter score on scale of 1-10, with 1 being poorly, 5 being fine, and 10 being very well; choose N/A if not applicable) :",
     type: "rating_scale",
@@ -77,7 +77,7 @@ const questions = [
   },
 
   {
-    title:"How well have things been going for you?",
+    title: "How well have things been going for you?",
     question:
       "(Enter score on scale of 1-10, with 1 being poorly, 5 being fine, and 10 being very well; choose N/A if not applicable) :",
     type: "rating_scale",
@@ -86,7 +86,7 @@ const questions = [
   },
 
   {
-    title:"How well have things been going for you?",
+    title: "How well have things been going for you?",
     question:
       "(Enter score on scale of 1-10, with 1 being poorly, 5 being fine, and 10 being very well; choose N/A if not applicable) :",
     type: "rating_scale",
@@ -95,7 +95,7 @@ const questions = [
   },
 
   {
-    title:"How well have things been going for you?",
+    title: "How well have things been going for you?",
     question:
       "(Enter score on scale of 1-10, with 1 being poorly, 5 being fine, and 10 being very well; choose N/A if not applicable) :",
     type: "rating_scale",
@@ -103,7 +103,7 @@ const questions = [
     name: "children_wellbeing",
   },
   {
-    title:"How well have things been going for you?",
+    title: "How well have things been going for you?",
     question:
       "(Enter score on scale of 1-10, with 1 being poorly, 5 being fine, and 10 being very well; choose N/A if not applicable) :",
     type: "rating_scale",
@@ -111,7 +111,7 @@ const questions = [
     name: "parents_wellbeing",
   },
   {
-    title:"How well have things been going for you?",
+    title: "How well have things been going for you?",
     question:
       "(Enter score on scale of 1-10, with 1 being poorly, 5 being fine, and 10 being very well; choose N/A if not applicable) :",
     type: "rating_scale",
@@ -202,37 +202,37 @@ const questions = [
       {
         label: "Silver mercury fillings",
         name: "Silver_mercury_fillings",
-        selectName: "Silver_mercury_fillings",
+        selectName: "Silver_mercury_fillings_select",
         selectOptions: Array.from({ length: 30 }, (_, i) => 1 + i),
       },
       {
         label: "Gold fillings",
         name: "Gold_fillings",
-        selectName: "Gold_fillings",
+        selectName: "Gold_fillings_select",
         selectOptions: Array.from({ length: 30 }, (_, i) => 1 + i),
       },
       {
         label: "Root canals",
         name: "Root_canals",
-        selectName: "Root_canals",
+        selectName: "Root_canals_select",
         selectOptions: Array.from({ length: 30 }, (_, i) => 1 + i),
       },
       {
         label: "Implants",
         name: "Implants",
-        selectName: "Implants",
+        selectName: "Implants_select",
         selectOptions: Array.from({ length: 30 }, (_, i) => 1 + i),
       },
       {
         label: "Caps/Crowns",
         name: "Caps/Crowns",
-        selectName: "Caps/Crowns",
+        selectName: "Caps/Crowns_select",
         selectOptions: Array.from({ length: 30 }, (_, i) => 1 + i),
       },
       {
         label: "Tooth pain",
         name: "Tooth_pain",
-        selectName: "Tooth_pain",
+        selectName: "Tooth_pain_select",
         selectOptions: Array.from({ length: 30 }, (_, i) => 1 + i),
       },
     ],
@@ -370,31 +370,100 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
   };
   const validateQuestion = () => {
     const question = questions[currentQuestionIndex];
-    if (question.type === "checkbox_with_select") {
-      return question.options.some((option) => {
-        const checkboxChecked = answers[option.name];
-        const selectValid = option.selectName
-          ? answers[option.selectName] !== undefined && answers[option.selectName] !== ""
-          : true;
   
-        return checkboxChecked && selectValid;
-      });
+    switch (question.type) { 
+      case "checkbox_with_select":
+        return question.options.every((option) => {
+          const checkboxChecked = answers[option.name];
+          const selectValid = option.selectName
+            ? (answers[option.selectName] !== undefined && answers[option.selectName] !== "") 
+            : true;
+  
+          return !checkboxChecked || selectValid;
+        });
+  
+      case "checkbox_with_input":
+        return question.options.every((option) => { // Changed .some to .every
+          const checkboxChecked = answers[option.name];
+          const inputValid = option.inputName
+            ? (answers[option.inputName] !== undefined && answers[option.inputName] !== "")
+            : true; 
+  
+          return !checkboxChecked || inputValid; // Key Change:  !checkboxChecked || inputValid
+        });
+  
+        case "checkbox": {
+            if (!answers[question.name] || answers[question.name].length === 0) {
+              return false; // No checkbox selected
+            }
+  
+            // Check if "Other" is selected and the "Other" input is filled
+            if (answers[question.name].includes("Other")) {
+              const otherInputName = `${question.name}_other`;
+              if (!answers[otherInputName] || answers[otherInputName] === "") {
+                console.log("Validation Failed: Other is checked, but input field is empty.");
+                return false;
+              }
+            }
+  
+            return true;
+          }
+  
+      case "radio": {
+        if (answers[question.name] === undefined) {
+          return false; // Radio button must be selected
+        }
+  
+        // Check if "Yes" is selected and if the corresponding input needs to be filled
+        if (answers[question.name] === "Yes" && (
+          question.name === "do_you_use_sleeping_aids" ||
+          question.name === "problems_limiting_exercise" ||
+          question.name === "sore_after_exercise"
+        )) {
+          const inputFieldName = `${question.name}_other`;
+          if (!answers[inputFieldName] || answers[inputFieldName] === "") {
+            console.log(`Validation Failed: ${question.name} is Yes, but input field is empty.`);
+            return false;
+          }
+        }
+  
+        return true;
+      }
+  
+      case "long_radio": {
+        if (answers[question.name] === undefined) {
+          return false; // Radio button must be selected
+        }
+  
+        if (answers[question.name] === "Yes") {
+          // Check if all sub-questions have been answered
+          if (!question.subQuestions) return true; // no subquestions, then valid
+  
+          for (const subQuestion of question.subQuestions) {
+            if (answers[subQuestion.name] === undefined || answers[subQuestion.name] === "") {
+              console.log(
+                `Validation Failed: Sub-question ${subQuestion.name} is not answered.`
+              );
+              return false; // A sub-question is not answered
+            }
+          }
+        }
+  
+        return true; // Either "No" is selected, or "Yes" is selected and all sub-questions are answered
+      }
+  
+      case "long_textarea":
+        return (
+          answers[question.name] !== undefined && answers[question.name] !== ""
+        );
+  
+      default:
+            return (
+              answers[question.name] !== undefined && answers[question.name] !== ""
+            );
     }
-    if (question.type === "checkbox_with_input") {
-      return question.options.some((option) => {
-        const checkboxChecked = answers[option.name];
-        const inputValid = option.inputName
-          ? answers[option.inputName] !== undefined && answers[option.inputName] !== ""
-          : true;
-  
-        return checkboxChecked || inputValid; 
-      });
-    }
-  
-    return (
-      answers[question.name] !== undefined && answers[question.name] !== ""
-    );
   };
+  
 
   const handleSave = () => {
     if (!validateQuestion()) {
@@ -434,12 +503,12 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
         howWellThingsGoingKids: answers.children_wellbeing || 0,
         howWellThingsGoingParents: answers.parents_wellbeing || 0,
         howWellThingsGoingSpouse: answers.spouse_wellbeing || 0,
-        howWereYouBorn: answers.mode_of_own_birth ||"Not answered",
+        howWereYouBorn: answers.mode_of_own_birth || "Not answered",
         wereYouBornWithComplication: {
           yesNo: answers.birth_complications === "Yes",
           describe: answers.birth_complications_details || "Not answered",
         },
-        breastFedHowLong: answers.breast_fed_duration ||"Not answered",
+        breastFedHowLong: answers.breast_fed_duration || "Not answered",
         breastFedFormula: answers.bottle_fed_type || "Not answered",
         breastFoodDontKnow: answers.dont_know || false,
         ageIntroductionSolidFood: answers.age_of_solid_food_intro || 0,
@@ -470,8 +539,8 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
         petsFarmAnimal: answers.pets_or_animal === "Yes",
         petsAnimalLiveWhere: answers.where_they_live || "Not answered",
       };
-    const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
-    const token = userInfo.obj.token || "";
+      const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
+      const token = userInfo.obj.token || "";
       const response = await fetch(
         "https://myfertilitydevapi.azurewebsites.net/api/Patient/AddHealthMedicalHistory",
         {
@@ -485,15 +554,15 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
           body: JSON.stringify(payload),
         }
       );
-  
+
       // Check for response status
       if (!response.ok) {
         throw new Error("Failed to submit data");
       }
-  
+
       const result = await response.json();
       console.log("Successfully submitted:", result);
-  
+
       // Proceed with navigation and localStorage updates
       dispatch(completeCard("/questionnaire/6"));
       localStorage.setItem("currentQuestionIndex6", 0);
@@ -504,7 +573,7 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
       // Handle any errors, maybe show a message to the user
     }
   };
-  
+
 
   const handleSelectInputChange = (
     checked,
@@ -536,25 +605,26 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
   const handleSelectCheckChange = (checked, checkboxName, selectName) => {
     setAnswers((prevAnswers) => {
       const updatedAnswers = { ...prevAnswers };
-      if (checked) {
-        updatedAnswers[checkboxName] = true;
-      } else {
-        delete updatedAnswers[checkboxName];
-        if (selectName) {
-          delete updatedAnswers[selectName];
-        }
+  
+      updatedAnswers[checkboxName] = checked;
+  
+      if (!checked && selectName) {
+        updatedAnswers[selectName] = "";  
       }
-
+  
       return updatedAnswers;
     });
   };
-
+  
   const handleSelectChange = (value, selectName) => {
     setAnswers((prevAnswers) => ({
       ...prevAnswers,
-      [selectName]: value, // Update the `selectName` field with the selected value
+      [selectName]: value,
     }));
   };
+  
+
+
 
   const renderSubQuestions = (subQuestions) => {
     return subQuestions.map((subQuestion, index) => (
@@ -785,19 +855,19 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
               </Row>
               <Row style={{ marginTop: "10px" }}>
                 <Col>
-                <Checkbox
-  checked={answers[`${question.name}_na`] || false}
-  onChange={(e) => {
-    const isChecked = e.target.checked;
-    setAnswers((prev) => ({
-      ...prev,
-      [`${question.name}_na`]: isChecked,
-      [question.name]: isChecked ? 0 : prev[question.name], // Reset slider/input if checked
-    }));
-  }}
->
-  N/A
-</Checkbox>
+                  <Checkbox
+                    checked={answers[`${question.name}_na`] || false}
+                    onChange={(e) => {
+                      const isChecked = e.target.checked;
+                      setAnswers((prev) => ({
+                        ...prev,
+                        [`${question.name}_na`]: isChecked,
+                        [question.name]: isChecked ? 0 : prev[question.name], // Reset slider/input if checked
+                      }));
+                    }}
+                  >
+                    N/A
+                  </Checkbox>
 
                 </Col>
               </Row>
@@ -924,9 +994,9 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
                       <Select
                         name={option.selectName}
                         value={answers[option.selectName] || undefined}
-                        onChange={(value) => handleSelectChange(value, option.selectName)} // Use the new handler
+                        onChange={(value) => handleSelectChange(value, option.selectName)} 
                         style={{ width: "100%" }}
-                        disabled={!answers[option.name]} // Disabled unless checkbox is checked
+                        disabled={!answers[option.name]} 
                       >
                         {option.selectOptions.map((selectOption, idx) => (
                           <Option key={idx} value={selectOption}>
@@ -1016,7 +1086,7 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
     </span>
   );
   const HighlightedQuestion = ({ question }) => {
-    console.log({question})
+    console.log({ question })
     const highlightWords = ['poorly', 'fine', 'very well', 'N/A'];
     const regex = new RegExp(`\\b(${highlightWords.join('|')})\\b`, 'gi');
 
@@ -1036,8 +1106,8 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
         {highlightedQuestion}
       </p>
     );
-    
-      };
+
+  };
 
 
   const progressColor =
@@ -1054,11 +1124,11 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
           strokeColor={progressColor}
         />
         <h3 style={{ margin: "20px 0", color: "#F2AA93" }}>
-         {questions[currentQuestionIndex]?.title ? questions[currentQuestionIndex]?.title :'Parent’s Birth/Childhood History' } 
+          {questions[currentQuestionIndex]?.title ? questions[currentQuestionIndex]?.title : 'Parent’s Birth/Childhood History'}
         </h3>
 
         <h3 style={{ margin: "20px 0", color: "#000", fontWeight: "600", fontSize: "15px" }}>
-          {questions[currentQuestionIndex]?.sub  && (
+          {questions[currentQuestionIndex]?.sub && (
             <span>
               {label}
               {questions[currentQuestionIndex]?.sub && (
@@ -1066,7 +1136,7 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
                   {questions[currentQuestionIndex]?.sub}
                 </span>
               )}
-              
+
               <br />
             </span>
           )}

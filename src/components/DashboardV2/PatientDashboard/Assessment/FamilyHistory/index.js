@@ -32,49 +32,49 @@ const questions = [
       {
         label: "Pregnancies",
         name: "pregnancies",
-        selectName: "pregnancies",
+        selectName: "pregnancies_select",
         selectOptions: Array.from({ length: 30 }, (_, i) => 0 + i),
       },
       {
         label: "Miscarriages",
         name: "miscarriages",
-        selectName: "miscarriages",
+        selectName: "miscarriages_select",
         selectOptions: Array.from({ length: 30 }, (_, i) => 0 + i),
       },
       {
         label: "Abortions",
         name: "Root_canals",
-        selectName: "Root_canals",
+        selectName: "Root_canals_select",
         selectOptions: Array.from({ length: 30 }, (_, i) => 0 + i),
       },
       {
         label: "Living children",
         name: "living_children",
-        selectName: "living_children",
+        selectName: "living_children_select",
         selectOptions: Array.from({ length: 30 }, (_, i) => 0 + i),
       },
       {
         label: "Vaginal deliveries",
         name: "vaginal_deliveries",
-        selectName: "vaginal_deliveries",
+        selectName: "vaginal_deliveries_select",
         selectOptions: Array.from({ length: 30 }, (_, i) => 0 + i),
       },
       {
         label: "Caeseran",
         name: "caeseran",
-        selectName: "caeseran",
+        selectName: "caeseran_select",
         selectOptions: Array.from({ length: 30 }, (_, i) => 0 + i),
       },
       {
         label: "Term births",
         name: "term_births",
-        selectName: "term_births",
+        selectName: "term_births_select",
         selectOptions: Array.from({ length: 30 }, (_, i) => 0 + i),
       },
       {
         label: "Premature birth",
         name: "premature_birth",
-        selectName: "premature_birth",
+        selectName: "premature_birth_select",
         selectOptions: Array.from({ length: 30 }, (_, i) => 0 + i),
       },
     ],
@@ -389,20 +389,69 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
   const validateQuestion = () => {
     const question = questions[currentQuestionIndex];
   
-    if (question.type === "checkbox_with_select") {
-      return question.options.some((option) => {
-        const checkboxChecked = answers[option.name];
-        const selectValid = option.selectName
-          ? answers[option.selectName] !== undefined && answers[option.selectName] !== ""
-          : true;
+    switch (question.type) {
+      case "checkbox_with_select":
+        for (const option of question.options) {
+          const checkboxChecked = answers[option.name] || false;
+          const selectName = option.selectName;
   
-        return checkboxChecked && selectValid;
-      });
+          if (checkboxChecked && selectName) {
+            const selectValue = answers[selectName];
+            if (selectValue === undefined || selectValue === "") {
+              console.log(`Validation Failed: Checkbox ${option.name} is checked, but select ${selectName} is empty.`);
+              return false;
+            }
+          }
+        }
+        console.log("Validation Passed: All checked checkboxes have filled selects.");
+        return true;
+  
+      case "long_radio":
+        if (answers[question.name] === undefined) {
+          return false;
+        }
+  
+        if (answers[question.name] === "Yes") {
+          if (!question.subQuestions) return true;
+  
+          for (const subQuestion of question.subQuestions) {
+            if (answers[subQuestion.name] === undefined || answers[subQuestion.name] === "") {
+              console.log(
+                `Validation Failed: Sub-question ${subQuestion.name} is not answered.`
+              );
+              return false;
+            }
+          }
+        }
+        return true;
+  
+        case "checkbox":
+          if (!answers[question.name] || answers[question.name].length === 0) {
+            return false;
+          }
+    
+          const requiresOtherInput =
+            answers[question.name].includes("Other") ||
+            answers[question.name].includes("Sexually transmitted disease (describe)");
+    
+          if (requiresOtherInput) {
+            const otherInputName = `${question.name}_other`;
+            if (!answers[otherInputName] || answers[otherInputName] === "") {
+              console.log("Validation Failed: Other/STD is checked, but input field is empty.");
+              return false;
+            }
+          }
+    
+  
+        return true;
+  
+      default:
+        return answers[question.name] !== undefined && answers[question.name] !== "";
     }
-  
-    return answers[question.name] !== undefined && answers[question.name] !== "";
   };
   
+  
+
 
   const handleExit = () => {
     navigate("/assessment");
@@ -602,22 +651,20 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
     ));
   };
 
-  const handleSelectCheckChange = (checked, checkboxName, selectName) => {
-    setAnswers((prevAnswers) => {
-      const updatedAnswers = { ...prevAnswers };
-      if (checked) {
-        updatedAnswers[checkboxName] = true;
-      } else {
-        delete updatedAnswers[checkboxName];
-        if (selectName) {
-          delete updatedAnswers[selectName];
-        }
+  const handleSelectCheckChange = (checked, name, selectName, options) => {
+    console.log(`handleSelectCheckChange: checked=${checked}, name=${name}, selectName=${selectName}`);
+    setAnswers(prevAnswers => {
+      const updatedAnswers = { ...prevAnswers, [name]: checked };
+      if (!checked && selectName) {
+        updatedAnswers[selectName] = undefined;
+        console.log(`  Clearing select value for ${selectName}`);
       }
-
+      console.log(`  Updated answers:`, updatedAnswers);
       return updatedAnswers;
     });
   };
 
+  
   const handleSelectChange = (value, selectName) => {
     setAnswers((prevAnswers) => ({
       ...prevAnswers,
@@ -809,7 +856,7 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
                       value={answers[option.selectName] || undefined}
                       onChange={(value) => handleSelectChange(value, option.selectName)} // Use the new handler
                       style={{ width: "100%" }}
-                      disabled={!answers[option.name]} // Disabled unless checkbox is checked
+                      disabled={!answers[option.name]}
                     >
                       {option.selectOptions.map((selectOption, idx) => (
                         <Option key={idx} value={selectOption}>
@@ -945,44 +992,41 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
       case "checkbox":
         return (
           <Checkbox.Group
-            name={question.name}
-            onChange={(checkedValues) =>
-              handleChange(checkedValues, question.name)
-            }
-            value={answers[question.name] || []}
-            className="checkbox-group"
-          >
-            {question.options.map((option, index) => (
-              <Checkbox key={index} value={option} className="checkbox-item">
-                {option === "Other" ? (
-                  <>
-                    {option}
-                    {answers[question.name] &&
-                      answers[question.name].includes("Other") && (
-                        <>
-                          <br />
-                          <Input
-                            className="input_questtionnaire"
-                            placeholder="Please specify"
-                            value={answers[`${question.name}_other`] || ""}
-                            onChange={(e) =>
-                              handleChange(
-                                e.target.value,
-                                `${question.name}_other`,
-                              )
-                            }
-                          />
-                        </>
-                      )}
-                  </>
-                ) : (
-                  option
-                )}
-              </Checkbox>
-            ))}
-          </Checkbox.Group>
+          name={question.name}
+          onChange={(checkedValues) => handleChange(checkedValues, question.name)}
+          value={answers[question.name] || []}
+          className="checkbox-group"
+        >
+          {question.options.map((option, index) => (
+            <Checkbox key={index} value={option} className="checkbox-item">
+              {option === "Other" || option === "Sexually transmitted disease (describe)" ? (
+                <>
+                  {option}
+                  {(answers[question.name]?.includes("Other") ||
+                    answers[question.name]?.includes("Sexually transmitted disease (describe)")) && (
+                    <>
+                      <br />
+                      <Input
+                        className="input_questtionnaire"
+                        placeholder="Please specify"
+                        value={answers[`${question.name}_other`] || ""}
+                        onChange={(e) =>
+                          handleChange(e.target.value, `${question.name}_other`)
+                        }
+                      />
+                    </>
+                  )}
+                </>
+              ) : (
+                option
+              )}
+            </Checkbox>
+          ))}
+        </Checkbox.Group>
+        
         );
-      case "long_radio":
+      
+        case "long_radio":
         return (
           <div style={{ flexDirection: "column" }}>
             <Radio.Group

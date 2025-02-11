@@ -50,7 +50,7 @@ export default function UserInfo() {
     "Reproductive Health",
 
   ];
-  console.log({personalFamily})
+  console.log({ personalFamily })
   console.log(useSelector((state) => state.intake));
   useEffect(() => {
     console.log("useEffect is running");
@@ -359,43 +359,43 @@ function SwitchContent({
         <p>Loading...</p>
       ) : (
         <div className="p-6 rounded-md shadow-md">
-       <Row gutter={16}>
-  {/* First Column */}
-  <Col xs={24} md={12}>
-    <Descriptions column={1} bordered>
-      <Descriptions.Item label="Genetic Background">
-        {generalInfo.geneticBackground || "N/A"}
-      </Descriptions.Item>
-      <Descriptions.Item label="Where Medical Care">
-        {generalInfo.whereMedicalCare || "N/A"}
-      </Descriptions.Item>
-      <Descriptions.Item label="When Medical Care">
-        {generalInfo.whenMedicalCare || "N/A"}
-      </Descriptions.Item>
-      <Descriptions.Item label="Whom Medical Care">
-        {generalInfo.whomMedicalCare || "N/A"}
-      </Descriptions.Item>
-      <Descriptions.Item label="Emergency Contact">
-        {generalInfo.emergencyContact || "N/A"}
-      </Descriptions.Item>
-      <Descriptions.Item label="Emergency Relationship">
-        {generalInfo.emergencyRelationship || "N/A"}
-      </Descriptions.Item>
-    </Descriptions>
-  </Col>
+          <Row gutter={16}>
+            {/* First Column */}
+            <Col xs={24} md={12}>
+              <Descriptions column={1} bordered>
+                <Descriptions.Item label="Genetic Background">
+                  {generalInfo.geneticBackground || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Where Medical Care">
+                  {generalInfo.whereMedicalCare || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="When Medical Care">
+                  {generalInfo.whenMedicalCare || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Whom Medical Care">
+                  {generalInfo.whomMedicalCare || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Emergency Contact">
+                  {generalInfo.emergencyContact || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Emergency Relationship">
+                  {generalInfo.emergencyRelationship || "N/A"}
+                </Descriptions.Item>
+              </Descriptions>
+            </Col>
 
-  <Col xs={24} md={12}>
-    <Descriptions column={1} bordered>
+            <Col xs={24} md={12}>
+              <Descriptions column={1} bordered>
 
-      <Descriptions.Item label="Emergency Phone (Work)">
-        {generalInfo.emergencyPhoneWork || "N/A"}
-      </Descriptions.Item>
-      <Descriptions.Item label="How Did You Hear About Us?">
-        {generalInfo.howDidHearAbout || "N/A"}
-      </Descriptions.Item>
-    </Descriptions>
-  </Col>
-</Row>
+                <Descriptions.Item label="Emergency Phone (Work)">
+                  {generalInfo.emergencyPhoneWork || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="How Did You Hear About Us?">
+                  {generalInfo.howDidHearAbout || "N/A"}
+                </Descriptions.Item>
+              </Descriptions>
+            </Col>
+          </Row>
 
         </div>
       );
@@ -1107,11 +1107,11 @@ function SwitchContent({
         </div>
       );
 
-      case 8:
-        return loading ? (
-          <p>{symptom}</p>
-        ) : (
-          <div className="p-6 rounded-md shadow-md bg-white">
+    case 8:
+      return loading ? (
+        <p>{symptom}</p>
+      ) : (
+        <div className="p-6 rounded-md shadow-md bg-white">
           <Row gutter={16}>
             {[0, Math.ceil(Object.entries(symptom).length / 2)].map((startIndex, colIndex) => (
               <Col xs={24} md={12} key={colIndex}>
@@ -1142,9 +1142,9 @@ function SwitchContent({
                         ) : typeof value === "object" && value !== null ? (
                           <>
                             {value.yesNo ? (
-                              <Tag color="green">Yes</Tag>
+                              <Tag color="green" >Yes</Tag>
                             ) : (
-                              <Tag color="red">No</Tag>
+                              <Tag color="red" >No</Tag>
                             )}
                             {value.describe && (
                               <div>
@@ -1153,8 +1153,15 @@ function SwitchContent({
                             )}
                           </>
                         ) : (
-                          <Typography.Text strong>{value !== null ? value : "N/A"}</Typography.Text>
-                        )}
+                          <Typography.Text>
+                            {typeof value === "boolean" ? (
+                              <Tag color={value ? "green" : "red"}>{value ? "Yes" : "No"}</Tag>
+                            ) : (
+                              <Typography.Text>
+                                {value !== null && value !== undefined ? String(value) : "N/A"}
+                              </Typography.Text>
+                            )}
+                          </Typography.Text>)}
                       </Descriptions.Item>
                     ))}
                 </Descriptions>
@@ -1162,9 +1169,9 @@ function SwitchContent({
             ))}
           </Row>
         </div>
-        
-        )
-        
+
+      )
+
     case 9:
       return loading ? (
         <p>{stress}</p>
@@ -1242,16 +1249,16 @@ function SwitchContent({
           </Row>
         </div>
       );
-      case 10:
-        return loading ? (
-          <p>{stress}</p>
-        ) : (
-          <div className="p-6 rounded-md shadow-md">
-            <Row gutter={16}>
-              {/* First Column */}
-              <Col xs={24} md={12}>
-                 <Descriptions column={1} bordered>
-                  <Descriptions.Item label="Birth Control">
+    case 10:
+      return loading ? (
+        <p>{stress}</p>
+      ) : (
+        <div className="p-6 rounded-md shadow-md">
+          <Row gutter={16}>
+            {/* First Column */}
+            <Col xs={24} md={12}>
+              <Descriptions column={1} bordered>
+                <Descriptions.Item label="Birth Control">
                   {
                     (reproductiveInfo.birthControl === null || reproductiveInfo.birthControl === undefined) ? '' :
                       (
@@ -1260,48 +1267,48 @@ function SwitchContent({
                         (reproductiveInfo?.birthControl && reproductiveInfo?.nonHormonalBirthControl !== "N/A" ? reproductiveInfo?.nonHormonalBirthControl : ' ')
                       )
                   }
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Currently Pregnant">
-                    {reproductiveInfo?.currentlyPregnant === null || reproductiveInfo.currentlyPregnant === undefined ? 'N/A' : (reproductiveInfo.currentlyPregnant ? 'Yes' : 'No')}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Trying to conceive">
+                </Descriptions.Item>
+                <Descriptions.Item label="Currently Pregnant">
+                  {reproductiveInfo?.currentlyPregnant === null || reproductiveInfo.currentlyPregnant === undefined ? 'N/A' : (reproductiveInfo.currentlyPregnant ? 'Yes' : 'No')}
+                </Descriptions.Item>
+                <Descriptions.Item label="Trying to conceive">
                   {reproductiveInfo?.tryingToConceive === null || reproductiveInfo.tryingToConceive === undefined ? 'N/A' : (reproductiveInfo.tryingToConceive ? 'Yes' : 'No')}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Difficulty Trying To Conceive">
-                    {reproductiveInfo?.difficultyTryingToConceive === null || reproductiveInfo.difficultyTryingToConceive === undefined ? 'N/A' : (reproductiveInfo.difficultyTryingToConceive ? 'Yes' : 'No')}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Family Member With Reproductive Concerns">
-                    {reproductiveInfo?.familyMemberWithReproductiveConcerns || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="How Long Trying To Conceive">
-                    {reproductiveInfo?.howLongTryingToConceive || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Method To Conceive">
-                    {reproductiveInfo?.methodToConceive?.length ? reproductiveInfo.methodToConceive.join(', ') : "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Charting To Conceive">
-                    {reproductiveInfo?.chartingToConceive?.length ? reproductiveInfo.chartingToConceive.join(', ') : "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Method Fertility Awareness">
-                    {reproductiveInfo?.methodFertilityAwareness || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Intercouse Each Cycle">
-                    {reproductiveInfo?.intercouseEachCycle || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Menstrual Pain During Period">
-                    {reproductiveInfo?.menstrualPainDuringPeriod || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Menstral Bleeding Pelvic Pain Duration">
-                    {reproductiveInfo?.menstralBleedingPelvicPain?.duration || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Menstral Bleeding Pelvic Pain Colour">
-                    {reproductiveInfo?.menstralBleedingPelvicPain?.colour || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Experience Pelvic Pain">
-                    {reproductiveInfo?.experiencePelvicPain === null || reproductiveInfo.experiencePelvicPain === undefined ? 'N/A' : (reproductiveInfo.experiencePelvicPain ? 'Yes' : 'No')}
-                  </Descriptions.Item>
-                  
-                 <>
+                </Descriptions.Item>
+                <Descriptions.Item label="Difficulty Trying To Conceive">
+                  {reproductiveInfo?.difficultyTryingToConceive === null || reproductiveInfo.difficultyTryingToConceive === undefined ? 'N/A' : (reproductiveInfo.difficultyTryingToConceive ? 'Yes' : 'No')}
+                </Descriptions.Item>
+                <Descriptions.Item label="Family Member With Reproductive Concerns">
+                  {reproductiveInfo?.familyMemberWithReproductiveConcerns || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="How Long Trying To Conceive">
+                  {reproductiveInfo?.howLongTryingToConceive || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Method To Conceive">
+                  {reproductiveInfo?.methodToConceive?.length ? reproductiveInfo.methodToConceive.join(', ') : "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Charting To Conceive">
+                  {reproductiveInfo?.chartingToConceive?.length ? reproductiveInfo.chartingToConceive.join(', ') : "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Method Fertility Awareness">
+                  {reproductiveInfo?.methodFertilityAwareness || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Intercouse Each Cycle">
+                  {reproductiveInfo?.intercouseEachCycle || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Menstrual Pain During Period">
+                  {reproductiveInfo?.menstrualPainDuringPeriod || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Menstral Bleeding Pelvic Pain Duration">
+                  {reproductiveInfo?.menstralBleedingPelvicPain?.duration || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Menstral Bleeding Pelvic Pain Colour">
+                  {reproductiveInfo?.menstralBleedingPelvicPain?.colour || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Experience Pelvic Pain">
+                  {reproductiveInfo?.experiencePelvicPain === null || reproductiveInfo.experiencePelvicPain === undefined ? 'N/A' : (reproductiveInfo.experiencePelvicPain ? 'Yes' : 'No')}
+                </Descriptions.Item>
+
+                <>
                   {/* <Descriptions.Item label="Utilizing Fertility Awareness">
                     {reproductiveInfo?.utilizingFertilityAwareness === null || reproductiveInfo.utilizingFertilityAwareness === undefined ? 'N/A' : (reproductiveInfo.utilizingFertilityAwareness ? 'Yes' : 'No')}
                   </Descriptions.Item> */}
@@ -1341,96 +1348,96 @@ function SwitchContent({
                   <Descriptions.Item label="Cycle Discharge Watery Colour">
                     {reproductiveInfo?.cycleDischargeWatery?.colour || "N/A"}
                   </Descriptions.Item> */}
-                  
+
                   {/* <Descriptions.Item label="Hormonal Birth Control">
                     {reproductiveInfo?.hormonalBirthControl || "N/A"}
                   </Descriptions.Item> */}
-                 </>
-                  
-                </Descriptions> 
-              </Col>
-      
-              {/* Second Column */}
-              <Col xs={24} md={12}>
-                <Descriptions column={1} bordered>
+                </>
+
+              </Descriptions>
+            </Col>
+
+            {/* Second Column */}
+            <Col xs={24} md={12}>
+              <Descriptions column={1} bordered>
                 <Descriptions.Item label="During Circle Pelvic Pain Duration">
-                    {reproductiveInfo?.duringCirclePelvicPain?.duration || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="During Circle Pelvic Pain Colour">
-                    {reproductiveInfo?.duringCirclePelvicPain?.colour || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Do You Pms Symptoms">
-                    {reproductiveInfo?.doYouPmsSymptoms === null || reproductiveInfo.doYouPmsSymptoms === undefined ? 'N/A' : (reproductiveInfo.doYouPmsSymptoms ? 'Yes' : 'No')}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="pms Symptoms">
-                    {reproductiveInfo?.pmsSymptoms || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="pms Duration">
-                    {reproductiveInfo?.pms?.duration || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="pms Colour">
-                    {reproductiveInfo?.pms?.colour || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Longest Cycle Lenght">
-                    {reproductiveInfo?.longestCycleLenght || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Shortest Cycle Lenght">
-                    {reproductiveInfo?.shortestCycleLenght || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Average Cycle Lenght">
-                    {reproductiveInfo?.averageCycleLenght || "N/A"}
-                  </Descriptions.Item>
-                   {/* <Descriptions.Item label="Who Do You Live With?">
+                  {reproductiveInfo?.duringCirclePelvicPain?.duration || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="During Circle Pelvic Pain Colour">
+                  {reproductiveInfo?.duringCirclePelvicPain?.colour || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Do You Pms Symptoms">
+                  {reproductiveInfo?.doYouPmsSymptoms === null || reproductiveInfo.doYouPmsSymptoms === undefined ? 'N/A' : (reproductiveInfo.doYouPmsSymptoms ? 'Yes' : 'No')}
+                </Descriptions.Item>
+                <Descriptions.Item label="pms Symptoms">
+                  {reproductiveInfo?.pmsSymptoms || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="pms Duration">
+                  {reproductiveInfo?.pms?.duration || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="pms Colour">
+                  {reproductiveInfo?.pms?.colour || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Longest Cycle Lenght">
+                  {reproductiveInfo?.longestCycleLenght || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Shortest Cycle Lenght">
+                  {reproductiveInfo?.shortestCycleLenght || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Average Cycle Lenght">
+                  {reproductiveInfo?.averageCycleLenght || "N/A"}
+                </Descriptions.Item>
+                {/* <Descriptions.Item label="Who Do You Live With?">
                   {reproductiveInfo.who_do_you_live_with || 'N/A'}
                   </Descriptions.Item> */}
-                  <Descriptions.Item label="Mid Cycle Spotting">
+                <Descriptions.Item label="Mid Cycle Spotting">
                   {reproductiveInfo?.midCycleSpotting ? "Yes" : "No"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Cycle Discharge Creamy Duration">
+                </Descriptions.Item>
+                <Descriptions.Item label="Cycle Discharge Creamy Duration">
                   {reproductiveInfo?.cycleDischargeCreamy?.duration || 'N/A'}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Cycle Discharge Creamy Colour">
+                </Descriptions.Item>
+                <Descriptions.Item label="Cycle Discharge Creamy Colour">
                   {reproductiveInfo?.cycleDischargeCreamy?.colour || 'N/A'}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Cycle Discharge Watery Duration">
+                </Descriptions.Item>
+                <Descriptions.Item label="Cycle Discharge Watery Duration">
                   {reproductiveInfo?.cycleDischargeWatery?.duration || 'N/A'}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Cycle Discharge Watery Colour">
+                </Descriptions.Item>
+                <Descriptions.Item label="Cycle Discharge Watery Colour">
                   {reproductiveInfo?.cycleDischargeWatery?.colour || 'N/A'}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Cycle Discharge Egg White Duration">
+                </Descriptions.Item>
+                <Descriptions.Item label="Cycle Discharge Egg White Duration">
                   {reproductiveInfo?.cycleDischargeEggWhite?.duration || 'N/A'}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Cycle Discharge Egg White Colour">
+                </Descriptions.Item>
+                <Descriptions.Item label="Cycle Discharge Egg White Colour">
                   {reproductiveInfo?.cycleDischargeEggWhite?.colour || 'N/A'}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Cycle Discharge Pre Period Duration">
+                </Descriptions.Item>
+                <Descriptions.Item label="Cycle Discharge Pre Period Duration">
                   {reproductiveInfo?.cycleDischargePrePeriod?.duration || 'N/A'}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Cycle Discharge Pre Period Colour">
+                </Descriptions.Item>
+                <Descriptions.Item label="Cycle Discharge Pre Period Colour">
                   {reproductiveInfo?.cycleDischargePrePeriod?.colour || 'N/A'}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Cycle Discharge Menstral Bleeding Duration">
+                </Descriptions.Item>
+                <Descriptions.Item label="Cycle Discharge Menstral Bleeding Duration">
                   {reproductiveInfo?.cycleDischargeMenstralBleeding?.duration || 'N/A'}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Cycle Discharge Menstral Bleeding Colour">
+                </Descriptions.Item>
+                <Descriptions.Item label="Cycle Discharge Menstral Bleeding Colour">
                   {reproductiveInfo?.cycleDischargeMenstralBleeding?.colour || 'N/A'}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Cycle Discharge Menstral Bleeding Clots">
+                </Descriptions.Item>
+                <Descriptions.Item label="Cycle Discharge Menstral Bleeding Clots">
                   {reproductiveInfo?.cycleDischargeMenstralBleeding?.clots ? "Yes" : "No"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Cycle Discharge After Period Spotting Duration">
+                </Descriptions.Item>
+                <Descriptions.Item label="Cycle Discharge After Period Spotting Duration">
                   {reproductiveInfo?.cycleDischargeAfterPeriodSpotting?.duration || 'N/A'}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Cycle Discharge After Period Spotting">
+                </Descriptions.Item>
+                <Descriptions.Item label="Cycle Discharge After Period Spotting">
                   {reproductiveInfo?.cycleDischargeAfterPeriodSpotting?.colour || 'N/A'}
-                  </Descriptions.Item>
+                </Descriptions.Item>
 
 
 
 
-                  
-                  {/* <Descriptions.Item label="Intercouse Days">
+
+                {/* <Descriptions.Item label="Intercouse Days">
                     {reproductiveInfo?.intercouseDays || "N/A"}
                   <Descriptions.Item label="Menstral Cycle Colour">
                     {reproductiveInfo?.menstralCycleColour || "N/A"}
@@ -1450,12 +1457,12 @@ function SwitchContent({
                   <Descriptions.Item label="Trying To Conceive">
                     {reproductiveInfo?.tryingToConceive === null || reproductiveInfo.tryingToConceive === undefined ? 'N/A' : (reproductiveInfo.tryingToConceive ? 'Yes' : 'No')}
                   </Descriptions.Item> */}
-                  
-                </Descriptions>
-              </Col> 
-            </Row>
-          </div>
-        );
+
+              </Descriptions>
+            </Col>
+          </Row>
+        </div>
+      );
 
     default:
       return <p style={{ textAlign: "center" }}> No Record available</p>;

@@ -230,7 +230,7 @@ export const getIllnessCondition = createAsyncThunk(
 
     try {
       const response = await axios.get(
-        `${baseUrl}/Doctor/GetMedicalHistory/${id}`,
+        `${baseUrl}/Doctor/GetIllnessConditions/${id}`,
         config,
       );
       console.log(response.data);

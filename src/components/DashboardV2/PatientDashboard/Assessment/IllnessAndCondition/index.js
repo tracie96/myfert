@@ -585,11 +585,211 @@ const IllnessAndCondition = ({ onComplete }) => {
   };
 
   const handleSubmit = () => {
-    dispatch(completeCard("/questionnaire/8"));
-    localStorage.setItem("currentQuestionIndex8", 0);
-    localStorage.setItem("answers", JSON.stringify(answers));
-    navigate("/assessment");
+    // Prepare the data to match the API structure
+    const apiData = {
+      gastroIntestinal: [
+        {
+          yesNo: answers.irritableBowel === "yes" || answers.crohns === "yes" || answers.peptic_ulcer === "yes",
+          describe: `${answers.irritableBowel === "yes" ? "Irritable Bowel, " : ""}${answers.crohns === "yes" ? "Crohns, " : ""}${answers.peptic_ulcer === "yes" ? "Peptic Ulcer" : ""}`,
+        },
+      ],
+      respiratory: [
+        {
+          yesNo: answers.lung === "yes",
+          describe: answers.lung === "yes" ? "Lung" : "",
+        },
+      ],
+      urinary: [
+        {
+          yesNo: answers.kidney_stones === "yes" || answers.interstitial_cystitis === "yes",
+          describe: `${answers.kidney_stones === "yes" ? "Kidney Stones, " : ""}${answers.interstitial_cystitis === "yes" ? "Interstitial Cystitis" : ""}`,
+        },
+      ],
+      endocrine: [
+        {
+          yesNo: answers.hyperglycemia === "yes" || answers.eating_disorder === "yes" || answers["metabolic_syndrome/insulin_resistance"] === "yes" ,
+          describe: `${answers.hyperglycemia === "yes" ? "Hyperglycemia, " : ""}${answers.eating_disorder === "yes" ? "Eating Disorder, " : ""}${answers["metabolic_syndrome/insulin_resistance"] === "yes" ? "Metabolic Syndrome/Insulin Resistance" : ""}`,
+        },
+      ],
+      inflammatory: [
+        {
+          yesNo: answers.gout === "yes",
+          describe: answers.gout === "yes" ? "Gout" : "",
+        },
+      ],
+      musculoskeletal: [
+        {
+          yesNo: answers.fibromyalgia === "yes",
+          describe: answers.fibromyalgia === "yes" ? "Fibromyalgia" : "",
+        },
+      ],
+      skin: [
+        {
+          yesNo: answers.acne === "yes" || answers.psoriasis === "yes" || answers.eczema === "yes",
+          describe: `${answers.acne === "yes" ? "Acne, " : ""}${answers.psoriasis === "yes" ? "Psoriasis, " : ""}${answers.eczema === "yes" ? "Eczema" : ""}`,
+        },
+      ],
+      cardiovascular: [
+        {
+          yesNo: answers.hypertension === "yes" || answers.stroke === "yes" || answers.high_blood_fats === "yes" || answers.rheumatic_fever === "yes" || answers.murmur === "yes",
+          describe: `${answers.hypertension === "yes" ? "Hypertension, " : ""}${answers.stroke === "yes" ? "Stroke, " : ""}${answers.high_blood_fats === "yes" ? "High Blood Fats, " : ""}${answers.rheumatic_fever === "yes" ? "Rheumatic Fever, " : ""}${answers.murmur === "yes" ? "Murmur" : ""}`,
+        },
+      ],
+      neurologic: [
+        {
+          yesNo: answers.epilepsy_seizures === "yes" || answers["ADD/ADHD"] === "yes" || answers.headaches === "yes" || answers.migraines === "yes" || answers.depression === "yes",
+          describe: `${answers.epilepsy_seizures === "yes" ? "Epilepsy/Seizures, " : ""}${answers["ADD/ADHD"] === "yes" ? "ADD/ADHD, " : ""}${answers.headaches === "yes" ? "Headaches, " : ""}${answers.migraines === "yes" ? "Migraines, " : ""}${answers.depression === "yes" ? "Depression" : ""}`,
+        },
+      ],
+      cancer: [
+        {
+          yesNo: answers.breast === "yes" || answers.colon === "yes",
+          describe: `${answers.breast === "yes" ? "Breast, " : ""}${answers.colon === "yes" ? "Colon" : ""}`,
+        },
+      ],
+      diagnosticBoneDensity: {
+        date: answers.boneDensity || "",
+        value: answers.boneDensity_Comments || "",
+      },
+      diagnosticCTScan: {
+        date: answers.ctscan || "",
+        value: answers.ctscan_Comments || "",
+      },
+      diagnosticColonoscopy: {
+        date: answers.colonoscopy || "",
+        value: answers.colonoscopy_Comments || "",
+      },
+      diagnosticCardiacStress: {
+        date: answers.cardiac_stress_test || "",
+        value: answers.cardiac_stress_test_Comments || "",
+      },
+      diagnosticEKG: {
+        date: answers.EKG_na ? "" : answers.EKG || "", // Handle boolean
+        value: answers.EKG_na ? "" : answers.EKG_Comments || "", // Handle boolean
+      },
+      diagnosticMRI: {
+        date: answers.MRI || "",
+        value: answers.MRI_Comments || "",
+      },
+      diagnosticUpperEndoscopy: {
+        date: answers.upper_endoscopy || "",
+        value: answers.upper_endoscopy_Comments || "",
+      },
+      diagnosticUpperGI: {
+        date: answers.upper_GI_series || "",
+        value: answers.upper_GI_series_Comments || "",
+      },
+      diagnosticChestXray: {
+        date: answers.chest_X_ray || "",
+        value: answers.chest_X_ray_Comments || "",
+      },
+      diagnosticOtherXray: {
+        date: answers.other_X_rays || "",
+        value: answers.other_X_rays_Comments || "",
+      },
+      diagnosticBarium: {
+        date: answers.barium_enema || "",
+        value: answers.barium_enema_Comments || "",
+      },
+      diagnosticOther: {
+        date: answers.other || "",
+        value: answers.other_Comments || "",
+        otherName: answers.other_Comments || "",
+      },
+      injuriesBrokenBones: {
+        date: answers.injuries || "",
+        value: answers.injuriess_Comments || "",
+      },
+      injuriesBack: {
+        date: answers.back_injury || "",
+        value: answers.back_injury_Comments || "",
+      },
+      injuriesNeck: {
+        date: answers.neck_injury || "",
+        value: answers.neck_injury_Comments || "",
+      },
+      injuriesHead: {
+        date: answers.head_injury || "",
+        value: answers.head_injury_Comments || "",
+      },
+      injuriesOther: {
+        date: answers.Injuries || "",
+        value: answers.Injuries_Comments || "",
+        otherName: answers.Injuries_Comments || "",
+      },
+      surgeryAppen: {
+        date: answers.appendectomy_na ? "" : answers.appendectomy || "", // Handle boolean
+        value: answers.appendectomy_na ? "" : answers.appendectomy_Comments || "", // Handle boolean
+      },
+      surgeryDental: {
+        date: answers.dental || "",
+        value: answers.dental_Comments || "",
+      },
+      gallBladder: {
+        date: answers.gallbladder || "",
+        value: answers.gallbladder_Comments || "",
+      },
+      hernia: {
+        date: answers.hernia || "",
+        value: answers.hernia_Comments || "",
+      },
+      hysterectomy: {
+        date: answers.hysterectomy || "",
+        value: answers.hysterectomy_Comments || "",
+      },
+      tonsillectomy: {
+        date: answers.tonsillectomy || "",
+        value: answers.tonsillectomy_Comments || "",
+      },
+      jointReplacement: {
+        date: answers.joint_replacement || "",
+        value: answers.joint_replacement_Comments || "",
+      },
+      heartSurgery: {
+        date: answers.heart_surgery || "",
+        value: answers.heart_surgery_Comments || "",
+      },
+      otherSurgeries: {
+        date: answers.other_surgeries || "",
+        value: answers.other_surgeries_Comments || "",
+        otherName: answers.other_surgeries_Comments || "",
+      },
+      addNew: answers.hospitalizations.map((item) => ({
+        date: item.date || "",
+        value: item.reason || "",
+      })),
+    };
+    const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
+    const token = userInfo.obj.token || "";
+    fetch("https://myfertilitydevapi.azurewebsites.net/api/Patient/AddIllnessConditions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        accept: "text/plain",
+        Authorization: `${token}`,
+
+      },
+      body: JSON.stringify(apiData),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to submit the form");
+        }
+        return response.json();
+      })
+      .then(() => {
+        message.success("Form submitted successfully!");
+        dispatch(completeCard("/questionnaire/5"));
+        localStorage.setItem("currentQuestionIndex5", 0);
+        localStorage.setItem("answers", JSON.stringify(answers));
+        navigate("/assessment");
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        message.error("Failed to submit the form. Please try again.");
+      });
   };
+
 
   const addHospitalization = (name) => {
     setAnswers((prevAnswers) => ({

@@ -229,10 +229,9 @@ const StressAndRelationship = ({ onComplete }) => {
     switch (question.type) {
       case "checkbox": {
         if (!answers[question.name] || answers[question.name].length === 0) {
-          return false; // No checkbox selected
+          return false; 
         }
   
-        // Check if "Other" is selected and the "Other" input is filled
         if (answers[question.name].includes("Other")) {
           const otherInputName = `${question.name}_other`;
           if (!answers[otherInputName] || answers[otherInputName] === "") {

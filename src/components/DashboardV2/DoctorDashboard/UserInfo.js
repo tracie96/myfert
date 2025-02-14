@@ -1190,34 +1190,54 @@ function SwitchContent({
         <p>{stress}</p>
       ) : (
         <div className="p-6 rounded-md shadow-md">
-          <Row gutter={16}>
-            <Col xs={24} md={12}>
-              <Descriptions column={1} bordered>
-                {Object.entries(illness).map(([key, value]) => (
+        <Row gutter={16}>
+          <Col xs={24} md={12}>
+            <Descriptions column={1} bordered>
+              {Object.entries(illness).map(([key, value]) => {
+                let displayValue = 'N/A';
+  
+                // Handle different data types correctly
+                if (value === null || value === undefined) {
+                  displayValue = 'N/A';
+                } else if (typeof value === 'boolean') {
+                  displayValue = value ? 'Yes' : 'No';  // Display boolean as "Yes" or "No"
+                } else if (typeof value === 'string' || typeof value === 'number') {
+                  displayValue = value;  // Directly render strings and numbers
+                } else if (Array.isArray(value)) {
+                  // Render arrays (e.g., addNew)
+                  displayValue = value.map((item, index) => (
+                    <div key={index}>
+                      Date: {item.date}, Reason: {item.value}
+                    </div>
+                  ));
+                } else if (typeof value === 'object') {
+                  // Render objects (e.g., diagnosticBoneDensity)
+                  displayValue = (
+                    <div>
+                      Date: {value.date}, Value: {value.value}, Other Name: {value.otherName}
+                    </div>
+                  );
+                } else {
+                  displayValue = 'Unknown Data Type';
+                }
+  
+                return (
                   <Descriptions.Item
-                    label={key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                    label={key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())}
                     key={key}
                   >
-                    <span className="font-medium">{value !== null ? value : 'N/A'}</span>
+                    <span className="font-medium">{displayValue}</span>
                   </Descriptions.Item>
-                ))}
-              </Descriptions>
-            </Col>
-
-            <Col xs={24} md={12}>
-              <Descriptions column={1} bordered>
-                {Object.entries(illness).map(([key, value]) => (
-                  <Descriptions.Item
-                    label={key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-                    key={key}
-                  >
-                    <span className="font-medium">{value !== null ? value : 'N/A'}</span>
-                  </Descriptions.Item>
-                ))}
-              </Descriptions>
-            </Col>
-          </Row>
-        </div>
+                );
+              })}
+            </Descriptions>
+          </Col>
+  
+          <Col xs={24} md={12}>
+            {/* Duplicate descriptions removed - displaying the data once is enough */}
+          </Col>
+        </Row>
+      </div>
       );
 
     case 8:

@@ -103,7 +103,7 @@ const SecondPlan = () => {
                         Clinician Assessment
                       </Typography.Title>
                     </Col>
-                 
+
                   </Row>
 
                   <Row
@@ -115,27 +115,27 @@ const SecondPlan = () => {
                     }}
                   >
                     <Col xs={18} sm={12} md={4}>
-                      <p style={{fontWeight:"bold"}}>Prerequisite:</p>
+                      <p style={{ fontWeight: "bold" }}>Prerequisite:</p>
                       <p>Complete all the General Intake Forms (except Holistic Nutrition) - ASSESS section</p>
                       <p>Watch Fertility Coach Video - LEARN section</p>
-                      <p style={{ marginTop: "2.3rem", fontWeight:"bold" }}>Description:</p>
+                      <p style={{ marginTop: "2.3rem", fontWeight: "bold" }}>Description:</p>
                       <p>Schedule a consultation with a clinician to review the General Intake Forms. Two requisition (Day 3 bloodwork and Peak +7 bloodwork) will be provided with a follow-up to discuss the results  </p>
                       <p>Includes two appointments with the Fertility Coach</p>
-                      <p style={{fontWeight:"bold"}}>Duration:</p>
+                      <p style={{ fontWeight: "bold" }}>Duration:</p>
                       <p>Clinician (1 hour consultation + 30 min follow-up), Fertility Coach (two 30 minute appointment)</p>
-                      <p style={{fontWeight:"bold"}}>Care Provider:</p>
+                      <p style={{ fontWeight: "bold" }}>Care Provider:</p>
                       <p>Clinician, Fertility Coach</p>
                     </Col>
 
-                 
-                    <Col xs={4} sm={4} md={4} style={{ textAlign: ""}}>
+
+                    <Col xs={4} sm={4} md={4} style={{ textAlign: "" }}>
                       <Typography.Title
                         level={3}
                         style={{
                           fontSize: "1.2rem",
                           fontWeight: 600,
                           color: "#000000",
-                          textAlign:"center"
+                          textAlign: "center"
                         }}
                       >
                         $500
@@ -200,21 +200,22 @@ const SecondPlan = () => {
                     <Col xs={24} sm={12} md={4}>
                       <p>Prerequisite:</p>
                       <p>Description:</p>
+                      <p style={{height:'30px'}}></p>
+
                       <p style={{ marginTop: "2.3rem" }}>Duration:</p>
                       <p>Care Provider:</p>
                     </Col>
 
                     <Col xs={24} sm={12} md={16}>
                       <p>
-                        Complete the Reproductive Health Assessment - ASSESS section
-                      </p>
+                        Complete all the General Intake Forms (except Holistic Nutrition) - ASSESS section
+                        Watch Fertility Coach Video - LEARN section                      </p>
                       <p>
-                        Schedule a consultation with a Fertility Coach by visiting
-                        to review the Reproductive Health Assessment, the benefits
-                        of ongoing care, and to address any questions you may have
+                        Schedule a consultation with a clinician to review the General Intake Forms. Two requisition (Day 3 bloodwork and Peak +7 bloodwork) will be provided with a follow-up to discuss the results
                       </p>
-                      <p>15 minutes</p>
-                      <p>Fertility Coach</p>
+                      <p>Includes two appointments with the Fertility Coach</p>
+                      <p>Clinician (1 hour consultation + 30 min follow-up), Fertility Coach (two 30 minute appointment)</p>
+                      <p>Clinician, Fertility Coach</p>
                     </Col>
 
                     <Col xs={24} sm={12} md={4} style={{ textAlign: "center" }}>
@@ -238,7 +239,7 @@ const SecondPlan = () => {
                           marginTop: "2rem",
                         }}
                       >
-                        Save & Continue
+                        Select
                       </Button>
                     </Col>
                   </Row>
@@ -247,14 +248,14 @@ const SecondPlan = () => {
             </div>
           </div>
 
-          <div className="mt-4">
+          <div className="mt-4" style={{ display: 'none' }}>
             <div
               style={{
                 width: "100%",
                 backgroundColor: "#B46DB8",
                 borderRadius: "12px 12px 0 0",
                 height: "61px",
-                display: "flex",
+                display: "none",
                 alignItems: "center",
                 justifyContent: "left",
               }}

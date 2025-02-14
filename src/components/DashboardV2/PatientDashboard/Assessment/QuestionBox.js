@@ -4,13 +4,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { getPatientStatus } from "../../../redux/patientSlice";
 import "./assesment.css";
 
-const CardComponent = ({ card, isClickable, handleCardClick }) => (
+const CardComponent = ({ card, isClickable,index, handleCardClick }) => (
   <div
     className={`assessment-card ${!isClickable ? "disabled" : ""}`}
     onClick={isClickable ? () => handleCardClick(card.component) : null}
   >
     <div className="card-image">
-      <img src={card.icon} alt={card.title} loading="lazy" />
+      <img src={card.icon} alt={card.title} loading="lazy"    style={{ width: (index === 4 || index === 7) ? '100%' : '' }}/>
     </div>
     <div className="card-title">{card.title}</div>
   </div>
@@ -45,6 +45,7 @@ const QuestionnaireGrid = ({ cards, onCardClick }) => {
           <CardComponent
             card={card}
             isClickable={isClickable}
+            index={index}
             handleCardClick={handleCardClick}
           />
         </Col>

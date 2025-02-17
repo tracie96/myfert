@@ -651,6 +651,13 @@ const ReproductiveHealth = ({ onComplete }) => {
         return false;
     }
 
+     // FABM/FAM charting your cycle 
+     if (question.name === "current_therapy" && mainAnswer === "Yes") {
+        if (answers["charting_method"] === "" || answers["charting_method"] === undefined) {
+            return false;
+        }
+      }
+
     // Special Handling for Birth Control Question
     if (question.name === "relaxation_techniques" && mainAnswer === "Yes") {
         const isHormonalAnswered = answers["how_often_hormonal_bc"] !== undefined && answers["how_often_hormonal_bc"]?.trim() !== "";
@@ -764,7 +771,7 @@ const ReproductiveHealth = ({ onComplete }) => {
   };
 
   const handleChange = (value, name) => {
-    const question = questions[currentQuestionIndex];
+    // const question = questions[currentQuestionIndex];
     let updatedAnswers = { ...answers };
 
     if (name === "relaxation_techniques") { 
@@ -789,32 +796,23 @@ const ReproductiveHealth = ({ onComplete }) => {
   }
   
     if (Array.isArray(value)) {
-      // Check if "Unsure" or "None" is selected
-      const isUnsureOrNoneSelected = value.includes("Unsure") || value.includes("None");
-  
-      if (isUnsureOrNoneSelected) {
-        // Keep only "Unsure" or "None" and remove all other selections
-        value = value.filter(opt => opt === "Unsure" || opt === "None");
-        updatedAnswers[name] = value;
-      } else {
-        // Otherwise, update normally
+      // const isUnsureOrNoneSelected = value.includes("Unsure") || value.includes("None");
+      const lastValue = value[value.length - 1];
+      if (lastValue !== 'Unsure' && lastValue !== 'None') {
+        const hasOtherValue = value.some(value => value !== null && value !== 'unsure');
+        if (hasOtherValue) {
+          value = value.filter(item => item !== 'None' && item !== 'Unsure');
+          updatedAnswers[name] = value;
+        }
+      }
+      if (lastValue === 'Unsure' || lastValue === 'None') {
+        // Keep only the last value if it's 'Unsure' or 'None'
+        value = value.filter(item => item === "Unsure" || item === "None");
         updatedAnswers[name] = value;
       }
+
     } 
-    else if (value === "Unsure" || value === "None") {
-      // If "Unsure" or "None" is selected, clear other answers
-      updatedAnswers = {
-        ...updatedAnswers,
-        [name]: value, // Keep the selected answer
-      };
   
-      // Reset sub-answers and other inputs for this question
-      if (question.subQuestions) {
-        question.subQuestions.forEach(subQ => {
-          updatedAnswers[subQ.name] = subQ.type === "number" ? 0 : "";
-        });
-      }
-    } 
     else {
       // Normal case when selecting other options
       updatedAnswers[name] = value;
@@ -964,7 +962,6 @@ const ReproductiveHealth = ({ onComplete }) => {
   
       const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
       const token = userInfo.obj?.token || "";
-      //console.log("userInfo--", userInfo);
   
       const response = await fetch(
         "https://myfertilitydevapi.azurewebsites.net/api/Patient/AddReproductiveHealth",
@@ -1012,21 +1009,23 @@ const ReproductiveHealth = ({ onComplete }) => {
         <p>{subQuestion.question}</p>
         {subQuestion.type === "text" && (
           <Input
+            name="method"
             value={answers[subQuestion.name] || ""}
             onChange={(e) => handleChange(e.target.value, subQuestion.name)}
             className="input_questtionnaire"
           />
         )}
+        {console.log("subQuestion.name--", subQuestion.name)}
         {subQuestion.type === "inputNumber" && (
           <InputNumber
             name={subQuestion.name}
             value={answers[subQuestion.name] || 0}
             onChange={(value) => handleChange(value, subQuestion.name)}
             className="input_questtionnaire"
-            disabled={answers[subQuestion.name] === "Unsure" || answers[subQuestion.name] === "None"}
+           // disabled={answers[subQuestion.name] === "Unsure" || answers[subQuestion.name] === "None"}
           />
         )}
-        {subQuestion.type === "number_with_radio_sub" && (
+        {subQuestion.name !== "menstrual_bleeding_sub" && subQuestion.type === "number_with_radio_sub" && (
           <>
             <div
               style={{ display: "flex", flexDirection: "column", gap: "10px" }}
@@ -1035,13 +1034,15 @@ const ReproductiveHealth = ({ onComplete }) => {
                  {/* InputNumber should have its own state key */}
                   {subQuestion.name === "intercourse_during_fertile_sub"?<span style={{ fontWeight: "600", color:"#303030"}}>Every&nbsp;</span>:""}
                     <InputNumber
+                      max={(subQuestion.name === "shortest_cycle_radio"|| subQuestion.name === "average_cycle_radio") ? answers.longest_cycle_radio : undefined}
+                      min={subQuestion.name === "average_cycle_radio" ? answers.shortest_cycle_radio : undefined}
                       name={`${subQuestion.name}_menstrual_bleeding`}
                       value={answers[subQuestion.name] || undefined}
                       onChange={(value) => handleChange(value, subQuestion.name)}
                       disabled={answers[`${subQuestion.name}_unsure`]}
                       className="input_questionnaire"
                     />
-                    {(subQuestion.name === "intercourse_during_fertile_sub" || subQuestion.name === "duration_per_cycle")?<span style={{ fontWeight: "600", color:"#303030"}}>&nbsp;Days</span>:""}
+                    {<span style={{ fontWeight: "600", color:"#303030"}}>&nbsp;Days</span>}
               </div>
              
               {/* Radio.Group should use a different key in the state */}
@@ -1066,12 +1067,13 @@ const ReproductiveHealth = ({ onComplete }) => {
                     name={nameSubQuestion}
                     value={answers[nameSubQuestion] || undefined}
                     onChange={(value) => handleChange(value, nameSubQuestion)}
-                    disabled={answers[`${subQuestion.name}_unsure`]}
+                    //disabled={answers[`${subQuestion.name}_unsure`]}
                     className="input_questionnaire"
                   />
                   <span className="question-text">
-                    {subQuestion.name || 'Default Name'} {/* Example text for the span */}
+                    {" "+subQuestion.name || 'Default Name'} {/* Example text for the span */}
                   </span>
+                  <div style={{ marginBottom: '10px' }}></div>
                 </div>
                 )})}
             </div>
@@ -1093,7 +1095,7 @@ const ReproductiveHealth = ({ onComplete }) => {
                     onChange={(value) => handleChange(value, item.name)}
                     className="input_questionnaire"
                     style={{ width: "100%" }}
-                    disabled={answers[item.name] === "Unsure" || answers[item.name] === "None"}
+                    //disabled={answers[item.name] === "Unsure" || answers[item.name] === "None"}
                   />
                 </div>
               ))}
@@ -1134,7 +1136,7 @@ const ReproductiveHealth = ({ onComplete }) => {
            onChange={(value) => handleChange(value || 0, `${subQuestion.name}_years`)}
            value={answers[`${subQuestion.name}_years`] || ""}
            name={`${subQuestion.name}_years`}
-           disabled={answers[subQuestion.name] === "Unsure" || answers[subQuestion.name] === "None"}
+          // disabled={answers[subQuestion.name] === "Unsure" || answers[subQuestion.name] === "None"}
            style={{
              height: 35,
              borderColor: "#00ADEF",
@@ -1152,7 +1154,7 @@ const ReproductiveHealth = ({ onComplete }) => {
            onChange={(value) => handleChange(value || 0, `${subQuestion.name}_months`)}
            value={answers[`${subQuestion.name}_months`] || ""}
            name={`${subQuestion.name}_months`}
-           disabled={answers[subQuestion.name] === "Unsure" || answers[subQuestion.name] === "None"}
+          // disabled={answers[subQuestion.name] === "Unsure" || answers[subQuestion.name] === "None"}
            style={{
              height: 35,
              borderColor: "#00ADEF",
@@ -1212,7 +1214,7 @@ const ReproductiveHealth = ({ onComplete }) => {
               value={answers[subQuestion.name] || []}
             >
               {subQuestion.options.map((option, idx) => {
-                const isUnsureOrNoneSelected = (answers[subQuestion.name] || []).includes("Unsure") || 
+                // const isUnsureOrNoneSelected = (answers[subQuestion.name] || []).includes("Unsure") || 
                 (answers[subQuestion.name] || []).includes("None");
                 return (
                <div key={idx} style={{ marginBottom: "10px" }}>
@@ -1220,7 +1222,7 @@ const ReproductiveHealth = ({ onComplete }) => {
                   {/* Ensure consistent spacing */}
                   <Checkbox 
                   value={option}
-                  disabled={isUnsureOrNoneSelected && option !== "Unsure" && option !== "None"}
+                 // disabled={isUnsureOrNoneSelected && option !== "Unsure" && option !== "None"}
                   >{option}</Checkbox>
                   {option === "Other" &&
                     answers[subQuestion.name]?.includes("Other") && (
@@ -1533,13 +1535,14 @@ const ReproductiveHealth = ({ onComplete }) => {
             className="checkbox-group"
           >
             {question.options.map((option, index) => {
-              const isUnsureOrNoneSelected = (answers[question.name] || []).includes("Unsure") || 
+              // const isUnsureOrNoneSelected = (answers[question.name] || []).includes("Unsure") || 
               (answers[question.name] || []).includes("None");
               return (
               <Checkbox 
                 key={index} 
                 value={option} 
-                disabled={isUnsureOrNoneSelected && option !== "Unsure" && option !== "None"}
+                checked={true}
+                //disabled={isUnsureOrNoneSelected && option !== "Unsure" && option !== "None"}
                 className="checkbox-item"
               >
                 {option === "Other" ? (

@@ -252,7 +252,7 @@ export default function DoctorDash() {
           dataSource={filteredData}
           loading={loading}
           scroll={{ x: "max-content" }}
-          pagination={false}
+          pagination={true}
           onChange={handleTableChange}
           rowKey="id"
           onRow={(record) => ({

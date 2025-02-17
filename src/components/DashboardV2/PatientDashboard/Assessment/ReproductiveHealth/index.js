@@ -653,7 +653,7 @@ const ReproductiveHealth = ({ onComplete }) => {
 
      // FABM/FAM charting your cycle 
      if (question.name === "current_therapy" && mainAnswer === "Yes") {
-        if (answers["charting_method"] == "" || answers["charting_method"] == undefined) {
+        if (answers["charting_method"] === "" || answers["charting_method"] === undefined) {
             return false;
         }
       }
@@ -771,7 +771,7 @@ const ReproductiveHealth = ({ onComplete }) => {
   };
 
   const handleChange = (value, name) => {
-    const question = questions[currentQuestionIndex];
+    // const question = questions[currentQuestionIndex];
     let updatedAnswers = { ...answers };
 
     if (name === "relaxation_techniques") { 
@@ -796,7 +796,7 @@ const ReproductiveHealth = ({ onComplete }) => {
   }
   
     if (Array.isArray(value)) {
-      const isUnsureOrNoneSelected = value.includes("Unsure") || value.includes("None");
+      // const isUnsureOrNoneSelected = value.includes("Unsure") || value.includes("None");
       const lastValue = value[value.length - 1];
       if (lastValue !== 'Unsure' && lastValue !== 'None') {
         const hasOtherValue = value.some(value => value !== null && value !== 'unsure');
@@ -1210,7 +1210,7 @@ const ReproductiveHealth = ({ onComplete }) => {
               value={answers[subQuestion.name] || []}
             >
               {subQuestion.options.map((option, idx) => {
-                const isUnsureOrNoneSelected = (answers[subQuestion.name] || []).includes("Unsure") || 
+                // const isUnsureOrNoneSelected = (answers[subQuestion.name] || []).includes("Unsure") || 
                 (answers[subQuestion.name] || []).includes("None");
                 return (
                <div key={idx} style={{ marginBottom: "10px" }}>
@@ -1531,7 +1531,7 @@ const ReproductiveHealth = ({ onComplete }) => {
             className="checkbox-group"
           >
             {question.options.map((option, index) => {
-              const isUnsureOrNoneSelected = (answers[question.name] || []).includes("Unsure") || 
+              // const isUnsureOrNoneSelected = (answers[question.name] || []).includes("Unsure") || 
               (answers[question.name] || []).includes("None");
               return (
               <Checkbox 

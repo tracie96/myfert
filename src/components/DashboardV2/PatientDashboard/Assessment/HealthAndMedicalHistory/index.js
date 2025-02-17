@@ -490,6 +490,10 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
   };
 
   const handleSubmit = async () => {
+    if (!validateQuestion()) {
+      message.error("Please answer the current question before Submitting.");
+      return;
+    }
     try {
       const payload = {
         howWellThingsGoingOverall: answers.overll_wellbeing || 0,

@@ -585,6 +585,10 @@ const IllnessAndCondition = ({ onComplete }) => {
   };
 
   const handleSubmit = () => {
+    if (!validateQuestion()) {
+      message.error("Please answer the current question before Submitting.");
+      return;
+    }
     // Prepare the data to match the API structure
     const apiData = {
       gastroIntestinal: [

@@ -852,6 +852,10 @@ const CurrentLifeStyle = ({ onComplete }) => {
   };
 
   const handleSubmit = () => {
+    if (!validateQuestion()) {
+      message.error("Please answer the current question before Submitting.");
+      return;
+    }
     const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
     const token = userInfo.obj.token || "";
     const transformedData = {

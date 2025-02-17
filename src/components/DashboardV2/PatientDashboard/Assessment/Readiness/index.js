@@ -203,6 +203,10 @@ const Readiness = ({ onComplete }) => {
   };
 
   const handleSubmit = () => {
+    if (!validateQuestion()) {
+      message.error("Please answer the current question before Submitting.");
+      return;
+    }
     localStorage.setItem("currentQuestionIndex10", 0);
     localStorage.setItem("answers-readiness", JSON.stringify(answers));
     const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};

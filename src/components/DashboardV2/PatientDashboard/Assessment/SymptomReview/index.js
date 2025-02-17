@@ -724,6 +724,10 @@ const SymptomReview = ({ onComplete }) => {
   };
 
   const handleSubmit = async () => {
+    if (!validateQuestion()) {
+      message.error("Please answer the current question before Submitting.");
+      return;
+    }
     const answers = JSON.parse(localStorage.getItem("answers")) || {};
     const apiFormat = {
       general: [],

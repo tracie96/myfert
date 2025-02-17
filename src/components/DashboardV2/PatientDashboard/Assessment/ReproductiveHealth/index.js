@@ -877,6 +877,10 @@ const ReproductiveHealth = ({ onComplete }) => {
     </span>
   );
   const handleSubmit = async () => {
+    if (!validateQuestion()) {
+      message.error("Please answer the current question before Submitting.");
+      return;
+    }
     try {
       const requestData = {
         birthControl: answers.relaxation_techniques === "Yes",

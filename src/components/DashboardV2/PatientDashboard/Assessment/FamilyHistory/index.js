@@ -482,6 +482,10 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
 
   const handleSubmit = async () => {
     // Prepare the API payload
+    if (!validateQuestion()) {
+      message.error("Please answer the current question before Submitting.");
+      return;
+    }
     const obstetricCategories = [
       "Pregnancy",
       "Miscarriages",

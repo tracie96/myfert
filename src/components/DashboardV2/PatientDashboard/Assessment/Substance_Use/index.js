@@ -302,6 +302,10 @@ const SubstanceUse = ({ onComplete }) => {
   };
 
   const handleSubmit = () => {
+    if (!validateQuestion()) {
+      message.error("Please answer the current question before Submitting.");
+      return;
+    }
     const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
 
     const transformedAnswers = transformAnswers(answers);

@@ -329,6 +329,10 @@ const StressAndRelationship = ({ onComplete }) => {
     navigate("/assessment");
   };
   const handleSubmit = () => {
+    if (!validateQuestion()) {
+      message.error("Please answer the current question before Submitting.");
+      return;
+    }
     // Map form data to API structure
     const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
     const token = userInfo.obj.token || "";

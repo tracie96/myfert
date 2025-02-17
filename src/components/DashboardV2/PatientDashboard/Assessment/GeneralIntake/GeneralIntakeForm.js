@@ -180,7 +180,7 @@ const GeneralIntakeForm = ({ onComplete }) => {
 
   const handleSubmit = async () => {
     if (!validateQuestion()) {
-      message.error("Please answer the current question before saving.");
+      message.error("Please answer the current question before submitting.");
       return;
     }
     const transformedData = {

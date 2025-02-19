@@ -335,9 +335,9 @@ const GeneralIntakeForm = ({ onComplete }) => {
 
   return (
     <Row gutter={16} style={{ padding: "0 5%" }}>
-      <Col xs={24} sm={24} md={16} lg={24} xl={24}>
+      <Col xs={24} sm={24} md={24} lg={24} xl={24}>
         <FormWrapper name="FEMALE INTAKE QUESTIONNAIRE" />
-        <Progress percent={Math.round(progressPercentage)- percentProgressBar} strokeColor={progressColor} />
+        <Progress percent={Math.round(progressPercentage)- percentProgressBar} strokeColor={progressColor}  style={{ width: '100%' }}/>
         <h3 style={{ margin: "20px 0", color: "#F2AA93" }}>
           General Information
         </h3>

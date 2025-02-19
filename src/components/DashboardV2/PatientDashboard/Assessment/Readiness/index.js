@@ -382,7 +382,7 @@ const Readiness = ({ onComplete }) => {
 
   return (
     <Row gutter={16} style={{ padding: "0 5%" }}>
-      <Col xs={24} sm={24} md={16} lg={24} xl={24}>
+      <Col xs={24} sm={24} md={24} lg={24} xl={24}>
         <FormWrapper name="FEMALE INTAKE QUESTIONNAIRE" />
         <Progress
           percent={Math.round(progressPercentage)}

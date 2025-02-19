@@ -318,7 +318,7 @@ export const GetSideBar = () => {
           ) : (
             <Sider
               collapsible
-              breakpoint="lg"
+              breakpoint="xs"
               collapsedWidth={0}
               trigger={null}
               theme="light"
@@ -504,7 +504,6 @@ export const GetSideBar = () => {
           className="navbar-nav sidebar sidebar-light accordion"
           id="accordionSidebar"
         >
-          {/* Sidebar - Brand */}
           <NavLink
             className="sidebar-brand d-flex align-items-center justify-content-center"
             to="/"
@@ -516,7 +515,6 @@ export const GetSideBar = () => {
                   alt="logo"
                   style={{ width: "100%" }}
                 />
-                {/* My Fertility */}
               </NavLink>
             </div>
           </NavLink>
@@ -581,7 +579,6 @@ export const GetSideBar = () => {
           {/* Divider */}
           <hr className="sidebar-divider d-none d-md-block" />
 
-          {/* Sidebar Toggler (Sidebar) */}
           <div className="text-center d-none d-md-inline">
             <button
               className="rounded-circle border-0"

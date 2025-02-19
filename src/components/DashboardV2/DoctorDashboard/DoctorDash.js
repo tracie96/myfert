@@ -145,6 +145,8 @@ export default function DoctorDash() {
         dataIndex: "firstname",
         key: "firstname",
         sorter: true,
+        responsive: ["xs"]
+
       },
       {
         title: "Last Name",
@@ -168,7 +170,9 @@ export default function DoctorDash() {
           ) : (
             <FlagTwoTone fill="red" twoToneColor={"red"} style={{ color: "red" }} />
           ),
+        responsive: ["sm"]
       },
+
       {
         title: "Lab",
         dataIndex: "lab",
@@ -179,12 +183,15 @@ export default function DoctorDash() {
           ) : (
             <QuestionCircleOutlined style={{ color: "gray" }} />
           ),
+        responsive: ["sm"]
+
       },
       {
         title: "Group",
         dataIndex: "groups",
         key: "groups",
         render: () => <p> Individual Screen - M</p>,
+        responsive: ["sm"]
       },
       {
         title: "Clinician",
@@ -215,7 +222,7 @@ export default function DoctorDash() {
               checked={record.patientStat?.statLevel === 3 || record.patientStat?.statLevel === 4}
               onChange={(checked, e) => handleSwitchChange(checked, record, 3, e)}
               disabled={
-                record.patientStat?.statLevel !== 1  && record.patientStat?.statLevel !== 2
+                record.patientStat?.statLevel !== 1 && record.patientStat?.statLevel !== 2
               } />
 
           </div>
@@ -230,7 +237,7 @@ export default function DoctorDash() {
               checked={record.patientStat?.statLevel === 4}
               onChange={(checked, e) => handleSwitchChange(checked, record, 4, e)}
               disabled={
-               record.patientStat?.statLevel !== 3
+                record.patientStat?.statLevel !== 3
               } />
           </div>
         ),

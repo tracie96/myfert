@@ -115,7 +115,7 @@ export default function UserInfo() {
   };
   return (
     <Row gutter={16} justify="" style={{ padding: "0 5%" }}>
-      <Col xs={24} sm={24} md={20} lg={24} xl={24}>
+      <Col xs={24} sm={24} md={24} lg={24} xl={24}>
         <div style={{ padding: "2% 0" }}>
           <Card
             style={{

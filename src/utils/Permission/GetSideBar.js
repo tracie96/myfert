@@ -394,7 +394,7 @@ export const GetSideBar = () => {
           ) : (
             <Sider
               collapsible
-              breakpoint="lg"
+              breakpoint="xs"
               collapsedWidth={0}
               trigger={null}
               theme="light"
@@ -471,7 +471,7 @@ export const GetSideBar = () => {
         ) : (
           <Sider
             collapsible
-            breakpoint="lg"
+            breakpoint="xs"
             collapsedWidth={0}
             trigger={null}
             theme="light"

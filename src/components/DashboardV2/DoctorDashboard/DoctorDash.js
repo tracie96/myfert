@@ -41,7 +41,7 @@ export default function DoctorDash() {
     setLoading(true);
     const params = {
       page: 1,
-      size: 100,
+      size: 200,
       sortColumn: sortConfig.sortField,
       sortDirection: sortConfig.sortOrder,
     };
@@ -258,19 +258,24 @@ export default function DoctorDash() {
           columns={columns}
           dataSource={filteredData}
           loading={loading}
-          scroll={{ x: "max-content" }}
-          pagination={true}
-          onChange={handleTableChange}
-          rowKey="id"
-          onRow={(record) => ({
-            onClick: (e) => {
-              if (!e.target.closest(".ant-switch")) {
-                navigate(`/doctor/user/${record.id}`, {
-                  state: { user: record },
-                });
-              }
-            },
-          })}
+          // scroll={{ x: "max-content" }}
+          // pagination={false}
+          pagination={{
+            position: ['bottomRight'],
+            pageSize: 20,
+            total: data.length,
+          }}
+          // onChange={handleTableChange}
+          // rowKey="id"
+          // onRow={(record) => ({
+          //   onClick: (e) => {
+          //     if (!e.target.closest(".ant-switch")) {
+          //       navigate(`/doctor/user/${record.id}`, {
+          //         state: { user: record },
+          //       });
+          //     }
+          //   },
+          // })}
         />
       </Card>
     ),

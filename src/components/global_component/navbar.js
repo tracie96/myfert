@@ -74,26 +74,29 @@ function Navbar() {
                 )}
               </span>
             )}
+
           </div>
+
         </form>
-          {isMobile?<div className="input-group">
-            {userAuth && (
-              <span type="text" style={{ color: "#00ADEF", fontSize:'12px', margin:"0% 30%"}}>
-                {userAuth.obj.companyName ? (
-                  <>
-                    <b>{userAuth.obj.companyName}</b>
-                  </>
-                ) : (
-                  <>
-                    Welcome,{" "}
-                    <b>
-                      {userAuth.obj.firstName} {userAuth.obj.lastName}
-                    </b>
-                  </>
-                )}
-              </span>
-            )}
-          </div>:''}
+
+        {isMobile ? <div className="input-group">
+          {userAuth && (
+            <span type="text" style={{ color: "#00ADEF", fontSize: '12px', margin: "0% 30%" }}>
+              {userAuth.obj.companyName ? (
+                <>
+                  <b>{userAuth.obj.companyName}</b>
+                </>
+              ) : (
+                <>
+                  Welcome,{" "}
+                  <b>
+                    {userAuth.obj.firstName} {userAuth.obj.lastName}
+                  </b>
+                </>
+              )}
+            </span>
+          )}
+        </div> : ''}
         {/* Topbar Navbar */}
         <ul className="navbar-nav ml-auto">
           {/* Nav Item - Alerts */}
@@ -109,7 +112,7 @@ function Navbar() {
             >
               <i
                 className="fas fa-bell fa-fw"
-                // onClick={() => fetchNotificationsList()}
+              // onClick={() => fetchNotificationsList()}
               ></i>
 
               <span className="badge badge-danger badge-counter">

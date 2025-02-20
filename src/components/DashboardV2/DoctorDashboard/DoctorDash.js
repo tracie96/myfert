@@ -265,17 +265,18 @@ export default function DoctorDash() {
             pageSize: 20,
             total: data.length,
           }}
-          // onChange={handleTableChange}
-          // rowKey="id"
-          // onRow={(record) => ({
-          //   onClick: (e) => {
-          //     if (!e.target.closest(".ant-switch")) {
-          //       navigate(`/doctor/user/${record.id}`, {
-          //         state: { user: record },
-          //       });
-          //     }
-          //   },
-          // })}
+          onChange={handleTableChange}
+          rowKey="id"
+          onRow={(record) => ({
+            onClick: (e) => {
+              if (!e.target.closest(".ant-switch")) {
+                localStorage.setItem("patient", JSON.stringify(record));
+                navigate(`/doctor/user/${record.id}`, {
+                  state: { user: record },
+                });
+              }
+            },
+          })}
         />
       </Card>
     ),

@@ -114,7 +114,7 @@ const SecondPlan = () => {
                       flexWrap: "wrap",
                     }}
                   >
-                    <Col xs={18} sm={12} md={4}>
+                    <Col xs={24} sm={24} md={24}>
                       <p style={{ fontWeight: "bold" }}>Prerequisite:</p>
                       <p>Complete all the General Intake Forms (except Holistic Nutrition) - ASSESS section</p>
                       <p>Watch Fertility Coach Video - LEARN section</p>
@@ -128,18 +128,8 @@ const SecondPlan = () => {
                     </Col>
 
 
-                    <Col xs={4} sm={4} md={4} style={{ textAlign: "" }}>
-                      <Typography.Title
-                        level={3}
-                        style={{
-                          fontSize: "1.2rem",
-                          fontWeight: 600,
-                          color: "#000000",
-                          textAlign: "center"
-                        }}
-                      >
-                        $500
-                      </Typography.Title>
+                    <Col xs={24} sm={24} md={24} style={{display:'flex'}}>
+                     
                       <Button
                         type="primary"
                         onClick={() => handleClick(500)}
@@ -147,10 +137,24 @@ const SecondPlan = () => {
                           background: "#00ADEF",
                           borderColor: "#00000080",
                           border: "none",
+                          width:"70%",
+                          borderRadius: "10px",
                         }}
                       >
                         Select
                       </Button>
+                      <Typography.Title
+                        level={3}
+                        style={{
+                          fontSize: "1.2rem",
+                          fontWeight: 600,
+                          marginLeft: 10,
+                          color: "#000000",
+                          textAlign: "center"
+                        }}
+                      >
+                        $500
+                      </Typography.Title>
                     </Col>
                   </Row>
                 </>
@@ -163,17 +167,18 @@ const SecondPlan = () => {
                       flexWrap: "wrap",
                     }}
                   >
-                    <Col span={24} md={12}>
+                    <Col span={24} md={20}>
                       <Typography.Title
                         level={4}
-                        style={{ color: "#F2AA93", fontSize: "1.2rem" }}
+                        style={{ color: "#F2AA93", fontSize: "1.2rem",    
+                      }}
                       >
                         Fertility Coach Assessment (Incomplete)
                       </Typography.Title>
                     </Col>
                     <Col
                       span={24}
-                      md={12}
+                      md={4}
                       style={{ textAlign: isMobile ? "left" : "right" }}
                     >
                       <Typography.Title
@@ -181,7 +186,8 @@ const SecondPlan = () => {
                         style={{
                           color: "#B46DB8",
                           fontSize: "1.2rem",
-                          marginRight: isMobile ? 0 : 80,
+                          textAlign: "center",
+                          marginRight: isMobile ? 0 : 0,
                         }}
                       >
                         Price

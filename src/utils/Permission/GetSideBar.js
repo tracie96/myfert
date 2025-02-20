@@ -14,7 +14,8 @@ import {
   FileAddTwoTone,
   OrderedListOutlined,
   InfoCircleTwoTone,
-  ContactsTwoTone 
+  ContactsTwoTone, 
+  ExperimentTwoTone
 } from "@ant-design/icons";
 import { useMediaQuery } from "react-responsive";
 
@@ -64,6 +65,8 @@ export const GetSideBar = () => {
         return "2";
       case "/doctor/appointments":
         return "3";
+      case "/doctor/labs":
+        return "4";
       default:
         return "1";
     }
@@ -137,6 +140,11 @@ export const GetSideBar = () => {
       <Menu.Item key="3" icon={<OrderedListOutlined />}>
         <NavLink to="/doctor/appointments" style={{ textDecoration: "none" }}>
           <span>APPOINTMENTS</span>
+        </NavLink>
+      </Menu.Item>
+      <Menu.Item key="4" icon={<ExperimentTwoTone />}>
+        <NavLink to="/doctor/labs" style={{ textDecoration: "none" }}>
+          <span>LABS</span>
         </NavLink>
       </Menu.Item>
     </Menu>

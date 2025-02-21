@@ -10816,7 +10816,7 @@ a:focus {
   display: flex;
   bottom: 0;
   justify-content: space-between;
-  width: 60vw;
+  /* width: 60vw; */
 }
 @media (max-width: 780px) {
   .button_group {

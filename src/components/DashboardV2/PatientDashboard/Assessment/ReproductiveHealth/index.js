@@ -1709,7 +1709,7 @@ const ReproductiveHealth = ({ onComplete }) => {
 
     {/* Fixed Button Group */}
     <div
-    style={{ marginTop: isMobile ? '10%' : '1%' ,background:'#fff'}}
+    style={{ marginTop: isMobile ? '10%' : '1%' ,background:'#fff', padding:isMobile ? '25px':'1px'}}
           className="button_group"
         >
       {isMobile ? (

@@ -1,9 +1,52 @@
 import React from "react";
-import { Card, Typography, Button, Row, Col, List } from "antd";
+import { Card, Typography, Button, Row, Col, List, Table } from "antd";
 import { FilePdfOutlined } from "@ant-design/icons";
 import Lab from "../../../../assets/images/lab.png";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFilePdf } from "@fortawesome/free-solid-svg-icons";
 
 const { Title, Text, Link } = Typography;
+
+const LabResults = ({ lastUpdated, results }) => {
+    const columns = [
+        {
+            title: 'Name',
+            dataIndex: 'name',
+            key: 'name',
+            render: (text) => <span style={{ fontWeight: 500 }}>{text}</span>,
+        },
+        {
+            title: 'Date',
+            dataIndex: 'date',
+            key: 'date',
+        },
+        {
+            title: '',
+            dataIndex: 'file',
+            key: 'file',
+            render: file => (
+                <div className="file-container">
+                    <FontAwesomeIcon icon={faFilePdf} color="red" className="pdf-icon ml-4" style={{fontSize:"20px", marginRight:"4px"}} />
+                    <a href={file} target="_blank" rel="noopener noreferrer">LabResults.pdf</a>
+                </div>
+            )
+        }
+    ];
+
+    return (
+        <Card style={{ border: '1px solid #C2E6F8', borderRadius: 8 , marginTop:"10px"}}>
+            <p style={{ fontStyle: 'italic', marginBottom: 16 }}>Last updated: {lastUpdated}</p>
+            <Table
+                dataSource={results}
+                columns={columns}
+                pagination={false}
+                rowKey="id"
+                style={{ overflowX: 'auto' }}
+                rowClassName={() => 'lab-result-row'}
+            />
+        </Card>
+    );
+};
 
 const LabScreen = () => {
     const bloodworkData = [
@@ -22,8 +65,8 @@ const LabScreen = () => {
     return (
         <Row gutter={[16, 16]} style={{ padding: "20px" }}>
             {/* Left Panel */}
-            <Col xs={24} md={12}>
-                <Title level={4}>LABS</Title>
+            <Col xs={24} md={16}>
+                <Title level={4} style={{color:"#335CAD"}}>LABS</Title>
                 <Text>
                     Just a quick reminder to print out your lab requisition form before
                     your bloodwork appointment. Having it ready will streamline the
@@ -98,10 +141,16 @@ const LabScreen = () => {
                     </div>
 
                 </div>
+                <LabResults
+                    lastUpdated="April 1, 2024"
+                    results={[
+                        { id: 1, name: 'Day 3', date: 'February 1, 2024', file: { name: 'LabResults.pdf', url: '/path-to-file.pdf' } },
+                        { id: 2, name: 'Day 3', date: 'February 1, 2024', file: { name: 'LabResults.pdf', url: '/path-to-file.pdf' } },
+                    ]}
+                />
 
             </Col>
 
-            {/* Right Panel */}
             <Col xs={24} md={8}>
                 <img
                     src={Lab}

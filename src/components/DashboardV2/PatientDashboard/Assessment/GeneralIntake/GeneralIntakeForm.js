@@ -18,6 +18,7 @@ import "../assesment.css";
 import { useMediaQuery } from "react-responsive";
 import { submitGeneralInformation } from "../../../../redux/AssessmentController";
 import { backBtnTxt, exitBtnTxt, saveAndContinueBtn, submitBtn } from "../../../../../utils/constant";
+import CryptoJS from "crypto-js";
 
 const { Option } = Select;
 
@@ -90,6 +91,7 @@ const GeneralIntakeForm = ({ onComplete }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const isMobile = useMediaQuery({ maxWidth: 767 });
+  const SECRET_KEY = "default_secret_key";
 
   useEffect(() => {
     const savedIndex = parseInt(
@@ -183,10 +185,11 @@ const GeneralIntakeForm = ({ onComplete }) => {
       message.error("Please answer the current question before submitting.");
       return;
     }
+  
     const transformedData = {
       geneticBackground: answers["geneticBackground"] || "",
-      whereMedicalCare:answers["where_received_medical_care"] || "",
-      whenMedicalCare:answers["when_received_medical_care"] || "",
+      whereMedicalCare: answers["where_received_medical_care"] || "",
+      whenMedicalCare: answers["when_received_medical_care"] || "",
       whomMedicalCare: answers["whom_received_medical_care"] || "",
       emergencyContact: answers["emergency_contact"]?.contact || "",
       emergencyRelationship: answers["emergency_contact"]?.relationship || "",
@@ -195,23 +198,39 @@ const GeneralIntakeForm = ({ onComplete }) => {
       emergencyPhoneWork: answers["emergency_contact"]?.phoneWork || "",
       howDidHearAbout: answers["how_did_you_hear"] || "",
     };
+  
+    const encryptedData = CryptoJS.AES.encrypt(
+      JSON.stringify(transformedData),
+      SECRET_KEY
+    ).toString();
+  
     try {
       const response = await dispatch(
-        submitGeneralInformation(transformedData),
+        submitGeneralInformation({ payload: encryptedData }) 
       ).unwrap();
+  
       if (response.data.success) {
+        message.success("Data saved successfully.");
       } else {
         message.error("Failed to save data.");
       }
     } catch (error) {
       console.log(error);
+      message.error("An error occurred while submitting the data.");
     }
-
+  
     dispatch(completeCard("/questionnaire/1"));
-    localStorage.setItem("currentQuestionIndex", 0);
-    localStorage.setItem("answers", JSON.stringify(answers));
+    localStorage.setItem("currentQuestionIndex", "0");
+  
+    const encryptedAnswers = CryptoJS.AES.encrypt(
+      JSON.stringify(answers),
+      SECRET_KEY
+    ).toString();
+    localStorage.setItem("answers", encryptedAnswers);
+  
     navigate("/assessment");
   };
+  
   const label = (
     <span>
       <span style={{ color: "red" }}>* </span>
@@ -223,7 +242,7 @@ const GeneralIntakeForm = ({ onComplete }) => {
       case "text":
         return (
           <Input
-            style={{ width: "100%", maxWidth: "300px", borderColor: "#bcbcbc" }}
+            style={{ width: "100%", maxWidth: isMobile?"100%":"300px", borderColor: "#bcbcbc" }}
             name={question.name}
             className="input_questtionnaire"
             value={answers[question.name] || ""}

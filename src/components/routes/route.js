@@ -355,6 +355,7 @@ const getRouter = createBrowserRouter(
 
         <Route path="doctor/appointments" element={<AppointmentList />} />
         <Route path="doctor/labs" element={<LabsAndRequisitions />} />
+        <Route path="patient/labs" element={<LabScreen />} />
 
         <Route path="appointment" element={<PatientAppointment />} />
         <Route path="labs" element={<LabScreen />} />

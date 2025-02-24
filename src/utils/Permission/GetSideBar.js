@@ -14,8 +14,9 @@ import {
   FileAddTwoTone,
   OrderedListOutlined,
   InfoCircleTwoTone,
-  ContactsTwoTone, 
-  ExperimentTwoTone
+  ContactsTwoTone,
+  ExperimentTwoTone,
+  DiffTwoTone
 } from "@ant-design/icons";
 import { useMediaQuery } from "react-responsive";
 
@@ -46,9 +47,11 @@ export const GetSideBar = () => {
         return "10";
       case "/plans":
         return "7";
+      case "/pre-plan":
+        return "9";
       case "/second-plan":
         return "8";
-      case "/pre-plan":
+      case "/patient/labs":
         return "9";
       case "/calendar":
         return "6";
@@ -97,12 +100,17 @@ export const GetSideBar = () => {
       <Menu.Item key="5" icon={<MedicineBoxTwoTone />}>
         <span>MEDS</span>
       </Menu.Item>
+      <Menu.Item key="9" icon={< DiffTwoTone />}>
+        <NavLink to="/patient/labs" style={{ textDecoration: "none" }}>
+          <span>LABS</span>
+        </NavLink>
+      </Menu.Item>
       <Menu.Item key="6" icon={<CalendarTwoTone />}>
         <NavLink to="/patient/calendar" style={{ textDecoration: "none" }}>
           <span className="no-underline">CALENDAR</span>
         </NavLink>
       </Menu.Item>
-      <Menu.Item key="6" icon={<ContactsTwoTone style={{ fontSize: '16px'}} />}>
+      <Menu.Item key="6" icon={<ContactsTwoTone style={{ fontSize: '16px' }} />}>
         <NavLink to="/patient/appointment" style={{ textDecoration: "none" }}>
           <span className="no-underline">APPOINTMENT</span>
         </NavLink>

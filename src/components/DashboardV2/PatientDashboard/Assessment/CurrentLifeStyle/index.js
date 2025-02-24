@@ -1240,6 +1240,7 @@ const CurrentLifeStyle = ({ onComplete }) => {
                 type="primary"
                 className="submit-button"
                 onClick={handleSubmit}
+                style={{padding:'20px', height:'48px'}}
               >
                 Submit
               </Button>

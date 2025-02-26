@@ -480,6 +480,7 @@ const questions = [
     type: "number_with_radio",
     title: "Duration(put 0 if you do not experience it)",
     name: "menstrual_bleeding",
+    value: 0,
     subQuestions: [
         {
           type: "number_with_radio_sub",

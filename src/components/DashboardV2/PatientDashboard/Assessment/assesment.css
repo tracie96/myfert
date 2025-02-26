@@ -16,6 +16,7 @@
 .ant-select-dropdown{
 max-width: 150px !important;
 width: 150px !important;}
+
 .ant-btn-default:not(:disabled):not(.ant-btn-disabled):hover {
   background: none;
   border: 1px solid #01acee;

@@ -10,6 +10,8 @@
  * Copyright 2011-2021 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
+ @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
 :root {
   --blue: #4e73df;
   --indigo: #6610f2;
@@ -37,11 +39,8 @@
   --breakpoint-md: 768px;
   --breakpoint-lg: 992px;
   --breakpoint-xl: 1200px;
-  --font-family-sans-serif: "Nunito", -apple-system, BlinkMacSystemFont,
-    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji",
-    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas,
-    "Liberation Mono", "Courier New", monospace;
+  --font-family-sans-serif: "Montserrat"
+
 }
 
 *,
@@ -51,7 +50,7 @@
 }
 
 html {
-  font-family: sans-serif;
+  font-family: "Montserrat", serif;
   line-height: 1.15;
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
@@ -202,8 +201,8 @@ pre,
 code,
 kbd,
 samp {
-  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
-    "Courier New", monospace;
+  font-family: "Montserrat", serif;
+
   font-size: 1em;
 }
 
@@ -6233,9 +6232,7 @@ a.close.disabled {
   z-index: 1070;
   display: block;
   margin: 0;
-  font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
-    "Segoe UI Symbol", "Noto Color Emoji";
+  font-family: "Montserrat", serif;
   font-style: normal;
   font-weight: 400;
   line-height: 1.5;
@@ -6360,9 +6357,8 @@ a.close.disabled {
   z-index: 1060;
   display: block;
   max-width: 276px;
-  font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
-    "Segoe UI Symbol", "Noto Color Emoji";
+  font-family: "Montserrat", serif;
+
   font-style: normal;
   font-weight: 400;
   line-height: 1.5;
@@ -9892,8 +9888,8 @@ button.bg-dark:focus {
 }
 
 .text-monospace {
-  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
-    "Courier New", monospace !important;
+  font-family: "Montserrat", serif;
+
 }
 
 .text-justify {
@@ -10584,7 +10580,7 @@ a:focus {
   border: 0;
   font-weight: 900;
   content: "\f105";
-  font-family: "Font Awesome 5 Free";
+  font-family: "Montserrat", serif;
 }
 
 .sidebar .nav-item.dropdown.show .dropdown-toggle::after,
@@ -10866,7 +10862,7 @@ a:focus {
 .sidebar #sidebarToggle::after {
   font-weight: 900;
   content: "\f104";
-  font-family: "Font Awesome 5 Free";
+  font-family: "Montserrat", serif;
   margin-right: 0.1rem;
 }
 
@@ -10885,7 +10881,7 @@ a:focus {
 
 .sidebar.toggled #sidebarToggle::after {
   content: "\f105";
-  font-family: "Font Awesome 5 Free";
+  font-family: "Montserrat", serif;
   margin-left: 0.25rem;
 }
 
@@ -10999,7 +10995,7 @@ a:focus {
     border: 0;
     font-weight: 900;
     content: "\f107";
-    font-family: "Font Awesome 5 Free";
+    font-family: "Montserrat", serif;
   }
   .sidebar .nav-item .nav-link[data-toggle="collapse"].collapsed::after {
     content: "\f105";
@@ -11274,7 +11270,7 @@ a:focus {
   line-height: 51px;
   font-weight: 900;
   content: "\f107";
-  font-family: "Font Awesome 5 Free";
+  font-family: "Montserrat", serif;
   color: #d1d3e2;
 }
 

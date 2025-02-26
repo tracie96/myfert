@@ -25,6 +25,49 @@ export const patientList = createAsyncThunk(
   },
 );
 
+export const getPatientBloodWork = createAsyncThunk(
+  'doctor/getBloodWork',
+  async (patientId, { rejectWithValue, getState, dispatch }) => {
+    const user = getState()?.authentication?.userAuth;
+      try {
+          const response = await axios.get(`https://myfertilitydevapi.azurewebsites.net/api/Doctor/GetPatientBloodWork/${patientId}`, {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${user?.obj?.token}`,
+               },
+          });
+          return response.data;
+      } catch (error) {
+          return rejectWithValue(error.response?.data || error.message);
+      }
+  }
+);
+
+export const addPatientBloodWork = createAsyncThunk(
+  "doctor/addPatientBloodWork",
+  async ({ patientRef, bloodWork }, { rejectWithValue, getState, dispatch }) => {
+    console.log(patientRef,bloodWork)
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+    try {
+      const response = await axios.post(
+        `${baseUrl}Doctor/AddPatientBloodWork`,
+        { patientRef, bloodWork },
+        config
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(handleApiError(error?.response?.data, dispatch, user));
+    }
+  }
+);
+
+
 export const submitAvailability = createAsyncThunk(
   "availability/submitAvailability",
   async (availabilityData, { rejectWithValue, getState, dispatch }) => {
@@ -388,6 +431,7 @@ const doctorSlices = createSlice({
     serverErr: null,
     upcomingPatientAppointment: [],
     doctorAvailability: {},
+    bloodWork: [],
   },
   extraReducers: (builder) => {
     builder.addCase(patientList.pending, (state, action) => {
@@ -530,6 +574,18 @@ const doctorSlices = createSlice({
       state.loading = true;
       state.error = null;
     });
+    builder
+    .addCase(getPatientBloodWork.pending, (state) => {
+        state.status = 'loading';
+    })
+    .addCase(getPatientBloodWork.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.bloodWork = action.payload;
+    })
+    .addCase(getPatientBloodWork.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload;
+    });
 
     builder
       .addCase(getUpcomingAppointments.pending, (state) => {
@@ -545,6 +601,7 @@ const doctorSlices = createSlice({
         state.loading = false;
         state.appErr = action.payload || "Failed to fetch upcoming appointments";
       });
+
     builder.addCase(createMeeting.fulfilled, (state, action) => {
       state.loading = false;
       state.createMeetingData = action.payload; 

@@ -1,43 +1,53 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Card, Typography, Button, Row, Col, List, Table } from "antd";
 import { FilePdfOutlined } from "@ant-design/icons";
-import Lab from "../../../../assets/images/lab.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilePdf } from "@fortawesome/free-solid-svg-icons";
+import { useDispatch, useSelector } from "react-redux";
+import Lab from "../../../../assets/images/lab.png";
+import { getPatientBloodWork } from "../../../redux/patientSlice";
+import moment from 'moment';
 
 const { Title, Text, Link } = Typography;
 
-const LabResults = ({ lastUpdated, results }) => {
+const LabResults = () => {
+    const { bloodWork, lastUpdated } = useSelector((state) => state?.patient);
+
     const columns = [
         {
-            title: 'Name',
-            dataIndex: 'name',
-            key: 'name',
+            title: 'File Name',
+            dataIndex: 'filename',
+            key: 'filename',
             render: (text) => <span style={{ fontWeight: 500 }}>{text}</span>,
         },
         {
-            title: 'Date',
-            dataIndex: 'date',
-            key: 'date',
+            title: 'Title',
+            dataIndex: 'fileTitle',
+            key: 'fileTitle',
+        },
+        {
+            title: 'Created On',
+            dataIndex: 'createdOn',
+            key: 'createdOn',
+            render: (text) => new Date(text).toLocaleDateString(),
         },
         {
             title: '',
-            dataIndex: 'file',
-            key: 'file',
-            render: file => (
+            dataIndex: 'fileRef',
+            key: 'fileRef',
+            render: fileRef => (
                 <div className="file-container">
-                    <FontAwesomeIcon icon={faFilePdf} color="red" className="pdf-icon ml-4" style={{fontSize:"20px", marginRight:"4px"}} />
-                    <a href={file} target="_blank" rel="noopener noreferrer">LabResults.pdf</a>
+                    <FontAwesomeIcon icon={faFilePdf} color="red" className="pdf-icon ml-4" style={{ fontSize: "20px", marginRight: "4px" }} />
+                    <a href={`/api/file/${fileRef}`} target="_blank" rel="noopener noreferrer">Download</a>
                 </div>
             )
         }
     ];
-
     return (
-        <Card style={{ border: '1px solid #C2E6F8', borderRadius: 8 , marginTop:"10px"}}>
+        <Card style={{ border: '1px solid #C2E6F8', borderRadius: 8, marginTop: "10px" }}>
             <p style={{ fontStyle: 'italic', marginBottom: 16 }}>Last updated: {lastUpdated}</p>
             <Table
-                dataSource={results}
+                dataSource={bloodWork}
                 columns={columns}
                 pagination={false}
                 rowKey="id"
@@ -49,24 +59,20 @@ const LabResults = ({ lastUpdated, results }) => {
 };
 
 const LabScreen = () => {
-    const bloodworkData = [
-        {
-            title: "Day 3 Bloodwork",
-            fileName: "LabRequisition.pdf",
-            uploadedDate: "Feb 1, 2024",
-        },
-        {
-            title: "Peak + 7 Bloodwork",
-            fileName: "LabRequisition.pdf",
-            uploadedDate: "Feb 1, 2024",
-        },
-    ];
+    const dispatch = useDispatch();
+    const { bloodWork, lastUpdated, loading, error } = useSelector((state) => state.patient);
+  
+    useEffect(() => {
+        dispatch(getPatientBloodWork());
+    }, [dispatch]);
+
+    if (loading) return <Text>Loading...</Text>;
+    if (error) return <Text>Error: {error}</Text>;
 
     return (
         <Row gutter={[16, 16]} style={{ padding: "20px" }}>
-            {/* Left Panel */}
             <Col xs={24} md={16}>
-                <Title level={4} style={{color:"#335CAD"}}>LABS</Title>
+                <Title level={4} style={{ color: "#335CAD" }}>LABS</Title>
                 <Text>
                     Just a quick reminder to print out your lab requisition form before
                     your bloodwork appointment. Having it ready will streamline the
@@ -75,7 +81,6 @@ const LabScreen = () => {
                 <br />
                 <Text>Thanks!</Text>
                 <div style={{ borderRadius: 12 }}>
-                    {/* Section Header */}
                     <div
                         style={{
                             width: "100%",
@@ -113,42 +118,40 @@ const LabScreen = () => {
                         }}
                     >
                         <List
-                            dataSource={bloodworkData}
-                            renderItem={(item) => (
-                                <List.Item>
-                                    <List.Item.Meta
-                                        avatar={
-                                            <FilePdfOutlined style={{ fontSize: "24px", color: "#e74c3c" }} />
-                                        }
-                                        title={
-                                            <Link href="#" style={{ color: "#357EC7" }}>
-                                                {item.fileName}
+                            dataSource={bloodWork}
+                            renderItem={(file) => (
+                                <List.Item style={{ borderBottom: '1px solid #f0f0f0', padding: '12px 16px' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 15, width: '100%' }}>
+                                        <div style={{ width: '3px', height: '40px', backgroundColor: 'red' }}></div>
+
+                                        <div style={{ flex: 1 }}>
+                                            <Text style={{ fontWeight: 500 }}>{file.filename}</Text>
+                                            <br />
+                                        </div>
+
+                                        <div style={{ flex: 1 }}>
+                                            <Text style={{ fontWeight: 500 }}>
+                                                {file.createdOn ? moment(file.createdOn).format('MMMM DD, YYYY') : 'No date available'}
+                                            </Text>
+                                            <br />
+                                        </div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                            <FilePdfOutlined style={{ color: 'red', fontSize: 24 }} />
+                                            <Link href={file.url || '#'} target="_blank" style={{ color: '#1890ff' }}>
+                                                {file.filename || 'LabResults.pdf'}
                                             </Link>
-                                        }
-                                        description={
-                                            <>
-                                                <Text strong>{item.title}</Text>
-                                                <br />
-                                                <Text type="secondary">
-                                                    Uploaded on: {item.uploadedDate}
-                                                </Text>
-                                            </>
-                                        }
-                                    />
+                                        </div>
+                                    </div>
                                 </List.Item>
                             )}
                         />
                     </div>
-
                 </div>
-                <LabResults
-                    lastUpdated="April 1, 2024"
-                    results={[
-                        { id: 1, name: 'Day 3', date: 'February 1, 2024', file: { name: 'LabResults.pdf', url: '/path-to-file.pdf' } },
-                        { id: 2, name: 'Day 3', date: 'February 1, 2024', file: { name: 'LabResults.pdf', url: '/path-to-file.pdf' } },
-                    ]}
-                />
 
+                <LabResults
+                    lastUpdated={lastUpdated}
+                    results={bloodWork}
+                />
             </Col>
 
             <Col xs={24} md={8}>
@@ -164,7 +167,6 @@ const LabScreen = () => {
                         textAlign: "center",
                     }}
                 >
-
                     <Text>
                         To learn more about:
                         <br />

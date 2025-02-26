@@ -9,7 +9,7 @@ export default function Header() {
 
     return (
         <div>
-            {userAuth?.id && (
+            {userAuth?.userRef && (
                 <Row style={{ padding: "0 1%" }}>
                     <Col span={24}>
                         <Card

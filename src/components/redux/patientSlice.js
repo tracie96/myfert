@@ -73,6 +73,30 @@ export const getPatientStatus = createAsyncThunk(
   }
 );
 
+export const getPatientBloodWork = createAsyncThunk(
+  "patient/getPatientBloodWork",
+  async (_, { rejectWithValue, getState, dispatch }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        "accept": "text/plain",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+    try {
+      const response = await axios.get(
+        `${baseUrl}Patient/GetPatientBloodWork`,
+        config
+      );
+      console.log(response);
+      return response.data;
+    } catch (error) {
+      handleApiError(error?.response?.data, dispatch, user);
+      return rejectWithValue(error?.response?.data || "An error occurred");
+    }
+  }
+);
+
 export const getDoctorAvailableSlotsForAppointment = createAsyncThunk(
   "patient/getDoctorAvailableSlotsForAppointment",
   async (obj, { rejectWithValue, getState, dispatch }) => {
@@ -240,6 +264,8 @@ const patientSlices = createSlice({
     patientAppStatus: null,
     patientAppStatusCode: null,
     patientServerErr: null,
+    bloodWork: [],
+
   },
   extraReducers: (builder) => {
     builder.addCase(
@@ -355,6 +381,21 @@ const patientSlices = createSlice({
       state.patientAppStatusCode = undefined;
       state.patientServerErr = undefined;
     });
+
+    builder
+    .addCase(getPatientBloodWork.pending, (state) => {
+        state.status = 'loading';
+    })
+    .addCase(getPatientBloodWork.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.bloodWork = action.payload;
+    })
+    .addCase(getPatientBloodWork.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload;
+    });
+
+
     builder.addCase(getPreviewLinkList.fulfilled, (state, action) => {
       state.patientLoading = false;
       state.patientAppStatus = action?.payload?.status;

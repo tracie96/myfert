@@ -1,5 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
 .ant-table-tbody > tr > td {
   background-color: #fff;
+  font-family: "Montserrat", serif;
+
+}
+.ant-btn  {
+  font-family: "Montserrat", serif !important;
+
 }
 
 .ant-table-wrapper .ant-table-thead > tr > th {

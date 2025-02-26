@@ -4,21 +4,11 @@
  */
 @import 'variables';
 
-@font-face {
-  font-family: 'Font Awesome 5 Free';
-  font-style: normal;
-  font-weight: 900;
-  font-display: $fa-font-display;
-  src: url('#{$fa-font-path}/fa-solid-900.eot');
-  src: url('#{$fa-font-path}/fa-solid-900.eot?#iefix') format('embedded-opentype'),
-  url('#{$fa-font-path}/fa-solid-900.woff2') format('woff2'),
-  url('#{$fa-font-path}/fa-solid-900.woff') format('woff'),
-  url('#{$fa-font-path}/fa-solid-900.ttf') format('truetype'),
-  url('#{$fa-font-path}/fa-solid-900.svg#fontawesome') format('svg');
-}
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
 
 .fa,
 .fas {
-  font-family: 'Font Awesome 5 Free';
+  font-family: "Montserrat", serif;
   font-weight: 900;
 }

@@ -5,7 +5,6 @@ import Sidebar from "../global_component/sidebar";
 import Footer from "../global_component/footer";
 import { useSelector } from "react-redux";
 import MyNavbar from "../global_component/navbar";
-{console.log("333--", MyNavbar);}
 const RootLayout = () => {
   const userAuth = useSelector((state) => state?.authentication?.userAuth);
   if (!userAuth || Object.keys(userAuth)?.length === 0) {

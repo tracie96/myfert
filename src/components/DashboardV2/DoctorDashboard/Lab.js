@@ -50,7 +50,7 @@ const LabsAndRequisitions = () => {
         reader.onload = async () => {
             const base64String = reader.result.split(',')[1];
             const payload = {
-                patientRef: "202410J48ZMR4E",
+                patientRef: patient.userRef,
                 bloodWork: [{
                     base64: base64String,
                     filename: file.name,

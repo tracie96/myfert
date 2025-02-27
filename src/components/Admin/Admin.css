@@ -2,3 +2,39 @@
   color: rgb(51, 92, 173);
   margin-bottom: 2vh;
 }
+
+.p-search-headers {
+  margin-right: 7px;
+}
+
+.inbox-big-div {
+  height: 75vh;
+  border: 3px solid #C2E6F8; 
+  border-radius: 10px;
+}
+
+.inbox-content-div {
+  display: flex;
+  padding: 10px;
+}
+
+.inbox-bottom-border {
+  border-bottom: 3px solid #C2E6F8;
+}
+
+.inbox-list-item {
+  display: flex !important; 
+  flex-direction: column !important;
+  align-items: flex-start !important; 
+  border-block-end: 3px solid #C2E6F8 !important; 
+  padding: 10px !important;
+  overflow-wrap: anywhere;
+}
+
+.inbox-read-item {
+  background-color: #E2E8F0 
+}
+
+.inbox-selected-item {
+  background-color: #CEF2F4
+}

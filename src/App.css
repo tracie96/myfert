@@ -1932,10 +1932,10 @@ pre code {
   .table-responsive-sm > .table-bordered {
     border: 0;
   }
-
+/* 
   div .resBtnContent #content-wrapper {
     overflow-x: unset !important;
-  }
+  } */
 }
 
 @media (max-width: 767.98px) {

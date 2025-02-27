@@ -2,31 +2,31 @@ import React, { useEffect, useState, useCallback } from "react";
 import editIcon from "../../assets/images/edit_icon.png";
 import Spinner from "react-bootstrap/Spinner";
 import { useDispatch } from "react-redux";
-import { getUserProfile, updateProfile } from "../redux/AuthController"; // Updated import
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useMediaQuery } from "react-responsive";
-import { Avatar } from "antd";
+import { Avatar, Upload, message } from "antd";
 import { UserAddOutlined } from "@ant-design/icons";
 import ReactInputMask from "react-input-mask";
 import { Spin } from "antd";
+import { getUserProfile, updateProfile } from "../redux/AuthController";
 
 const UpdateProfile = () => {
   const dispatch = useDispatch();
   const [showSpinner, setShowSpinner] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [uploadedFileUrl, setUploadedFileUrl] = useState(null);
   const isMobile = useMediaQuery({ maxWidth: 767 });
 
   const validateUpdateProfile = Yup.object().shape({
     email: Yup.string(),
     phoneNumber: Yup.string().min(
       8,
-      "Phone Number must be at least 8 characters",
+      "Phone Number must be at least 8 characters"
     ),
     DOB: Yup.date().max(
       new Date(new Date().setFullYear(new Date().getFullYear() - 18)),
-      "You must be 18 years or older",
+      "You must be 18 years or older"
     ),
   });
 
@@ -39,7 +39,7 @@ const UpdateProfile = () => {
       phoneNumber: "",
       address: "",
       DOB: "",
-      profile: "",
+      picture: "", // Changed to store URL from Cloudinary
       availabilityFrom: "",
       availabilityTo: "",
       latitude: 53.520611,
@@ -49,7 +49,9 @@ const UpdateProfile = () => {
     onSubmit: async (values) => {
       try {
         setShowSpinner(true);
-        const action = dispatch(updateProfile(values));
+        // Include the Cloudinary URL in the values to be submitted
+        const updatedValues = { ...values, profile: uploadedFileUrl };
+        const action = dispatch(updateProfile(updatedValues));
         const resultAction = await action;
         console.log(resultAction);
       } catch (error) {
@@ -73,15 +75,17 @@ const UpdateProfile = () => {
     setLoading(true);
     try {
       const resultAction = await dispatch(getUserProfile());
-      console.log(resultAction, "resultAction");
-
       const response = resultAction.payload;
-      console.log(response, "res");
+
       setFieldValue("firstName", response.firstname || "");
       setFieldValue("lastName", response.lastName || "");
       setFieldValue("email", response.email || "");
       setFieldValue("address", response.address || "");
       setFieldValue("phoneNumber", response.phoneNumber || "");
+      setFieldValue("picture", response.picture || "");
+
+      // If there's an existing profile image URL, set it
+      setUploadedFileUrl(response.profile || null);
     } catch (error) {
       console.error(error);
     } finally {
@@ -89,16 +93,33 @@ const UpdateProfile = () => {
     }
   }, [dispatch, setFieldValue]);
 
-  const handleImageChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setSelectedImage(file);
-    }
-  };
-
   useEffect(() => {
     handleDispatch();
   }, [handleDispatch]);
+
+  const uploadProps = {
+    name: "file",
+    multiple: false,
+    action: "https://api.cloudinary.com/v1_1/tracysoft/upload",
+    data: {
+      upload_preset: "myfertility",
+    },
+    onChange(info) {
+      const { status } = info.file;
+
+      if (status === "done") {
+        const url = info.file.response.secure_url;
+        setUploadedFileUrl(url);
+        setFieldValue("picture", url);
+        message.success(`${info.file.name} file uploaded successfully!`);
+      } else if (status === "error") {
+        message.error(`${info.file.name} file upload failed.`);
+      }
+    },
+    onDrop(e) {
+      console.log("Dropped files", e.dataTransfer.files);
+    },
+  };
 
   if (loading) {
     return (
@@ -130,33 +151,39 @@ const UpdateProfile = () => {
         <div className="col-md-4">
           <div className="card-body">
             <div className="text-center mt-4">
-              {selectedImage ? (
+              {uploadedFileUrl ? (
                 <div>
                   <img
-                    src={URL.createObjectURL(selectedImage)}
+                    src={uploadedFileUrl}
                     className="rounded-circle"
                     width={200}
                     height={200}
-                    alt="Selected"
+                    alt="Uploaded"
                   />
                 </div>
               ) : (
                 <div>
-                  <Avatar
-                    shape="circle"
-                    size={200}
-                    icon={<UserAddOutlined />}
-                  />
+                  {values.picture && ( <Avatar
+                      shape="circle"
+                      size={200}
+                      icon={<img
+                        src={values.picture}
+                        alt="edit"
+                        style={{
+                          cursor: "pointer",
+                        }}
+                      />}
+                    />)}
+                  {!values.picture &&
+                    <Avatar
+                      shape="circle"
+                      size={200}
+                      icon={<UserAddOutlined />}
+                    />}
+
                 </div>
               )}
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                style={{ display: "none" }}
-                id="profileImage"
-              />
-              <label htmlFor="profileImage">
+              <Upload {...uploadProps} showUploadList={false}>
                 <img
                   src={editIcon}
                   alt="edit"
@@ -165,16 +192,16 @@ const UpdateProfile = () => {
                     top: isMobile ? "55%" : "55%",
                     left: "63%",
                     width: isMobile ? "15%" : "12%",
+                    cursor: "pointer",
                   }}
                 />
-              </label>
-              <div className="my-3 d-md-flex justify-content-md-center">
+              </Upload>
+              {values.picture ? ' ' : <div className="my-3 d-md-flex justify-content-md-center">
                 {values.firstName} {values.lastName}
-              </div>
+              </div>}
             </div>
           </div>
         </div>
-
         <div className="col-md-8">
           <div className="card-body">
             <form className="" method="put" onSubmit={handleSubmit}>

@@ -19,7 +19,7 @@ const RootLayout = () => {
     <>
       <div id="wrapper">
         <Sidebar />
-        <div class="resBtnContent">
+        {/* <div class="resBtnContent"> */}
         <div id="content-wrapper" className="d-flex flex-column">
           <div id="content" style={{ background: "#fff" }}>
             <MyNavbar />
@@ -36,7 +36,7 @@ const RootLayout = () => {
           <Footer />
         </div>
         </div>
-      </div>
+      {/* </div> */}
       {/* <Login /> */}
       {/* <Register /> */}
       {/* <ForgotPassword /> */}

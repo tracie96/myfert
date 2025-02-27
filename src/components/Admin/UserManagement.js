@@ -28,7 +28,7 @@ const UserManagement = () => {
         },
       }
       try {
-        const response = await axios(`${baseUrl}Admin/GetPatientList`, config);
+        const response = await axios(`${baseUrl}Admin/GetPatientList/0/100`, config);
         return response.data
       } catch(error) {
         handleApiError(error);

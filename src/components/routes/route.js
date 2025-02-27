@@ -348,6 +348,7 @@ const getRouter = createBrowserRouter(
         <Route path="pre-plan" element={<PrePlan />} />
         <Route path="second-plan" element={<SecondPlan />} />
         <Route path="settings" element={<SettingsPage />} />
+        {/* <Route path="inbox" element={<AdminInbox />} /> */}
 
         #endregion #region Appointment
         <Route path="patient/calendar" element={<PatientAppointment />} />

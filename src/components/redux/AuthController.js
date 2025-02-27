@@ -368,6 +368,7 @@ export const updateProfile = createAsyncThunk(
         Authorization: `Bearer ${user?.obj?.token}`,
       },
     };
+    console.log({users})
 
     try {
       const response = await axios.patch(
@@ -376,7 +377,6 @@ export const updateProfile = createAsyncThunk(
         config,
       );
       const responseBack = getResponse(response, dispatch, user);
-      console.log(response, responseBack);
 
       if (response?.data?.status) {
         const currentUserInfo =
@@ -390,7 +390,6 @@ export const updateProfile = createAsyncThunk(
         });
 
         localStorage.setItem("userInfo", JSON.stringify(updatedUserInfo));
-        console.log("Profile Update:", updatedUserInfo);
         message.success(response?.data?.message);
       }
       return responseBack;

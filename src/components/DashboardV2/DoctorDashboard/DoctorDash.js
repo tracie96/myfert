@@ -271,7 +271,7 @@ export default function DoctorDash() {
             onClick: (e) => {
               if (!e.target.closest(".ant-switch")) {
                 localStorage.setItem("patient", JSON.stringify(record));
-                navigate(`/doctor/user/${record.id}`, {
+                navigate(`/doctor/user/${record.userRef}`, {
                   state: { user: record },
                 });
               }

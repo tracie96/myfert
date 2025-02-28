@@ -775,6 +775,8 @@ const ReproductiveHealth = ({ onComplete }) => {
     // const question = questions[currentQuestionIndex];
     let updatedAnswers = { ...answers };
 
+    //Discharge: Menstrual Bleeding input error solve
+    updatedAnswers["menstrual_bleeding"] =  0;
     if (name === "relaxation_techniques") { 
       // Main question: Are you currently using birth control?
       if (value === "Yes") {
@@ -996,7 +998,7 @@ const ReproductiveHealth = ({ onComplete }) => {
     }
   };
   
-  
+ 
   const subQuestions_question = [
     { name: 'days light bleeding' },
     { name: 'days moderate bleeding' },

@@ -60,48 +60,48 @@ export default function UserInfo() {
       switch (visibleModal) {
         case 0:
           console.log("Dispatching getGeneralInformation");
-          dispatch(getGeneralInformation(userInfo?.user?.id));
+          dispatch(getGeneralInformation(userInfo?.user?.userRef));
           break;
         case 1:
           console.log("Dispatching getCurrentHealthLifestyle");
-          dispatch(getCurrentHealthLifestyle(userInfo?.user?.id));
+          dispatch(getCurrentHealthLifestyle(userInfo?.user?.userRef));
           break;
         case 2:
           console.log("Dispatching getNutritionAndDietaryHabits");
-          dispatch(getNutritionAndDietaryHabits(userInfo?.user?.id));
+          dispatch(getNutritionAndDietaryHabits(userInfo?.user?.userRef));
           break;
         case 3:
           console.log("Dispatching getSubstanceAbuse");
-          dispatch(getSubstanceAbuse(userInfo?.user?.id));
+          dispatch(getSubstanceAbuse(userInfo?.user?.userRef));
           break;
 
         case 4:
           console.log("Dispatching getSubstanceAbuse");
-          dispatch(getGetStress(userInfo?.user?.id));
+          dispatch(getGetStress(userInfo?.user?.userRef));
           break;
         case 5:
           console.log("Dispatching getSubstanceAbuse");
-          dispatch(getHealthandMedical(userInfo?.user?.id));
+          dispatch(getHealthandMedical(userInfo?.user?.userRef));
           break;
         case 6:
           console.log("Dispatching getSubstanceAbuse");
-          dispatch(getPersonalFamily(userInfo?.user?.id));
+          dispatch(getPersonalFamily(userInfo?.user?.userRef));
           break;
         case 7:
           console.log("Dispatching getSubstanceAbuse");
-          dispatch(getIllnessCondition(userInfo?.user?.id));
+          dispatch(getIllnessCondition(userInfo?.user?.userRef));
           break;
         case 8:
           console.log("Dispatching getSubstanceAbuse");
-          dispatch(getSymptomReview(userInfo?.user?.id));
+          dispatch(getSymptomReview(userInfo?.user?.userRef));
           break;
         case 9:
           console.log("Dispatching getSubstanceAbuse");
-          dispatch(getReadiness(userInfo?.user?.id));
+          dispatch(getReadiness(userInfo?.user?.userRef));
           break;
         case 10:
           console.log("Dispatching Reproductive");
-          dispatch(getReproductiveReview(userInfo?.user?.id));
+          dispatch(getReproductiveReview(userInfo?.user?.userRef));
           break;
         default:
           break;
@@ -1416,22 +1416,22 @@ function SwitchContent({
               <Descriptions column={1} bordered>
                 <Descriptions.Item label="Birth Control">
                   {
-                    (reproductiveInfo.birthControl === null || reproductiveInfo.birthControl === undefined) ? '' :
+                    (reproductiveInfo?.birthControl === null || reproductiveInfo?.birthControl === undefined) ? '' :
                       (
-                        (reproductiveInfo.birthControl ? 'Yes, ' : 'No') + '' +
+                        (reproductiveInfo?.birthControl ? 'Yes, ' : 'No') + '' +
                         (reproductiveInfo?.birthControl && reproductiveInfo?.hormonalBirthControl !== "N/A" ? reproductiveInfo?.hormonalBirthControl : ' ') + '' +
                         (reproductiveInfo?.birthControl && reproductiveInfo?.nonHormonalBirthControl !== "N/A" ? reproductiveInfo?.nonHormonalBirthControl : ' ')
                       )
                   }
                 </Descriptions.Item>
                 <Descriptions.Item label="Currently Pregnant">
-                  {reproductiveInfo?.currentlyPregnant === null || reproductiveInfo.currentlyPregnant === undefined ? 'N/A' : (reproductiveInfo.currentlyPregnant ? 'Yes' : 'No')}
+                  {reproductiveInfo?.currentlyPregnant === null || reproductiveInfo?.currentlyPregnant === undefined ? 'N/A' : (reproductiveInfo?.currentlyPregnant ? 'Yes' : 'No')}
                 </Descriptions.Item>
                 <Descriptions.Item label="Trying to conceive">
-                  {reproductiveInfo?.tryingToConceive === null || reproductiveInfo.tryingToConceive === undefined ? 'N/A' : (reproductiveInfo.tryingToConceive ? 'Yes' : 'No')}
+                  {reproductiveInfo?.tryingToConceive === null || reproductiveInfo?.tryingToConceive === undefined ? 'N/A' : (reproductiveInfo?.tryingToConceive ? 'Yes' : 'No')}
                 </Descriptions.Item>
                 <Descriptions.Item label="Difficulty Trying To Conceive">
-                  {reproductiveInfo?.difficultyTryingToConceive === null || reproductiveInfo.difficultyTryingToConceive === undefined ? 'N/A' : (reproductiveInfo.difficultyTryingToConceive ? 'Yes' : 'No')}
+                  {reproductiveInfo?.difficultyTryingToConceive === null || reproductiveInfo?.difficultyTryingToConceive === undefined ? 'N/A' : (reproductiveInfo?.difficultyTryingToConceive ? 'Yes' : 'No')}
                 </Descriptions.Item>
                 <Descriptions.Item label="Family Member With Reproductive Concerns">
                   {reproductiveInfo?.familyMemberWithReproductiveConcerns || "N/A"}
@@ -1461,7 +1461,7 @@ function SwitchContent({
                   {reproductiveInfo?.menstralBleedingPelvicPain?.colour || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Experience Pelvic Pain">
-                  {reproductiveInfo?.experiencePelvicPain === null || reproductiveInfo.experiencePelvicPain === undefined ? 'N/A' : (reproductiveInfo.experiencePelvicPain ? 'Yes' : 'No')}
+                  {reproductiveInfo?.experiencePelvicPain === null || reproductiveInfo?.experiencePelvicPain === undefined ? 'N/A' : (reproductiveInfo.experiencePelvicPain ? 'Yes' : 'No')}
                 </Descriptions.Item>
 
                 <>
@@ -1523,7 +1523,7 @@ function SwitchContent({
                   {reproductiveInfo?.duringCirclePelvicPain?.colour || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Do You Pms Symptoms">
-                  {reproductiveInfo?.doYouPmsSymptoms === null || reproductiveInfo.doYouPmsSymptoms === undefined ? 'N/A' : (reproductiveInfo.doYouPmsSymptoms ? 'Yes' : 'No')}
+                  {reproductiveInfo?.doYouPmsSymptoms === null || reproductiveInfo?.doYouPmsSymptoms === undefined ? 'N/A' : (reproductiveInfo.doYouPmsSymptoms ? 'Yes' : 'No')}
                 </Descriptions.Item>
                 <Descriptions.Item label="pms Symptoms">
                   {reproductiveInfo?.pmsSymptoms || "N/A"}

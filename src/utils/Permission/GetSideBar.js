@@ -72,6 +72,8 @@ export const GetSideBar = () => {
         return "3";
       case "/doctor/labs":
         return "4";
+      case "/doctor/meds":
+        return "5";
       default:
         return "1";
     }
@@ -169,6 +171,11 @@ export const GetSideBar = () => {
       <Menu.Item key="4" icon={<ExperimentTwoTone />}>
         <NavLink to="/doctor/labs" style={{ textDecoration: "none" }}>
           <span>LABS</span>
+        </NavLink>
+      </Menu.Item>
+      <Menu.Item key="5" icon={<ExperimentTwoTone />}>
+        <NavLink to="/doctor/meds" style={{ textDecoration: "none" }}>
+          <span>MEDS</span>
         </NavLink>
       </Menu.Item>
     </Menu>

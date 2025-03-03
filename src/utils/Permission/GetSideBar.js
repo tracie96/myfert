@@ -116,7 +116,9 @@ export const GetSideBar = () => {
       </Menu.Item>
 
       <Menu.Item key="5" icon={<MedicineBoxTwoTone />}>
+      <NavLink to="/patient/meds" style={{ textDecoration: "none" }}>
         <span>MEDS</span>
+        </NavLink>
       </Menu.Item>
       <Menu.Item key="9" icon={< DiffTwoTone />}>
         <NavLink to="/patient/labs" style={{ textDecoration: "none" }}>

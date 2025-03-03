@@ -1,17 +1,39 @@
 import React, { useEffect } from "react";
-import { Card, Typography, Button, Row, Col, List, Table } from "antd";
+import { Card, Typography, Button, Row, Col, List, Table, message } from "antd";
 import { FilePdfOutlined } from "@ant-design/icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilePdf } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch, useSelector } from "react-redux";
 import Lab from "../../../../assets/images/lab.png";
-import { getPatientBloodWork } from "../../../redux/patientSlice";
+import { downloadBloodWork, getPatientBloodWork } from "../../../redux/patientSlice";
 import moment from 'moment';
 
 const { Title, Text, Link } = Typography;
 
 const LabResults = () => {
+    const dispatch = useDispatch();  // FIXED: Added dispatch
+
     const { bloodWork, lastUpdated } = useSelector((state) => state?.patient);
+
+    const handleDownload = async (fileRef) => {
+        try {
+            const resultAction = await dispatch(downloadBloodWork(fileRef));
+            if (downloadBloodWork.fulfilled.match(resultAction)) {
+                const blob = new Blob([resultAction.payload], { type: "application/pdf" });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `${fileRef}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+            } else {
+                message.error("Failed to download file.");
+            }
+        } catch (error) {
+            message.error("Download error.");
+        }
+    };
 
     const columns = [
         {
@@ -35,14 +57,17 @@ const LabResults = () => {
             title: '',
             dataIndex: 'fileRef',
             key: 'fileRef',
-            render: fileRef => (
+            render: (fileRef) => (
                 <div className="file-container">
                     <FontAwesomeIcon icon={faFilePdf} color="red" className="pdf-icon ml-4" style={{ fontSize: "20px", marginRight: "4px" }} />
-                    <a href={`/api/file/${fileRef}`} target="_blank" rel="noopener noreferrer">Download</a>
+                    <Link onClick={() => handleDownload(fileRef)} style={{ color: "#1890ff", cursor: "pointer" }}>
+                        Download
+                    </Link>
                 </div>
             )
         }
     ];
+
     return (
         <Card style={{ border: '1px solid #C2E6F8', borderRadius: 8, marginTop: "10px" }}>
             <p style={{ fontStyle: 'italic', marginBottom: 16 }}>Last updated: {lastUpdated}</p>
@@ -57,14 +82,34 @@ const LabResults = () => {
         </Card>
     );
 };
-
+//i need download section as well here too
 const LabScreen = () => {
     const dispatch = useDispatch();
     const { bloodWork, lastUpdated, loading, error } = useSelector((state) => state.patient);
-  
+
     useEffect(() => {
         dispatch(getPatientBloodWork());
     }, [dispatch]);
+
+    const handleDownload = async (fileRef) => {
+        try {
+            const resultAction = await dispatch(downloadBloodWork(fileRef));
+            if (downloadBloodWork.fulfilled.match(resultAction)) {
+                const blob = new Blob([resultAction.payload], { type: "application/pdf" });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `${fileRef}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+            } else {
+                message.error("Failed to download file.");
+            }
+        } catch (error) {
+            message.error("Download error.");
+        }
+    };
 
     if (loading) return <Text>Loading...</Text>;
     if (error) return <Text>Error: {error}</Text>;
@@ -135,9 +180,10 @@ const LabScreen = () => {
                                             </Text>
                                             <br />
                                         </div>
+
                                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                             <FilePdfOutlined style={{ color: 'red', fontSize: 24 }} />
-                                            <Link href={file.url || '#'} target="_blank" style={{ color: '#1890ff' }}>
+                                            <Link onClick={() => handleDownload(file.fileRef)} style={{ color: "#1890ff", cursor: "pointer" }}>
                                                 {file.filename || 'LabResults.pdf'}
                                             </Link>
                                         </div>
@@ -145,6 +191,7 @@ const LabScreen = () => {
                                 </List.Item>
                             )}
                         />
+
                     </div>
                 </div>
 

@@ -178,7 +178,29 @@ export const addAppointment = createAsyncThunk(
     }
   },
 );
+export const downloadBloodWork = createAsyncThunk(
+  "patient/downloadBloodWork",
+  async (fileRef, { rejectWithValue, getState }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        Accept: "*/*",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+      responseType: "blob",
+    };
 
+    try {
+      const response = await axios.get(
+        `${baseUrl}Patient/DownloadBloodWork/${fileRef}`,
+        config
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Download failed");
+    }
+  }
+);
 export const updateAppointment = createAsyncThunk(
   "patient/updateAppointment",
   async (appointment, { rejectWithValue, getState, dispatch }) => {

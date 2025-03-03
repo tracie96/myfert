@@ -244,6 +244,7 @@ import LabScreen from "../DashboardV2/PatientDashboard/Lab";
 import PatientAppointmentList from "../DashboardV2/PatientDashboard/AppontmentList";
 import LabsAndRequisitions from "../DashboardV2/DoctorDashboard/Lab";
 import MedicationTable from "../DashboardV2/DoctorDashboard/Medications";
+import MedScreen from "../DashboardV2/PatientDashboard/Meds";
 
 //#endregion
 
@@ -361,6 +362,7 @@ const getRouter = createBrowserRouter(
 
         
         <Route path="patient/labs" element={<LabScreen />} />
+        <Route path="patient/meds" element={<MedScreen />} />
 
         <Route path="appointment" element={<PatientAppointment />} />
         <Route path="labs" element={<LabScreen />} />

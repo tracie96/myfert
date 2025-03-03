@@ -1376,6 +1376,8 @@ const PatientSignup = () => {
                                         name="PartnerDob"
                                       >
                                         <DatePicker
+                                         defaultPickerValue={dayjs(`${startYear}-01-01`)}
+
                                           format="DD-MM-YYYY"
                                           style={{
                                             width: "100%",

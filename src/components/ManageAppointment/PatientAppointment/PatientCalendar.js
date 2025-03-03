@@ -55,7 +55,7 @@ const PatientCalendar = ({ selectedProviders }) => {
   const [selectedRole, setSelectedRole] = useState("");
   const [doctorList, setAvailableDoctors] = useState(availableDoctors);
   const [newAppointmentList, setAppointmentList] = useState([]);
-  console.log({ newAppointmentList })
+  console.log({ newAppointmentList,doctorList });
   useEffect(() => {
     setAppointmentList(appointmentList);
   }, [appointmentList]);
@@ -395,7 +395,6 @@ const PatientCalendar = ({ selectedProviders }) => {
         initialView="dayGridMonth"
         events={apptEvents}
         datesSet={(dateInfo) => handleDateRangeChange(dateInfo)}
-
         eventClick={(selectInfo) => {
           const formattedDate = moment(selectInfo.event.startStr)
             .local()
@@ -406,11 +405,8 @@ const PatientCalendar = ({ selectedProviders }) => {
             const filteredClinicians = availableDoctors.filter(
               (clinician) => clinician.roleName === selectedRole
             );
-        
             setSelectedRole(selectedRole);
             setAvailableDoctors(filteredClinicians); 
-
-
           addCalendarAppointment.resetForm();
           showDrawer();
           setSelectedDate(formattedDate);
@@ -530,7 +526,7 @@ const PatientCalendar = ({ selectedProviders }) => {
             care.
           </p>
           <div style={{ margin: "50px 0" }}>
-            {doctorList?.map((clinician, index) => (
+            {availableDoctors?.map((clinician, index) => (
               <Row
                 key={index}
                 align="middle"

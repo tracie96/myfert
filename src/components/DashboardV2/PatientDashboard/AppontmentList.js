@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Row, Col, Tabs, Button, Table, Card, Input } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import {  getUpcomingAppointments} from "../../redux/doctorSlice";
+import {  getUpcomingAppointments} from "../../redux/patientSlice";
 
 export default function PatientAppointmentList() {
   const dispatch = useDispatch();

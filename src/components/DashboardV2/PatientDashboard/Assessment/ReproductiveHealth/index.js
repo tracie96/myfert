@@ -1038,7 +1038,7 @@ const ReproductiveHealth = ({ onComplete }) => {
                   {subQuestion.name === "intercourse_during_fertile_sub"?<span style={{ fontWeight: "600", color:"#303030"}}>Every&nbsp;</span>:""}
                     <InputNumber
                       max={(subQuestion.name === "shortest_cycle_radio"|| subQuestion.name === "average_cycle_radio") ? answers.longest_cycle_radio : undefined}
-                      min={subQuestion.name === "average_cycle_radio" ? answers.shortest_cycle_radio : undefined}
+                      min={subQuestion.name === "average_cycle_radio" ? answers.shortest_cycle_radio : 0}
                       name={`${subQuestion.name}_menstrual_bleeding`}
                       value={answers[subQuestion.name] || undefined}
                       onChange={(value) => handleChange(value, subQuestion.name)}
@@ -1344,38 +1344,52 @@ const ReproductiveHealth = ({ onComplete }) => {
         );
         case "info_spotting":
         return (
-          <div className="info-box">
-            <div className="info-header">
-              <InfoCircleOutlined className="info-icon" />
+ 
+          <div className="info-box info-form-message">
+            <div className="info-header info-header-message">
               <Title
                 level={5}
                 className="info-title"
                 style={{ color: "#335CAD" }}
               >
-                Pre-Period Spotting: 
+                ℹ️  Pre-Period Spotting:
               </Title>
+              <Paragraph>
+                This spotting happens just before menstrual bleeding begins.
+                It is light and often serves as an early indicator that the period is about to start.
+                It usually transitions into the regular menstrual flow shortly afterward.
+              </Paragraph>
             </div>
             
+           
+            <div className="info-header info-header-message">
+            <Title
+                level={5}
+                className="info-title"
+                style={{ color: "#335CAD" }}
+              >
+                ℹ️  After Period Spotting:
+              </Title>
             <Paragraph>
-            Pre-Period Spotting: 
-
-            This spotting happens just before menstrual bleeding begins. 
-            It is light and often serves as an early indicator that the period is about to start. 
-            It usually transitions into the regular menstrual flow shortly afterward.
-            </Paragraph>
-            <Paragraph>
-            After Period Spotting:
-
+ 
             This may occur at the tail end of menstrual bleeding as the flow tapers off into lighter spotting.
             </Paragraph>
+          </div>
+          <div className="info-header info-header-message">
+            <Title
+                level={5}
+                className="info-title"
+                style={{ color: "#335CAD" }}
+              >
+                ℹ️  Bleeding:
+              </Title>
             <Paragraph>
-            ℹ️  Bleeding
-
-              Light: Tampons/Pads typically need to be changed every 7-8 hours. Menstrual cups can be worn for up to 12 hours.
-              Moderate: Tampons/Pads generally need to be changed every 5-6 hours. Menstrual cups can be left in place for 8-12 hours, depending on the flow.
-              Heavy: Tampons/Pads generally need to be changed every 3-4 hours. Menstrual cups can be left in place for up to 4-6 hours, depending on the flow.
-              Very Heavy: Tampons/Pads often need to be changed every 1-2 hours. Heavy bleeding is defined as soaking through one or more pads or tampons every 1-2 hours. Menstrual cups may need to be emptied more frequently, every 4 hours or more frequently, depending on the volume and heaviness of the flow.
+              <div class="info-bleed-head"><span class="info-bleed">Light: </span>Tampons/Pads typically need to be changed every 7-8 hours. Menstrual cups can be worn for up to 12 hours.</div>
+              <div class="info-bleed-head"><span class="info-bleed">Moderate: </span>Tampons/Pads generally need to be changed every 5-6 hours. Menstrual cups can be left in place for 8-12 hours, depending on the flow.</div>
+              <div class="info-bleed-head"><span class="info-bleed">Heavy:</span>Tampons/Pads generally need to be changed every 3-4 hours. Menstrual cups can be left in place for up to 4-6 hours, depending on the flow.</div>
+              <div class="info-bleed-head"><span class="info-bleed">Very Heavy: </span>Tampons/Pads often need to be changed every 1-2 hours. Heavy bleeding is defined as soaking through one or more pads or tampons every 1-2 hours. Menstrual cups may need to be emptied more frequently, every 4 hours or more frequently, depending on the volume and heaviness of the flow.</div>
             </Paragraph>
+            </div>
           </div>
         );
       case "radiowithselect":

@@ -388,6 +388,9 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
 
   const validateQuestion = () => {
     const question = questions[currentQuestionIndex];
+    if (question.question === "(Check if applicable)") {
+      return true;
+    }
   
     switch (question.type) {
       case "checkbox_with_select":
@@ -500,7 +503,9 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
     const apiPayload = {
       obstetricHistory: obstetricCategories.map((category) => ({
         name: category,
-        level: answers[category.toLowerCase().replace(/\s+/g, "_")] || 0, 
+        level: Number.isInteger(answers[category.toLowerCase().replace(/\s+/g, "_")])
+          ? answers[category.toLowerCase().replace(/\s+/g, "_")]
+          : null,
       })),
 
         weightChild: {
@@ -1104,7 +1109,9 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
   };
   const label = (
     <span>
-      <span style={{ color: "red" }}>* </span>
+      {
+        questions[currentQuestionIndex].name !== "symptomatic_problems_menopause_other"? <span style={{ color: "red" }}>* </span>: undefined
+      }
     </span>
   );
 

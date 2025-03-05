@@ -3,6 +3,8 @@ import { Col, Collapse, Row } from "antd";
 import "./learn.css";
 import { useMediaQuery } from "react-responsive";
 import learnImage from "../../../../assets/images/learn.png";
+import newImage from "../../../../assets/images/new.png";
+
 import { Button, Typography, List } from "antd";
 const { Title, Text } = Typography;
 
@@ -21,7 +23,7 @@ const LearnInfo = () => {
     <div className="cycle-tracking-container">
       <Row
         gutter={[16, 16]} // Adds spacing between columns
-        style={{ alignItems: "center", background: "#EFD0BD80", padding: 20 }}
+        style={{ alignItems: "center", background: "#EFD0BD80", padding: 20, display:'none' }}
       >
         <Col xs={24} md={8}>
           <div className="video-frame">
@@ -71,32 +73,43 @@ const LearnInfo = () => {
           </Col>
         )}
       </Row>
-//here
-      <div style={{textAlign: "left", marginTop:'5%' }}>
-      <Title level={4}>SUMMARY</Title>
-      <List
-        dataSource={summaryPoints}
-        renderItem={(item) => (
-          <List.Item style={{ padding: "4px 0", border: "none" }}>
-            <Text>- {item}</Text>
-          </List.Item>
-        )}
+      <img
+        src={newImage}
+        alt="Learn"
+        style={{
+          width: "90%",
+          height: "auto",
+          borderRadius: "10px",
+          // position: "absolute",
+          top: "-100px",
+        }}
       />
-      <div style={{ marginTop: "20px" }}>
-        <Button
-          type="primary"
-          size="large"
-          style={{
-            backgroundColor: "#DAA520", 
-            borderColor: "#DAA520",
-            color: "white",
-            boxShadow: "0 4px 6px rgba(0,0,0,0.2)",
-          }}
-        >
-          Take Quiz!
-        </Button>
+
+      <div style={{ textAlign: "left", marginTop: '5%' , display:'none'}}>
+        <Title level={4}>SUMMARY</Title>
+        <List
+          dataSource={summaryPoints}
+          renderItem={(item) => (
+            <List.Item style={{ padding: "4px 0", border: "none" }}>
+              <Text>- {item}</Text>
+            </List.Item>
+          )}
+        />
+        <div style={{ marginTop: "20px" }}>
+          <Button
+            type="primary"
+            size="large"
+            style={{
+              backgroundColor: "#DAA520",
+              borderColor: "#DAA520",
+              color: "white",
+              boxShadow: "0 4px 6px rgba(0,0,0,0.2)",
+            }}
+          >
+            Take Quiz!
+          </Button>
+        </div>
       </div>
-    </div>
 
       <div style={{ position: "relative", marginTop: "50px" }}>
         <Row
@@ -145,9 +158,9 @@ const LearnInfo = () => {
               background: "#335CADCC",
               padding: "16px",
               color: "#fff",
-              borderTopRightRadius:"10px",
-              borderBottomRightRadius:"10px",
-              borderBottomLeftRadius:"50px"
+              borderTopRightRadius: "10px",
+              borderBottomRightRadius: "10px",
+              borderBottomLeftRadius: "50px"
             }}
           >
             <p style={{ fontWeight: "bold" }}>Day 3 Bloodwork</p>
@@ -169,9 +182,9 @@ const LearnInfo = () => {
               padding: "16px",
               color: "#fff",
               marginTop: isMobile ? 10 : 0,
-              borderTopRightRadius:"50px",
-              borderBottomLeftRadius:"10px",
-              borderTopLeftRadius:"10px"
+              borderTopRightRadius: "50px",
+              borderBottomLeftRadius: "10px",
+              borderTopLeftRadius: "10px"
             }}
           >
             <p style={{ fontWeight: "bold" }}>Peak +7 Bloodwork</p>

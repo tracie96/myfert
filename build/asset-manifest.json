@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.0e01a494.css",
-    "main.js": "/static/js/main.6301f5ac.js",
+    "main.css": "/static/css/main.c2ff82bf.css",
+    "main.js": "/static/js/main.e1877952.js",
     "static/js/787.28637dfb.chunk.js": "/static/js/787.28637dfb.chunk.js",
     "static/media/learn.png": "/static/media/learn.4b147d39002e13a19010.png",
     "static/media/pharmacist_clinician.jpeg": "/static/media/pharmacist_clinician.fba42df8bf00c9e71db3.jpeg",
@@ -13,7 +13,6 @@
     "static/media/forgotPassword.svg": "/static/media/forgotPassword.97507445564c3aeefbb5827e0a19f238.svg",
     "static/media/patients.png": "/static/media/patients.907d8aff953df9c361f2.png",
     "static/media/bootstrap-icons.woff?": "/static/media/bootstrap-icons.66b7720f4a230f1b0341.woff",
-    "static/media/usersIcon.png": "/static/media/usersIcon.03201b7b11d732412db1.png",
     "static/media/lab.png": "/static/media/lab.0675ed1f9f7aa263f959.png",
     "static/media/jane.svg": "/static/media/jane.7d7b8ee466d2c8c77fa99a2bdbc72dbe.svg",
     "static/media/clinicians.png": "/static/media/clinicians.6b731f3fc2fc4c8348d2.png",
@@ -26,17 +25,19 @@
     "static/media/crossImage.png": "/static/media/crossImage.104333be04f61604ce2e.png",
     "static/media/tickImage.png": "/static/media/tickImage.4798a7bc5cf35affdcd3.png",
     "static/media/ifm.svg": "/static/media/ifm.6222016a2520592a6d478b12ece1b49f.svg",
+    "static/media/meds.svg": "/static/media/meds.e3b7f1b4c59b894f4fb9241a945703d9.svg",
     "static/media/user1.jpg": "/static/media/user1.f3714f3391c9a5903799.jpg",
     "static/media/subscription_home-logo.png": "/static/media/subscription_home-logo.8c4d7c8360f10ff9f1fc.png",
     "static/media/edit_icon.png": "/static/media/edit_icon.75b0fd055492784d81e7.png",
+    "static/media/capsule.png": "/static/media/capsule.f5bcfe66aab44334d25f.png",
     "static/media/mirabutton.svg": "/static/media/mirabutton.8c4bb1d4eb9d220526aaa72f0a3946ac.svg",
     "index.html": "/index.html",
-    "main.0e01a494.css.map": "/static/css/main.0e01a494.css.map",
-    "main.6301f5ac.js.map": "/static/js/main.6301f5ac.js.map",
+    "main.c2ff82bf.css.map": "/static/css/main.c2ff82bf.css.map",
+    "main.e1877952.js.map": "/static/js/main.e1877952.js.map",
     "787.28637dfb.chunk.js.map": "/static/js/787.28637dfb.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.0e01a494.css",
-    "static/js/main.6301f5ac.js"
+    "static/css/main.c2ff82bf.css",
+    "static/js/main.e1877952.js"
   ]
 }

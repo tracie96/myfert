@@ -54,7 +54,6 @@ const LearnInfo = () => {
             </p>
           </div>
         </Col>
-
         {!isMobile && (
           <Col xs={24} md={8}>
             <img
@@ -72,7 +71,7 @@ const LearnInfo = () => {
           </Col>
         )}
       </Row>
-
+//here
       <div style={{textAlign: "left", marginTop:'5%' }}>
       <Title level={4}>SUMMARY</Title>
       <List

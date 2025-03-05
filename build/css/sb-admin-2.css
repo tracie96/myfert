@@ -10,8 +10,6 @@
  * Copyright 2011-2021 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
- @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
-
 :root {
   --blue: #4e73df;
   --indigo: #6610f2;
@@ -50,7 +48,7 @@
 }
 
 html {
-  font-family: "Montserrat", serif;
+  font-family: sans-serif;
   line-height: 1.15;
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
@@ -201,8 +199,8 @@ pre,
 code,
 kbd,
 samp {
-  font-family: "Montserrat", serif;
-
+  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
   font-size: 1em;
 }
 
@@ -6232,7 +6230,9 @@ a.close.disabled {
   z-index: 1070;
   display: block;
   margin: 0;
-  font-family: "Montserrat", serif;
+  font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", "Noto Color Emoji";
   font-style: normal;
   font-weight: 400;
   line-height: 1.5;
@@ -6357,8 +6357,9 @@ a.close.disabled {
   z-index: 1060;
   display: block;
   max-width: 276px;
-  font-family: "Montserrat", serif;
-
+  font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", "Noto Color Emoji";
   font-style: normal;
   font-weight: 400;
   line-height: 1.5;
@@ -9888,8 +9889,8 @@ button.bg-dark:focus {
 }
 
 .text-monospace {
-  font-family: "Montserrat", serif;
-
+  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace !important;
 }
 
 .text-justify {
@@ -10580,7 +10581,7 @@ a:focus {
   border: 0;
   font-weight: 900;
   content: "\f105";
-  font-family: "Montserrat", serif;
+  font-family: "Font Awesome 5 Free";
 }
 
 .sidebar .nav-item.dropdown.show .dropdown-toggle::after,
@@ -10862,7 +10863,7 @@ a:focus {
 .sidebar #sidebarToggle::after {
   font-weight: 900;
   content: "\f104";
-  font-family: "Montserrat", serif;
+  font-family: "Font Awesome 5 Free";
   margin-right: 0.1rem;
 }
 
@@ -10881,7 +10882,7 @@ a:focus {
 
 .sidebar.toggled #sidebarToggle::after {
   content: "\f105";
-  font-family: "Montserrat", serif;
+  font-family: "Font Awesome 5 Free";
   margin-left: 0.25rem;
 }
 
@@ -10995,7 +10996,7 @@ a:focus {
     border: 0;
     font-weight: 900;
     content: "\f107";
-    font-family: "Montserrat", serif;
+    font-family: "Font Awesome 5 Free";
   }
   .sidebar .nav-item .nav-link[data-toggle="collapse"].collapsed::after {
     content: "\f105";
@@ -11270,7 +11271,7 @@ a:focus {
   line-height: 51px;
   font-weight: 900;
   content: "\f107";
-  font-family: "Montserrat", serif;
+  font-family: "Font Awesome 5 Free";
   color: #d1d3e2;
 }
 

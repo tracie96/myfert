@@ -31,24 +31,24 @@ export const getPatientBloodWork = createAsyncThunk(
   'doctor/getBloodWork',
   async (patientId, { rejectWithValue, getState, dispatch }) => {
     const user = getState()?.authentication?.userAuth;
-      try {
-          const response = await axios.get(`https://myfertilitydevapi.azurewebsites.net/api/Doctor/GetPatientBloodWork/${patientId}`, {
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${user?.obj?.token}`,
-               },
-          });
-          return response.data;
-      } catch (error) {
-          return rejectWithValue(error.response?.data || error.message);
-      }
+    try {
+      const response = await axios.get(`https://myfertilitydevapi.azurewebsites.net/api/Doctor/GetPatientBloodWork/${patientId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user?.obj?.token}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
   }
 );
 
 export const addPatientBloodWork = createAsyncThunk(
   "doctor/addPatientBloodWork",
   async ({ patientRef, bloodWork }, { rejectWithValue, getState, dispatch }) => {
-    console.log(patientRef,bloodWork)
+    console.log(patientRef, bloodWork)
     const user = getState()?.authentication?.userAuth;
     const config = {
       headers: {
@@ -60,6 +60,48 @@ export const addPatientBloodWork = createAsyncThunk(
       const response = await axios.post(
         `${baseUrl}Doctor/AddPatientBloodWork`,
         { patientRef, bloodWork },
+        config
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(handleApiError(error?.response?.data, dispatch, user));
+    }
+  }
+);
+export const getPatientMed = createAsyncThunk(
+  'doctor/getPatientMed',
+  async (patientId, { rejectWithValue, getState, dispatch }) => {
+    const user = getState()?.authentication?.userAuth;
+    try {
+      const response = await axios.get(`https://myfertilitydevapi.azurewebsites.net/api/Doctor/GetPatientMed/${patientId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user?.obj?.token}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+export const addPatientMed = createAsyncThunk(
+  "doctor/addPatientMed",
+  async ({ drugName, dose, amount, route, frequency, patientRef }, { rejectWithValue, getState, dispatch }) => {
+    console.log(drugName, dose, amount, route, frequency, patientRef);
+
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+
+    try {
+      const response = await axios.post(
+        `${baseUrl}Doctor/AddPatientMed`,
+        { drugName, dose, amount, route, frequency, patientRef },
         config
       );
       return response.data;
@@ -145,7 +187,7 @@ export const getZohoClientID = createAsyncThunk(
   "doctor/getZohoClientID",
   async (_, { rejectWithValue, getState }) => {
     const user = getState()?.authentication?.userAuth;
-    
+
     const config = {
       headers: {
         Accept: "text/plain",
@@ -171,19 +213,19 @@ export const acceptAppointment = createAsyncThunk(
 
     const config = {
       headers: {
-        Accept: "text/plain", 
+        Accept: "text/plain",
         Authorization: `Bearer ${user?.obj?.token}`,
       },
     };
 
     try {
       const response = await axios.get(
-        `${baseUrl}Doctor/AcceptAppointment/${appointmentId}/${status}`, 
+        `${baseUrl}Doctor/AcceptAppointment/${appointmentId}/${status}`,
         config
       );
       return response.data; // Return the response data to be used by reducers
     } catch (error) {
-      
+
       return rejectWithValue(error?.response?.data);
     }
   }
@@ -302,7 +344,7 @@ export const setPatientAppointment = createAsyncThunk(
 
 export const codeGrantAuth = createAsyncThunk(
   "user/codeGrantAuth",
-  async ( {appointmentId,code}, { rejectWithValue, getState, dispatch }) => {
+  async ({ appointmentId, code }, { rejectWithValue, getState, dispatch }) => {
     const users = getState()?.authentication?.userAuth;
     const config = {
       headers: {
@@ -323,7 +365,7 @@ export const codeGrantAuth = createAsyncThunk(
 
 export const createMeeting = createAsyncThunk(
   "user/createMeeting",
-  async ( {appointmentId,code}, { rejectWithValue, getState, dispatch }) => {
+  async ({ appointmentId, code }, { rejectWithValue, getState, dispatch }) => {
     const users = getState()?.authentication?.userAuth;
     const appointmentIdNumber = Number(appointmentId);
     const config = {
@@ -343,8 +385,8 @@ export const createMeeting = createAsyncThunk(
 
       //  // Reconstruct the full URL with the updated location
       //  const updatedCode = locationUrl.toString();
- 
-      const response = await axios.post(url, {appointmentId: appointmentIdNumber, url:code}, config);
+
+      const response = await axios.post(url, { appointmentId: appointmentIdNumber, url: code }, config);
       const responseBack = getResponse(response, dispatch, users);
       return responseBack;
     } catch (error) {
@@ -379,11 +421,11 @@ export const cancelPatientAppointment = createAsyncThunk(
 export const getUpcomingAppointments = createAsyncThunk(
   "doctor/getUpcomingAppointments",
   async (_, { rejectWithValue, getState }) => {
-    const user = getState()?.authentication?.userAuth; 
+    const user = getState()?.authentication?.userAuth;
     const config = {
       headers: {
         Accept: "text/plain",
-        Authorization: `Bearer ${user?.obj?.token}`, 
+        Authorization: `Bearer ${user?.obj?.token}`,
       },
     };
 
@@ -392,9 +434,9 @@ export const getUpcomingAppointments = createAsyncThunk(
         `${baseUrl}Doctor/GetUpComingAppointment`,
         config
       );
-      return response.data; 
+      return response.data;
     } catch (error) {
-      return rejectWithValue(error?.response?.data); 
+      return rejectWithValue(error?.response?.data);
     }
   }
 );
@@ -402,11 +444,11 @@ export const getUpcomingAppointments = createAsyncThunk(
 export const cancelAppointment = createAsyncThunk(
   "doctor/cancelAppointment",
   async (appointmentId, { rejectWithValue, getState }) => {
-    const user = getState()?.authentication?.userAuth; 
+    const user = getState()?.authentication?.userAuth;
     const config = {
       headers: {
         Accept: "text/plain",
-        Authorization: `Bearer ${user?.obj?.token}`, 
+        Authorization: `Bearer ${user?.obj?.token}`,
       },
     };
 
@@ -415,9 +457,9 @@ export const cancelAppointment = createAsyncThunk(
         `${baseUrl}Doctor/CancelAppointment/${appointmentId}`,
         config
       );
-      return response.data; 
+      return response.data;
     } catch (error) {
-      return rejectWithValue(error?.response?.data); 
+      return rejectWithValue(error?.response?.data);
     }
   }
 );
@@ -434,6 +476,10 @@ const doctorSlices = createSlice({
     upcomingPatientAppointment: [],
     doctorAvailability: {},
     bloodWork: [],
+    medStatus: null,
+    medError: null,
+    medications:[]
+
   },
   extraReducers: (builder) => {
     builder.addCase(patientList.pending, (state, action) => {
@@ -565,12 +611,12 @@ const doctorSlices = createSlice({
     });
     builder.addCase(codeGrantAuth.fulfilled, (state, action) => {
       state.loading = false;
-      state.appointmentConfirmation = action.payload; 
+      state.appointmentConfirmation = action.payload;
       state.error = null;
     });
     builder.addCase(codeGrantAuth.rejected, (state, action) => {
       state.loading = false;
-      state.error = action.payload; 
+      state.error = action.payload;
     });
     builder.addCase(codeGrantAuth.pending, (state) => {
       state.loading = true;
@@ -578,20 +624,35 @@ const doctorSlices = createSlice({
     });
     builder
     .addCase(getPatientBloodWork.pending, (state) => {
-        state.status = 'loading';
+      state.bloodWorkStatus = 'loading';
     })
     .addCase(getPatientBloodWork.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.bloodWork = action.payload;
+      state.bloodWorkStatus = 'succeeded';
+      state.bloodWork = action.payload;
     })
     .addCase(getPatientBloodWork.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.payload;
+      state.bloodWorkStatus = 'failed';
+      state.bloodWorkError = action.error.message || "Something went wrong";
     });
+  
+  builder
+    .addCase(getPatientMed.pending, (state) => {
+      state.medStatus = 'loading';
+    })
+    .addCase(getPatientMed.fulfilled, (state, action) => {
+      state.medStatus = 'succeeded';
+      state.medications = action.payload;
+    })
+    .addCase(getPatientMed.rejected, (state, action) => {
+      state.medStatus = 'failed';
+      state.medError = action.error.message || "Something went wrong";
+    });
+  
+  
 
     builder
       .addCase(getUpcomingAppointments.pending, (state) => {
-        state.loading = true; 
+        state.loading = true;
         state.appErr = null;
         state.serverErr = null;
       })
@@ -606,12 +667,12 @@ const doctorSlices = createSlice({
 
     builder.addCase(createMeeting.fulfilled, (state, action) => {
       state.loading = false;
-      state.createMeetingData = action.payload; 
+      state.createMeetingData = action.payload;
       state.error = null;
     });
     builder.addCase(createMeeting.rejected, (state, action) => {
       state.loading = false;
-      state.error = action.payload; 
+      state.error = action.payload;
     });
     builder.addCase(createMeeting.pending, (state) => {
       state.loading = true;

@@ -29,7 +29,7 @@ export const getDoctorListDropdownForAppointment = createAsyncThunk(
 );
 export const increaseUserStep = createAsyncThunk(
   "patient/increaseUserStep",
-  async ({step }, { rejectWithValue, getState, dispatch }) => {
+  async ({ step }, { rejectWithValue, getState, dispatch }) => {
     const user = getState()?.authentication?.userAuth;
     const config = {
       headers: {
@@ -42,7 +42,7 @@ export const increaseUserStep = createAsyncThunk(
         `${baseUrl}Patient/UpdatePatientStep/${step}`,
         config
       );
-      return response.data; 
+      return response.data;
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, user);
       return rejectWithValue(error?.response?.data || "An error occurred");
@@ -178,6 +178,31 @@ export const addAppointment = createAsyncThunk(
     }
   },
 );
+
+export const getPatientMed = createAsyncThunk(
+  "patient/getPatientMed",
+  async (_, { rejectWithValue, getState, dispatch }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        "accept": "text/plain",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+    try {
+      const response = await axios.get(
+        `${baseUrl}Patient/GetPatientMed`,
+        config
+      );
+      console.log(response);
+      return response.data;
+    } catch (error) {
+      handleApiError(error?.response?.data, dispatch, user);
+      return rejectWithValue(error?.response?.data || "An error occurred");
+    }
+  }
+);
+
 export const downloadBloodWork = createAsyncThunk(
   "patient/downloadBloodWork",
   async (fileRef, { rejectWithValue, getState }) => {
@@ -257,11 +282,11 @@ export const getPreviewLinkList = createAsyncThunk(
 export const getUpcomingAppointments = createAsyncThunk(
   "patient/getUpcomingAppointments",
   async (_, { rejectWithValue, getState }) => {
-    const user = getState()?.authentication?.userAuth; 
+    const user = getState()?.authentication?.userAuth;
     const config = {
       headers: {
         Accept: "text/plain",
-        Authorization: `Bearer ${user?.obj?.token}`, 
+        Authorization: `Bearer ${user?.obj?.token}`,
       },
     };
 
@@ -270,9 +295,9 @@ export const getUpcomingAppointments = createAsyncThunk(
         `${baseUrl}Patient/GetUpComingAppointment`,
         config
       );
-      return response.data; 
+      return response.data;
     } catch (error) {
-      return rejectWithValue(error?.response?.data); 
+      return rejectWithValue(error?.response?.data);
     }
   }
 );
@@ -287,6 +312,7 @@ const patientSlices = createSlice({
     patientAppStatusCode: null,
     patientServerErr: null,
     bloodWork: [],
+    medication: []
 
   },
   extraReducers: (builder) => {
@@ -405,17 +431,30 @@ const patientSlices = createSlice({
     });
 
     builder
-    .addCase(getPatientBloodWork.pending, (state) => {
+      .addCase(getPatientBloodWork.pending, (state) => {
         state.status = 'loading';
-    })
-    .addCase(getPatientBloodWork.fulfilled, (state, action) => {
+      })
+      .addCase(getPatientBloodWork.fulfilled, (state, action) => {
         state.status = 'succeeded';
         state.bloodWork = action.payload;
-    })
-    .addCase(getPatientBloodWork.rejected, (state, action) => {
+      })
+      .addCase(getPatientBloodWork.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload;
-    });
+      });
+
+    builder
+      .addCase(getPatientMed.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(getPatientMed.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.medication = action.payload;
+      })
+      .addCase(getPatientMed.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload;
+      });
 
 
     builder.addCase(getPreviewLinkList.fulfilled, (state, action) => {
@@ -433,32 +472,32 @@ const patientSlices = createSlice({
       state.patientAppStatusCode = action?.payload?.statusCode;
     });
     builder
-    .addCase(getUpcomingAppointments.pending, (state,action) => {
-      state.patientLoading = false;
-      state.patientAppErr = action?.payload?.message;
-      state.patientServerErr = action?.error?.message;
-      state.patientAppStatus = action?.payload?.status;
-      state.patientAppStatusCode = action?.payload?.statusCode;
-    })
-    .addCase(getUpcomingAppointments.fulfilled, (state, action) => {
-      state.patientLoading = false;
-      state.patientAppErr = action?.payload?.message;
-      state.patientServerErr = action?.error?.message;
-      state.upcomingPatientAppointment = action?.payload?.records;
-      state.patientAppStatusCode = action?.payload?.statusCode;
-    })
+      .addCase(getUpcomingAppointments.pending, (state, action) => {
+        state.patientLoading = false;
+        state.patientAppErr = action?.payload?.message;
+        state.patientServerErr = action?.error?.message;
+        state.patientAppStatus = action?.payload?.status;
+        state.patientAppStatusCode = action?.payload?.statusCode;
+      })
+      .addCase(getUpcomingAppointments.fulfilled, (state, action) => {
+        state.patientLoading = false;
+        state.patientAppErr = action?.payload?.message;
+        state.patientServerErr = action?.error?.message;
+        state.upcomingPatientAppointment = action?.payload?.records;
+        state.patientAppStatusCode = action?.payload?.statusCode;
+      })
     builder
-    .addCase(getPatientStatus.pending, (state) => {
-      state.loading = true;
-    })
-    .addCase(getPatientStatus.fulfilled, (state, action) => {
-      state.loading = false;
-      state.status = action.payload; 
-    })
-    .addCase(getPatientStatus.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    });
+      .addCase(getPatientStatus.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getPatientStatus.fulfilled, (state, action) => {
+        state.loading = false;
+        state.status = action.payload;
+      })
+      .addCase(getPatientStatus.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
 });
 

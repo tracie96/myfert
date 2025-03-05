@@ -1,5 +1,4 @@
 // Custom Card Styling
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 
 .card {
   .card-header {
@@ -24,7 +23,7 @@
       line-height: 51px;
       font-weight: 900;
       content: '\f107';
-      font-family: "Montserrat", serif;
+      font-family: 'Font Awesome 5 Free';
       color: $gray-400;
     }
     &.collapsed {

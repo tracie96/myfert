@@ -1,5 +1,4 @@
 // Global styles for both custom sidebar and topbar compoments
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 
 .sidebar,
 .topbar {
@@ -15,7 +14,7 @@
           border: 0;
           font-weight: 900;
           content: '\f105';
-          font-family: "Montserrat", serif;
+          font-family: 'Font Awesome 5 Free';
         }
       }
       &.show {

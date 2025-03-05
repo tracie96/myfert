@@ -197,8 +197,8 @@ const HormoneChart = () => {
               <Legend verticalAlign="top" />
 
               {shadingAreas.map((area, index) => {
-                const startDate = new Date(new Date().getFullYear(), new Date(hormoneData.find(item => item.month === area.month).test_time).getMonth(), area.start);
-                const endDate = new Date(new Date().getFullYear(), new Date(hormoneData.find(item => item.month === area.month).test_time).getMonth(), area.end);
+                const startDate = new Date(new Date().getFullYear(), new Date(hormoneData.find(item => item.month === area.month)?.test_time).getMonth(), area.start);
+                const endDate = new Date(new Date().getFullYear(), new Date(hormoneData.find(item => item.month === area.month)?.test_time)?.getMonth(), area.end);
                 const startIndex = dataWithXAxis.findIndex(item => new Date(new Date().getFullYear(), new Date(hormoneData.find(data => data.month === item.month).test_time).getMonth(), item.day).getTime() === startDate.getTime());
                 const endIndex = dataWithXAxis.findIndex(item => new Date(new Date().getFullYear(), new Date(hormoneData.find(data => data.month === item.month).test_time).getMonth(), item.day).getTime() === endDate.getTime());
 

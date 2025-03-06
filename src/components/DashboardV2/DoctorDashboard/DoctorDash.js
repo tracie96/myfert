@@ -124,11 +124,11 @@ export default function DoctorDash() {
 
     const handleSwitchChange = useCallback(
         async (checked, record, step) => {
-            console.log(step, "step");
+            console.log(record, "step");
 
             if (checked) {
                 try {
-                    await dispatch(increaseUserStep({ patientId: record.id, step }));
+                    await dispatch(increaseUserStep({ patientId: record.userRef, step }));
 
                     console.log(
                         `${step} stage switch ${checked ? "enabled" : "disabled"} for record:`,

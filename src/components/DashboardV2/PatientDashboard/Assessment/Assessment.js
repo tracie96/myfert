@@ -9,7 +9,7 @@ import "./assesment.css";
 
 export default function Assessment() {
   const cards = useSelector((state) => state.assessment);
-  console.log({cards})
+
   const navigate = useNavigate();
 
   const handleCardClick = (path) => {

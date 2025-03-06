@@ -56,6 +56,35 @@ export const getGeneralInformation = createAsyncThunk(
   },
 );
 
+export const getAccessDetails = createAsyncThunk(
+  "Patient/GetAccessDetails", // Unique action type prefix
+  async (_, { getState }) => { //  No id parameter needed, use _ to indicate unused parameter
+      console.log("Fetching access details...");
+
+      const user = getState()?.authentication?.userAuth;
+      const token = user?.obj?.token;
+
+      const config = {
+          headers: {
+              accept: "text/plain",
+              Authorization: `Bearer ${token}`,
+          },
+      };
+
+      try {
+          const response = await axios.get(
+              `${baseUrl}/Patient/GetAccessDetails`,
+              config,
+          );
+
+          console.log("Access details response:", response);
+          return response.data;
+      } catch (error) {
+          console.error("Error fetching access details:", error);
+          return handleApiError(error); // Use the error handling function
+      }
+  },
+);
 export const getCurrentHealthLifestyle = createAsyncThunk(
   "user/getCurrentHealthLifestyle",
   async (id, { getState }) => {
@@ -342,7 +371,7 @@ export const getReadiness = createAsyncThunk(
       return response.data || data; 
     } catch (error) {
       console.error("API Error:", error);
-      return handleApiError(error); // Call the error handler
+      return handleApiError(error);
     }
   }
 );
@@ -361,6 +390,7 @@ const initialState = {
   readinessInfo: {},
   loading: false,
   error: null,
+  accessDetails: {},
 };
 
 const intakeFormSlice = createSlice({
@@ -520,6 +550,20 @@ const intakeFormSlice = createSlice({
       .addCase(getReadiness.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
+      });
+
+      builder
+      .addCase(getAccessDetails.pending, (state) => {
+          state.loading = true;
+          state.error = null;
+      })
+      .addCase(getAccessDetails.fulfilled, (state, action) => {
+          state.loading = false;
+          state.accessDetails = action.payload;
+      })
+      .addCase(getAccessDetails.rejected, (state, action) => {
+          state.loading = false;
+          state.error = action.payload?.message || 'Failed to fetch access details.'; // Access the message from the error object
       });
   },
 });

@@ -3,14 +3,25 @@ import { Container, Row, Col } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { getPatientStatus } from "../../../redux/patientSlice";
 import "./assesment.css";
+import { getAccessDetails } from "../../../redux/AssessmentController";
+import CheckIcon from "../../../../assets/images/check.svg";
 
-const CardComponent = ({ card, isClickable,index, handleCardClick }) => (
+
+
+const CardComponent = ({ card, isClickable, index, handleCardClick, isCompleted }) => (
   <div
     className={`assessment-card ${!isClickable ? "disabled" : ""}`}
     onClick={isClickable ? () => handleCardClick(card.component) : null}
   >
+     {isCompleted && (
+        <div className="checkmark-overlay">
+          <img src={CheckIcon} className="checkmark-icon" alt="check" />
+        </div>
+      )}
     <div className="card-image">
-      <img src={card.icon} alt={card.title} loading="lazy"    style={{ width: (index === 4 || index === 7) ? '100%' : '' }}/>
+   
+      <img src={card.icon} alt={card.title} loading="lazy" style={{ width: (index === 4 || index === 7) ? '100%' : '' }} />
+    
     </div>
     <div className="card-title">{card.title}</div>
   </div>
@@ -18,6 +29,11 @@ const CardComponent = ({ card, isClickable,index, handleCardClick }) => (
 
 const QuestionnaireGrid = ({ cards, onCardClick }) => {
   const dispatch = useDispatch();
+  const accessDetails = useSelector((state) => state.intake.accessDetails);
+
+  useEffect(() => {
+    dispatch(getAccessDetails());
+  }, [dispatch]);
 
   const { userAuth, status } = useSelector((state) => ({
     userAuth: state.authentication.userAuth,
@@ -40,6 +56,9 @@ const QuestionnaireGrid = ({ cards, onCardClick }) => {
   const cardList = useMemo(() => {
     return cards.map((card, index) => {
       const isClickable = status?.statLevel > 1 || index === 0;
+      // Determine if the card is completed based on accessDetails
+      const isCompleted = accessDetails ? accessDetails[card.meta] : false;
+
       return (
         <Col key={index} className="mb-4 d-flex justify-content-center">
           <CardComponent
@@ -47,11 +66,12 @@ const QuestionnaireGrid = ({ cards, onCardClick }) => {
             isClickable={isClickable}
             index={index}
             handleCardClick={handleCardClick}
+            isCompleted={isCompleted} // Pass the isCompleted status to the CardComponent
           />
         </Col>
       );
     });
-  }, [cards, status?.statLevel, handleCardClick]);
+  }, [cards, status?.statLevel, handleCardClick, accessDetails]);  // Include accessDetails in the dependency array
 
   return (
     <Container className="mt-4 assessment-container">

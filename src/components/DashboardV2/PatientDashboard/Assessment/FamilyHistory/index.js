@@ -134,14 +134,14 @@ const questions = [
     type: "select",
     title: "Menstrual History",
     name: "length_of_cycle",
-    options: Array.from({ length: 30 }, (_, i) => 0 + i),
+    options: Array.from({ length: 12 }, (_, i) => 24 + i),
   },
   {
     question: "Times between cycles",
     type: "select",
     title: "Menstrual History",
     name: "times_between_of_cycle",
-    options: Array.from({ length: 30 }, (_, i) => 0 + i),
+    options: Array.from({ length: 30 }, (_, i) => 10 + i),
   },
 
   {

@@ -18,11 +18,10 @@ export const submitGeneralInformation = createAsyncThunk(
     try {
       const response = await axios.post(
         `${baseUrl}/Patient/AddGeneralInformation`,
-        transformedData,
+        transformedData.payload,
         config,
       );
-
-      console.log({ response });
+        return response.data
     } catch (error) {
       console.log({ error });
     }

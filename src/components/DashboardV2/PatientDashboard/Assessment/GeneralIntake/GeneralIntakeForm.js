@@ -9,7 +9,7 @@ import {
   Select,
   message,
 } from "antd";
-import { useNavigate } from "react-router-dom"; // useNavigate for react-router v6
+import { useNavigate } from "react-router-dom";
 import FormWrapper from "../FormWrapper";
 import EmergencyContactInput from "./EmergencyContactInput";
 import { useDispatch } from "react-redux";
@@ -18,7 +18,7 @@ import "../assesment.css";
 import { useMediaQuery } from "react-responsive";
 import { submitGeneralInformation } from "../../../../redux/AssessmentController";
 import { backBtnTxt, exitBtnTxt, saveAndContinueBtn, submitBtn } from "../../../../../utils/constant";
-import CryptoJS from "crypto-js";
+// import CryptoJS from "crypto-js";
 
 const { Option } = Select;
 
@@ -81,7 +81,6 @@ const questions = [
       "Other",
     ],
   },
-  // Add more questions as needed
 ];
 
 const GeneralIntakeForm = ({ onComplete }) => {
@@ -91,7 +90,7 @@ const GeneralIntakeForm = ({ onComplete }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const isMobile = useMediaQuery({ maxWidth: 767 });
-  const SECRET_KEY = "default_secret_key";
+  // const SECRET_KEY = "default_secret_key";
 
   useEffect(() => {
     const savedIndex = parseInt(
@@ -199,34 +198,37 @@ const GeneralIntakeForm = ({ onComplete }) => {
       howDidHearAbout: answers["how_did_you_hear"] || "",
     };
   
-    const encryptedData = CryptoJS.AES.encrypt(
-      JSON.stringify(transformedData),
-      SECRET_KEY
-    ).toString();
-  
+    const encryptedData = 
+      transformedData
+
+      // const encryptedData = CryptoJS.AES.encrypt(
+      //   JSON.stringify(transformedData),
+      //   SECRET_KEY
+      // ).toString();
+    
     try {
       const response = await dispatch(
         submitGeneralInformation({ payload: encryptedData }) 
       ).unwrap();
-  
-      if (response.data.success) {
+      console.log(response)
+
+
+      if (response.success) {
         message.success("Data saved successfully.");
       } else {
         message.error("Failed to save data.");
       }
-    } catch (error) {
+    } 
+    catch (error) {
+      console.log("did i get")
       console.log(error);
       message.error("An error occurred while submitting the data.");
     }
   
     dispatch(completeCard("/questionnaire/1"));
     localStorage.setItem("currentQuestionIndex", "0");
-  
-    const encryptedAnswers = CryptoJS.AES.encrypt(
-      JSON.stringify(answers),
-      SECRET_KEY
-    ).toString();
-    localStorage.setItem("answers", encryptedAnswers);
+ 
+    localStorage.setItem("answers", JSON.stringify(answers));
   
     navigate("/assessment");
   };

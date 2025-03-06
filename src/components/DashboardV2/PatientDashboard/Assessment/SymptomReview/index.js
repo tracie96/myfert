@@ -1470,8 +1470,8 @@ const SymptomReview = ({ onComplete }) => {
           <>
             <Button
               type="primary"
-              style={{ background: "#335CAD", padding: 20, marginBottom: 10, width:"100%", overflowX:"auto"}}
-            >{question?.sub ? question.sub : ''}</Button>
+              style={{ background: "#335CAD", padding: 20, marginBottom: 10, overflowX:"auto"}}
+            ><span>{question?.sub ? question.sub : ''}</span></Button>
 
             <Radio.Group
               name={question.name}

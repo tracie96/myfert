@@ -377,7 +377,7 @@ const SubstanceUse = ({ onComplete }) => {
           <InputNumber
             name={subQuestion.name}
             value={answers[subQuestion.name] || 0}
-            min={-1}
+            min={0}
             onChange={(value) => handleChange(value, subQuestion.name)}
             className="select_questtionnaire"
             style={{

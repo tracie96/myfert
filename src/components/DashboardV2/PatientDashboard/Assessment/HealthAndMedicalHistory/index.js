@@ -840,6 +840,7 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
                   <Slider
                     min={1}
                     max={10}
+                    dots
                     value={answers[question.name] || 1}
                     onChange={(value) => handleChange(value, question.name)}
                     style={{ width: isMobile ? "100%" : "80%" }}

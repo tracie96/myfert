@@ -822,6 +822,7 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
                 onChange={(e) => handleChange(e.target.value, question.name)}
                 value={answers[question.name] || ""}
                 style={{ marginLeft: "10px", width: "100px" }}
+                min={0}
               />
             )}
             {answers[`${question.name}_checked`] && (

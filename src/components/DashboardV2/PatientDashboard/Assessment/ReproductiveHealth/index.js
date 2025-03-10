@@ -1069,6 +1069,7 @@ const ReproductiveHealth = ({ onComplete }) => {
                   <InputNumber
                     name={nameSubQuestion}
                     value={answers[nameSubQuestion] || undefined}
+                    min={ 0 }
                     onChange={(value) => handleChange(value, nameSubQuestion)}
                     //disabled={answers[`${subQuestion.name}_unsure`]}
                     className="input_questionnaire"
@@ -1440,6 +1441,7 @@ const ReproductiveHealth = ({ onComplete }) => {
               value={answers[question.name] || ""}
               onChange={(e) => handleChange(e.target.value, question.name)}
               style={{ marginBottom: "10px", width: isMobile ? "100%" : "10%" }}
+              min={0}
             />
             <br />
             {/* Checkbox */}

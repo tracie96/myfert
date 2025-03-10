@@ -1293,6 +1293,7 @@ const PatientSignup = () => {
                                             value={weightOfPatient}
                                             onChange={(e) => setWeightOfPatient(e.target.value)}
                                             style={{ marginRight: "10px" }}
+                                            min={0}
                                           />
                                           <span>
                                             {unit === "Metric" ? "kg" : "lbs"}

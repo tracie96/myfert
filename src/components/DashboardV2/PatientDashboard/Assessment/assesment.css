@@ -202,9 +202,8 @@ width: 150px !important;}
   display: flex;
   align-items: center;
   margin-bottom: 8px;
-  border: 1px solid #335cad;
   border-radius: 5px;
-  padding: 16px;
+  padding: 8px;
 }
  
 .info-header-message {

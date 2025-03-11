@@ -197,7 +197,7 @@ const questions = [
     subQuestions: [
       {
         type: "number_with_radio_sub",
-        name: "duration_per_cycle",
+        name: "duration_per_cycle_pelvic_pain",
       },
      
       {
@@ -205,7 +205,7 @@ const questions = [
         type: "radio",
         label: "Severity",
         options: ["Mild", "Moderate", "Severe"],
-        name: "duration_per_cycle_severity",
+        name: "duration_per_cycle_severity_pelvic_pain",
       },
     ],
   },
@@ -227,7 +227,7 @@ const questions = [
     subQuestions: [
       {
         type: "number_with_radio_sub",
-        name: "duration_per_cycle",
+        name: "duration_per_cycle_pp_not_menstrual",
       },
   
       {
@@ -235,7 +235,7 @@ const questions = [
         type: "radio",
         label: "Severity",
         options: ["Mild", "Moderate", "Severe"],
-        name: "duration_per_mild_cycle_severity",
+        name: "duration_per_mild_cycle_severity_pp_not_menstrual",
       },
     ],
   },
@@ -474,35 +474,35 @@ const questions = [
       ],
   },
 
-  {
-    question:
-    "Discharge: Menstrual Bleeding",
-    type: "number_with_radio",
-    title: "Duration(put 0 if you do not experience it)",
-    name: "menstrual_bleeding",
-    value: 0,
-    subQuestions: [
-        {
-          type: "number_with_radio_sub",
-          label: "",
-          name: "menstrual_bleeding_sub",
-        },
-        {
-          question: "Colour",
-          type: "radio",
-          label: "Colour",
-          options: ["None", "Pink", "Red", "Brown",  "Black"],
-          name: "menstrual_bleeding_sub_colour",
-        },
-        {
-          question: "Clots",
-          type: "radio",
-          label: "Colour",
-          options: ["Yes", "No"],
-          name: "menstrual_bleeding_sub_clots",
-        },
-      ],
-  },
+  // {
+  //   question:
+  //   "Discharge: Menstrual Bleeding",
+  //   type: "number_with_radio",
+  //   title: "Duration(put 0 if you do not experience it)",
+  //   name: "menstrual_bleeding",
+  //   value: 0,
+  //   subQuestions: [
+  //       {
+  //         type: "number_with_radio_sub",
+  //         label: "",
+  //         name: "menstrual_bleeding_sub",
+  //       },
+  //       {
+  //         question: "Colour",
+  //         type: "radio",
+  //         label: "Colour",
+  //         options: ["None", "Pink", "Red", "Brown",  "Black"],
+  //         name: "menstrual_bleeding_sub_colour",
+  //       },
+  //       {
+  //         question: "Clots",
+  //         type: "radio",
+  //         label: "Colour",
+  //         options: ["Yes", "No"],
+  //         name: "menstrual_bleeding_sub_clots",
+  //       },
+  //     ],
+  // },
 
   {
     question:
@@ -618,121 +618,70 @@ const ReproductiveHealth = ({ onComplete }) => {
     }
   }, []);
 
-  
   const validateQuestion = () => {
-
+    
     const question = questions[currentQuestionIndex];
-    const isUnsureChecked = answers[`${question.name}_unsure`];
-    let mainAnswer = answers[question.name];
-    let subQuestionUnsureChecked = false;
-    
+    const mainAnswer = answers[question.name];
+    // const isUnsureChecked = answers[`${question.name}_unsure`];
     const isMainQuestionValid = mainAnswer !== undefined && mainAnswer !== "";
-  
-    // If the main question's answer does not require subquestions, skip their validation
-    if (!question.subQuestions || mainAnswer !== "Yes") {
-      return isMainQuestionValid;
-    }
-  
-    if (!mainAnswer && question.subQuestions) {
-      for (const subQuestion of question.subQuestions) {
-        if (answers[`${subQuestion.name}_unsure`]) {
-          subQuestionUnsureChecked = true;
-        }
-        if (answers[subQuestion.name] !== undefined && answers[subQuestion.name] !== "" && !isNaN(answers[subQuestion.name])) {
-          mainAnswer = answers[subQuestion.name];
-          break;
-        }
-      }
-      return isUnsureChecked || subQuestionUnsureChecked || (mainAnswer !== undefined && mainAnswer !== "" && !isNaN(mainAnswer));
-    }
-    
-    const isCheckbox = Array.isArray(mainAnswer);
-    const isOtherSelected = isCheckbox
-        ? mainAnswer.includes("Other")
-        : mainAnswer === "Other";
-    const otherAnswerKey = `${question.name}_other`;
-    const otherAnswer = answers[otherAnswerKey];
+    let subQuestionsValid = true;
 
-    if (isOtherSelected && (!otherAnswer || otherAnswer.trim() === "")) {
-        return false;
-    }
-
-     if (question.name === "current_therapy" && mainAnswer === "Yes") {
-        if (answers["charting_method"] === "" || answers["charting_method"] === undefined) {
-            return false;
-        }
-      }
-
-    if (question.name === "relaxation_techniques" && mainAnswer === "Yes") {
-        const isHormonalAnswered = answers["how_often_hormonal_bc"] !== undefined && answers["how_often_hormonal_bc"]?.trim() !== "";
-        const isNonHormonalAnswered = answers["how_often_non_hormonal_bc"] !== undefined && answers["how_often_non_hormonal_bc"]?.trim() !== "";
-
-
-        if (!isHormonalAnswered && !isNonHormonalAnswered) {
-            return false;
-        }
-
-    }
-
-    if (question.name === "is_menstrual_pain" && mainAnswer === "Yes") {
-      const isHormonalAnswered = answers["how_often_hormonal_bc"] !== undefined && answers["how_often_hormonal_bc"]?.trim() !== "";
-      const isNonHormonalAnswered = answers["how_often_non_hormonal_bc"] !== undefined && answers["how_often_non_hormonal_bc"]?.trim() !== "";
-
-
-      if (!isHormonalAnswered && !isNonHormonalAnswered) {
-          return false;
-      }
-
-      return false;
+    if (question.type === "info_spotting") {
+      return true;
   }
+    // Handle main question validation when no subquestions are present or main answer is "No"
+    if (!question.subQuestions || mainAnswer === "No") {
+        if (question.type === "checkbox") {
+            // Checkbox requires at least one selection unless "Unsure" is checked
+            return answers[`${question.name}_unsure`] || (Array.isArray(mainAnswer) && mainAnswer.length > 0);
+        }
+        // For other types, either "Unsure" is checked or a valid main answer is provided
+        return answers[`${question.name}_unsure`] || isMainQuestionValid;
+    }
 
-    if (question.type === "number_with_radio" && question.subQuestions) {
+    let allSubQuestionsUnsure = true; // Assume all subquestions are unsure initially
+
+    // Validate sub-questions
+    if (question.subQuestions) {
         for (const subQuestion of question.subQuestions) {
             const subAnswer = answers[subQuestion.name];
-            const radioAnswer = answers[`${subQuestion.name}_radio`];
+            const subUnsure = answers[`${subQuestion.name}_unsure`];
 
+            // If at least one subquestion is not unsure, set flag to false
+            if (!subUnsure) {
+                allSubQuestionsUnsure = false;
+            }
+            
+
+            // Validate number_with_radio_sub questions if not "Unsure"
             if (subQuestion.type === "number_with_radio_sub") {
-                const isSubAnswered =
-                    (typeof subAnswer === "number" && subAnswer >= 0) || radioAnswer === "Unsure";
-                if (!isSubAnswered) {
-                    return false;
-                }
-            } else if (subQuestion.type === "radio") {
-                // Validate radio questions
-                if (!subAnswer || subAnswer.trim() === "") {
-                    return false;
+                if (!subUnsure && (typeof subAnswer !== "number" || isNaN(subAnswer))) {
+                    subQuestionsValid = false;
+                    break; // No need to continue if one subquestion is invalid
                 }
             }
+
+            // Validate radio questions
+            if (subQuestion.type === "radio") {
+                if (!subAnswer) {
+                    subQuestionsValid = false;
+                    break; // No need to continue if one subquestion is invalid
+                }
+            }
+
+            // Validate checkbox questions
+             if (subQuestion.type === "checkbox") {
+                if (!subAnswer || !Array.isArray(subAnswer) || subAnswer.length === 0) {
+                     subQuestionsValid = false;
+                     break; // No need to continue if one subquestion is invalid
+                 }
+             }
         }
     }
 
-    // Validate Other Sub-Questions (for all other questions)
-    if (question.subQuestions && mainAnswer === "Yes" ) {
-        // for (const subQuestion of question.subQuestions) {
-        //     // const subAnswer = answers[subQuestion.name];
-        //     // Skip already validated birth control sub-questions
-        //     if (question.name === "relaxation_techniques") continue;
-        //     // if (!subAnswer || subAnswer.trim() === "") {
-        //     //     return false;
-        //     // }
-        // }
-    }
-
-    // Validate Checkbox Answers
-    if (isCheckbox) {
-        return mainAnswer.length > 0;
-    }
-
-    // Validate Number Inputs
-    if (typeof mainAnswer === "number") {
-        return !isNaN(mainAnswer) && mainAnswer >= 0;
-    }
-
-    return true;
+    // If all subquestions are "Unsure" or if all subquestions are valid, the question is considered valid
+    return allSubQuestionsUnsure || subQuestionsValid;
 };
-
-
-
 
 
   const handleSave = () => {
@@ -1064,11 +1013,10 @@ const ReproductiveHealth = ({ onComplete }) => {
                     value={answers[nameSubQuestion] || undefined}
                     min={ 0 }
                     onChange={(value) => handleChange(value, nameSubQuestion)}
-                    //disabled={answers[`${subQuestion.name}_unsure`]}
                     className="input_questionnaire"
                   />
                   <span className="question-text">
-                    {" "+subQuestion.name || 'Default Name'} {/* Example text for the span */}
+                    {" "+subQuestion.name || 'Default Name'} 
                   </span>
                   <div style={{ marginBottom: '10px' }}></div>
                 </div>
@@ -1274,6 +1222,7 @@ const ReproductiveHealth = ({ onComplete }) => {
                         <Input
                           className="input_questtionnaire"
                           placeholder="Please specify"
+                          style={{ height: 50, borderColor: "#00ADEF" }}
                           value={answers[`${question.name}_other`] || ""}
                           onChange={(e) =>
                             handleChange(
@@ -1338,7 +1287,6 @@ const ReproductiveHealth = ({ onComplete }) => {
         );
         case "info_spotting":
         return (
- 
           <div className="info-box info-form-message">
             <div className="info-header info-header-message">
               <Title
@@ -1566,6 +1514,7 @@ const ReproductiveHealth = ({ onComplete }) => {
                           <br />
                           <Input
                             className="input_questtionnaire"
+                            style={{ height: 50, borderColor: "#00ADEF" }}
                             placeholder="Please specify"
                             value={answers[`${question.name}_other`] || ""}
                             onChange={(e) =>

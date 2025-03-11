@@ -11,7 +11,7 @@ import moment from 'moment';
 const { Title, Text, Link } = Typography;
 
 const LabResults = () => {
-    const dispatch = useDispatch();  // FIXED: Added dispatch
+    const dispatch = useDispatch();  
 
     const { bloodWork, lastUpdated } = useSelector((state) => state?.patient);
 

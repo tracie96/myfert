@@ -80,9 +80,9 @@ const QuestionnaireGrid = ({ cards, onCardClick }) => {
       </div>
 
       <div className="assessment-content">
-        <i className="assessment-progress">
+        {/* <i className="assessment-progress">
           0 out of {cards.length} questions complete
-        </i>
+        </i> */}
         <Row className="mt-4" xs={2} sm={2} md={3} lg={5} xl={5}>
           {cardList}
         </Row>

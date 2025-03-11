@@ -44,6 +44,50 @@ export const getPatientBloodWork = createAsyncThunk(
     }
   }
 );
+export const downloadBloodWork = createAsyncThunk(
+  "doctor/downloadBloodWork",
+  async (fileRef, { rejectWithValue, getState }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        Accept: "*/*",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+      responseType: "blob",
+    };
+
+    try {
+      const response = await axios.get(
+        `${baseUrl}Doctor/DownloadBloodWork/${fileRef}`,
+        config
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Download failed");
+    }
+  }
+);
+export const deletePatientBloodWork = createAsyncThunk(
+  'doctor/deleteBloodWork',
+  async (bloodWorkId, { rejectWithValue, getState }) => {
+    const user = getState()?.authentication?.userAuth;
+    try {
+      const response = await axios.get(
+        `https://myfertilitydevapi.azurewebsites.net/api/Doctor/DeleteBloodWork/${bloodWorkId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user?.obj?.token}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 
 export const addPatientBloodWork = createAsyncThunk(
   "doctor/addPatientBloodWork",
@@ -478,7 +522,7 @@ const doctorSlices = createSlice({
     bloodWork: [],
     medStatus: null,
     medError: null,
-    medications:[]
+    medications: []
 
   },
   extraReducers: (builder) => {
@@ -527,6 +571,13 @@ const doctorSlices = createSlice({
       state.appErr = null;
       state.serverErr = null;
     });
+    builder
+      .addCase(deletePatientBloodWork.fulfilled, (state, action) => {
+        state.bloodWork = state.bloodWork.filter(file => file.fileRef !== action.meta.arg);
+      })
+      .addCase(deletePatientBloodWork.rejected, (state, action) => {
+        state.error = action.payload;
+      });
     builder.addCase(cancelAppointment.fulfilled, (state, action) => {
       state.loading = false;
       state.appStatus = true;
@@ -623,32 +674,32 @@ const doctorSlices = createSlice({
       state.error = null;
     });
     builder
-    .addCase(getPatientBloodWork.pending, (state) => {
-      state.bloodWorkStatus = 'loading';
-    })
-    .addCase(getPatientBloodWork.fulfilled, (state, action) => {
-      state.bloodWorkStatus = 'succeeded';
-      state.bloodWork = action.payload;
-    })
-    .addCase(getPatientBloodWork.rejected, (state, action) => {
-      state.bloodWorkStatus = 'failed';
-      state.bloodWorkError = action.error.message || "Something went wrong";
-    });
-  
-  builder
-    .addCase(getPatientMed.pending, (state) => {
-      state.medStatus = 'loading';
-    })
-    .addCase(getPatientMed.fulfilled, (state, action) => {
-      state.medStatus = 'succeeded';
-      state.medications = action.payload;
-    })
-    .addCase(getPatientMed.rejected, (state, action) => {
-      state.medStatus = 'failed';
-      state.medError = action.error.message || "Something went wrong";
-    });
-  
-  
+      .addCase(getPatientBloodWork.pending, (state) => {
+        state.bloodWorkStatus = 'loading';
+      })
+      .addCase(getPatientBloodWork.fulfilled, (state, action) => {
+        state.bloodWorkStatus = 'succeeded';
+        state.bloodWork = action.payload;
+      })
+      .addCase(getPatientBloodWork.rejected, (state, action) => {
+        state.bloodWorkStatus = 'failed';
+        state.bloodWorkError = action.error.message || "Something went wrong";
+      });
+
+    builder
+      .addCase(getPatientMed.pending, (state) => {
+        state.medStatus = 'loading';
+      })
+      .addCase(getPatientMed.fulfilled, (state, action) => {
+        state.medStatus = 'succeeded';
+        state.medications = action.payload;
+      })
+      .addCase(getPatientMed.rejected, (state, action) => {
+        state.medStatus = 'failed';
+        state.medError = action.error.message || "Something went wrong";
+      });
+
+
 
     builder
       .addCase(getUpcomingAppointments.pending, (state) => {

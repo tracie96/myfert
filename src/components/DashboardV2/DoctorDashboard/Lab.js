@@ -4,7 +4,7 @@ import { InboxOutlined, FilePdfOutlined, EditOutlined, DeleteOutlined } from '@a
 import Header from './Components/Header';
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
-import { addPatientBloodWork, getPatientBloodWork } from '../../redux/doctorSlice';
+import { addPatientBloodWork, getPatientBloodWork, deletePatientBloodWork, downloadBloodWork } from '../../redux/doctorSlice';
 import moment from 'moment';
 const { Dragger } = Upload;
 const { Text, Link } = Typography;
@@ -18,7 +18,6 @@ const LabsAndRequisitions = () => {
     const patient = JSON.parse(localStorage.getItem("patient")) || { userRef: "" };
     const [isModalVisible, setIsModalVisible] = useState(false);
     const navigate = useNavigate();
-
     useEffect(() => {
         if (!patient.userRef) {
             setIsModalVisible(true);
@@ -28,7 +27,7 @@ const LabsAndRequisitions = () => {
     }, [dispatch, patient.userRef]);
 
     useEffect(() => {
-        if (status === 'succeeded') {
+        if ( bloodWork) {
             setFiles(bloodWork.map(file => ({
                 id: file.fileRef,
                 name: file.filename,
@@ -39,10 +38,32 @@ const LabsAndRequisitions = () => {
         }
     }, [bloodWork, status, error]);
 
+    console.log({files,bloodWork})
     const handleModalClose = () => {
         navigate("/doctor");
 
     };
+
+    const handleDownload = async (fileRef) => {
+        try {
+            const resultAction = await dispatch(downloadBloodWork(fileRef));
+            if (downloadBloodWork.fulfilled.match(resultAction)) {
+                const blob = new Blob([resultAction.payload], { type: "application/pdf" });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `${fileRef}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+            } else {
+                message.error("Failed to download file.");
+            }
+        } catch (error) {
+            message.error("Download error.");
+        }
+    };
+
 
     const uploadFileToAPI = async (file) => {
         const reader = new FileReader();
@@ -66,11 +87,11 @@ const LabsAndRequisitions = () => {
                 message.error(`Error uploading ${file.name}: ${error.message}`);
             }
         };
-    };    
-    
+    };
+
     const handleDelete = async (fileId) => {
         try {
-            // await dispatch(deletePatientBloodWork(fileId));
+            await dispatch(deletePatientBloodWork(fileId)).unwrap();
             setFiles((prevFiles) => prevFiles.filter(file => file.id !== fileId));
             message.success('File deleted successfully.');
         } catch (error) {
@@ -147,13 +168,13 @@ const LabsAndRequisitions = () => {
                                             </div>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                                 <FilePdfOutlined style={{ color: 'red', fontSize: 24 }} />
-                                                <Link href={file.url || '#'} target="_blank" style={{ color: '#1890ff' }}>
+                                                <Link style={{ color: '#1890ff' }} onClick={()=>handleDownload(file.id)}>
                                                     {file.filename || 'LabResults.pdf'}
                                                 </Link>
                                             </div>
                                             <div style={{ display: 'flex', gap: 10 }}>
-                                               
-                                                <EditOutlined style={{ color: '#1890ff', cursor: 'pointer' }} onClick={() => console.log('Edit', file.id)} />
+
+                                                {/* <EditOutlined style={{ color: '#1890ff', cursor: 'pointer' }} onClick={() => console.log('Edit', file.id)} /> */}
                                                 <DeleteOutlined style={{ color: 'red', cursor: 'pointer' }} onClick={() => handleDelete(file.id)} />
                                             </div>
                                         </div>

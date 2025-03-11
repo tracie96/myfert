@@ -53,29 +53,27 @@ const CircleWithArc = ({ cycleInfo }) => {
         return today.format("ddd / MMM Do");
     };
 
-    const hardcodedPeriodDays = [1, 2, 3, 4, 27, 28, 29, 30, 31];
-
     const isWithinRange = (date, rangeStart, rangeEnd) => {
         const dateMoment = moment(date).startOf('day');
         const rangeStartMoment = moment(rangeStart).startOf('day');
         const rangeEndMoment = moment(rangeEnd).startOf('day');
-
+    
         if (rangeStartMoment.isBefore(rangeEndMoment)) {
-            // Standard case: rangeStart is before rangeEnd in the same or later month
             return dateMoment.isBetween(rangeStartMoment, rangeEndMoment, 'days', '[]');
         } else {
             // Range spans across months (e.g., Feb 27 - Mar 4)
             // Check if the date is in the remaining days of the start month
             const endOfStartMonth = moment(rangeStart).endOf('month');
             const isInStartMonth = dateMoment.isBetween(rangeStartMoment, endOfStartMonth, 'days', '[]');
-
+    
             // Check if the date is in the beginning days of the end month
             const startOfEndMonth = moment(rangeEnd).startOf('month');
             const isInEndMonth = dateMoment.isBetween(startOfEndMonth, rangeEndMoment, 'days', '[]');
-
+    
             return isInStartMonth || isInEndMonth;
         }
     };
+    
     
     return (
         <div
@@ -130,46 +128,54 @@ const CircleWithArc = ({ cycleInfo }) => {
                     strokeLinecap="round"
                 />
 
-                {dayPositions.map((position, i) => {
-                    const dayDate = moment().date(i + 1);
-                    console.log({period_start,period_end})
-                    const isToday = i + 1 === today.date();
-                    const dayOfMonth = i + 1;
+{dayPositions.map((position, i) => {
+    let currentYear = moment().year();
+    let currentMonth = moment().month(); // 0-indexed (0 = January, 2 = March)
 
-                    const isInPeriod = hardcodedPeriodDays.includes(dayOfMonth);                    const isInFertileWindow = isWithinRange(dayDate, fertile_window_start, fertile_window_end);
-                    let showDate = isInPeriod || isInFertileWindow;
+    let dayOfMonth = i + 1;
 
-                    let textColor = "white";
-//                     if (isInPeriod) {
-//                         textColor = "red";
-//                     }
-// console.log({showDate, dayDate})
+    // Adjust year and month if dayOfMonth exceeds the number of days in the current month
+    let daysInCurrentMonth = moment().daysInMonth();
+    if (dayOfMonth > daysInCurrentMonth) {
+        currentMonth = currentMonth + 1;
+        dayOfMonth = dayOfMonth - daysInCurrentMonth;
+    }
 
-                    return (
-                        <React.Fragment key={i}>
-                            {!showDate && (
-                                <circle
-                                    cx={position.x}
-                                    cy={position.y}
-                                    r={4}
-                                    fill="#f3f3f5"
-                                    filter="url(#shadow)"
-                                />
-                            )}
-                            <text
-                                x={position.x}
-                                y={position.y}
-                                textAnchor="middle"
-                                alignmentBaseline="middle"
-                                fontSize="10"
-                                fill={textColor}
-                                style={{ display: showDate ? 'block' : 'none' }}
-                            >
-                                {isToday ? i + 1 : dayDate.format('ddd D')}
-                            </text>
-                        </React.Fragment>
-                    );
-                })}
+    const dayDate = moment([currentYear, currentMonth, i + 1]);
+    const isToday = i + 1 === today.date();
+    const isInPeriod = isWithinRange(dayDate, period_start, period_end);
+    const isInFertileWindow = isWithinRange(dayDate, fertile_window_start, fertile_window_end);
+
+    let showDate = isInPeriod || isInFertileWindow;
+
+    let textColor = "white";
+
+    return (
+        <React.Fragment key={i}>
+            {!showDate && (
+                <circle
+                    cx={position.x}
+                    cy={position.y}
+                    r={4}
+                    fill="#f3f3f5"
+                    filter="url(#shadow)"
+                />
+            )}
+            <text
+                x={position.x}
+                y={position.y}
+                textAnchor="middle"
+                alignmentBaseline="middle"
+                fontSize="10"
+                fill={textColor}
+                style={{ display: showDate ? 'block' : 'none' }}
+            >
+                {isToday ? i + 1 : dayDate.format('ddd D')}
+            </text>
+        </React.Fragment>
+    );
+})}
+
             </svg>
 
             <div

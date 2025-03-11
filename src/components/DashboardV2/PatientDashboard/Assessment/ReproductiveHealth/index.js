@@ -625,8 +625,14 @@ const ReproductiveHealth = ({ onComplete }) => {
     const isUnsureChecked = answers[`${question.name}_unsure`];
     let mainAnswer = answers[question.name];
     let subQuestionUnsureChecked = false;
-
-    // Ensure the main question is answered
+    
+    const isMainQuestionValid = mainAnswer !== undefined && mainAnswer !== "";
+  
+    // If the main question's answer does not require subquestions, skip their validation
+    if (!question.subQuestions || mainAnswer !== "Yes") {
+      return isMainQuestionValid;
+    }
+  
     if (!mainAnswer && question.subQuestions) {
       for (const subQuestion of question.subQuestions) {
         if (answers[`${subQuestion.name}_unsure`]) {
@@ -640,7 +646,6 @@ const ReproductiveHealth = ({ onComplete }) => {
       return isUnsureChecked || subQuestionUnsureChecked || (mainAnswer !== undefined && mainAnswer !== "" && !isNaN(mainAnswer));
     }
     
-    // Handle "Other" selection with an additional input
     const isCheckbox = Array.isArray(mainAnswer);
     const isOtherSelected = isCheckbox
         ? mainAnswer.includes("Other")
@@ -652,14 +657,12 @@ const ReproductiveHealth = ({ onComplete }) => {
         return false;
     }
 
-     // FABM/FAM charting your cycle 
      if (question.name === "current_therapy" && mainAnswer === "Yes") {
         if (answers["charting_method"] === "" || answers["charting_method"] === undefined) {
             return false;
         }
       }
 
-    // Special Handling for Birth Control Question
     if (question.name === "relaxation_techniques" && mainAnswer === "Yes") {
         const isHormonalAnswered = answers["how_often_hormonal_bc"] !== undefined && answers["how_often_hormonal_bc"]?.trim() !== "";
         const isNonHormonalAnswered = answers["how_often_non_hormonal_bc"] !== undefined && answers["how_often_non_hormonal_bc"]?.trim() !== "";
@@ -671,7 +674,6 @@ const ReproductiveHealth = ({ onComplete }) => {
 
     }
 
-    // Special Handling for time of your period Question
     if (question.name === "is_menstrual_pain" && mainAnswer === "Yes") {
       const isHormonalAnswered = answers["how_often_hormonal_bc"] !== undefined && answers["how_often_hormonal_bc"]?.trim() !== "";
       const isNonHormonalAnswered = answers["how_often_non_hormonal_bc"] !== undefined && answers["how_often_non_hormonal_bc"]?.trim() !== "";
@@ -684,14 +686,12 @@ const ReproductiveHealth = ({ onComplete }) => {
       return false;
   }
 
-    // Validate "number_with_radio" with multiple subQuestions
     if (question.type === "number_with_radio" && question.subQuestions) {
         for (const subQuestion of question.subQuestions) {
             const subAnswer = answers[subQuestion.name];
             const radioAnswer = answers[`${subQuestion.name}_radio`];
 
             if (subQuestion.type === "number_with_radio_sub") {
-                // Either the number input or "Unsure" must be selected
                 const isSubAnswered =
                     (typeof subAnswer === "number" && subAnswer >= 0) || radioAnswer === "Unsure";
                 if (!isSubAnswered) {
@@ -772,13 +772,10 @@ const ReproductiveHealth = ({ onComplete }) => {
   };
 
   const handleChange = (value, name) => {
-    // const question = questions[currentQuestionIndex];
     let updatedAnswers = { ...answers };
 
-    //Discharge: Menstrual Bleeding input error solve
     updatedAnswers["menstrual_bleeding"] =  0;
     if (name === "relaxation_techniques") { 
-      // Main question: Are you currently using birth control?
       if (value === "Yes") {
           updatedAnswers[name] = "Yes";
       } else {
@@ -788,18 +785,15 @@ const ReproductiveHealth = ({ onComplete }) => {
       }
   } 
   else if (name === "how_often_hormonal_bc") {
-      // If the first subquestion is answered, clear the second
       updatedAnswers["how_often_hormonal_bc"] = value;
-      updatedAnswers["how_often_non_hormonal_bc"] = "";
+      // updatedAnswers["how_often_non_hormonal_bc"] = "";
   } 
   else if (name === "how_often_non_hormonal_bc") {
-      // If the second subquestion is answered, clear the first
       updatedAnswers["how_often_non_hormonal_bc"] = value;
-      updatedAnswers["how_often_hormonal_bc"] = "";
+      // updatedAnswers["how_often_hormonal_bc"] = "";
   }
   
     if (Array.isArray(value)) {
-      // const isUnsureOrNoneSelected = value.includes("Unsure") || value.includes("None");
       const lastValue = value[value.length - 1];
       if (lastValue !== 'Unsure' && lastValue !== 'None') {
         const hasOtherValue = value.some(value => value !== null && value !== 'unsure');
@@ -1018,7 +1012,6 @@ const ReproductiveHealth = ({ onComplete }) => {
             className="input_questtionnaire"
           />
         )}
-        {console.log("subQuestion.name--", subQuestion.name)}
         {subQuestion.type === "inputNumber" && (
           <InputNumber
             name={subQuestion.name}

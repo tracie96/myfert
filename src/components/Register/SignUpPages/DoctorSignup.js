@@ -626,21 +626,7 @@ const DoctorSignup = ({ userRole }) => {
                                 </div>
                               </div>
 
-                              <div
-                                style={{
-                                  textAlign: "center",
-                                  background: "#d6deef",
-                                  color: "#335CAD",
-                                  padding: 5,
-                                  width: "90%",
-                                  margin: "auto",
-                                  borderRadius: 10,
-                                  marginBottom: 10,
-                                }}
-                              >
-                                Please use the same email you signed up with for
-                                both Mira and the Jane app
-                              </div>
+                           
                               <div className="row">
                                 <div className="col-lg-12 col-sm-12">
                                   <FormItem

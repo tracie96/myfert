@@ -58,21 +58,7 @@ const ClinicianSecondStep = () => {
         your account!
       </p>
       <hr style={{ background: "#EFD0BD", width: "200px", height: "2px" }} />
-      <div
-        style={{
-          textAlign: "center",
-          background: "#335CAD",
-          color: "#fff",
-          padding: 10,
-          width: "90%",
-          margin: "auto",
-          borderRadius: 10,
-          marginBottom: 10,
-        }}
-      >
-        Please use the same email you signed up with for both Mira and the Jane
-        app
-      </div>
+ 
 
       <Row justify="" style={{ marginTop: "20px" }}>
         <Col span={12} style={{ marginBottom: "20px" }}>
@@ -94,7 +80,6 @@ const ClinicianSecondStep = () => {
                 height: "41px",
               }}
             >
-              {" "}
               Create Account
             </Button>
           </div>

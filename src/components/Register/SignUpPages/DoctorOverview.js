@@ -118,16 +118,13 @@ const DoctorRegister = () => {
                                 <div
                                   className="card clickable-card"
                                   style={{
-                                    backgroundColor:
-                                      hoveredRole === category.role
-                                        ? "#CEF2F4"
-                                        : "",
+                                    backgroundColor: hoveredRole === category.role ? "#CEF2F4" : "",
                                   }}
+                                  onMouseEnter={() => setHoveredRole(category.role)}
+                                  onMouseLeave={() => setHoveredRole(null)}
+                                  onClick={() => handleNavigation(category.role, category.name)}
                                 >
                                   <div className="card-body image-container">
-                                    <h5 className="overlay-text">
-                                      {category.name}
-                                    </h5>
                                     <img
                                       src={category.image}
                                       alt={category.name}
@@ -137,8 +134,11 @@ const DoctorRegister = () => {
                                         height: "auto",
                                       }}
                                     />
+                                    <h5 className="overlay-text" >{category.name}</h5>
                                   </div>
                                 </div>
+
+
                               </div>
                             ))}
                           </div>

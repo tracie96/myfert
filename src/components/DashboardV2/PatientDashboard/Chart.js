@@ -142,6 +142,7 @@ const HormoneChart = () => {
           lh: existingData?.lh || null,
           e3g: existingData?.e3g || null,
           pdg: existingData?.pdg || null,
+          fsh: existingData?.fsg || null,
         };
       });
       return acc.concat(monthData);

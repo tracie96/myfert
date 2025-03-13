@@ -143,12 +143,12 @@ const GeneralIntakeForm = ({ onComplete }) => {
     }
   
     if (question.type === "radio") {
-      // if (answers[question.name] === "Other") {
-      //   const otherValue = answers[`${question.name}_other`];
-      //   if (!otherValue || otherValue.trim() === "") {
-      //     return false;
-      //   }
-      // }
+      if (answers[question.name] === "Other") {
+        const otherValue = answers[`${question.name}_other`];
+        if (!otherValue || otherValue.trim() === "") {
+          return false;
+        }
+      }
     }
   
     return answers[question.name] !== undefined && answers[question.name] !== "";
@@ -310,7 +310,7 @@ const GeneralIntakeForm = ({ onComplete }) => {
                     {answers[question.name] === "Other" && (
                       <>
                         <br />
-                        {/* <Input
+                        <Input
                           style={{
                             marginTop: 10,
                             marginLeft: 50,
@@ -325,7 +325,7 @@ const GeneralIntakeForm = ({ onComplete }) => {
                               `${question.name}_other`,
                             )
                           }
-                        /> */}
+                        />
                       </>
                     )}
                   </>

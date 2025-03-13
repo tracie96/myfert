@@ -184,7 +184,7 @@ const questions = [
     subQuestion: [
       {
         type: "time_select",
-        label: "Time of Breakfast",
+        label: "Time of Snack",
         name: "snack_time",
       },
     ],
@@ -347,27 +347,25 @@ const Nutrition = ({ onComplete }) => {
 
   const validateQuestion = () => {
     const question = questions[currentQuestionIndex];
-
+  
     switch (question.type) {
       case "checkbox_with_select":
         for (const option of question.options) {
           const checkboxChecked = answers[option.name] || false;
           const selectName = option.selectName;
-
+  
           if (checkboxChecked && selectName) {
             const selectValue = answers[selectName];
             if (selectValue === undefined || selectValue === "") {
               console.log(`Validation Failed: Checkbox ${option.name} is checked, but select ${selectName} is empty.`);
-              return false; // Validation fails if a checked checkbox has an empty select
+              return false; 
             }
           }
         }
-        console.log("Validation Passed: All checked checkboxes have filled selects.");
         return true;
-
+  
       case "long_radio":
         if (question.subQuestions) {
-          // For long_radio, validate subquestions only if the main radio is "Yes"
           if (answers[question.name] === "Yes") {
             for (const subQuestion of question.subQuestions) {
               if (!answers[subQuestion.name] || answers[subQuestion.name] === "") {
@@ -377,58 +375,55 @@ const Nutrition = ({ onComplete }) => {
             }
           }
         }
-        return answers[question.name] !== undefined; // Validate the main radio
-
+        return answers[question.name] !== undefined;
+  
       case "radio": {
         if (answers[question.name] === undefined) {
-          return false;  // Radio button must be selected
+          console.log(`Validation Failed: No selection made for ${question.name}`);
+          return false;
         }
-        if (question.name === "sensitive_food" && answers[question.name] === "Yes") {
+        if (["sensitive_food", "sensitive_food_caffeine"].includes(question.name) && answers[question.name] === "Yes") {
           if (!answers[`${question.name}_other`] || answers[`${question.name}_other`] === "") {
-            console.log("Validation Failed: sensitive_food is Yes, but input field is empty.");
-            return false; 
+            console.log(`Validation Failed: ${question.name} is Yes, but input field is empty.`);
+            return false;
           }
         }
-        if (question.name === "sensitive_food_caffeine" && answers[question.name] === "Yes") {
-          if (!answers[`${question.name}_other`] || answers[`${question.name}_other`] === "") {
-            console.log("Validation Failed: sensitive_food is Yes, but input field is empty.");
-            return false; 
-          }
-        }
-        else if(answers[question.name] === "Yes"){
-          if (!answers[`${question.name}_other`] || answers[`${question.name}_other`] === "") {
-            console.log("Validation Failed: sensitive_food is Yes, but input field is empty.");
-            return false; 
-          }
-        }
-        return true; 
+        return true;
       }
-
+  
       case "checkbox": {
         if (!answers[question.name] || answers[question.name].length === 0) {
           console.log(`Validation Failed: No checkboxes selected for ${question.name}`);
-          return false; // At least one checkbox MUST be selected
+          return false;
         }
-  
-        // Check if "Other" is selected and if the corresponding input is filled
         if (answers[question.name].includes("Other")) {
           if (!answers[`${question.name}_other`] || answers[`${question.name}_other`] === "") {
             console.log(`Validation Failed: "Other" checkbox selected for ${question.name}, but input is empty.`);
-            return false; // Input field must be filled if "Other" is selected
+            return false;
           }
         }
-  
-        return true; // Checkbox selection is valid
+        return true;
       }
   
       case "long_textarea":
         return answers[question.name] !== undefined && answers[question.name] !== "";
-
+  
+      case "radiowithselect":
+        if (!answers[question.name]) {
+          console.log(`Validation Failed: No option selected for ${question.name}`);
+          return false;
+        }
+        if (answers[question.name] === "No" && (!answers[`${question.name}_detail`] || answers[`${question.name}_detail`] === "")) {
+          console.log(`Validation Failed: User selected "No" for ${question.name}, but did not specify how many.`);
+          return false;
+        }
+        return true;
+  
       default:
-        return true; // If no specific validation, consider it valid
+        return true;
     }
   };
-
+  
 
   const handleSave = () => {
     if (!validateQuestion()) {
@@ -676,7 +671,7 @@ const Nutrition = ({ onComplete }) => {
                   onChange={(value) =>
                     handleChange(value, `${question.name}_detail`)
                   }
-                  style={{ width: "100%", marginTop: "10px" }}
+                  style={{ width: isMobile?"100%":"50%", marginTop: "10px" }}
                 >
                   <Option value="1">1</Option>
                   <Option value="2">2</Option>
@@ -689,7 +684,8 @@ const Nutrition = ({ onComplete }) => {
             )}
           </Radio.Group>
         );
-      case "time_select":
+     
+        case "time_select":
         const timeOptions = Array.from({ length: 24 }, (_, i) => {
           const hour = i < 10 ? `0${i}` : i;
           return `${hour}:00`;

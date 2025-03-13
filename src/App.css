@@ -4961,7 +4961,12 @@ input[type="button"].btn-block {
   padding: 10px 20px;
   border-radius: 10px;
 }
-
+.clickable-card:hover .card-img-top {
+  filter: brightness(50%);
+}
+.card-img-top {
+  transition: filter 0.3s ease-in-out;
+}
 .card-img-top {
   border-radius: 20px;
   max-width: 100%;

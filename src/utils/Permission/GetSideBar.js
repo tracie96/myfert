@@ -45,6 +45,8 @@ export const GetSideBar = () => {
         return "2";
       case "/chart":
         return "3";
+      case "/patient/meds":
+          return "5";
       case "/patient/appointment":
         return "10";
       case "/plans":
@@ -135,11 +137,6 @@ export const GetSideBar = () => {
           <span className="no-underline">APPOINTMENT</span>
         </NavLink>
       </Menu.Item>
-      {/* <Menu.Item key="7" icon={<PlayCircleTwoTone />}>
-        <NavLink to="/plans" style={{ textDecoration: "none" }}>
-          <span className="no-underline">PLANS</span>
-        </NavLink>
-      </Menu.Item> */}
       <Menu.Item key="8" icon={<InfoCircleTwoTone />}>
         <NavLink to="/learn" style={{ textDecoration: "none" }}>
           <span className="no-underline">LEARN</span>

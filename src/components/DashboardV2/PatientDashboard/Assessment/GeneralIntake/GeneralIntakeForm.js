@@ -310,7 +310,7 @@ const GeneralIntakeForm = ({ onComplete }) => {
                     {answers[question.name] === "Other" && (
                       <>
                         <br />
-                        {/* <Input
+                        <Input
                           style={{
                             marginTop: 10,
                             marginLeft: 50,
@@ -325,7 +325,7 @@ const GeneralIntakeForm = ({ onComplete }) => {
                               `${question.name}_other`,
                             )
                           }
-                        /> */}
+                        />
                       </>
                     )}
                   </>

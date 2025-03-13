@@ -140,7 +140,7 @@ const questions = [
   {
     question: "Please record what you eat in a typical day:",
     type: "long_textarea",
-    sub: "Breakfast",
+    sub: "Snacks",
     name: "diet_detail_breakfast",
     subQuestion: [
       {
@@ -743,7 +743,7 @@ const Nutrition = ({ onComplete }) => {
             <Select
               className="select_questtionnaire"
               name={question.name}
-              value={answers[question.name] || ""}
+              value={answers[question.name] || 0}
               onChange={(value) => handleChange(value, question.name)}
               style={{ marginTop: "10px", width: "50%" }}
             >

@@ -62,16 +62,37 @@ const EmailVerificationModal = ({ visible, onCancel, email }) => {
   }, [visible]);
 
   const handleInputChange = (index, value) => {
-    if (/^\d$/.test(value) || value === "") {
+    // Allow pasting of multiple digits
+    if (value.length > 1) {
+      // Distribute the pasted digits across the fields
       const updatedOtpFields = [...otpFields];
-      updatedOtpFields[index] = value;
+      let pasteIndex = index;
+      for (let i = 0; i < value.length; i++) {
+        if (pasteIndex >= otpFields.length) break;
+        if (/^\d$/.test(value[i])) {
+          updatedOtpFields[pasteIndex] = value[i];
+          pasteIndex++;
+        }
+      }
       setOtpFields(updatedOtpFields);
+      // Focus on the next field if necessary
+      if (pasteIndex < otpFields.length) {
+        inputRefs.current[pasteIndex].focus();
+      }
+    } else {
+      // Handle single digit input as before
+      if (/^\d$/.test(value) || value === "") {
+        const updatedOtpFields = [...otpFields];
+        updatedOtpFields[index] = value;
+        setOtpFields(updatedOtpFields);
 
-      if (value !== "" && index < otpFields.length - 1) {
-        inputRefs.current[index + 1].focus();
+        if (value !== "" && index < otpFields.length - 1) {
+          inputRefs.current[index + 1].focus();
+        }
       }
     }
   };
+
 
   const handleVerify = async () => {
     const otp = otpFields.join("");
@@ -187,7 +208,6 @@ const EmailVerificationModal = ({ visible, onCancel, email }) => {
                   margin: "0 5px",
                   borderColor: "#b0b0b0",
                 }}
-                maxLength={1}
                 value={otp}
                 onChange={(e) => handleInputChange(index, e.target.value)}
               />

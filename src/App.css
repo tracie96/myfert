@@ -4959,6 +4959,7 @@ input[type="button"].btn-block {
   transform: translateX(-50%);
   color: white;
   padding: 10px 20px;
+  text-shadow: 10px 10px 10px rgba(0, 0, 0, 0.9);
   border-radius: 10px;
 }
 .clickable-card:hover .card-img-top {

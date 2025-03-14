@@ -53,28 +53,23 @@ const CircleWithArc = ({ cycleInfo }) => {
         return today.format("ddd / MMM Do");
     };
 
-    const isWithinRange = (date, rangeStart, rangeEnd) => {
-        const dateMoment = moment(date).startOf('day');
-        const rangeStartMoment = moment(rangeStart).startOf('day');
-        const rangeEndMoment = moment(rangeEnd).startOf('day');
-    
-        if (rangeStartMoment.isBefore(rangeEndMoment)) {
-            return dateMoment.isBetween(rangeStartMoment, rangeEndMoment, 'days', '[]');
-        } else {
-            // Range spans across months (e.g., Feb 27 - Mar 4)
-            // Check if the date is in the remaining days of the start month
-            const endOfStartMonth = moment(rangeStart).endOf('month');
-            const isInStartMonth = dateMoment.isBetween(rangeStartMoment, endOfStartMonth, 'days', '[]');
-    
-            // Check if the date is in the beginning days of the end month
-            const startOfEndMonth = moment(rangeEnd).startOf('month');
-            const isInEndMonth = dateMoment.isBetween(startOfEndMonth, rangeEndMoment, 'days', '[]');
-    
-            return isInStartMonth || isInEndMonth;
+    const getDaysArray = (start, end) => {
+        const startDate = moment(start);
+        const endDate = moment(end);
+        const days = [];
+
+        let currentDate = startDate.clone();
+
+        while (currentDate.isSameOrBefore(endDate)) {
+            days.push(currentDate.date());
+            currentDate.add(1, 'day');
         }
+        return days;
     };
-    
-    
+
+    const periodDays = getDaysArray(period_start, period_end);
+    const fertileWindowDays = getDaysArray(fertile_window_start, fertile_window_end);
+
     return (
         <div
             style={{
@@ -109,7 +104,7 @@ const CircleWithArc = ({ cycleInfo }) => {
                         <stop offset="0%" style={{ stopColor: "#E4D00A", stopOpacity: 1 }} />
                         <stop offset="100%" style={{ stopColor: "#FFC300", stopOpacity: 1 }} />
                     </linearGradient>
-                </defs>                
+                </defs>
                 <circle cx={centerX} cy={centerY} r={radius} stroke="gray" strokeWidth="0" fill="none" />
 
                 <path
@@ -128,53 +123,53 @@ const CircleWithArc = ({ cycleInfo }) => {
                     strokeLinecap="round"
                 />
 
-{dayPositions.map((position, i) => {
-    let currentYear = moment().year();
-    let currentMonth = moment().month(); // 0-indexed (0 = January, 2 = March)
+                {dayPositions.map((position, i) => {
+                    let currentYear = moment().year();
+                    let currentMonth = moment().month();
 
-    let dayOfMonth = i + 1;
+                    let dayOfMonth = i + 1;
 
-    // Adjust year and month if dayOfMonth exceeds the number of days in the current month
-    let daysInCurrentMonth = moment().daysInMonth();
-    if (dayOfMonth > daysInCurrentMonth) {
-        currentMonth = currentMonth + 1;
-        dayOfMonth = dayOfMonth - daysInCurrentMonth;
-    }
+                    let daysInCurrentMonth = moment().daysInMonth();
+                    if (dayOfMonth > daysInCurrentMonth) {
+                        currentMonth = currentMonth + 1;
+                        dayOfMonth = dayOfMonth - daysInCurrentMonth;
+                    }
 
-    const dayDate = moment([currentYear, currentMonth, i + 1]);
-    const isToday = i + 1 === today.date();
-    const isInPeriod = isWithinRange(dayDate, period_start, period_end);
-    const isInFertileWindow = isWithinRange(dayDate, fertile_window_start, fertile_window_end);
+                    const dayDate = moment([currentYear, currentMonth, i + 1]);
+                    const isToday = i + 1 === today.date();
 
-    let showDate = isInPeriod || isInFertileWindow;
+                    const isInPeriod = periodDays.includes(dayOfMonth);
+                    const isInFertileWindow = fertileWindowDays.includes(dayOfMonth);
 
-    let textColor = "white";
+                    let showDate = isInPeriod || isInFertileWindow;
 
-    return (
-        <React.Fragment key={i}>
-            {!showDate && (
-                <circle
-                    cx={position.x}
-                    cy={position.y}
-                    r={4}
-                    fill="#f3f3f5"
-                    filter="url(#shadow)"
-                />
-            )}
-            <text
-                x={position.x}
-                y={position.y}
-                textAnchor="middle"
-                alignmentBaseline="middle"
-                fontSize="10"
-                fill={textColor}
-                style={{ display: showDate ? 'block' : 'none' }}
-            >
-                {isToday ? i + 1 : dayDate.format('ddd D')}
-            </text>
-        </React.Fragment>
-    );
-})}
+                    let textColor = "white";
+
+                    return (
+                        <React.Fragment key={i}>
+                            {!showDate && (
+                                <circle
+                                    cx={position.x}
+                                    cy={position.y}
+                                    r={4}
+                                    fill="#f3f3f5"
+                                    filter="url(#shadow)"
+                                />
+                            )}
+                            <text
+                                x={position.x}
+                                y={position.y}
+                                textAnchor="middle"
+                                alignmentBaseline="middle"
+                                fontSize="10"
+                                fill={textColor}
+                                style={{ display: showDate ? 'block' : 'none' }}
+                            >
+                                {isToday ? i + 1 : dayDate.format('ddd D')}
+                            </text>
+                        </React.Fragment>
+                    );
+                })}
 
             </svg>
 

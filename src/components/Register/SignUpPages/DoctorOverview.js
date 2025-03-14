@@ -95,8 +95,8 @@ const DoctorRegister = () => {
                           <div className="row justify-content-center">
                             <div className="col-lg-12">
                               <h1
-                                className="h4 mb-4 overlay-text"
-                                style={{ color: "#01ACEE", fontWeight: 700 }}
+                                className="h4 mb-4"
+                                style={{ color: "#01ACEE", fontWeight: 700, marginTop: -50 }}
                               >
                                 Join My Fertility Labs as:
                               </h1>
@@ -106,7 +106,7 @@ const DoctorRegister = () => {
                             {professionCategories.map((category, index) => (
                               <div
                                 key={index}
-                                className={`col-lg-4 mb-4 px-2 ${hoveredRole === category.role ? "" : "hover-opacity"}`}
+                                className={`col-lg-4 mb-4 px-2 ${hoveredRole === category.role ? "" : ""}`}
                                 onMouseEnter={() =>
                                   handleMouseEnter(category.role)
                                 }

@@ -377,7 +377,15 @@ console.log({filteredAppointments})
                     </div>
                   </Col>
                 </Row>
-
+                <label
+                  style={{
+                    fontWeight: "bold",
+                    margin: "30px 0",
+                    color: "#335CAD",
+                  }}
+                >
+                  Slots
+                </label>
                 <label
                   style={{
                     fontWeight: "bold",

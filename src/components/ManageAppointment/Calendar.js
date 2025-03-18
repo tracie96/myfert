@@ -40,10 +40,8 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
   const { userAuth } = useSelector((state) => state?.authentication);
   const user = userAuth?.obj;
 
-  // State to manage editing states of each time range
   const [editingKey, setEditingKey] = useState("");
 
-  // Function to fetch appointment details
   const fetchAppointmentDetails = useCallback(
     async (date) => {
       try {
@@ -57,13 +55,11 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
             },
           },
         );
-        console.log(response.data); // Log the response data
+        console.log(response.data); 
 
-        // Assuming the API returns start and end times in the response
         setAppointmentDetails(response.data);
       } catch (error) {
         console.error("Error fetching appointment details:", error);
-        // Handle error appropriately (e.g., show an error message)
       }
     },
     [user?.token],
@@ -258,7 +254,10 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
 
   // Cancel event handler (placeholder)
   const handleCancelEvent = () => {
-    console.log("Cancel event clicked", selectedEvent);
+    setIsModalVisible(false);
+    setSelectedEvent(null);
+    setAppointmentDetails(null); // Clear appointment details
+    setEditingKey(null);
     // Implement your cancel logic here, which might involve removing the event
     // from the calendar and updating the availability in your backend.
   };

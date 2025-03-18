@@ -6,7 +6,7 @@ import * as Yup from "yup";
 import fertilityImage from "../../../assets/images/auth/fertilityImage.svg";
 import Spinner from "react-bootstrap/Spinner";
 import CustomModal from "../../global_component/CustomModal";
-import { Card, Row } from "react-bootstrap";
+import {  Row } from "react-bootstrap";
 import { postRegister } from "../../redux/AuthController";
 import { useDispatch } from "react-redux";
 
@@ -18,7 +18,7 @@ const CoachSignup = (userRole) => {
   const fileInputRef = useRef(null);
 
   const initialValues = {
-    role: userRole || "3", // 4 is for patient
+    role: userRole || "3", 
     userName: "",
     firstName: "",
     lastName: "",

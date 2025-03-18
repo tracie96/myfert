@@ -27,6 +27,7 @@ const Appointment = () => {
   const [open, setOpen] = useState(false);
   const [currentWeek, setCurrentWeek] = useState(moment());
   const [drawerKey, setDrawerKey] = useState(0);
+  console.log({drawerKey})
   const [availability, setAvailability] = useState({
     Sunday: [],
     Monday: [],
@@ -61,17 +62,7 @@ const Appointment = () => {
     ? filteredAppointments
     : filteredAppointments.slice(0, 2);
   const [moreVisible, setMoreVisible] = useState(filteredAppointments.map(() => true));
-console.log({filteredAppointments})
   const onClose = () => {
-    setAvailability({
-      Sunday: [],
-      Monday: [],
-      Tuesday: [],
-      Wednesday: [],
-      Thursday: [],
-      Friday: [],
-      Saturday: [],
-    })
     setOpen(false);
   };
   const addTimeSlot = (day) => {
@@ -282,7 +273,6 @@ console.log({filteredAppointments})
                 </div>
               </form>
               <Drawer
-                key={drawerKey}
                 title={
                   <div
                     style={{

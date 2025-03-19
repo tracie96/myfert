@@ -26,7 +26,7 @@ const UserDropdown = ({ userAuth, setShowModal }) => {
         <NavLink to="/settings">Settings</NavLink>
       </Menu.Item>
       <Menu.Divider />
-      <Menu.Item key="logout" icon={<LogoutOutlined />}>
+      <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={() => setShowModal(true)}>
         <button
           style={{
             border: "none",
@@ -35,7 +35,6 @@ const UserDropdown = ({ userAuth, setShowModal }) => {
             margin: 0,
             cursor: "pointer",
           }}
-          onClick={() => setShowModal(true)}
         >
           Logout
         </button>

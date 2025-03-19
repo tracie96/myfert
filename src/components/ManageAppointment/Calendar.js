@@ -8,11 +8,12 @@ import { getAvailability } from "../redux/doctorSlice";
 import "./PatientAppointment/PatientCalendar.css";
 import { useMediaQuery } from "react-responsive";
 import {
-  Modal,
+  Drawer,
   Button,
   TimePicker,
   Space,
   Typography,
+  Divider,
 } from "antd"; // Import necessary Ant Design components
 import moment from "moment";
 import axios from "axios"; // Import axios
@@ -25,12 +26,12 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
   const calendarRef = useRef(null);
   const dispatch = useDispatch();
 
-  // State for event details modal
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  // State for event details drawer
+  const [isDrawerVisible, setIsDrawerVisible] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
 
-  // State for edit modal
-  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  // State for edit drawer
+  const [isEditDrawerVisible, setIsEditDrawerVisible] = useState(false);
   const [editStartTime, setEditStartTime] = useState(null);
   const [editEndTime, setEditEndTime] = useState(null);
 
@@ -55,7 +56,7 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
             },
           },
         );
-        console.log(response.data); 
+        console.log(response.data);
 
         setAppointmentDetails(response.data);
       } catch (error) {
@@ -154,7 +155,7 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
   // Event click handler
   const handleEventClick = (clickInfo) => {
     setSelectedEvent(clickInfo.event);
-    setIsModalVisible(true);
+    setIsDrawerVisible(true);
 
     // Format the date from the FullCalendar event to 'YYYY-MM-DD'
     const formattedDate = moment(clickInfo.event.extendedProps.date).format(
@@ -165,15 +166,15 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
     fetchAppointmentDetails(formattedDate);
   };
 
-  // Modal close handler
-  const handleModalClose = () => {
-    setIsModalVisible(false);
+  // Drawer close handler
+  const handleDrawerClose = () => {
+    setIsDrawerVisible(false);
     setSelectedEvent(null);
     setAppointmentDetails(null); // Clear appointment details
     setEditingKey(null);
   };
 
-  // Edit event handler (opens the edit modal)
+  // Edit event handler (opens the edit drawer)
   const handleEditEvent = () => {
     console.log("Edit event clicked", selectedEvent);
 
@@ -205,14 +206,14 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
       );
       // Optionally, show an error message to the user
       // message.error("Could not load appointment details for editing.");
-      return; // Prevent the edit modal from opening with invalid data
+      return; // Prevent the edit drawer from opening with invalid data
     }
 
-    setIsModalVisible(false); // Close the event details modal
-    setIsEditModalVisible(true); // Open the edit modal
+    setIsDrawerVisible(false); // Close the event details drawer
+    setIsEditDrawerVisible(true); // Open the edit drawer
   };
 
-  // Handle time change in the edit modal
+  // Handle time change in the edit drawer
   const handleEditTimeChange = (field, time, timeString) => {
     if (field === "start") {
       setEditStartTime(time);
@@ -247,14 +248,14 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
     //   },
     // }));
 
-    // Close the edit modal
-    setIsEditModalVisible(false);
+    // Close the edit drawer
+    setIsEditDrawerVisible(false);
     setSelectedEvent(null);
   };
 
   // Cancel event handler (placeholder)
   const handleCancelEvent = () => {
-    setIsModalVisible(false);
+    setIsDrawerVisible(false);
     setSelectedEvent(null);
     setAppointmentDetails(null); // Clear appointment details
     setEditingKey(null);
@@ -262,9 +263,9 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
     // from the calendar and updating the availability in your backend.
   };
 
-  // Close the edit modal
-  const handleEditModalClose = () => {
-    setIsEditModalVisible(false);
+  // Close the edit drawer
+  const handleEditDrawerClose = () => {
+    setIsEditDrawerVisible(false);
     setSelectedEvent(null);
   };
 
@@ -272,7 +273,6 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
   const startEditing = (key) => {
     setEditingKey(key);
   };
-
   // Function to handle saving the edited time range (You'll need to implement the actual save logic)
   const saveEdit = (key) => {
     console.log("Save edit called for key:", key);
@@ -307,29 +307,49 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
         eventClick={handleEventClick} // Add event click handler
       />
 
-      {/* Event Details Modal */}
-      <Modal
+      {/* Event Details Drawer */}
+      <Drawer
         title={selectedEvent?.title}
-        visible={isModalVisible}
-        onCancel={handleModalClose}
-        footer={[
-          <Button key="cancel" onClick={handleCancelEvent} danger>
-            Cancel
-          </Button>,
-          <Button key="edit" type="primary" onClick={handleEditEvent}>
-            Edit
-          </Button>,
-        ]}
+        placement="right"
+        width={500} // Adjust width as needed
+        onClose={handleDrawerClose}
+        open={isDrawerVisible}
+        extra={
+          <Space>
+            <Button onClick={handleCancelEvent} danger>
+              Cancel
+            </Button>
+            <Button type="primary" onClick={handleEditEvent}>
+              Edit
+            </Button>
+          </Space>
+        }
       >
         {selectedEvent && (
           <div>
             {appointmentDetails?.bookedTimeRange?.map((timeRange, index) => {
               const key = `timeRange-${index}`; // Unique key for each time range
               return (
-                <div key={key}>
-                  <Space align="center">
-                    {editingKey === key ? (
-                      <div style={{marginTop:10}}>
+                <div key={key} style={{ marginBottom: "20px" }}>
+                  <Divider orientation="left">
+                    Time Range {index + 1}
+                  </Divider>
+                  {editingKey === key ? (
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "10px",
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "10px",
+                        }}
+                      >
+                        <Text strong>Start Time:</Text>
                         <TimePicker
                           defaultValue={
                             timeRange?.start
@@ -344,6 +364,15 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
                             onTimeChange(time, timeString, "start", index)
                           }
                         />
+                      </div>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "10px",
+                        }}
+                      >
+                        <Text strong>End Time:</Text>
                         <TimePicker
                           defaultValue={
                             timeRange?.end
@@ -358,16 +387,33 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
                             onTimeChange(time, timeString, "end", index)
                           }
                         />
-                        <Button size="small" onClick={() => saveEdit(key)} style={{marginLeft:20}}>
+                      </div>
+                      <Space>
+                        <Button
+                          size="small"
+                          onClick={() => saveEdit(key)}
+                          type="primary"
+                        >
                           Save
                         </Button>
                         <Button size="small" onClick={cancelEdit}>
                           Cancel
                         </Button>
-                      </div>
-                    ) : (
+                      </Space>
+                    </div>
+                  ) : (
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "flex-start",
+                        gap: "20px",
+                      }}
+                    >
                       <div>
-                        <Text strong>Start Time:</Text>
+                        <Text strong style={{ marginRight: "8px" }}>
+                          Start Time:
+                        </Text>
                         <Text>
                           {timeRange?.start
                             ? moment({
@@ -376,7 +422,9 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
                               }).format("HH:mm")
                             : "N/A"}
                         </Text>
-                        <Text strong style={{ marginLeft: 8 }}>
+                      </div>
+                      <div>
+                        <Text strong style={{ marginRight: "8px" }}>
                           End Time:
                         </Text>
                         <Text>
@@ -387,26 +435,38 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
                               }).format("HH:mm")
                             : "N/A"}
                         </Text>
-                        <Button size="small" onClick={() => startEditing(key)} style={{marginTop:10}}>
-                          Edit
-                        </Button>
                       </div>
-                    )}
-                  </Space>
+                      <Button
+                        size="small"
+                        onClick={() => startEditing(key)}
+                        style={{ marginTop: "10px" }}
+                      >
+                        Edit
+                      </Button>
+                    </div>
+                  )}
                 </div>
               );
             })}
-          
           </div>
         )}
-      </Modal>
+      </Drawer>
 
-      {/* Edit Event Modal */}
-      <Modal
+      {/* Edit Event Drawer */}
+      <Drawer
         title="Edit Event Time"
-        visible={isEditModalVisible}
-        onCancel={handleEditModalClose}
-        onOk={handleSaveEdit}
+        placement="right"
+        width={500} // Adjust width as needed
+        onClose={handleEditDrawerClose}
+        open={isEditDrawerVisible}
+        footer={
+          <Space>
+            <Button onClick={handleEditDrawerClose}>Cancel</Button>
+            <Button type="primary" onClick={handleSaveEdit}>
+              Save
+            </Button>
+          </Space>
+        }
       >
         <p>Select new start and end times:</p>
         <TimePicker
@@ -427,7 +487,7 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
           format="HH:mm"
           use12Hours={false}
         />
-      </Modal>
+      </Drawer>
     </>
   );
 };

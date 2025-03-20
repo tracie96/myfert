@@ -228,7 +228,7 @@ export default function PatDash() {
               Initial Sign Up Steps:
             </h3>
           </>}
-        {status === "" || status?.statLevel <= 1 || status === undefined ?
+        {status === "" || status?.statLevel <= 2 || status === undefined ?
           <Steps
             current={currentStep}
             progressDot={customDot}
@@ -250,7 +250,6 @@ export default function PatDash() {
                     <div style={{ marginTop: "10px" }}>
                       <Button
                         onClick={() => {
-                          handleStepChange(1);
                           navigate("/assessment");
                         }}
                         type="primary"
@@ -279,7 +278,7 @@ export default function PatDash() {
                           handleStepChange(2);
                           navigate("/patient/appointment");
                         }}
-                        disabled={currentStep !== 1 && currentStep !== 2}
+                        disabled={status?.statLevel !== 1 || status?.statLevel === null}
                         style={{
                           backgroundColor: "#C2E6F8",
                           borderColor: "none",
@@ -304,7 +303,7 @@ export default function PatDash() {
                         onClick={() => {
                           navigate("/plans");
                         }}
-                        disabled={status?.statLevel !== 1 || status?.statLevel === null}
+                        disabled={status?.statLevel !== 2 || status?.statLevel === null}
                         style={{
                           backgroundColor: "#C2E6F8",
                           borderColor: "none",

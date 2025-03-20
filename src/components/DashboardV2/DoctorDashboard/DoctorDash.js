@@ -245,10 +245,10 @@ export default function DoctorDash() {
                 render: (_, record) => (
                     <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
                         <Switch
-                            checked={record.patientStat?.statLevel === 3 || record.patientStat?.statLevel === 4}
-                            onChange={(checked, e) => handleSwitchChange(checked, record, 3, e)}
+                            checked={record.patientStat?.statLevel === 4 || record.patientStat?.statLevel === 2}
+                            onChange={(checked, e) => handleSwitchChange(checked, record, 2, e)}
                             disabled={
-                                record.patientStat?.statLevel !== 1 && record.patientStat?.statLevel !== 2
+                                record.patientStat?.statLevel !== 2
                             } />
 
                     </div>
@@ -263,7 +263,7 @@ export default function DoctorDash() {
                             checked={record.patientStat?.statLevel === 4}
                             onChange={(checked, e) => handleSwitchChange(checked, record, 4, e)}
                             disabled={
-                                record.patientStat?.statLevel !== 3
+                                record.patientStat?.statLevel !== 2
                             } />
                     </div>
                 ),

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Upload, List, Typography, message, Card, Modal, Button } from 'antd';
-import { InboxOutlined, FilePdfOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Upload, List, Typography, message, Card, Modal, Button, Input } from 'antd';
+import { InboxOutlined, FilePdfOutlined, EditOutlined, DeleteOutlined, LeftOutlined, UploadOutlined } from '@ant-design/icons';
 import Header from './Components/Header';
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
@@ -17,17 +17,59 @@ const LabsAndRequisitions = () => {
     const error = useSelector((state) => state.doctor.error);
     const patient = JSON.parse(localStorage.getItem("patient")) || { userRef: "" };
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const [isNewLabResultVisible, setIsNewLabResultVisible] = useState(false);
+    const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+    const [newLabResultFile, setNewLabResultFile] = useState(null);
+    const [newLabResultName, setNewLabResultName] = useState('');
     const navigate = useNavigate();
+
+    // Generic function to open modals, closing others
+    const openModal = (modalType) => {
+        setIsModalVisible(false);
+        setIsNewLabResultVisible(false);
+        setIsEditModalVisible(false);
+
+        switch (modalType) {
+            case 'patientSelect':
+                setIsModalVisible(true);
+                break;
+            case 'newLabResult':
+                setIsNewLabResultVisible(true);
+                break;
+            case 'editLabResult':
+                setIsEditModalVisible(true);
+                break;
+            default:
+                break;
+        }
+    };
+
+    const closeModal = (modalType) => {
+        switch (modalType) {
+            case 'patientSelect':
+                setIsModalVisible(false);
+                break;
+            case 'newLabResult':
+                setIsNewLabResultVisible(false);
+                break;
+            case 'editLabResult':
+                setIsEditModalVisible(false);
+                break;
+            default:
+                break;
+        }
+    };
+
     useEffect(() => {
         if (!patient.userRef) {
-            setIsModalVisible(true);
+            openModal('patientSelect');
         } else {
             dispatch(getPatientBloodWork(patient.userRef));
         }
     }, [dispatch, patient.userRef]);
 
     useEffect(() => {
-        if ( bloodWork) {
+        if (bloodWork) {
             setFiles(bloodWork.map(file => ({
                 id: file.fileRef,
                 name: file.filename,
@@ -38,10 +80,9 @@ const LabsAndRequisitions = () => {
         }
     }, [bloodWork, status, error]);
 
-    console.log({files,bloodWork})
     const handleModalClose = () => {
         navigate("/doctor");
-
+        closeModal('patientSelect');
     };
 
     const handleDownload = async (fileRef) => {
@@ -64,27 +105,51 @@ const LabsAndRequisitions = () => {
         }
     };
 
+    // const handleNewLabResultUpload = (info) => {
+    //     if (info.file.type !== 'application/pdf') {
+    //         message.error('Only PDF files are allowed.');
+    //         setNewLabResultFile(null);
+    //         return;
+    //     }
+    //     setNewLabResultFile(info.file);
+    // };
 
-    const uploadFileToAPI = async (file) => {
+    const handleNewLabResultNameChange = (e) => {
+        setNewLabResultName(e.target.value);
+    };
+
+    const handleAddLabResult = async () => {
+        if (!newLabResultFile) {
+            message.error('Please upload a lab result file.');
+            return;
+        }
+        if (!newLabResultName.trim()) {
+            message.error('Please enter a lab result name.');
+            return;
+        }
+
         const reader = new FileReader();
-        reader.readAsDataURL(file);
+        reader.readAsDataURL(newLabResultFile);
         reader.onload = async () => {
             const base64String = reader.result.split(',')[1];
             const payload = {
                 patientRef: patient.userRef,
                 bloodWork: [{
                     base64: base64String,
-                    filename: file.name,
-                    fileTitle: file.name.split('.')[0],
+                    filename: newLabResultFile.name,
+                    fileTitle: newLabResultName.trim(),
                 }]
             };
 
             try {
                 await dispatch(addPatientBloodWork(payload));
-                setFiles((prev) => [...prev, { name: file.name, date: new Date().toLocaleDateString() }]);
-                message.success(`${file.name} uploaded successfully.`);
+                setFiles((prev) => [...prev, { name: newLabResultName, date: new Date().toLocaleDateString() }]);
+                message.success(`${newLabResultName} uploaded successfully.`);
+                closeModal('newLabResult');
+                setNewLabResultFile(null);
+                setNewLabResultName('');
             } catch (error) {
-                message.error(`Error uploading ${file.name}: ${error.message}`);
+                message.error(`Error uploading ${newLabResultName}: ${error.message}`);
             }
         };
     };
@@ -103,7 +168,7 @@ const LabsAndRequisitions = () => {
         name: 'file',
         multiple: true,
         beforeUpload: (file) => {
-            if (files.length >= 2) {
+            if (files.length >= 20) {
                 message.error('You can only upload a maximum of 2 files.');
                 return Upload.LIST_IGNORE;
             }
@@ -111,8 +176,6 @@ const LabsAndRequisitions = () => {
                 message.error('Only PDF files are allowed.');
                 return Upload.LIST_IGNORE;
             }
-
-            uploadFileToAPI(file);
             return false;
         },
     };
@@ -122,7 +185,7 @@ const LabsAndRequisitions = () => {
             {patient ? <Header /> : "Select a patient to view their labs and requisitions"}
             <Modal
                 title="No Patient Selected"
-                visible={isModalVisible}
+                open={isModalVisible}
                 footer={[
                     <Button key="ok" type="primary" onClick={handleModalClose}>
                         Select Patient
@@ -133,13 +196,94 @@ const LabsAndRequisitions = () => {
             >
                 <p>Please select a patient to view their labs and requisitions.</p>
             </Modal>
+
+            <Modal
+                title={<div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                    <LeftOutlined onClick={() => closeModal('newLabResult')} style={{ cursor: "pointer" }} />
+                    <Text strong>NEW LAB RESULT</Text>
+                </div>}
+                open={isNewLabResultVisible}
+                onCancel={() => closeModal('newLabResult')}
+                footer={[
+                    <Button key="cancel" onClick={() => closeModal('newLabResult')}>Cancel</Button>,
+                    <Button key="save" type="primary" onClick={handleAddLabResult} style={{            background: "#00ADEF",
+                }}>Add Lab Result</Button>,
+                ]}
+            >
+                <Input
+                    placeholder="Enter lab result name"
+                    style={{ marginBottom: "15px" }}
+                    value={newLabResultName}
+                    onChange={handleNewLabResultNameChange}
+                />
+                <Text strong>Upload lab result</Text>
+                <Dragger
+                    name="file"
+                    multiple={false}
+                    showUploadList={true}
+                    beforeUpload={(file) => {
+                        if (file.type !== 'application/pdf') {
+                            message.error('Only PDF files are allowed.');
+                            return Upload.LIST_IGNORE;
+                        }
+                        setNewLabResultFile(file);
+                        return false;
+                    }}
+                >
+                    <p className="ant-upload-drag-icon">
+                        <UploadOutlined />
+                    </p>
+                    <p className="ant-upload-text">Drag and drop</p>
+                    <p className="ant-upload-hint">- OR -</p>
+                    <Button icon={<UploadOutlined />}>Browse Files</Button>
+                </Dragger>
+                {newLabResultFile && <Text>Selected File: {newLabResultFile.name}</Text>}
+            </Modal>
+
+            <Modal
+                title="LAB RESULTS"
+                open={isEditModalVisible}
+                width={800}
+                onCancel={() => closeModal('editLabResult')}
+                footer={[
+                    <Button key="cancel" onClick={() => closeModal('editLabResult')}>
+                        Cancel
+                    </Button>,
+                    <Button key="save" type="primary" style={{ background: "green" }}>
+                        Save Changes
+                    </Button>,
+                ]}
+            >
+                <List
+                    dataSource={files}
+                    renderItem={(file) => (
+                        <List.Item>
+                            <div style={{ display: 'flex', alignItems: 'center', width: '100%', gap: 15 }}>
+                                <div style={{ width: '3px', height: '40px', backgroundColor: 'red' }}></div>
+                                <Text>{file.name}</Text>
+                                <Text>{moment(file.date).format('MMMM DD, YYYY')}</Text>
+                                <FilePdfOutlined style={{ color: 'red', fontSize: 24 }} />
+                                <Link onClick={() => handleDownload(file.id)}>{file.filename || 'LabResults.pdf'}</Link>
+                                <EditOutlined style={{ color: '#1890ff', cursor: 'pointer' }} onClick={() => openModal('editLabResult')} />
+                                <DeleteOutlined style={{ color: 'red', cursor: 'pointer' }} onClick={() => handleDelete(file.id)} />
+                            </div>
+                        </List.Item>
+                    )}
+                />
+                <Button type="primary" style={{ marginTop: 10, background: "#00ADEF",
+ }} key={'new'} onClick={() => openModal('newLabResult')} >+ New Lab Result</Button>
+            </Modal>
+
             <div className="p-6 mt-4" style={{ padding: "0 1%" }}>
                 <p style={{ fontWeight: 'bold', marginBottom: '30px' }}>LABS AND REQUISITIONS</p>
 
                 <div style={{ display: 'flex', gap: 20 }}>
-                    <div style={{ flex: 1 }}> {/* Reduced from flex: 1 to 0.7 */}
+                    <div style={{ flex: 1 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                            <div
+                                style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
+                                onClick={() => openModal('editLabResult')}
+                            >
                                 <EditOutlined style={{ fontSize: '16px', color: '#1890ff' }} />
                                 <Text strong>Edit Lab Result</Text>
                             </div>
@@ -159,7 +303,6 @@ const LabsAndRequisitions = () => {
                                                 <Text style={{ fontWeight: 500 }}>{file.name}</Text>
                                                 <br />
                                             </div>
-
                                             <div style={{ flex: 1 }}>
                                                 <Text style={{ fontWeight: 500 }}>
                                                     {file.date ? moment(file.date).format('MMMM DD, YYYY') : 'No date available'}
@@ -168,13 +311,12 @@ const LabsAndRequisitions = () => {
                                             </div>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                                 <FilePdfOutlined style={{ color: 'red', fontSize: 24 }} />
-                                                <Link style={{ color: '#1890ff' }} onClick={()=>handleDownload(file.id)}>
+                                                <Link style={{ color: '#1890ff' }} onClick={() => handleDownload(file.id)}>
                                                     {file.filename || 'LabResults.pdf'}
                                                 </Link>
                                             </div>
                                             <div style={{ display: 'flex', gap: 10 }}>
 
-                                                {/* <EditOutlined style={{ color: '#1890ff', cursor: 'pointer' }} onClick={() => console.log('Edit', file.id)} /> */}
                                                 <DeleteOutlined style={{ color: 'red', cursor: 'pointer' }} onClick={() => handleDelete(file.id)} />
                                             </div>
                                         </div>

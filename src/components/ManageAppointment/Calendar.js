@@ -274,16 +274,16 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
     setEditingKey(key);
   };
   // Function to handle saving the edited time range (You'll need to implement the actual save logic)
-  const saveEdit = (key) => {
-    console.log("Save edit called for key:", key);
-    setEditingKey(null); // Close the edit mode
-    // Implement your save logic here (API call, state update, etc.)
-  };
+  // const saveEdit = (key) => {
+  //   console.log("Save edit called for key:", key);
+  //   setEditingKey(null); // Close the edit mode
+  //   // Implement your save logic here (API call, state update, etc.)
+  // };
 
-  // Function to handle canceling the edit
-  const cancelEdit = () => {
-    setEditingKey(null);
-  };
+  // // Function to handle canceling the edit
+  // const cancelEdit = () => {
+  //   setEditingKey(null);
+  // };
 
   // Function to handle time change in the time pickers
   const onTimeChange = (time, timeString, field, index) => {
@@ -307,162 +307,153 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
         eventClick={handleEventClick} // Add event click handler
       />
 
-      {/* Event Details Drawer */}
       <Drawer
         title={selectedEvent?.title}
         placement="right"
-        width={500} // Adjust width as needed
+        width={500} 
         onClose={handleDrawerClose}
         open={isDrawerVisible}
-        extra={
-          <Space>
-            <Button onClick={handleCancelEvent} danger>
+        footer={
+          <div style={{ textAlign: "right" }}>
+            <Button onClick={handleCancelEvent} style={{ marginRight: 8 }}>
               Cancel
             </Button>
-            <Button type="primary" onClick={handleEditEvent}>
-              Edit
+            <Button
+              type="primary"
+              onClick={handleEditEvent}
+              style={{
+                background: "#00ADEF",
+                padding: "10px 20px",
+              }}
+            >
+             Save
             </Button>
-          </Space>
+          </div>
         }
+       
       >
         {selectedEvent && (
-          <div>
-            {appointmentDetails?.bookedTimeRange?.map((timeRange, index) => {
-              const key = `timeRange-${index}`; // Unique key for each time range
-              return (
-                <div key={key} style={{ marginBottom: "20px" }}>
-                  <Divider orientation="left">
-                    Time Range {index + 1}
-                  </Divider>
-                  {editingKey === key ? (
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "10px",
-                      }}
-                    >
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "10px",
-                        }}
-                      >
-                        <Text strong>Start Time:</Text>
-                        <TimePicker
-                          defaultValue={
-                            timeRange?.start
-                              ? moment({
-                                  hour: timeRange?.start?.hour,
-                                  minute: timeRange?.start?.minute,
-                                })
-                              : null
-                          }
-                          format="HH:mm"
-                          onChange={(time, timeString) =>
-                            onTimeChange(time, timeString, "start", index)
-                          }
-                        />
-                      </div>
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "10px",
-                        }}
-                      >
-                        <Text strong>End Time:</Text>
-                        <TimePicker
-                          defaultValue={
-                            timeRange?.end
-                              ? moment({
-                                  hour: timeRange?.end?.hour,
-                                  minute: timeRange?.end?.minute,
-                                })
-                              : null
-                          }
-                          format="HH:mm"
-                          onChange={(time, timeString) =>
-                            onTimeChange(time, timeString, "end", index)
-                          }
-                        />
-                      </div>
-                      <Space>
-                        <Button
-                          size="small"
-                          onClick={() => saveEdit(key)}
-                          type="primary"
-                        >
-                          Save
-                        </Button>
-                        <Button size="small" onClick={cancelEdit}>
-                          Cancel
-                        </Button>
-                      </Space>
-                    </div>
-                  ) : (
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "flex-start",
-                        gap: "20px",
-                      }}
-                    >
-                      <div>
-                        <Text strong style={{ marginRight: "8px" }}>
-                          Start Time:
-                        </Text>
-                        <Text>
-                          {timeRange?.start
-                            ? moment({
-                                hour: timeRange?.start?.hour,
-                                minute: timeRange?.start?.minute,
-                              }).format("HH:mm")
-                            : "N/A"}
-                        </Text>
-                      </div>
-                      <div>
-                        <Text strong style={{ marginRight: "8px" }}>
-                          End Time:
-                        </Text>
-                        <Text>
-                          {timeRange?.end
-                            ? moment({
-                                hour: timeRange?.end?.hour,
-                                minute: timeRange?.end?.minute,
-                              }).format("HH:mm")
-                            : "N/A"}
-                        </Text>
-                      </div>
-                      <Button
-                        size="small"
-                        onClick={() => startEditing(key)}
-                        style={{ marginTop: "10px" }}
-                      >
-                        Edit
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+     <div>
+     {appointmentDetails?.bookedTimeRange?.map((timeRange, index) => {
+       const key = `timeRange-${index}`; // Unique key for each time range
+       return (
+         <div key={key} style={{ marginBottom: "20px" }}>
+           <Divider orientation="left">Time Range {index + 1}</Divider>
+           {editingKey === key ? (
+             <div
+               style={{
+                 display: "flex",
+                 alignItems: "center",
+                 gap: "20px",
+                 flexWrap: "wrap",
+               }}
+             >
+               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                 <Text strong>Start Time:</Text>
+                 <TimePicker
+                   defaultValue={
+                     timeRange?.start
+                       ? moment({
+                           hour: timeRange?.start?.hour,
+                           minute: timeRange?.start?.minute,
+                         })
+                       : null
+                   }
+                   format="HH:mm"
+                   onChange={(time, timeString) =>
+                     onTimeChange(time, timeString, "start", index)
+                   }
+                 />
+               </div>
+   
+               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                 <Text strong>End Time:</Text>
+                 <TimePicker
+                   defaultValue={
+                     timeRange?.end
+                       ? moment({
+                           hour: timeRange?.end?.hour,
+                           minute: timeRange?.end?.minute,
+                         })
+                       : null
+                   }
+                   format="HH:mm"
+                   onChange={(time, timeString) =>
+                     onTimeChange(time, timeString, "end", index)
+                   }
+                 />
+               </div>
+   
+               {/* <Space>
+                 <Button size="small" onClick={() => saveEdit(key)} type="primary">
+                   Save
+                 </Button>
+                 <Button size="small" onClick={cancelEdit}>Cancel</Button>
+               </Space> */}
+             </div>
+           ) : (
+             <div
+               style={{
+                 display: "flex",
+                 alignItems: "center",
+                 gap: "20px",
+                 flexWrap: "wrap",
+               }}
+             >
+               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                 <Text strong>Start Time:</Text>
+                 <Text>
+                   {timeRange?.start
+                     ? moment({
+                         hour: timeRange?.start?.hour,
+                         minute: timeRange?.start?.minute,
+                       }).format("HH:mm")
+                     : "N/A"}
+                 </Text>
+               </div>
+   
+               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                 <Text strong>End Time:</Text>
+                 <Text>
+                   {timeRange?.end
+                     ? moment({
+                         hour: timeRange?.end?.hour,
+                         minute: timeRange?.end?.minute,
+                       }).format("HH:mm")
+                     : "N/A"}
+                 </Text>
+               </div>
+   
+               <Button size="small" onClick={() => startEditing(key)}>
+                 Edit
+               </Button>
+             </div>
+           )}
+         </div>
+       );
+     })}
+   </div>
+   
+       
         )}
       </Drawer>
 
-      {/* Edit Event Drawer */}
       <Drawer
         title="Edit Event Time"
         placement="right"
         width={500} // Adjust width as needed
         onClose={handleEditDrawerClose}
         open={isEditDrawerVisible}
+        
         footer={
           <Space>
             <Button onClick={handleEditDrawerClose}>Cancel</Button>
-            <Button type="primary" onClick={handleSaveEdit}>
+            <Button type="primary" onClick={handleSaveEdit}  
+              style={{
+                background: "#00ADEF",
+                padding: "10px 20px",
+              }}
+            >
               Save
             </Button>
           </Space>

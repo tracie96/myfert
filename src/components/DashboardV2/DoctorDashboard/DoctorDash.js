@@ -65,9 +65,9 @@ export default function DoctorDash() {
                 setAllData(updatedList); // Store all data
                 setPagination((prev) => ({
                     ...prev,
-                    total: updatedList.length, // Set total from the fetched data
+                    total: updatedList?.length, // Set total from the fetched data
                 }));
-                setData(updatedList.slice(0, pagination.pageSize)); // Display the first page
+                setData(updatedList?.slice(0, pagination.pageSize)); // Display the first page
             }
         } catch (error) {
             console.error("Error fetching users:", error);

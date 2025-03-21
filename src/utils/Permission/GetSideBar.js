@@ -28,7 +28,7 @@ export const GetSideBar = () => {
   const { Sider } = Layout;
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const location = useLocation();
-
+console.log(userAuth)
   const showDrawer = () => {
     setVisible(true);
   };
@@ -381,7 +381,7 @@ export const GetSideBar = () => {
         </div>
       </>
     );
-  } else if (userAuth.obj.role === "Nurse") {
+  } else if (userAuth.obj.role === "Nurse" || "Fertility Support Practitioner") {
     return (
       <>
         <div>

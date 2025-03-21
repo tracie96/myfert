@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import fertilityImage from "../../assets/images/auth/fertilityImage.svg";
-import docDashBoardIcon from "../../assets/images/sidebar/docDashboardIcon.png";
 import { useSelector } from "react-redux";
 import { Menu, Button, Drawer, Layout } from "antd";
 import {
@@ -179,25 +178,7 @@ console.log(userAuth)
       </Menu.Item>
     </Menu>
   );
-  const nurseMenuItems = (
-    <Menu
-      theme="light"
-      defaultSelectedKeys={["1"]}
-      mode="inline"
-      onClick={onClose}
-    >
-      <Menu.Item key="1" icon={<OrderedListOutlined />}>
-        <NavLink to="/doctor" style={{ textDecoration: "none" }}>
-          <span>PATIENT LIST</span>
-        </NavLink>
-      </Menu.Item>
-      <Menu.Item key="2" icon={<CalendarTwoTone />}>
-        <NavLink to="/doctor/appointment" style={{ textDecoration: "none" }}>
-          <span className="no-underline">CALENDAR</span>
-        </NavLink>
-      </Menu.Item>
-    </Menu>
-  );
+
 
   const adminMenuItems = (
     <Menu
@@ -303,7 +284,8 @@ console.log(userAuth)
         </div>
       </>
     );
-  } else if (userAuth.obj.role === "Doctor" || userAuth.obj.role === "FertilityEducator") {
+  }
+   else if (userAuth.obj.role === "Doctor" || userAuth.obj.role === "FertilityEducator") {
     return (
       <>
         <div>
@@ -381,83 +363,9 @@ console.log(userAuth)
         </div>
       </>
     );
-  } else if (userAuth.obj.role !== '') {
-    return (
-      <>
-        <div>
-          {isMobile ? (
-            <>
-              <Button
-                type="primary"
-                onClick={showDrawer}
-                className="sidebar-toggle"
-                style={{
-                  marginBottom: 16,
-                  position: "absolute",
-                  top: 15,
-                  left: 30,
-                  zIndex: 9,
-                }}
-              >
-                <MenuOutlined />
-              </Button>
-              <Drawer
-                placement="left"
-                closable={false}
-                onClose={onClose}
-                visible={visible}
-                bodyStyle={{ padding: 0 }}
-                width={250} // Set the width of the Drawer here
-              >
-                <NavLink
-                  className="sidebar-brand d-flex align-items-center justify-content-center"
-                  to="/"
-                  onClick={onClose}
-                >
-                  <div className="sidebar-brand-text mx-3">
-                    <NavLink className="text-white" to="/">
-                      <img
-                        src={fertilityImage}
-                        alt="logo"
-                        style={{ width: "100%" }}
-                      />
-                    </NavLink>
-                  </div>
-                </NavLink>
-                {nurseMenuItems}
-              </Drawer>
-            </>
-          ) : (
-            <Sider
-              collapsible
-              breakpoint="xs"
-              collapsedWidth={0}
-              trigger={null}
-              theme="light"
-              className="navbar-nav sidebar sidebar-light accordion"
-              id="accordionSidebar"
-            >
-              <NavLink
-                className="sidebar-brand d-flex align-items-center justify-content-center"
-                to="/"
-              >
-                <div className="sidebar-brand-text  mx-3">
-                  <NavLink className="text-white" to="/">
-                    <img
-                      src={fertilityImage}
-                      alt="logo"
-                      style={{ width: "100%" }}
-                    />
-                  </NavLink>
-                </div>
-              </NavLink>
-              {nurseMenuItems}
-            </Sider>
-          )}
-        </div>
-      </>
-    );
-  } else if (userAuth.obj.role === "Patient") {
+  } 
+
+  else if (userAuth.obj.role === "Patient") {
     return (
       <div>
         {isMobile ? (
@@ -533,95 +441,83 @@ console.log(userAuth)
         )}
       </div>
     );
-  } else {
+  } 
+  else {
     return (
       <>
-        <ul
-          className="navbar-nav sidebar sidebar-light accordion"
-          id="accordionSidebar"
-        >
-          <NavLink
-            className="sidebar-brand d-flex align-items-center justify-content-center"
-            to="/"
-          >
-            <div className="sidebar-brand-text  mx-3">
-              <NavLink className="text-white" to="/">
-                <img
-                  src={fertilityImage}
-                  alt="logo"
-                  style={{ width: "100%" }}
-                />
-              </NavLink>
-            </div>
-          </NavLink>
-
-          {/* Divider */}
-          <hr className="sidebar-divider my-0" />
-
-          {/* empty */}
-          <li className="nav-item">
-            <NavLink className="nav-link" to="/"></NavLink>
-          </li>
-
-          {/* Nav Item - Dashboard */}
-          <li className="nav-item">
-            <NavLink className="nav-link" to="/">
-              <img
-                src={docDashBoardIcon}
-                alt="dashboard"
-                style={{ width: "35px" }}
-              ></img>
-              <span className="pl-2">Dashboard</span>
-            </NavLink>
-          </li>
-
-          {/* Nav Item - Add Company Collapse Menu */}
-          {userAuth && !userAuth.obj.companyName ? (
+        <div>
+          {isMobile ? (
             <>
-              <li className="nav-item d-none">
-                <a
-                  className="nav-link collapsed"
-                  href="/"
-                  data-toggle="collapse"
-                  data-target="#collapseMCompany"
-                  aria-expanded="true"
-                  aria-controls="collapseMCompany"
+              <Button
+                type="primary"
+                onClick={showDrawer}
+                className="sidebar-toggle"
+                style={{
+                  marginBottom: 16,
+                  position: "absolute",
+                  top: 30,
+                  left: 30,
+                  zIndex: 9,
+                  background: "none",
+                  color: "#00ADEF"
+                }}
+              >
+                <MenuOutlined />
+              </Button>
+              <Drawer
+                placement="left"
+                closable={false}
+                onClose={onClose}
+                visible={visible}
+                bodyStyle={{ padding: 0 }}
+                width={250}
+              >
+                <NavLink
+                  className="sidebar-brand d-flex align-items-center justify-content-center"
+                  to="/"
+                  onClick={onClose}
                 >
-                  <i className="fas fa-fw fa-university"></i>
-                  <span>Manage Compnay</span>
-                </a>
-                <div
-                  id="collapseMCompany"
-                  className="collapse"
-                  aria-labelledby="headingMCompany"
-                  data-parent="#accordionSidebar"
-                >
-                  <div className="bg-white py-2 collapse-inner rounded">
-                    <NavLink className="collapse-item" to="add-company">
-                      Add Company
-                    </NavLink>
-                    <div className="collapse-divider"></div>
-                    <NavLink className="collapse-item" to="company-list">
-                      Company List
+                  <div className="sidebar-brand-text mx-3">
+                    <NavLink className="text-white" to="/">
+                      <img
+                        src={fertilityImage}
+                        alt="logo"
+                        style={{ width: "100%" }}
+                      />
                     </NavLink>
                   </div>
-                </div>
-              </li>
+                </NavLink>
+                {doctorMenuItems}
+              </Drawer>
             </>
           ) : (
-            ""
+            <Sider
+              collapsible
+              breakpoint="xs"
+              collapsedWidth={0}
+              trigger={null}
+              theme="light"
+              className="navbar-nav sidebar sidebar-light accordion"
+              id="accordionSidebar"
+            >
+              <NavLink
+                className="sidebar-brand d-flex align-items-center justify-content-center"
+                to="/"
+              >
+                <div className="sidebar-brand-text  mx-3">
+                  <NavLink className="text-white" to="/">
+                    <img
+                      src={fertilityImage}
+                      alt="logo"
+                      style={{ width: "100%" }}
+                    />
+                  </NavLink>
+                </div>
+              </NavLink>
+              {doctorMenuItems}
+            </Sider>
           )}
-
-          {/* Divider */}
-          <hr className="sidebar-divider d-none d-md-block" />
-
-          <div className="text-center d-none d-md-inline">
-            <button
-              className="rounded-circle border-0"
-              id="sidebarToggle"
-            ></button>
-          </div>
-        </ul>
+        </div>
       </>
     );
   }

@@ -248,7 +248,7 @@ import MedScreen from "../DashboardV2/PatientDashboard/Meds";
 
 //#endregion
 
-const allowedDoctorRoles = ['Nurse', 'Doctor', 'PharmacistClinician', 'NutritionalPractitioner', 'FertilitySupportPractitioner', 'FertilityEducator'];
+const allowedDoctorRoles = ['Nurse', 'Doctor', 'PharmacistClinician', 'NutritionalPractitioner', 'FertilitySupport', 'FertilityEducator'];
 const RoleProtectedRoute = ({ element, allowedRoles }) => {
   const userAuth = useSelector((state) => state?.authentication?.userAuth);
 

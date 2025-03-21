@@ -381,7 +381,7 @@ console.log(userAuth)
         </div>
       </>
     );
-  } else if (userAuth.obj.role === "Nurse" || "Fertility Support Practitioner") {
+  } else if (userAuth.obj.role !== '') {
     return (
       <>
         <div>

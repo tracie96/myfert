@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Upload, List, Typography, message, Card, Modal, Button, Input } from 'antd';
 import { InboxOutlined, FilePdfOutlined, EditOutlined, DeleteOutlined, LeftOutlined, UploadOutlined } from '@ant-design/icons';
 import Header from './Components/Header';
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
-import { addPatientBloodWork, getPatientBloodWork, deletePatientBloodWork, downloadBloodWork } from '../../redux/doctorSlice';
+import { getPatientBloodWork, deletePatientBloodWork, downloadBloodWork, addPatientDocuments } from '../../redux/doctorSlice';
 import moment from 'moment';
 const { Dragger } = Upload;
 const { Text, Link } = Typography;
@@ -12,7 +12,8 @@ const { Text, Link } = Typography;
 const LabsAndRequisitions = () => {
     const [files, setFiles] = useState([]);
     const dispatch = useDispatch();
-    const bloodWork = useSelector((state) => state.doctor.bloodWork);
+    const [bloodWorkFile1, setBloodWorkFile1] = useState(null);
+    const [bloodWorkFile2, setBloodWorkFile2] = useState(null);
     const status = useSelector((state) => state.doctor.status);
     const error = useSelector((state) => state.doctor.error);
     const patient = JSON.parse(localStorage.getItem("patient")) || { userRef: "" };
@@ -23,7 +24,7 @@ const LabsAndRequisitions = () => {
     const [newLabResultName, setNewLabResultName] = useState('');
     const navigate = useNavigate();
 
-    // Generic function to open modals, closing others
+    console.log({ bloodWorkFile1, bloodWorkFile2 })
     const openModal = (modalType) => {
         setIsModalVisible(false);
         setIsNewLabResultVisible(false);
@@ -59,18 +60,37 @@ const LabsAndRequisitions = () => {
                 break;
         }
     };
-
-    useEffect(() => {
+    const fetchPatientBloodWork = useCallback(async (fileType) => {
         if (!patient.userRef) {
+            console.log("Opening patient select modal");
             openModal('patientSelect');
         } else {
-            dispatch(getPatientBloodWork(patient.userRef));
+            console.log(`Fetching patient blood work for fileType ${fileType}...`);
+            const resultAction = await dispatch(getPatientBloodWork({ patientId: patient.userRef, fileType }));
+    
+            if (getPatientBloodWork.fulfilled.match(resultAction)) {
+                if (fileType === 1) {
+                    setBloodWorkFile1(resultAction.payload);
+                } else if (fileType === 2) {
+                    setBloodWorkFile2(resultAction.payload);
+                }
+            }
         }
-    }, [dispatch, patient.userRef]);
+    }, [patient.userRef, dispatch]);
 
     useEffect(() => {
-        if (bloodWork) {
-            setFiles(bloodWork.map(file => ({
+        fetchPatientBloodWork(1);
+    }, [dispatch, patient.userRef, fetchPatientBloodWork]);
+
+    useEffect(() => {
+        fetchPatientBloodWork(2);
+    }, [dispatch, patient.userRef, fetchPatientBloodWork]);
+
+
+
+    useEffect(() => {
+        if (bloodWorkFile1) {
+            setFiles(bloodWorkFile1.map(file => ({
                 id: file.fileRef,
                 name: file.filename,
                 date: file.createdOn
@@ -78,7 +98,7 @@ const LabsAndRequisitions = () => {
         } else if (status === 'failed') {
             message.error(error || 'Failed to retrieve files.');
         }
-    }, [bloodWork, status, error]);
+    }, [bloodWorkFile1, status, error]);
 
     const handleModalClose = () => {
         navigate("/doctor");
@@ -120,39 +140,49 @@ const LabsAndRequisitions = () => {
 
     const handleAddLabResult = async () => {
         if (!newLabResultFile) {
-            message.error('Please upload a lab result file.');
-            return;
+          message.error('Please upload a lab result file.');
+          return;
         }
         if (!newLabResultName.trim()) {
-            message.error('Please enter a lab result name.');
-            return;
+          message.error('Please enter a lab result name.');
+          return;
         }
-
+      
         const reader = new FileReader();
         reader.readAsDataURL(newLabResultFile);
         reader.onload = async () => {
-            const base64String = reader.result.split(',')[1];
-            const payload = {
-                patientRef: patient.userRef,
-                bloodWork: [{
-                    base64: base64String,
-                    filename: newLabResultFile.name,
-                    fileTitle: newLabResultName.trim(),
-                }]
-            };
-
-            try {
-                await dispatch(addPatientBloodWork(payload));
-                setFiles((prev) => [...prev, { name: newLabResultName, date: new Date().toLocaleDateString() }]);
-                message.success(`${newLabResultName} uploaded successfully.`);
-                closeModal('newLabResult');
-                setNewLabResultFile(null);
-                setNewLabResultName('');
-            } catch (error) {
-                message.error(`Error uploading ${newLabResultName}: ${error.message}`);
-            }
+          const base64String = reader.result.split(',')[1];
+          const payload = {
+            patientRef: patient.userRef,
+            bloodWork: [{
+              base64: base64String,
+              filename: newLabResultFile.name,
+              fileTitle: newLabResultName.trim(),
+              fileType: 1 // lab report file type
+            }]
+          };
+      
+          try {
+            await dispatch(addPatientDocuments(payload));
+            // Update the bloodWorkFile1 state instead of a generic files state
+            setBloodWorkFile1((prev) => [
+              ...prev,
+              {
+                id: Date.now(), // Generate a unique id (or use the id from the response if available)
+                name: newLabResultName,
+                filename: newLabResultFile.name,
+                uploadedDate: new Date().toLocaleDateString(),
+              }
+            ]);
+            message.success(`${newLabResultName} uploaded successfully.`);
+            closeModal('newLabResult');
+            setNewLabResultFile(null);
+            setNewLabResultName('');
+          } catch (error) {
+            message.error(`Error uploading ${newLabResultName}: ${error.message}`);
+          }
         };
-    };
+      };
 
     const handleDelete = async (fileId) => {
         try {
@@ -168,7 +198,7 @@ const LabsAndRequisitions = () => {
         name: 'file',
         multiple: true,
         beforeUpload: (file) => {
-            if (files.length >= 20) {
+            if (bloodWorkFile2.length >= 2) { // Enforce max 2 files
                 message.error('You can only upload a maximum of 2 files.');
                 return Upload.LIST_IGNORE;
             }
@@ -176,9 +206,45 @@ const LabsAndRequisitions = () => {
                 message.error('Only PDF files are allowed.');
                 return Upload.LIST_IGNORE;
             }
-            return false;
+    
+            const reader = new FileReader();
+            reader.onload = async () => {
+                const base64String = reader.result.split(',')[1];
+                const payload = {
+                    patientRef: patient.userRef,
+                    bloodWork: [{
+                        base64: base64String,
+                        filename: file.name,
+                        fileTitle: newLabResultName.trim(),
+                        fileType: 2,
+                    }],
+                };
+    
+                try {
+                    await dispatch(addPatientDocuments(payload));
+    
+                    // Update the correct state
+                    setBloodWorkFile2((prev) => [...prev, {
+                        id: Date.now(), // Generate a temporary ID
+                        name: file.name,
+                        filename: file.name,
+                        uploadedDate: new Date().toLocaleDateString(),
+                    }]);
+    
+                    message.success(`${file.name} uploaded successfully.`);
+                    setNewLabResultName('');
+                } catch (error) {
+                    message.error(`Error uploading ${file.name}: ${error.message}`);
+                }
+            };
+    
+            reader.readAsDataURL(file);
+            return false; // Prevent automatic upload
         },
     };
+    
+
+
 
     return (
         <>
@@ -206,8 +272,9 @@ const LabsAndRequisitions = () => {
                 onCancel={() => closeModal('newLabResult')}
                 footer={[
                     <Button key="cancel" onClick={() => closeModal('newLabResult')}>Cancel</Button>,
-                    <Button key="save" type="primary" onClick={handleAddLabResult} style={{            background: "#00ADEF",
-                }}>Add Lab Result</Button>,
+                    <Button key="save" type="primary" onClick={handleAddLabResult} style={{
+                        background: "#00ADEF",
+                    }}>Add Lab Result</Button>,
                 ]}
             >
                 <Input
@@ -270,8 +337,9 @@ const LabsAndRequisitions = () => {
                         </List.Item>
                     )}
                 />
-                <Button type="primary" style={{ marginTop: 10, background: "#00ADEF",
- }} key={'new'} onClick={() => openModal('newLabResult')} >+ New Lab Result</Button>
+                <Button type="primary" style={{
+                    marginTop: 10, background: "#00ADEF",
+                }} key={'new'} onClick={() => openModal('newLabResult')} >+ New Lab Result</Button>
             </Modal>
 
             <div className="p-6 mt-4" style={{ padding: "0 1%" }}>
@@ -328,7 +396,34 @@ const LabsAndRequisitions = () => {
                     </div>
 
                     <Card style={{ border: '1px solid #C2E6F8', width: '35%' }} className='mt-4'>
-                        <Text strong>Upload requisition (max 2)</Text>
+                        {bloodWorkFile2?.map((file, index) => (
+                            <Card key={index} style={{border: 'none', boxShadow: 'none' }}>
+                                <Text strong>Day 1 Requisition</Text>
+                                <List.Item style={{ borderBottom: '1px solid #f0f0f0', padding: '12px 16px' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 15, width: '100%' }}>
+                                        <div style={{ width: '3px', height: '40px', backgroundColor: 'red' }}></div>
+
+                                        <div style={{ flex: 1 }}>
+                                            <Text style={{ fontWeight: 500 }}>{file.name}</Text>
+                                            <br />
+                                        </div>
+
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                            <FilePdfOutlined style={{ color: 'red', fontSize: 24 }} />
+                                            <Link style={{ color: '#1890ff' }} onClick={() => handleDownload(file.id)}>
+                                                {file.filename || 'LabResults.pdf'}
+                                            </Link>
+                                        </div>
+                                        <div style={{ display: 'flex', gap: 10 }}>
+
+                                            <DeleteOutlined style={{ color: 'red', cursor: 'pointer' }} onClick={() => handleDelete(file.id)} />
+                                        </div>
+                                    </div>
+                                </List.Item>
+                            </Card>
+                        ))}
+
+                        {/* File Upload Section */}
                         <Dragger {...uploadProps} style={{ marginTop: 10 }}>
                             <p className="ant-upload-drag-icon">
                                 <InboxOutlined />
@@ -338,6 +433,7 @@ const LabsAndRequisitions = () => {
                             <p className="ant-upload-text">Browse Files</p>
                         </Dragger>
                     </Card>
+
                 </div>
 
             </div>

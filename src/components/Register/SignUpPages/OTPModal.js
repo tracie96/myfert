@@ -117,6 +117,8 @@ const EmailVerificationModal = ({ visible, onCancel, email }) => {
     } catch (error) {
       message.error(error);
     }
+    setOtpFields(["", "", "", "", ""]);
+
   };
 
   const handleNewEmailSubmit = (newEmail) => {

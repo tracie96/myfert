@@ -248,7 +248,7 @@ import MedScreen from "../DashboardV2/PatientDashboard/Meds";
 
 //#endregion
 
-const allowedDoctorRoles = ['Nurse', 'Doctor', 'PharmacistClinician', 'NutritionalPractitioner', 'FertilitySupport', 'FertilityEducator'];
+const allowedDoctorRoles = ['Nurse', 'Doctor', 'PharmacistClinician', 'NutritionalPractitioner','Nutritionist', 'FertilitySupport', 'FertilityEducator','Pharmacist'];
 const RoleProtectedRoute = ({ element, allowedRoles }) => {
   const userAuth = useSelector((state) => state?.authentication?.userAuth);
 
@@ -279,6 +279,21 @@ const ProtectedRoute = ({ allowedRoles }) => {
   if (userAuth && Object.keys(userAuth).length > 0 && userAuth.obj.role === 'Admin') {
     return <><Navigate to="/admin" replace /><UserManagement /></>;
   }
+  if (userAuth && Object.keys(userAuth).length > 0 && userAuth.obj.role === 'Nurse') {
+    return <><Navigate to="/nurse" replace /><DoctorDash /></>;
+  }
+  if (userAuth && Object.keys(userAuth).length > 0 && userAuth.obj.role === 'Pharmacist') {
+    return <><Navigate to="/pharmacist" replace /><DoctorDash /></>;
+  }
+  if (userAuth && Object.keys(userAuth).length > 0 && userAuth.obj.role === 'Nutritionist') {
+    return <><Navigate to="/nutritionist" replace /><DoctorDash /></>;
+  }
+  if (userAuth && Object.keys(userAuth).length > 0 && userAuth.obj.role === 'FertilitySupport') {
+    return <><Navigate to="/fertility-support" replace /><DoctorDash /></>;
+  }
+  if (userAuth && Object.keys(userAuth).length > 0 && userAuth.obj.role === 'FertilityEducator') {
+    return <><Navigate to="/fertility-educator" replace /><DoctorDash /></>;
+  }
   if (userAuth && Object.keys(userAuth).length > 0 && (allowedRoles.includes(userAuth.obj.role))) {
     return <><Navigate to="/doctor" replace /><DoctorDash /></>;
   }
@@ -305,6 +320,12 @@ const getRouter = createBrowserRouter(
         {/* <Route path="home" element={<Dashboard />} /> */}
         <Route path="patient" element={<ProtectedRoute allowedRoles={allowedDoctorRoles} />} />
         <Route path="doctor" element={<ProtectedRoute allowedRoles={allowedDoctorRoles} />} />
+        <Route path="nurse" element={<ProtectedRoute allowedRoles={allowedDoctorRoles} />} />
+        <Route path="pharmacist" element={<ProtectedRoute allowedRoles={allowedDoctorRoles} />} />
+        <Route path="nutritionist" element={<ProtectedRoute allowedRoles={allowedDoctorRoles} />} />
+        <Route path="fertility-support" element={<ProtectedRoute allowedRoles={allowedDoctorRoles} />} />
+        <Route path="fertility-educator" element={<ProtectedRoute allowedRoles={allowedDoctorRoles} />} />
+
         <Route
           path="doctor/user/:id?"
           element={

@@ -28,22 +28,28 @@ export const patientList = createAsyncThunk(
 
 
 export const getPatientBloodWork = createAsyncThunk(
-  'doctor/getBloodWork',
-  async (patientId, { rejectWithValue, getState, dispatch }) => {
+  "doctor/getBloodWork",
+  async ({ patientId, fileType }, { rejectWithValue, getState, dispatch }) => {
     const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+
     try {
-      const response = await axios.get(`https://myfertilitydevapi.azurewebsites.net/api/Doctor/GetPatientBloodWork/${patientId}`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user?.obj?.token}`,
-        },
-      });
+      const url = `${baseUrl}Doctor/GetPatientDocument/${patientId}/${fileType}`;
+      const response = await axios.get(url, config);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+      handleApiError(error?.response?.data, dispatch, user);
+      return rejectWithValue(error?.response?.data || error.message);
     }
   }
 );
+
+
 export const downloadBloodWork = createAsyncThunk(
   "doctor/downloadBloodWork",
   async (fileRef, { rejectWithValue, getState }) => {
@@ -112,6 +118,35 @@ export const addPatientBloodWork = createAsyncThunk(
     }
   }
 );
+
+export const addPatientDocuments = createAsyncThunk(
+  "doctor/addPatientDocuments",
+  async ({ patientRef, bloodWork }, { rejectWithValue, getState, dispatch }) => {
+    console.log("addPatientDocuments Thunk:", { patientRef, bloodWork }); 
+
+    const user = getState()?.authentication?.userAuth; 
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+    try {
+      const response = await axios.post(
+        `${baseUrl}Doctor/AddPatientDocument`, 
+        { patientRef, document: bloodWork }, 
+        config
+      );
+      console.log("API Response:", response.data); 
+      return response.data;
+
+    } catch (error) {
+      console.error("API Error:", error); 
+      return rejectWithValue(handleApiError(error?.response?.data, dispatch, user)); 
+    }
+  }
+);
+
 export const getPatientMed = createAsyncThunk(
   'doctor/getPatientMed',
   async (patientId, { rejectWithValue, getState, dispatch }) => {

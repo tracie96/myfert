@@ -56,7 +56,7 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
             },
           },
         );
-        console.log(response.data);
+        // console.log(response.data);
 
         setAppointmentDetails(response.data);
       } catch (error) {
@@ -92,10 +92,10 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
                 classNames: `fc-event-coach-available`,
                 textColor: "white",
                 extendedProps: {
-                  startTime: start.toLocaleTimeString(), // Store formatted start time
-                  endTime: end.toLocaleTimeString(), // Store formatted end time
-                  slotData: slot, // Store the original slot data
-                  date: slot.date, // Store the date
+                  startTime: start.toLocaleTimeString(), 
+                  endTime: end.toLocaleTimeString(), 
+                  slotData: slot, 
+                  date: slot.date,
                 },
               },
             ]
@@ -108,10 +108,10 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
                 classNames: "fc-event-coach-booked",
                 textColor: "white",
                 extendedProps: {
-                  startTime: start.toLocaleTimeString(), // Store formatted start time
-                  endTime: end.toLocaleTimeString(), // Store formatted end time
-                  slotData: slot, // Store the original slot data
-                  date: slot.date, // Store the date
+                  startTime: start.toLocaleTimeString(),
+                  endTime: end.toLocaleTimeString(), 
+                  slotData: slot,
+                  date: slot.date, 
                 },
               },
             ];
@@ -129,7 +129,6 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
         );
         if (getAvailability.fulfilled.match(response)) {
           const availability = response.payload;
-          console.log(response.payload);
           updateCalendarEvents(availability, startYear, startMonth);
         } else {
           console.error("Failed to fetch availability");

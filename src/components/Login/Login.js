@@ -59,7 +59,9 @@ function Login() {
             navigate("/patient");
           } else if (resultAction.obj.role === "SuperAdmin") {
             navigate("/users");
-          } else if (resultAction.obj.role) {
+          } else if (resultAction.obj.role === "Nurse") {
+            navigate("/nurse");}
+           else if (resultAction.obj.role) {
             navigate("/doctor");
           }
         }

@@ -46,7 +46,6 @@ const DoctorSignup = ({ userRole }) => {
   });
   const [username, setUsername] = useState("");
   const { Item: FormItem } = Form;
-  console.log(location.state, "pro");
   const initialValues = {
     role: location.state?.role,
     userName: "",
@@ -247,6 +246,7 @@ const DoctorSignup = ({ userRole }) => {
       console.log("Processed Values:", processedValues);
 
       const response = await dispatch(postRegister(processedValues));
+      console.log({response})
       if (response && response?.meta?.requestStatus === "fulfilled") {
         setTimeout(() => {
           setEmailVerificationVisible(true);

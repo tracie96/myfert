@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {  useState } from "react";
 import Calendar from "./Calendar";
 import { Drawer, Button, Checkbox, Row, Col, Space, Avatar, TimePicker } from "antd";
 import moment from "moment";
@@ -19,7 +19,7 @@ import {
   VideoCameraOutlined,
 } from "@ant-design/icons";
 
-import { submitAvailability } from "../redux/doctorSlice";
+import {  submitAvailability } from "../redux/doctorSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useMediaQuery } from "react-responsive";
 
@@ -27,7 +27,7 @@ const Appointment = () => {
   const [open, setOpen] = useState(false);
   const [currentWeek, setCurrentWeek] = useState(moment());
   const [drawerKey, setDrawerKey] = useState(0);
-  console.log({ drawerKey })
+  console.log(drawerKey)
   const [availability, setAvailability] = useState({
     Sunday: [],
     Monday: [],
@@ -39,6 +39,7 @@ const Appointment = () => {
   });
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const maxSlots = 5;
+  // let availabilities=[]
   const [viewAll, setViewAll] = useState(false);
   const handleViewAll = () => {
     setViewAll(!viewAll);
@@ -58,6 +59,41 @@ const Appointment = () => {
   const filteredAppointments = appointmentList.filter(
     (app) => app.roleId === 0
   );
+
+  // const fetchAndSetAvailability = useCallback(
+  //   async (startYear, startMonth) => {
+  //     try {
+  //       const response = await dispatch(
+  //         getAvailability({ month: startMonth, year: startYear }),
+  //       );
+  //       if (getAvailability.fulfilled.match(response)) {
+  //          availabilities = response.payload;
+  //       } else {
+  //         console.error("Failed to fetch availability");
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching availability:", error);
+  //     }
+  //   },
+  //   [dispatch],
+  // );
+
+  // useEffect(() => {
+  //   const startYear = currentWeek.year();
+  //   const startMonth = currentWeek.month() + 1;
+    
+  //   fetchAndSetAvailability(startYear, startMonth);
+  
+  //   const intervalId = setInterval(() => {
+  //     fetchAndSetAvailability(startYear, startMonth);
+  //   }, 5000);
+  
+  //   return () => clearInterval(intervalId); 
+  
+  // }, [fetchAndSetAvailability, currentWeek]);
+  
+
+
   const visibleAppointments = viewAll
     ? filteredAppointments
     : filteredAppointments.slice(0, 2);

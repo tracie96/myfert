@@ -240,7 +240,7 @@ export const downloadBloodWork = createAsyncThunk(
 
     try {
       const response = await axios.get(
-        `${baseUrl}Patient/DownloadBloodWork/${fileRef}`,
+        `${baseUrl}Patient/DownloadDocument/${fileRef}`,
         config
       );
       return response.data;
@@ -249,6 +249,8 @@ export const downloadBloodWork = createAsyncThunk(
     }
   }
 );
+
+
 export const updateAppointment = createAsyncThunk(
   "patient/updateAppointment",
   async (appointment, { rejectWithValue, getState, dispatch }) => {

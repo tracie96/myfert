@@ -276,7 +276,7 @@ export default function PatDash() {
                         onClick={() => {
                           navigate("/patient/calendar");
                         }}
-                        disabled={currentStep !== 1 || currentStep === null}
+                        disabled={currentStep < 1 || currentStep === null}
                         style={{
                           backgroundColor: "#C2E6F8",
                           borderColor: "none",

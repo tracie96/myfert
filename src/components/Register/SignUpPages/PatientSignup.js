@@ -1444,7 +1444,7 @@ const PatientSignup = () => {
                                           and accurately recorded. If the email
                                           address is not mine, I permit the
                                           owner of the provided email address to
-                                          receive my test results on my behalf *
+                                          receive my test results on my behalf 
                                         </Checkbox>
                                       </FormItem>
                                     </div>
@@ -1467,7 +1467,7 @@ const PatientSignup = () => {
                                           and authorize the use of anonymized
                                           data for research and development
                                           purposes, aimed at enhancing services
-                                          for all users *
+                                          for all users 
                                         </Checkbox>
                                       </FormItem>
                                     </div>

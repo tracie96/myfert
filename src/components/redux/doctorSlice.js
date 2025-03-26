@@ -64,7 +64,7 @@ export const downloadBloodWork = createAsyncThunk(
 
     try {
       const response = await axios.get(
-        `${baseUrl}Doctor/DownloadBloodWork/${fileRef}`,
+        `${baseUrl}Doctor/DownloadDocument/${fileRef}`,
         config
       );
       return response.data;

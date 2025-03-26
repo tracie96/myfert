@@ -2,14 +2,14 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Row, Col, Tabs, Button, Table, Card, Input } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import {  getUpcomingAppointments} from "../../redux/patientSlice";
+import { getUpcomingAppointments } from "../../redux/patientSlice";
 
 export default function PatientAppointmentList() {
   const dispatch = useDispatch();
 
   const {
-  upcomingPatientAppointment
-  } = useSelector((state) => state?.patient);; 
+    upcomingPatientAppointment
+  } = useSelector((state) => state?.patient);;
 
   const [loading] = useState(false);
   const [setSortConfig] = useState({
@@ -28,7 +28,19 @@ export default function PatientAppointmentList() {
     });
   }, [setSortConfig]);
 
+  //something is wrong here
 
+  const handleStepChange = useCallback(() => {
+    localStorage.setItem("currentStep", 2);
+  }, []);
+
+  const handleJoinMeeting = useCallback(
+    (meetingLink) => {
+      window.open(meetingLink, "_blank");
+      handleStepChange();
+    },
+    [handleStepChange]
+  );
 
   const columns = useMemo(
     () => [
@@ -63,11 +75,27 @@ export default function PatientAppointmentList() {
                 <Button
                   type="primary"
                   style={{
-                    backgroundColor: "#007bff", 
+                    backgroundColor: "#007bff",
                     border: "none",
                     width: "100%",
                   }}
-                  onClick={() => window.open(record.meetingLink, "_blank")}
+                  onClick={handleJoinMeeting}
+                >
+                  Join
+                </Button>
+              </Col>
+            )}
+            {!record.approved && (
+              <Col span={24}>
+                <Button
+                  type="primary"
+                  style={{
+                    backgroundColor: "grey",
+                    border: "none",
+                    width: "100%",
+                    color: "#fff"
+                  }}
+                  onClick={handleJoinMeeting}
                 >
                   Join
                 </Button>
@@ -77,13 +105,13 @@ export default function PatientAppointmentList() {
         ),
       },
     ],
-    []
+    [handleJoinMeeting]
   );
-  
+
   const filteredAppointments = useMemo(() => {
     if (!Array.isArray(upcomingPatientAppointment)) {
       console.error("upcomingPatientAppointment is not an array");
-      return []; 
+      return [];
     }
 
     if (!searchParam) return upcomingPatientAppointment;

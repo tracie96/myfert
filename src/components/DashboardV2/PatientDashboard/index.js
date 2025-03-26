@@ -141,7 +141,6 @@ export default function PatDash() {
   useEffect(() => {
     let intervalId;
 
-    // Fetch patient status only if user is authenticated
     if (userAuth?.obj?.token) {
       dispatch(getPatientStatus());
 
@@ -275,10 +274,9 @@ export default function PatDash() {
                       <Button
                         type="primary"
                         onClick={() => {
-                          handleStepChange(2);
-                          navigate("/patient/appointment");
+                          navigate("/patient/calendar");
                         }}
-                        disabled={status?.statLevel !== 1 || status?.statLevel === null}
+                        disabled={currentStep !== 1 || currentStep === null}
                         style={{
                           backgroundColor: "#C2E6F8",
                           borderColor: "none",
@@ -303,7 +301,7 @@ export default function PatDash() {
                         onClick={() => {
                           navigate("/plans");
                         }}
-                        disabled={status?.statLevel !== 2 || status?.statLevel === null}
+                        disabled={currentStep !== 2 || currentStep === null}
                         style={{
                           backgroundColor: "#C2E6F8",
                           borderColor: "none",

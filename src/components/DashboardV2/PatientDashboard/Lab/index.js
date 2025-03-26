@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilePdf } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch, useSelector } from "react-redux";
 import Lab from "../../../../assets/images/lab.png";
-import { downloadBloodWork, getPatientBloodWork } from "../../../redux/patientSlice";
+import { downloadBloodWork, getPatientLabs } from "../../../redux/patientSlice";
 import moment from 'moment';
 
 const { Title, Text, Link } = Typography;
@@ -88,7 +88,7 @@ const LabScreen = () => {
     const { bloodWork, lastUpdated, loading, error } = useSelector((state) => state.patient);
 
     useEffect(() => {
-        dispatch(getPatientBloodWork());
+        dispatch(getPatientLabs());
     }, [dispatch]);
 
     const handleDownload = async (fileRef) => {

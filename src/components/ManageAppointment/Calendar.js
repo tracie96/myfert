@@ -14,7 +14,7 @@ import {
   Space,
   Typography,
   Divider,
-} from "antd"; // Import necessary Ant Design components
+} from "antd"; 
 import moment from "moment";
 import axios from "axios"; // Import axios
 
@@ -56,7 +56,6 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
             },
           },
         );
-        // console.log(response.data);
 
         setAppointmentDetails(response.data);
       } catch (error) {
@@ -68,6 +67,8 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
 
   const updateCalendarEvents = useCallback(
     (availability, startYear, startMonth) => {
+      console.log({availability})
+
       const events = availability.flatMap((slot, index) => {
         const start = new Date(slot.date);
         const end = new Date(slot.date);
@@ -77,11 +78,8 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
         const startMinute = slot.start ? slot.start.minute : 0;
         const endHour = slot.end ? slot.end.hour : 0;
         const endMinute = slot.end ? slot.end.minute : 0;
-
-        // Set the time for the start and end dates
         start.setHours(startHour, startMinute, 0, 0);
         end.setHours(endHour, endMinute, 0, 0);
-
         return slot.free
           ? [
               {
@@ -203,12 +201,11 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
       console.warn(
         "Appointment details or bookedTimeRange is missing.  Cannot initialize edit form.",
       );
-      // Optionally, show an error message to the user
-      // message.error("Could not load appointment details for editing.");
-      return; // Prevent the edit drawer from opening with invalid data
+   
+      return;
     }
 
-    setIsDrawerVisible(false); // Close the event details drawer
+    setIsDrawerVisible(false); 
     setIsEditDrawerVisible(true); // Open the edit drawer
   };
 
@@ -230,24 +227,6 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
       editEndTime,
     );
 
-    // You would implement your save logic here, which might involve:
-    // 1. Calling an API to update the availability slot in your backend
-    // 2. Updating the apptEvents state to reflect the changes in the calendar
-
-    // Example (replace with your actual save logic):
-    // dispatch(updateAvailability({
-    //   ...selectedEvent.extendedProps.slotData,
-    //   start: {
-    //     hour: editStartTime.hour(),
-    //     minute: editStartTime.minute(),
-    //   },
-    //   end: {
-    //     hour: editEndTime.hour(),
-    //     minute: editEndTime.minute(),
-    //   },
-    // }));
-
-    // Close the edit drawer
     setIsEditDrawerVisible(false);
     setSelectedEvent(null);
   };
@@ -258,8 +237,7 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
     setSelectedEvent(null);
     setAppointmentDetails(null); // Clear appointment details
     setEditingKey(null);
-    // Implement your cancel logic here, which might involve removing the event
-    // from the calendar and updating the availability in your backend.
+   
   };
 
   // Close the edit drawer
@@ -272,17 +250,6 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
   const startEditing = (key) => {
     setEditingKey(key);
   };
-  // Function to handle saving the edited time range (You'll need to implement the actual save logic)
-  // const saveEdit = (key) => {
-  //   console.log("Save edit called for key:", key);
-  //   setEditingKey(null); // Close the edit mode
-  //   // Implement your save logic here (API call, state update, etc.)
-  // };
-
-  // // Function to handle canceling the edit
-  // const cancelEdit = () => {
-  //   setEditingKey(null);
-  // };
 
   // Function to handle time change in the time pickers
   const onTimeChange = (time, timeString, field, index) => {

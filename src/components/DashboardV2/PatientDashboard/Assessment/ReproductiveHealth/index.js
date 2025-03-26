@@ -403,7 +403,7 @@ const questions = [
           question: "Colour",
           type: "radio",
           label: "Colour",
-          options: ["None", "White"],
+          options: ["White","Other"],
           name: "cervical_mucus_sub",
         },
       ],
@@ -424,7 +424,7 @@ const questions = [
           question: "Colour",
           type: "radio",
           label: "Colour",
-          options: ["None", "clear"],
+          options: ["White","Other"],
           name: "Watery_mucus_colour",
         },
       ],
@@ -446,7 +446,7 @@ const questions = [
           question: "Colour",
           type: "radio",
           label: "Colour",
-          options: ["None", "clear"],
+          options: ["White","Other"],
           name: "egg_white_mucus_colour",
         },
       ],
@@ -468,7 +468,7 @@ const questions = [
           question: "Colour",
           type: "radio",
           label: "Colour",
-          options: ["None", "Pink", "Red", "Brown",  "Black"],
+          options: ["None", "Pink", "Red", "Brown",  "Black","Other"],
           name: "pre_spotting_colour",
         },
       ],
@@ -811,7 +811,9 @@ const ReproductiveHealth = ({ onComplete }) => {
   const handleExit = () => {
     navigate("/assessment");
   };
-
+  const handleStepChange = () => {
+    localStorage.setItem("currentStep", 1);
+  };
   const handleInfoModal = () => {
     setShowInfoMoal(!showInfoMoal)
   }
@@ -930,6 +932,8 @@ const ReproductiveHealth = ({ onComplete }) => {
         localStorage.setItem("currentQuestionIndex11", 0);
         localStorage.setItem("currentStep", 1);
         localStorage.setItem("answers", JSON.stringify(answers));
+        handleStepChange(2);
+
         navigate("/assessment");
       } else {
         console.error("API error:", response.statusText);

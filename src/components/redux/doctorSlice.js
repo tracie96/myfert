@@ -79,7 +79,7 @@ export const deletePatientBloodWork = createAsyncThunk(
     const user = getState()?.authentication?.userAuth;
     try {
       const response = await axios.get(
-        `https://myfertilitydevapi.azurewebsites.net/api/Doctor/DeleteBloodWork/${bloodWorkId}`,
+        `https://myfertilitydevapi.azurewebsites.net/api/Doctor/DeleteDocument/${bloodWorkId}`,
         {
           headers: {
             "Content-Type": "application/json",

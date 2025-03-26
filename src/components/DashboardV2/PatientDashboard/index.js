@@ -227,7 +227,7 @@ export default function PatDash() {
               Initial Sign Up Steps:
             </h3>
           </>}
-        {status === "" || status?.statLevel <= 2 || status === undefined ?
+        {currentStep < 3 ?
           <Steps
             current={currentStep}
             progressDot={customDot}

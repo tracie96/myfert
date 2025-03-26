@@ -1537,7 +1537,7 @@ const PatientSignup = () => {
                                       </FormItem>
                                     </div>
                                   </div>
-                                  <div className="row">
+                                  <div className="row" style={{display:'none'}}>
                                     <p
                                       style={{
                                         color: "#335CAD",
@@ -1550,7 +1550,7 @@ const PatientSignup = () => {
                                         <i>(Optional)</i>
                                       </span>
                                     </p>
-                                    <div className="col-lg-12 col-sm-12">
+                                    <div className="col-lg-12 col-sm-12" style={{display:'none'}}>
                                       <FormItem
                                         name="AgreeToUseData"
                                         valuePropName="checked"

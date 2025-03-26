@@ -952,7 +952,7 @@ const ReproductiveHealth = ({ onComplete }) => {
   const renderSubQuestions = (subQuestions) => {
     return subQuestions.map((subQuestion, index) => (
       <div key={index} style={{ marginTop: "20px" }}>
-        <p style={{color:'#353C43', fontWeight:'bold'}}>{subQuestion.question}</p>
+        <p style={{color:'#000'}}>{subQuestion.question}</p>
         {subQuestion.type === "text" && (
           <Input
             name="method"

@@ -1444,7 +1444,7 @@ const PatientSignup = () => {
                                           and accurately recorded. If the email
                                           address is not mine, I permit the
                                           owner of the provided email address to
-                                          receive my test results on my behalf
+                                          receive my test results on my behalf *
                                         </Checkbox>
                                       </FormItem>
                                     </div>
@@ -1467,7 +1467,7 @@ const PatientSignup = () => {
                                           and authorize the use of anonymized
                                           data for research and development
                                           purposes, aimed at enhancing services
-                                          for all users
+                                          for all users *
                                         </Checkbox>
                                       </FormItem>
                                     </div>
@@ -1533,6 +1533,44 @@ const PatientSignup = () => {
                                             {" "}
                                             Privacy Policy
                                           </span>
+                                        </Checkbox>
+                                      </FormItem>
+                                    </div>
+                                  </div>
+                                  <div className="row">
+                                    <p
+                                      style={{
+                                        color: "#335CAD",
+                                        fontWeight: "bold",
+                                      }}
+                                    >
+                                      {" "}
+                                      Consent to Use Anonymized Data{" "}
+                                      <span style={{ fontWeight: "400" }}>
+                                        <i>(Optional)</i>
+                                      </span>
+                                    </p>
+                                    <div className="col-lg-12 col-sm-12">
+                                      <FormItem
+                                        name="AgreeToUseData"
+                                        valuePropName="checked"
+                                        rules={[
+                                          {
+                                            required: true,
+                                            message: "! Please confirm",
+                                          },
+                                        ]}
+                                      >
+                                        <Checkbox>
+                                          I consent to the use of my anonymized
+                                          health data for clinical research,
+                                          internal research, and AI development
+                                          aimed at improving reproductive
+                                          healthcare outcomes. I understand that
+                                          this data will be used in a manner
+                                          that does not identify me personally
+                                          and that I can withdraw this consent
+                                          at any time
                                         </Checkbox>
                                       </FormItem>
                                     </div>

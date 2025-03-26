@@ -633,7 +633,7 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
   const renderSubQuestions = (subQuestions) => {
     return subQuestions.map((subQuestion, index) => (
       <div key={index} style={{ marginTop: "20px" }}>
-        <p style={{color:'#353C43', fontWeight:'bold'}}>{subQuestion.type !== "text" && subQuestion.question}</p>
+        <p>{subQuestion.type !== "text" && subQuestion.question}</p>
         {subQuestion.type === "text" && (
           <Input
             placeholder={subQuestion.question}

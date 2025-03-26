@@ -100,10 +100,10 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
           : [
               {
                 id: `${slot.date}_${slot.roleId}_${index}`,
-                title: `Booked`,
+                title: `Available`,
                 start: start,
                 end: end,
-                classNames: "fc-event-coach-booked",
+                classNames: `fc-event-coach-available`,
                 textColor: "white",
                 extendedProps: {
                   startTime: start.toLocaleTimeString(),

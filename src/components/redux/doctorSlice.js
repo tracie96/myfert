@@ -344,7 +344,7 @@ export const getUpcomingAppointmentForDoctor = createAsyncThunk(
     };
     try {
       const response = await axios.get(
-        `${baseUrl}Doctor/GetUpComingAppointment`,
+        `${baseUrl}Doctor/GetAllAppointment`,
         config,
       );
       return response.data;
@@ -510,7 +510,7 @@ export const getUpcomingAppointments = createAsyncThunk(
 
     try {
       const response = await axios.get(
-        `${baseUrl}Doctor/GetUpComingAppointment`,
+        `${baseUrl}Doctor/GetAllAppointment`,
         config
       );
       return response.data;

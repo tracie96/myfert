@@ -424,7 +424,7 @@ const questions = [
           question: "Colour",
           type: "radio",
           label: "Colour",
-          options: ["None", "clear"],
+          options: ["Clear", "Other"],
           name: "Watery_mucus_colour",
         },
       ],
@@ -1129,24 +1129,40 @@ const ReproductiveHealth = ({ onComplete }) => {
           />
         )}
         {subQuestion.type === "radio" && (
-          <Radio.Group
-            name={subQuestion.name}
-            className="radioGroup"
-            onChange={(e) => handleChange(e.target.value, subQuestion.name)}
-            value={answers[subQuestion.name]}
-            style={{ width: "100%" }}
-          >
-            {subQuestion.options.map((option, idx) => (
-              <Radio
-                key={idx}
-                value={option}
-                name={option}
-                style={{ display: "block", marginBottom: "10px" }}
-              >
-                {option}
-              </Radio>
-            ))}
-          </Radio.Group>
+         <Radio.Group
+         name={subQuestion.name}
+         className="radioGroup"
+         onChange={(e) => handleChange(e.target.value, subQuestion.name)}
+         value={answers[subQuestion.name]}
+         style={{ width: "100%" }}
+       >
+         {subQuestion.options.map((option, idx) => {
+       
+           return (
+             <div key={idx} style={{ marginBottom: "10px" }}>
+               <Radio
+                 key={idx}
+                 value={option}
+                 name={option}
+                 style={{ display: "block", marginBottom: "10px" }}
+               >
+                 {option}
+               </Radio>
+               {option === "Other" && answers[subQuestion.name]?.includes("Other") && (
+                 <Input
+                   className="input_questionnaire"
+                   placeholder="Please specify"
+                   value={answers[`${subQuestion.name}_other`] || ""}
+                   onChange={(e) =>
+                     handleChange(e.target.value, `${subQuestion.name}_other`)
+                   }
+                   style={{ marginTop: "5px" }}
+                 />
+               )}
+             </div>
+           );
+         })}
+       </Radio.Group>
         )}
         {subQuestion.type === "checkbox" && (
           <Col>

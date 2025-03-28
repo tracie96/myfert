@@ -600,6 +600,7 @@ const questions = [
 
 const ReproductiveHealth = ({ onComplete }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [isDisabled, setisDisabled] = useState(false);
   const [showInfoMoal,setShowInfoMoal] = useState(false);
   const [answers, setAnswers] = useState({});
   const totalQuestions = questions.length;
@@ -652,15 +653,27 @@ const ReproductiveHealth = ({ onComplete }) => {
                 allSubQuestionsUnsure = false;
             }
             
+          const validCervicalMucusNames = [
+            "cervical_mucus",
+            "pre_spotting_sub",
+            "Watery_mucus_sub",
+            "egg_white_mucus_sub",
+            "after_period_spot_sub"
+          ];
 
-            // Validate number_with_radio_sub questions if not "Unsure"
-            if (subQuestion.type === "number_with_radio_sub") {
-                if (!subUnsure && (typeof subAnswer !== "number" || isNaN(subAnswer))) {
-                    subQuestionsValid = false;
-                    break; // No need to continue if one subquestion is invalid
-                }
+          // Check if subQuestion name is one of the valid names
+          if (validCervicalMucusNames.includes(subQuestion.name)) {
+            return true;
+          }
+
+          // Validate number_with_radio_sub questions if not "Unsure"
+          if (subQuestion.type === "number_with_radio_sub") {
+            if (!subUnsure && (typeof subAnswer !== "number" || isNaN(subAnswer))) {
+              subQuestionsValid = false;
+              break; // No need to continue if one subquestion is invalid
             }
-
+          }
+            
             // Validate radio questions
             if (subQuestion.type === "radio") {
                 if (!subAnswer) {
@@ -686,7 +699,6 @@ const ReproductiveHealth = ({ onComplete }) => {
 
   const handleSave = () => {
     const question = questions[currentQuestionIndex];
-  
     // Allow skipping validation if "Unsure" is selected for subQuestions
     if (
       question.type === "number_with_radio" &&
@@ -723,6 +735,16 @@ const ReproductiveHealth = ({ onComplete }) => {
   const handleChange = (value, name) => {
     let updatedAnswers = { ...answers };
 
+    const disabledNames = [
+      "cervical_mucus",
+      "pre_spotting_sub",
+      "Watery_mucus_sub",
+      "egg_white_mucus_sub",
+      "after_period_spot_sub"
+    ];
+    
+    setisDisabled(value === 0 && disabledNames.includes(name));
+    
     updatedAnswers["menstrual_bleeding"] =  0;
     if (name === "relaxation_techniques") { 
       if (value === "Yes") {
@@ -886,15 +908,21 @@ const ReproductiveHealth = ({ onComplete }) => {
         },
         cycleDischargeWatery: {
           duration: `${answers.Watery_mucus_sub}` || "N/A", // Example default
-          colour: answers.Watery_mucus_colour || "N/A", // Example default
+          colour: answers.Watery_mucus_colour === "Other"
+            ? answers.Watery_mucus_colour_other
+            : (answers.Watery_mucus_colour || "N/A"),
         },
         cycleDischargeEggWhite: {
           duration: `${answers.egg_white_mucus_sub}` || "N/A", // Example default
-          colour: answers.egg_white_mucus_colour || "N/A", // Example default
+          colour: answers.egg_white_mucus_colour === "Other"
+            ? answers.egg_white_mucus_colour_other
+            : (answers.egg_white_mucus_colour || "N/A"),
         },
         cycleDischargePrePeriod: {
           duration: `${answers.pre_spotting_sub}` || "N/A", // Example default
-          colour: answers.pre_spotting_colour || "N/A", // Example default
+          colour: answers.pre_spotting_colour === "Other"
+            ? answers.pre_spotting_colour_other
+            : (answers.pre_spotting_colour || "N/A"),
         },
         cycleDischargeMenstralBleeding: {
           duration: `${answers.menstrual_bleeding_sub+ ", " +answers.days_light_bleeding+ ", " +answers.days_moderate_bleeding+ ", " +answers.days_heavy_bleeding+ ", " +answers.days_very_heavy_bleeding}` || "N/A", // Example default
@@ -956,7 +984,7 @@ const ReproductiveHealth = ({ onComplete }) => {
   const renderSubQuestions = (subQuestions) => {
     return subQuestions.map((subQuestion, index) => (
       <div key={index} style={{ marginTop: "20px" }}>
-        <p style={{color:'#000'}}>{subQuestion.question}</p>
+        <p style={{color:'#353C43', fontWeight:'bold'}}>{subQuestion.question}</p>
         {subQuestion.type === "text" && (
           <Input
             name="method"
@@ -982,15 +1010,15 @@ const ReproductiveHealth = ({ onComplete }) => {
               <div style={{display: "flex", alignItems:"center"}}>
                  {/* InputNumber should have its own state key */}
                   {subQuestion.name === "intercourse_during_fertile_sub"?<span style={{ fontWeight: "600", color:"#303030"}}>Every&nbsp;</span>:""}
-                    <InputNumber
-                      max={(subQuestion.name === "shortest_cycle_radio"|| subQuestion.name === "average_cycle_radio") ? answers.longest_cycle_radio : undefined}
-                      min={subQuestion.name === "average_cycle_radio" ? answers.shortest_cycle_radio : 0}
-                      name={`${subQuestion.name}_menstrual_bleeding`}
-                      value={answers[subQuestion.name] || undefined}
-                      onChange={(value) => handleChange(value, subQuestion.name)}
-                      disabled={answers[`${subQuestion.name}_unsure`]}
-                      className="input_questionnaire"
-                    />
+                  <InputNumber
+                    max={subQuestion.name === "shortest_cycle_radio" || subQuestion.name === "average_cycle_radio" ? answers.longest_cycle_radio : undefined}
+                    min={subQuestion.name === "average_cycle_radio" ? answers.shortest_cycle_radio : 0}
+                    name={`${subQuestion.name}_menstrual_bleeding`}
+                    value={answers[subQuestion.name] || 0} // Default to 0 instead of undefined
+                    onChange={(value) => handleChange(value, subQuestion.name)}
+                    disabled={answers[`${subQuestion.name}_unsure`]}
+                    className="input_questionnaire"
+                  />
                     {<span style={{ fontWeight: "600", color:"#303030"}}>&nbsp;Days</span>}
               </div>
              
@@ -1133,24 +1161,43 @@ const ReproductiveHealth = ({ onComplete }) => {
           />
         )}
         {subQuestion.type === "radio" && (
-          <Radio.Group
-            name={subQuestion.name}
-            className="radioGroup"
-            onChange={(e) => handleChange(e.target.value, subQuestion.name)}
-            value={answers[subQuestion.name]}
-            style={{ width: "100%" }}
-          >
-            {subQuestion.options.map((option, idx) => (
-              <Radio
-                key={idx}
-                value={option}
-                name={option}
-                style={{ display: "block", marginBottom: "10px" }}
-              >
-                {option}
-              </Radio>
-            ))}
-          </Radio.Group>
+           <Radio.Group
+           name={subQuestion.name}
+           className="radioGroup"
+           onChange={(e) => handleChange(e.target.value, subQuestion.name)}
+           value={answers[subQuestion.name]}
+           style={{ width: "100%" }}
+         >
+           {subQuestion.options.map((option, idx) => {
+  
+             return (
+               <div key={idx} style={{ marginBottom: "10px" }}>
+                 <Radio
+                   key={idx}
+                   value={option}
+                   name={option}
+                   style={{ display: "block", marginBottom: "10px" }}
+                   disabled={isDisabled}
+                 >
+                   {option}
+                 </Radio>
+                 {option === "Other" && answers[subQuestion.name]?.includes("Other") && (
+                   <Input
+                     className="input_questionnaire"
+                     placeholder="Please specify"
+                     name={`${subQuestion.name}_other`}
+                     value={answers[`${subQuestion.name}_other`] || ""}
+                     disabled={isDisabled}
+                     onChange={(e) =>
+                       handleChange(e.target.value, `${subQuestion.name}_other`)
+                     }
+                     style={{ marginTop: "5px" }}
+                   />
+                 )}
+               </div>
+             );
+           })}
+         </Radio.Group>
         )}
         {subQuestion.type === "checkbox" && (
           <Col>

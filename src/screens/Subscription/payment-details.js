@@ -63,7 +63,12 @@ const PaymentDetails = () => {
 
   const handleModalOk = () => {
     setIsModalVisible(false);
+    handleStepChange()
     navigate("/patient"); 
+  };
+
+  const handleStepChange = () => {
+    localStorage.setItem("currentStep", 3);
   };
 
   const handleModalCancel = () => {

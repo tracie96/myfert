@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useCallback } from "react";
+import React, { useEffect, useMemo, useCallback, useState } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { getPatientStatus } from "../../../redux/patientSlice";
@@ -30,14 +30,23 @@ const CardComponent = ({ card, isClickable, index, handleCardClick, isCompleted 
 const QuestionnaireGrid = ({ cards, onCardClick }) => {
   const dispatch = useDispatch();
   const accessDetails = useSelector((state) => state.intake.accessDetails);
+  const [currentStep, setCurrentStep] = useState(0);
+
+  useEffect(() => {
+    const storedStep = localStorage.getItem("currentStep");
+    if (storedStep) {
+      setCurrentStep(parseInt(storedStep, 10));
+    }
+  }, []);
 
   useEffect(() => {
     dispatch(getAccessDetails());
   }, [dispatch]);
 
-  const { userAuth, status } = useSelector((state) => ({
+  const { userAuth } = useSelector((state) => ({
+  
     userAuth: state.authentication.userAuth,
-    status: state.patient.status,
+    // status: state.patient.status,
   }));
 
   useEffect(() => {
@@ -55,7 +64,7 @@ const QuestionnaireGrid = ({ cards, onCardClick }) => {
 
   const cardList = useMemo(() => {
     return cards.map((card, index) => {
-      const isClickable = status?.statLevel > 1 || index === 0;
+      const isClickable = currentStep > 3 || index === 0;
       // Determine if the card is completed based on accessDetails
       const isCompleted = accessDetails ? accessDetails[card.meta] : false;
 
@@ -71,7 +80,7 @@ const QuestionnaireGrid = ({ cards, onCardClick }) => {
         </Col>
       );
     });
-  }, [cards, status?.statLevel, handleCardClick, accessDetails]);  // Include accessDetails in the dependency array
+  }, [cards, handleCardClick, accessDetails, currentStep]);  // Include accessDetails in the dependency array
 
   return (
     <Container className="mt-4 assessment-container">

@@ -64,7 +64,7 @@ export const downloadBloodWork = createAsyncThunk(
 
     try {
       const response = await axios.get(
-        `${baseUrl}Doctor/DownloadBloodWork/${fileRef}`,
+        `${baseUrl}Doctor/DownloadDocument/${fileRef}`,
         config
       );
       return response.data;
@@ -79,7 +79,7 @@ export const deletePatientBloodWork = createAsyncThunk(
     const user = getState()?.authentication?.userAuth;
     try {
       const response = await axios.get(
-        `https://myfertilitydevapi.azurewebsites.net/api/Doctor/DeleteBloodWork/${bloodWorkId}`,
+        `https://myfertilitydevapi.azurewebsites.net/api/Doctor/DeleteDocument/${bloodWorkId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -344,7 +344,7 @@ export const getUpcomingAppointmentForDoctor = createAsyncThunk(
     };
     try {
       const response = await axios.get(
-        `${baseUrl}Doctor/GetUpComingAppointment`,
+        `${baseUrl}Doctor/GetAllAppointment`,
         config,
       );
       return response.data;
@@ -510,7 +510,7 @@ export const getUpcomingAppointments = createAsyncThunk(
 
     try {
       const response = await axios.get(
-        `${baseUrl}Doctor/GetUpComingAppointment`,
+        `${baseUrl}Doctor/GetAllAppointment`,
         config
       );
       return response.data;

@@ -226,12 +226,13 @@ const PatientCalendar = ({ selectedProviders }) => {
       if (setPatientAppointment.fulfilled.match(result)) {
         message.success("Appointment successfully set!");
         setIsModalVisible(false);
-
+        
         const currentDate = new Date(selectedDate);
         const startMonth = currentDate.getMonth() + 1;
         const startYear = currentDate.getFullYear();
         fetchAndSetAvailability(startYear, startMonth);
         dispatch(getUpcomingAppointments());
+        setOpen(false);
       } else {
         message.error(result.error.message || "Failed to set appointment");
       }

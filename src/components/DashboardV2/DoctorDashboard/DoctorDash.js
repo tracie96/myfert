@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Row, Col, Tabs, Table, Card, message, Switch, Input } from "antd";
+import { Row, Col, Tabs, Table, Card, message, Input } from "antd";
 import {
     ExperimentOutlined,
     FlagTwoTone,
@@ -7,20 +7,20 @@ import {
     SearchOutlined,
 } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { getZohoClientID, increaseUserStep, patientList } from "../../redux/doctorSlice";
+import { getZohoClientID, patientList } from "../../redux/doctorSlice";
 import { useNavigate } from "react-router-dom";
 
-const SwitchWrapper = ({ onChange, ...props }) => {
-    const handleClick = (e) => {
-        e.stopPropagation();
-    };
+// const SwitchWrapper = ({ onChange, ...props }) => {
+//     const handleClick = (e) => {
+//         e.stopPropagation();
+//     };
 
-    return (
-        <div onClick={handleClick}>
-            <Switch {...props} onChange={onChange} />
-        </div>
-    );
-};
+//     return (
+//         <div onClick={handleClick}>
+//             <Switch {...props} onChange={onChange} />
+//         </div>
+//     );
+// };
 
 export default function DoctorDash() {
     const dispatch = useDispatch();
@@ -122,27 +122,27 @@ export default function DoctorDash() {
         setSearchQuery(value);
     }, []);
 
-    const handleSwitchChange = useCallback(
-        async (checked, record, step) => {
-            console.log(record, "step");
+    // const handleSwitchChange = useCallback(
+    //     async (checked, record, step) => {
+    //         console.log(record, "step");
 
-            if (checked) {
-                try {
-                    await dispatch(increaseUserStep({ patientId: record.userRef, step }));
+    //         if (checked) {
+    //             try {
+    //                 await dispatch(increaseUserStep({ patientId: record.userRef, step }));
 
-                    console.log(
-                        `${step} stage switch ${checked ? "enabled" : "disabled"} for record:`,
-                        record
-                    );
+    //                 console.log(
+    //                     `${step} stage switch ${checked ? "enabled" : "disabled"} for record:`,
+    //                     record
+    //                 );
 
-                    fetchPatientList();
-                } catch (error) {
-                    console.error("Error while updating step:", error);
-                }
-            }
-        },
-        [dispatch, fetchPatientList]
-    );
+    //                 fetchPatientList();
+    //             } catch (error) {
+    //                 console.error("Error while updating step:", error);
+    //             }
+    //         }
+    //     },
+    //     [dispatch, fetchPatientList]
+    // );
 
     const dataWithIds = useMemo(
         () =>
@@ -225,50 +225,50 @@ export default function DoctorDash() {
                 key: "clinician",
                 render: () => <p> Clinician Bama Bish</p>,
             },
-            {
-                title: "Action",
-                key: "action",
-                render: (_, record) => (
-                    <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                        <SwitchWrapper
-                            checked={record.patientStat?.statLevel === 1 || record.patientStat?.statLevel === 2 || record.patientStat?.statLevel === 3 || record.patientStat?.statLevel === 4}
-                            onChange={(checked, e) => handleSwitchChange(checked, record, 1, e)}
-                        />
+            // {
+            //     title: "Action",
+            //     key: "action",
+            //     render: (_, record) => (
+            //         <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+            //             <SwitchWrapper
+            //                 checked={record.patientStat?.statLevel === 1 || record.patientStat?.statLevel === 2 || record.patientStat?.statLevel === 3 || record.patientStat?.statLevel === 4}
+            //                 onChange={(checked, e) => handleSwitchChange(checked, record, 1, e)}
+            //             />
 
 
-                    </div>
-                ),
-            },
-            {
-                title: "Second Step",
-                key: "action1",
-                render: (_, record) => (
-                    <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                        <Switch
-                            checked={record.patientStat?.statLevel === 4 || record.patientStat?.statLevel === 2}
-                            onChange={(checked, e) => handleSwitchChange(checked, record, 2, e)}
-                            // disabled={
-                            //     record.patientStat?.statLevel !== 2
-                            // } 
-                            />
+            //         </div>
+            //     ),
+            // },
+            // {
+            //     title: "Second Step",
+            //     key: "action1",
+            //     render: (_, record) => (
+            //         <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+            //             <Switch
+            //                 checked={record.patientStat?.statLevel === 4 || record.patientStat?.statLevel === 2}
+            //                 onChange={(checked, e) => handleSwitchChange(checked, record, 2, e)}
+            //                 // disabled={
+            //                 //     record.patientStat?.statLevel !== 2
+            //                 // } 
+            //                 />
 
-                    </div>
-                ),
-            },
-            {
-                title: "Third Step",
-                key: "action2",
-                render: (_, record) => (
-                    <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                        <Switch
-                            checked={record.patientStat?.statLevel === 4}
-                            onChange={(checked, e) => handleSwitchChange(checked, record, 4, e)}
-                           />
-                    </div>
-                ),
-            },
+            //         </div>
+            //     ),
+            // },
+            // {
+            //     title: "Third Step",
+            //     key: "action2",
+            //     render: (_, record) => (
+            //         <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+            //             <Switch
+            //                 checked={record.patientStat?.statLevel === 4}
+            //                 onChange={(checked, e) => handleSwitchChange(checked, record, 4, e)}
+            //                />
+            //         </div>
+            //     ),
+            // },
         ],
-        [handleSwitchChange]
+        []
     );
 
     const PatientList = React.memo(

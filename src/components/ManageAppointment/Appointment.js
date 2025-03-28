@@ -1,4 +1,4 @@
-import React, {  useState } from "react";
+import React, { useState } from "react";
 import Calendar from "./Calendar";
 import { Drawer, Button, Checkbox, Row, Col, Space, Avatar, TimePicker } from "antd";
 import moment from "moment";
@@ -19,7 +19,7 @@ import {
   VideoCameraOutlined,
 } from "@ant-design/icons";
 
-import {  submitAvailability } from "../redux/doctorSlice";
+import { submitAvailability } from "../redux/doctorSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useMediaQuery } from "react-responsive";
 
@@ -27,7 +27,6 @@ const Appointment = () => {
   const [open, setOpen] = useState(false);
   const [currentWeek, setCurrentWeek] = useState(moment());
   const [drawerKey, setDrawerKey] = useState(0);
-  console.log(drawerKey)
   const [availability, setAvailability] = useState({
     Sunday: [],
     Monday: [],
@@ -39,7 +38,6 @@ const Appointment = () => {
   });
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const maxSlots = 5;
-  // let availabilities=[]
   const [viewAll, setViewAll] = useState(false);
   const handleViewAll = () => {
     setViewAll(!viewAll);
@@ -59,46 +57,21 @@ const Appointment = () => {
   const filteredAppointments = appointmentList.filter(
     (app) => app.roleId === 0
   );
-
-  // const fetchAndSetAvailability = useCallback(
-  //   async (startYear, startMonth) => {
-  //     try {
-  //       const response = await dispatch(
-  //         getAvailability({ month: startMonth, year: startYear }),
-  //       );
-  //       if (getAvailability.fulfilled.match(response)) {
-  //          availabilities = response.payload;
-  //       } else {
-  //         console.error("Failed to fetch availability");
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching availability:", error);
-  //     }
-  //   },
-  //   [dispatch],
-  // );
-
-  // useEffect(() => {
-  //   const startYear = currentWeek.year();
-  //   const startMonth = currentWeek.month() + 1;
-    
-  //   fetchAndSetAvailability(startYear, startMonth);
-  
-  //   const intervalId = setInterval(() => {
-  //     fetchAndSetAvailability(startYear, startMonth);
-  //   }, 5000);
-  
-  //   return () => clearInterval(intervalId); 
-  
-  // }, [fetchAndSetAvailability, currentWeek]);
-  
-
-
   const visibleAppointments = viewAll
     ? filteredAppointments
     : filteredAppointments.slice(0, 2);
   const [moreVisible, setMoreVisible] = useState(filteredAppointments.map(() => true));
+console.log({filteredAppointments})
   const onClose = () => {
+    setAvailability({
+      Sunday: [],
+      Monday: [],
+      Tuesday: [],
+      Wednesday: [],
+      Thursday: [],
+      Friday: [],
+      Saturday: [],
+    })
     setOpen(false);
   };
   const addTimeSlot = (day) => {
@@ -174,7 +147,7 @@ const Appointment = () => {
     const startMinute = moment(startTime, "HH:mm").minute();
 
     return {
-      disabledHours: () => Array.from({ length: startHour }, (_, i) => i),
+      disabledHours: () => Array.from({ length: startHour }, (_, i) => i), 
       disabledMinutes: (selectedHour) =>
         selectedHour === startHour
           ? Array.from({ length: startMinute }, (_, i) => i)
@@ -225,79 +198,79 @@ const Appointment = () => {
         <div className="col-lg-12 mb-4">
           <div className="card shadow mb-4">
             <div className="card-body">
-              <div className="user" style={{ maxWidth: "600px", margin: "auto", padding: "20px", border: "1px solid #f0f0f0", borderRadius: "8px", backgroundColor: "#fff" }}>
-                <div className="form-group">
-                  <h3 style={{ color: "#333", marginBottom: "15px", fontWeight: "bold" }}>
-                    Upcoming Appointment
-                  </h3>
-                </div>
-
-                {filteredAppointments.length > 0 ? (
-                  <div>
-                    {visibleAppointments.map((appointment, index) => (
-                      <div
-                        key={index}
-                        style={{
-                          borderBottom: "1px solid #e0e0e0",
-                          padding: "15px 0",
-                          fontSize: "14px",
-                          position: "relative",
-                        }}
-                      >
-                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                          <p style={{ fontWeight: "bold", color: "#333" }}>
-                            <Avatar style={{ backgroundColor: "#1E90FF", marginRight: "8px" }} icon={<UserOutlined />} />
-                            Patient Gullbringa
-                          </p>
-                          {moreVisible[index] ? (
-                            <MoreOutlined style={{ fontSize: '18px', color: "#1E90FF", cursor: "pointer" }} onClick={() => toggleMore(index)} />
-                          ) : (
-                            <Button type="link" onClick={() => toggleMore(index)} style={{ color: "#ff4d4f" }}>
-                              Cancel
-                            </Button>
-                          )}
-                        </div>
-
-                        <div style={{ color: "#666" }}>
-                          <p>
-                            <CalendarOutlined style={{ marginRight: "8px" }} />
-                            {new Date(appointment.date).toLocaleDateString("en-Us", { month: "short", day: "numeric", year: "numeric" })}
-                          </p>
-                          <p>
-                            <ClockCircleOutlined style={{ marginRight: "8px" }} />
-                            {new Date(appointment.date).toLocaleTimeString("en-US", { hour: '2-digit', minute: '2-digit' })}
-                          </p>
-                          <p>
-                            <EnvironmentOutlined style={{ marginRight: "8px" }} />
-                            Virtual or In-person
-                          </p>
-                        </div>
-
-                        <div style={{ textAlign: "center", marginTop: "10px" }}>
-                          <Button type="primary" icon={<VideoCameraOutlined />} style={{ backgroundColor: "#1E90FF", border: "none", width: "100%", marginBottom: "8px" }}>
-                            Join
-                          </Button>
-                          <p style={{ fontSize: "13px", color: "#888", margin: "5px 0 0" }}>
-                            Ongoing Care Plan - Initial Care Team Appointment
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-
-                    {filteredAppointments.length > 2 && (
-                      <div onClick={handleViewAll} style={{ color: "#1E90FF", textAlign: "center", marginTop: "15px", cursor: "pointer" }}>
-                        {viewAll ? <UpOutlined style={{ marginRight: "8px" }} /> : <DownOutlined style={{ marginRight: "8px" }} />}
-                        {viewAll ? "View Less" : "View All"}
-                      </div>
-                    )}
-                  </div>
+            <div className="user" style={{ maxWidth: "600px", margin: "auto", padding: "20px", border: "1px solid #f0f0f0", borderRadius: "8px", backgroundColor: "#fff" }}>
+      <div className="form-group">
+        <h3 style={{ color: "#333", marginBottom: "15px", fontWeight: "bold" }}>
+          Upcoming Appointment
+        </h3>
+      </div>
+      
+      {filteredAppointments.length > 0 ? (
+        <div>
+          {visibleAppointments.map((appointment, index) => (
+            <div
+              key={index}
+              style={{
+                borderBottom: "1px solid #e0e0e0",
+                padding: "15px 0",
+                fontSize: "14px",
+                position: "relative",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <p style={{ fontWeight: "bold", color: "#333" }}>
+                  <Avatar style={{ backgroundColor: "#1E90FF", marginRight: "8px" }} icon={<UserOutlined />} />
+                  Patient Gullbringa
+                </p>
+                {moreVisible[index] ? (
+                  <MoreOutlined style={{ fontSize: '18px', color: "#1E90FF", cursor: "pointer" }} onClick={() => toggleMore(index)} />
                 ) : (
-                  <div style={{ textAlign: "center", color: "#888", fontSize: "14px" }}>
-                    <p>You have no upcoming appointment.</p>
-                    <p>The earliest appointment you can schedule with your provider is:</p>
-                  </div>
+                  <Button type="link" onClick={() => toggleMore(index)} style={{ color: "#ff4d4f" }}>
+                    Cancel
+                  </Button>
                 )}
               </div>
+
+              <div style={{ color: "#666" }}>
+                <p>
+                  <CalendarOutlined style={{ marginRight: "8px" }} />
+                  {new Date(appointment.date).toLocaleDateString("en-Us", { month: "short", day: "numeric", year: "numeric" })}
+                </p>
+                <p>
+                  <ClockCircleOutlined style={{ marginRight: "8px" }} />
+                  {new Date(appointment.date).toLocaleTimeString("en-US", { hour: '2-digit', minute: '2-digit' })}
+                </p>
+                <p>
+                  <EnvironmentOutlined style={{ marginRight: "8px" }} />
+                  Virtual or In-person
+                </p>
+              </div>
+
+              <div style={{ textAlign: "center", marginTop: "10px" }}>
+                <Button type="primary" icon={<VideoCameraOutlined />} style={{ backgroundColor: "#1E90FF", border: "none", width: "100%", marginBottom: "8px" }}>
+                  Join
+                </Button>
+                <p style={{ fontSize: "13px", color: "#888", margin: "5px 0 0" }}>
+                  Ongoing Care Plan - Initial Care Team Appointment
+                </p>
+              </div>
+            </div>
+          ))}
+
+          {filteredAppointments.length > 2 && (
+            <div onClick={handleViewAll} style={{ color: "#1E90FF", textAlign: "center", marginTop: "15px", cursor: "pointer" }}>
+              {viewAll ? <UpOutlined style={{ marginRight: "8px" }} /> : <DownOutlined style={{ marginRight: "8px" }} />}
+              {viewAll ? "View Less" : "View All"}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div style={{ textAlign: "center", color: "#888", fontSize: "14px" }}>
+          <p>You have no upcoming appointment.</p>
+          <p>The earliest appointment you can schedule with your provider is:</p>
+        </div>
+      )}
+    </div>
               <form className="user mt-4">
                 <div className="form-group col-lg-12">
                   <label className="form-label ml-1 font-weight-bold">
@@ -309,6 +282,7 @@ const Appointment = () => {
                 </div>
               </form>
               <Drawer
+                key={drawerKey}
                 title={
                   <div
                     style={{
@@ -403,15 +377,7 @@ const Appointment = () => {
                     </div>
                   </Col>
                 </Row>
-                <label
-                  style={{
-                    fontWeight: "bold",
-                    margin: "30px 0",
-                    color: "#335CAD",
-                  }}
-                >
-                  Slots
-                </label>
+
                 <label
                   style={{
                     fontWeight: "bold",

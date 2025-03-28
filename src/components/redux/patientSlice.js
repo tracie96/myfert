@@ -72,6 +72,29 @@ export const getPatientStatus = createAsyncThunk(
     }
   }
 );
+export const getPatientLabs = createAsyncThunk(
+  "patient/getPatientLabs",
+  async (_, { rejectWithValue, getState, dispatch }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        "accept": "text/plain",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+    try {
+      const response = await axios.get(
+        `${baseUrl}Patient/GetPatientDocument/1`,
+        config
+      );
+      console.log(response);
+      return response.data;
+    } catch (error) {
+      handleApiError(error?.response?.data, dispatch, user);
+      return rejectWithValue(error?.response?.data || "An error occurred");
+    }
+  }
+);
 
 export const getPatientBloodWork = createAsyncThunk(
   "patient/getPatientBloodWork",
@@ -217,7 +240,7 @@ export const downloadBloodWork = createAsyncThunk(
 
     try {
       const response = await axios.get(
-        `${baseUrl}Patient/DownloadBloodWork/${fileRef}`,
+        `${baseUrl}Patient/DownloadDocument/${fileRef}`,
         config
       );
       return response.data;
@@ -226,6 +249,8 @@ export const downloadBloodWork = createAsyncThunk(
     }
   }
 );
+
+
 export const updateAppointment = createAsyncThunk(
   "patient/updateAppointment",
   async (appointment, { rejectWithValue, getState, dispatch }) => {
@@ -431,14 +456,14 @@ const patientSlices = createSlice({
     });
 
     builder
-      .addCase(getPatientBloodWork.pending, (state) => {
+      .addCase(getPatientLabs.pending, (state) => {
         state.status = 'loading';
       })
-      .addCase(getPatientBloodWork.fulfilled, (state, action) => {
+      .addCase(getPatientLabs.fulfilled, (state, action) => {
         state.status = 'succeeded';
         state.bloodWork = action.payload;
       })
-      .addCase(getPatientBloodWork.rejected, (state, action) => {
+      .addCase(getPatientLabs.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload;
       });

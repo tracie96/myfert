@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Row, Col, Tabs, Button, Table, Card, Input, message } from "antd";
+import { Row, Col, Tabs, Button, Table, Card, Input } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { acceptAppointment, getUpcomingAppointments, getZohoClientID } from "../../redux/doctorSlice";
+import { getUpcomingAppointments, getZohoClientID } from "../../redux/doctorSlice";
 
 export default function AppointmentList() {
   const dispatch = useDispatch();
@@ -37,33 +37,21 @@ export default function AppointmentList() {
     });
   }, [setSortConfig]);
 
-  const handleAccept = useCallback((appointId) => {
-    dispatch(acceptAppointment({ appointmentId: appointId, status: 1 }))
-      .then((result) => {
-        if (acceptAppointment.fulfilled.match(result)) {
-          message.success(`Appointment ${appointId} accepted.`);
-        } else {
-          message.error(result.error.message || "Failed to accept the appointment");
-        }
-      })
-      .catch((error) => {
-        message.error("An error occurred while accepting the appointment");
-      });
-  }, [dispatch]);
+  // const handleAccept = useCallback((appointId) => {
+  //   dispatch(acceptAppointment({ appointmentId: appointId, status: 1 }))
+  //     .then((result) => {
+  //       if (acceptAppointment.fulfilled.match(result)) {
+  //         message.success(`Appointment ${appointId} accepted.`);
+  //       } else {
+  //         message.error(result.error.message || "Failed to accept the appointment");
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       message.error("An error occurred while accepting the appointment");
+  //     });
+  // }, [dispatch]);
 
-  const handleReject = useCallback((appointId) => {
-    dispatch(acceptAppointment({ appointmentId: appointId, status: 0 }))
-      .then((result) => {
-        if (acceptAppointment.fulfilled.match(result)) {
-          message.success(`Appointment ${appointId} rejected.`);
-        } else {
-          message.error(result.error.message || "Failed to reject the appointment");
-        }
-      })
-      .catch((error) => {
-        message.error("An error occurred while rejecting the appointment");
-      });
-  }, [dispatch]);
+
   const columns = useMemo(
     () => [
       {
@@ -110,21 +98,20 @@ export default function AppointmentList() {
             ) : (
               // If the appointment is not accepted, show "Accept" and "Reject" buttons
               <>
-                <Col span={12}>
-                  <Button
-                    type="primary"
-                    onClick={() => handleAccept(record.appointId)}
-                    style={{
-                      backgroundColor: "#28a745", 
-                      border: "none",
-                      width: "100%",
-                      marginBottom: "8px",
-                    }}
-                  >
-                    Accept
-                  </Button>
+                <Col span={24}>
+                <Button
+                  type="primary"
+                  style={{
+                    backgroundColor: "#007bff", // Blue color for "Join"
+                    border: "none",
+                    width: "100%",
+                  }}
+                  onClick={() => window.open(record.meetingLink, "_blank")}
+                >
+                  Join
+                </Button>
                 </Col>
-                <Col span={12}>
+                {/* <Col span={12}>
                   <Button
                     type="primary"
                     onClick={() => handleReject(record.appointId)}
@@ -136,14 +123,14 @@ export default function AppointmentList() {
                   >
                     Reject
                   </Button>
-                </Col>
+                </Col> */}
               </>
             )}
           </Row>
         ),
       },
     ],
-    [handleAccept, handleReject]
+    []
   );
   
   const filteredAppointments = useMemo(() => {
@@ -165,9 +152,6 @@ export default function AppointmentList() {
     (item) => item.approved === true
   );
 
-  const rejectedAppointments = filteredAppointments.filter(
-    (item) => item.approved === false
-  );
 
   return (
     <Row gutter={16} style={{ padding: "0 5%" }}>
@@ -218,22 +202,7 @@ export default function AppointmentList() {
               />
             </Card>
           </Tabs.TabPane>
-          <Tabs.TabPane tab="Rejected Meetings" key="3">
-            <Card>
-              <Table
-                columns={columns}
-                dataSource={rejectedAppointments}
-                loading={loading}
-                scroll={{ x: "max-content" }}
-                pagination={{
-                  pageSize: 10,
-                  total: rejectedAppointments.length,
-                }}
-                onChange={handleTableChange}
-                rowKey="id"
-              />
-            </Card>
-          </Tabs.TabPane>
+        
         </Tabs>
       </Col>
     </Row>

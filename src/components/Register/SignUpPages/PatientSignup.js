@@ -1444,7 +1444,7 @@ const PatientSignup = () => {
                                           and accurately recorded. If the email
                                           address is not mine, I permit the
                                           owner of the provided email address to
-                                          receive my test results on my behalf *
+                                          receive my test results on my behalf 
                                         </Checkbox>
                                       </FormItem>
                                     </div>
@@ -1467,7 +1467,7 @@ const PatientSignup = () => {
                                           and authorize the use of anonymized
                                           data for research and development
                                           purposes, aimed at enhancing services
-                                          for all users *
+                                          for all users 
                                         </Checkbox>
                                       </FormItem>
                                     </div>
@@ -1537,7 +1537,7 @@ const PatientSignup = () => {
                                       </FormItem>
                                     </div>
                                   </div>
-                                  <div className="row">
+                                  <div className="row" style={{display:'none'}}>
                                     <p
                                       style={{
                                         color: "#335CAD",
@@ -1550,7 +1550,7 @@ const PatientSignup = () => {
                                         <i>(Optional)</i>
                                       </span>
                                     </p>
-                                    <div className="col-lg-12 col-sm-12">
+                                    <div className="col-lg-12 col-sm-12" style={{display:'none'}}>
                                       <FormItem
                                         name="AgreeToUseData"
                                         valuePropName="checked"

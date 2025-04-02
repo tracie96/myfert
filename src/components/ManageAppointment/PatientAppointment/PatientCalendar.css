@@ -17,7 +17,7 @@
 }
 .fc-event-green {
   background-color: green !important;
-  color: #fff !important;
+  color: #000 !important;
   font-size: .7rem;
   text-align: center;
   cursor: pointer;
@@ -41,7 +41,7 @@ border: none !important;
 
 .fc-event-lilac {
   background-color: #B46DB8 !important;
-  color: #fff !important;
+  color: #000 !important;
   text-align: center;
   font-size: .7rem;
   cursor: pointer;
@@ -91,7 +91,7 @@ border: none !important;
 
 .fc-event-occupied {
   background-color: #ff4d4f !important;
-  color: #fff !important;
+  color: #000 !important;
   text-align: center;
   font-size: .5rem;
   cursor: pointer;
@@ -99,9 +99,18 @@ border: none !important;
 
 .fc-event-available {
   background-color: #52c41a !important;
-  color: #fff !important;
+  color: #000 !important;
   text-align: center;
   font-size: .5rem;
+  cursor: pointer;
+}
+
+.fc-event-cyan {
+  background-color: #F2AA9380 !important;
+  color: #000 !important;
+  font-size: .6rem;
+  padding: auto;
+  text-align: center;
   cursor: pointer;
 }
 
@@ -122,6 +131,13 @@ border: none !important;
   }
   .fc-event-blue {
     background-color: #cef2f4 !important;
+    color: #000 !important;
+    font-size: .5rem;
+    text-align: center;
+    cursor: pointer;
+  }
+  .fc-event-cyan {
+    background-color: #01EEFE !important;
     color: #000 !important;
     font-size: .5rem;
     text-align: center;

@@ -3,23 +3,22 @@ import { NavLink, useLocation } from "react-router-dom";
 import fertilityImage from "../../assets/images/auth/fertilityImage.svg";
 import { useSelector } from "react-redux";
 import { Menu, Button, Drawer, Layout } from "antd";
-import {
-  QrcodeOutlined,
-  MenuOutlined,
-  CalendarTwoTone,
-  MedicineBoxTwoTone,
-  PieChartTwoTone,
-  FileAddTwoTone,
-  InfoCircleTwoTone,
-  ContactsTwoTone,
-  ExperimentTwoTone,
-  DiffTwoTone,
-  InboxOutlined,
-  LinkOutlined,
-  OrderedListOutlined
-} from "@ant-design/icons";
 import { useMediaQuery } from "react-responsive";
-
+// Import React Icons
+import { 
+  FaQrcode, 
+  FaCalendarAlt, 
+  FaPills, 
+  FaChartPie, 
+  FaFileAlt, 
+  FaInfoCircle, 
+  FaAddressBook, 
+  FaFlask, 
+  FaInbox, 
+  FaLink, 
+  FaListOl, 
+  FaBars 
+} from "react-icons/fa";
 
 export const GetSideBar = () => {
   const { userAuth } = useSelector((state) => state.authentication);
@@ -100,43 +99,43 @@ console.log(userAuth)
       mode="inline"
       onClick={onClose}
     >
-      <Menu.Item key="1" icon={<QrcodeOutlined />}>
+      <Menu.Item key="1" icon={<FaQrcode style={{ color: "#00ADEF" }} />}>
         <NavLink to="/patient" style={{ textDecoration: "none" }}>
           <span>HOME</span>
         </NavLink>
       </Menu.Item>
-      <Menu.Item key="2" icon={<FileAddTwoTone />}>
+      <Menu.Item key="2" icon={<FaFileAlt style={{ color: "#00ADEF" }} />}>
         <NavLink to="/assessment" style={{ textDecoration: "none" }}>
           <span>ASSESS</span>
         </NavLink>
       </Menu.Item>
-      <Menu.Item key="3" icon={<PieChartTwoTone />}>
+      <Menu.Item key="3" icon={<FaChartPie style={{ color: "#00ADEF" }} />}>
         <NavLink to="/chart" style={{ textDecoration: "none" }}>
           <span className="no-underline">CHART</span>
         </NavLink>
       </Menu.Item>
 
-      <Menu.Item key="5" icon={<MedicineBoxTwoTone />}>
+      <Menu.Item key="5" icon={<FaPills style={{ color: "#00ADEF" }} />}>
       <NavLink to="/patient/meds" style={{ textDecoration: "none" }}>
         <span>MEDS</span>
         </NavLink>
       </Menu.Item>
-      <Menu.Item key="9" icon={< DiffTwoTone />}>
+      <Menu.Item key="9" icon={<FaFlask style={{ color: "#00ADEF" }} />}>
         <NavLink to="/patient/labs" style={{ textDecoration: "none" }}>
           <span>LABS</span>
         </NavLink>
       </Menu.Item>
-      <Menu.Item key="6" icon={<CalendarTwoTone />}>
+      <Menu.Item key="6" icon={<FaCalendarAlt style={{ color: "#00ADEF" }} />}>
         <NavLink to="/patient/calendar" style={{ textDecoration: "none" }}>
           <span className="no-underline">CALENDAR</span>
         </NavLink>
       </Menu.Item>
-      <Menu.Item key="6" icon={<ContactsTwoTone style={{ fontSize: '16px' }} />}>
+      <Menu.Item key="6" icon={<FaAddressBook style={{ color: "#00ADEF" }} />}>
         <NavLink to="/patient/appointment" style={{ textDecoration: "none" }}>
           <span className="no-underline">APPOINTMENT</span>
         </NavLink>
       </Menu.Item>
-      <Menu.Item key="8" icon={<InfoCircleTwoTone />}>
+      <Menu.Item key="8" icon={<FaInfoCircle style={{ color: "#00ADEF" }} />}>
         <NavLink to="/learn" style={{ textDecoration: "none" }}>
           <span className="no-underline">LEARN</span>
         </NavLink>
@@ -151,27 +150,27 @@ console.log(userAuth)
       mode="inline"
       onClick={onClose}
     >
-      <Menu.Item key="1" icon={<OrderedListOutlined />}>
+      <Menu.Item key="1" icon={<FaListOl style={{ color: "#00ADEF" }} />}>
         <NavLink to="/doctor" style={{ textDecoration: "none" }}>
           <span>PATIENT LIST</span>
         </NavLink>
       </Menu.Item>
-      <Menu.Item key="2" icon={<CalendarTwoTone />}>
+      <Menu.Item key="2" icon={<FaCalendarAlt style={{ color: "#00ADEF" }} />}>
         <NavLink to="/doctor/appointment" style={{ textDecoration: "none" }}>
           <span className="no-underline">CALENDAR</span>
         </NavLink>
       </Menu.Item>
-      <Menu.Item key="3" icon={<OrderedListOutlined />}>
+      <Menu.Item key="3" icon={<FaListOl style={{ color: "#00ADEF" }} />}>
         <NavLink to="/doctor/appointments" style={{ textDecoration: "none" }}>
           <span>APPOINTMENTS</span>
         </NavLink>
       </Menu.Item>
-      <Menu.Item key="4" icon={<ExperimentTwoTone />}>
+      <Menu.Item key="4" icon={<FaFlask style={{ color: "#00ADEF" }} />}>
         <NavLink to="/doctor/labs" style={{ textDecoration: "none" }}>
           <span>LABS</span>
         </NavLink>
       </Menu.Item>
-      <Menu.Item key="5" icon={<ExperimentTwoTone />}>
+      <Menu.Item key="5" icon={<FaPills style={{ color: "#00ADEF" }} />}>
         <NavLink to="/doctor/meds" style={{ textDecoration: "none" }}>
           <span>MEDS</span>
         </NavLink>
@@ -187,17 +186,17 @@ console.log(userAuth)
       mode="inline"
       onClick={onClose}
     >
-      <Menu.Item key="1" icon={<OrderedListOutlined />}>
+      <Menu.Item key="1" icon={<FaListOl style={{ color: "#00ADEF" }} />}>
         <NavLink to="/users" style={{ textDecoration: "none" }}>
           <span>PATIENT LIST</span>
         </NavLink>
       </Menu.Item>
-      <Menu.Item key="2" icon={<LinkOutlined />}>
+      <Menu.Item key="2" icon={<FaLink style={{ color: "#00ADEF" }} />}>
         <NavLink to="/preview-link" style={{ textDecoration: "none" }}>
           <span className="no-underline">PREVIEW LINKS</span>
         </NavLink>
       </Menu.Item>
-      <Menu.Item key="3" icon={<InboxOutlined />}>
+      <Menu.Item key="3" icon={<FaInbox style={{ color: "#00ADEF" }} />}>
         <NavLink to="/inbox" style={{ textDecoration: "none" }}>
           <span className="no-underline">INBOX</span>
         </NavLink>
@@ -226,7 +225,7 @@ console.log(userAuth)
                   color: "#00ADEF"
                 }}
               >
-                <MenuOutlined />
+                <FaBars style={{ color: "#00ADEF" }} />
               </Button>
               <Drawer
                 placement="left"
@@ -305,7 +304,7 @@ console.log(userAuth)
                   color: "#00ADEF"
                 }}
               >
-                <MenuOutlined />
+                <FaBars style={{ color: "#00ADEF" }} />
               </Button>
               <Drawer
                 placement="left"
@@ -384,7 +383,7 @@ console.log(userAuth)
                 color: "#00ADEF"
               }}
             >
-              <MenuOutlined />
+              <FaBars style={{ color: "#00ADEF" }} />
             </Button>
             <Drawer
               placement="left"
@@ -462,7 +461,7 @@ console.log(userAuth)
                   color: "#00ADEF"
                 }}
               >
-                <MenuOutlined />
+                <FaBars style={{ color: "#00ADEF" }} />
               </Button>
               <Drawer
                 placement="left"

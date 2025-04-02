@@ -39,7 +39,7 @@ const PatientCalendar = ({ selectedProviders }) => {
       3: "blue",
       4: "purple",
       9: "lilac",
-      8: "cyan",
+      8: "brown",
     }),
     []
   );

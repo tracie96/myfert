@@ -4,7 +4,7 @@ import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import Header from "./Components/Header";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { addPatientMed, getPatientMed } from "../../redux/doctorSlice";
+import { addPatientMed, getPatientMed, deletePatientBloodWork } from "../../redux/doctorSlice";
 
 const { Text } = Typography;
 
@@ -77,19 +77,12 @@ const MedicationTable = () => {
 
     const handleDelete = async (key) => {
         try {
-            // Assuming you have an API endpoint to delete medication by ID
-            // Replace 'deletePatientMed' with your actual API call
-            // and adjust the parameter accordingly
-            //await dispatch(deletePatientMed(key)).unwrap();
-            const updatedMedications = medications.filter(item => item.key !== key);
-            setMedications(updatedMedications);
-
+            await dispatch(deletePatientBloodWork(patient.userRef)).unwrap();
             message.success("Medication deleted successfully!");
-            dispatch(getPatientMed(patient.userRef))
+            dispatch(getPatientMed(patient.userRef));
         } catch (error) {
             message.error("Failed to delete medication.");
         }
-
     };
 
     const columns = [

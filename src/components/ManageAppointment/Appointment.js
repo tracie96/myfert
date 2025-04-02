@@ -161,6 +161,30 @@ console.log({filteredAppointments})
   const handleNextWeek = () => {
     setCurrentWeek((prev) => moment(prev).add(1, "weeks"));
   };
+
+  // Function to get existing appointments for a specific day
+  const getExistingAppointmentsForDay = (day) => {
+    const dayIndex = moment().day(day).day(); // Get day index (0-6)
+    
+    // Find appointments for the current week
+    return filteredAppointments.filter(appointment => {
+      const appointmentDate = moment(appointment.date);
+      const appointmentDayIndex = appointmentDate.day();
+      
+      // Check if the appointment is in the current week
+      return appointmentDayIndex === dayIndex && 
+             appointmentDate.isSame(currentWeek, 'week');
+    });
+  };
+
+  // Function to format time from hour and minute objects
+  const formatTimeFromObject = (timeObj) => {
+    if (!timeObj) return '';
+    const hour = timeObj.hour.toString().padStart(2, '0');
+    const minute = timeObj.minute.toString().padStart(2, '0');
+    return `${hour}:${minute}`;
+  };
+
   return (
     <>
       <div className="row">
@@ -297,6 +321,7 @@ console.log({filteredAppointments})
                         color: "#335CAD",
                         fontWeight: "bold",
                         fontSize: "16px",
+                        fontFamily: "Montserrat, sans-serif"
                       }}
                     >
                       Set Availability
@@ -308,8 +333,8 @@ console.log({filteredAppointments})
                 onClose={onClose}
                 open={open}
                 footer={
-                  <div style={{ textAlign: "right" }}>
-                    <Button onClick={onClose} style={{ marginRight: 8 }}>
+                  <div style={{ textAlign: "right", fontFamily: "Montserrat, sans-serif" }}>
+                    <Button onClick={onClose} style={{ marginRight: 8, fontFamily: "Montserrat, sans-serif" }}>
                       Cancel
                     </Button>
                     <Button
@@ -318,6 +343,7 @@ console.log({filteredAppointments})
                       style={{
                         background: "#00ADEF",
                         padding: "10px 20px",
+                        fontFamily: "Montserrat, sans-serif"
                       }}
                     >
                       Set Availability
@@ -336,9 +362,9 @@ console.log({filteredAppointments})
                       alignItems: "center",
                       justifyContent: "space-between",
                       textAlign: "center",
+                      fontFamily: "Montserrat, sans-serif"
                     }}
                   >
-                    {/* Right Section: Previous/Next Arrows and Date Range */}
                     <div
                       style={{
                         display: "block",
@@ -357,6 +383,7 @@ console.log({filteredAppointments})
                           fontSize: "14px",
                           fontWeight: "bold",
                           margin: "0 10px",
+                          fontFamily: "Montserrat, sans-serif"
                         }}
                       >
                         Week
@@ -367,9 +394,8 @@ console.log({filteredAppointments})
                         icon={<RightCircleTwoTone />}
                       />
 
-                      {/* Date Range Display */}
                       <div style={{ marginLeft: 8 }}>
-                        <span style={{ fontSize: "14px", color: "#5A5A5A" }}>
+                        <span style={{ fontSize: "14px", color: "#5A5A5A", fontFamily: "Montserrat, sans-serif" }}>
                           {currentWeek.startOf("week").format("MMMM D, YYYY")} -{" "}
                           {currentWeek.endOf("week").format("MMMM D, YYYY")}
                         </span>
@@ -383,98 +409,161 @@ console.log({filteredAppointments})
                     fontWeight: "bold",
                     margin: "30px 0",
                     color: "#335CAD",
+                    fontFamily: "Montserrat, sans-serif"
                   }}
                 >
                   Availability
                 </label>
 
-                {/* Weekly Recurrence Checkbox */}
                 <Row style={{ marginBottom: 24 }}>
                   <Col span={24}>
-                    <Checkbox style={{ fontSize: "14px" }}>
+                    <Checkbox style={{ fontSize: "14px", fontFamily: "Montserrat, sans-serif" }}>
                       Weekly recurrence
                     </Checkbox>
                   </Col>
                 </Row>
 
-                {/* Availability */}
                 <Row gutter={[16, 16]}>
                   <Col span={24}>
-                    {Object.keys(availability).map((day) => (
-                      <Row key={day} style={{ marginBottom: 8 }}>
-                        <Col span={8}>
-                          <strong>{day}</strong>
-                        </Col>
-                        <Col
-                          span={16}
-                          style={{ display: "flex", alignItems: "center" }}
-                        >
-
-                          {availability[day].length === 0 ? (
-                            <span style={{ color: "grey" }}>Unavailable</span>
-                          ) : (
-                            availability[day].map((slot, index) => (
-                              <Space
-                                key={index}
-                                style={{ display: "flex", marginBottom: 4 }}
-                              >
-                                <TimePicker
-                                  placeholder="Start Time"
-
-                                  onChange={(time, timeString) =>
-                                    handleTimeChange(
-                                      day,
-                                      index,
-                                      "startTime",
-                                      timeString,
-                                    )
-                                  }
-                                  format="HH:mm"
-                                  showNow={false}
-                                  use12Hours={false}
-                                  needConfirm={false}
-                                />
-                                <TimePicker
-                                  placeholder="End Time"
-
-                                  onChange={(time, timeString) =>
-                                    handleTimeChange(
-                                      day,
-                                      index,
-                                      "endTime",
-                                      timeString,
-                                    )
-                                  }
-                                  format="HH:mm"
-                                  showNow={false}
-                                  use12Hours={false}
-                                  needConfirm={false}
-                                  disabledTime={() =>
-                                    disableEndTime(slot.startTime)
-                                  }
-                                />
-                                <Button
-                                  type="link"
-                                  danger
-                                  onClick={() => removeTimeSlot(day, index)}
-                                >
-                                  <MinusCircleOutlined />
-                                </Button>
-                              </Space>
-                            ))
-                          )}
-                          {!isPastDay(day) &&
-                            availability[day].length < maxSlots && (
-                              <Button
-                                type="link"
-                                onClick={() => addTimeSlot(day)}
-                              >
-                                <PlusCircleTwoTone style={{ marginTop: -4 }} />
-                              </Button>
+                    {Object.keys(availability).map((day) => {
+                      const existingAppointments = getExistingAppointmentsForDay(day);
+                      
+                      return (
+                        <Row key={day} style={{ marginBottom: 8 }}>
+                          <Col span={8}>
+                            <strong style={{ fontFamily: "Montserrat, sans-serif" }}>{day}</strong>
+                          </Col>
+                          <Col
+                            span={16}
+                            style={{ display: "flex", flexDirection: "column" }}
+                          >
+                            {existingAppointments.length > 0 && (
+                              <div style={{ marginBottom: 8 }}>
+                                <div style={{ fontSize: "12px", color: "#666", marginBottom: 4, fontFamily: "Montserrat, sans-serif" }}>
+                                  Existing appointments:
+                                </div>
+                                {existingAppointments.map((appointment, appIndex) => (
+                                  <div key={`existing-${appIndex}`} style={{ marginBottom: 4 }}>
+                                    {appointment.periods && appointment.periods.map((period, periodIndex) => (
+                                      <div 
+                                        key={`period-${periodIndex}`} 
+                                        style={{ 
+                                          display: "flex", 
+                                          alignItems: "center",
+                                          backgroundColor: "#f5f5f5",
+                                          padding: "4px 8px",
+                                          borderRadius: "4px",
+                                          marginBottom: "4px",
+                                          fontFamily: "Montserrat, sans-serif"
+                                        }}
+                                      >
+                                        <span style={{ marginRight: 8 }}>
+                                          {formatTimeFromObject(period.start)} - {formatTimeFromObject(period.end)}
+                                        </span>
+                                        <span style={{ fontSize: "12px", color: "#999" }}>
+                                          (Booked)
+                                        </span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                ))}
+                              </div>
                             )}
-                        </Col>
-                      </Row>
-                    ))}
+
+                            {availability[day].length === 0 ? (
+                              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                                <span style={{ color: "grey", fontFamily: "Montserrat, sans-serif" }}>Unavailable</span>
+                                {!isPastDay(day) && (
+                                  <Button
+                                    type="link"
+                                    onClick={() => addTimeSlot(day)}
+                                    style={{ 
+                                      padding: "4px 8px", 
+                                      color: "#1890ff", 
+                                      display: "flex", 
+                                      alignItems: "center",
+                                      fontFamily: "Montserrat, sans-serif"
+                                    }}
+                                  >
+                                    <PlusCircleTwoTone style={{ marginRight: 4 }} />
+                                    <span>Add Availability</span>
+                                  </Button>
+                                )}
+                              </div>
+                            ) : (
+                              <div>
+                                {availability[day].map((slot, index) => (
+                                  <Space
+                                    key={index}
+                                    style={{ display: "flex", marginBottom: 4 }}
+                                  >
+                                    <TimePicker
+                                      placeholder="Start Time"
+                                      onChange={(time, timeString) =>
+                                        handleTimeChange(
+                                          day,
+                                          index,
+                                          "startTime",
+                                          timeString,
+                                        )
+                                      }
+                                      format="HH:mm"
+                                      showNow={false}
+                                      use12Hours={false}
+                                      needConfirm={false}
+                                      style={{ fontFamily: "Montserrat, sans-serif" }}
+                                    />
+                                    <TimePicker
+                                      placeholder="End Time"
+                                      onChange={(time, timeString) =>
+                                        handleTimeChange(
+                                          day,
+                                          index,
+                                          "endTime",
+                                          timeString,
+                                        )
+                                      }
+                                      format="HH:mm"
+                                      showNow={false}
+                                      use12Hours={false}
+                                      needConfirm={false}
+                                      style={{ fontFamily: "Montserrat, sans-serif" }}
+                                      disabledTime={() =>
+                                        disableEndTime(slot.startTime)
+                                      }
+                                    />
+                                    <Button
+                                      type="link"
+                                      danger
+                                      onClick={() => removeTimeSlot(day, index)}
+                                      style={{ fontFamily: "Montserrat, sans-serif" }}
+                                    >
+                                      <MinusCircleOutlined />
+                                    </Button>
+                                  </Space>
+                                ))}
+                                {!isPastDay(day) && availability[day].length < maxSlots && (
+                                  <Button
+                                    type="link"
+                                    onClick={() => addTimeSlot(day)}
+                                    style={{ 
+                                      padding: "4px 0", 
+                                      color: "#1890ff", 
+                                      display: "flex", 
+                                      alignItems: "center",
+                                      fontFamily: "Montserrat, sans-serif"
+                                    }}
+                                  >
+                                    <PlusCircleTwoTone style={{ marginRight: 4 }} />
+                                    <span>Add Availability</span>
+                                  </Button>
+                                )}
+                              </div>
+                            )}
+                          </Col>
+                        </Row>
+                      );
+                    })}
                   </Col>
                 </Row>
               </Drawer>

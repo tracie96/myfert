@@ -88,6 +88,23 @@ border: none !important;
   border: none !important; /* Ensures no border appears on hover */
   box-shadow: none !important;
 }
+
+.fc-event-occupied {
+  background-color: #ff4d4f !important;
+  color: #fff !important;
+  text-align: center;
+  font-size: .5rem;
+  cursor: pointer;
+}
+
+.fc-event-available {
+  background-color: #52c41a !important;
+  color: #fff !important;
+  text-align: center;
+  font-size: .5rem;
+  cursor: pointer;
+}
+
 @media (max-width: 1200px) {
   .fc-event-lilac {
     background-color: #B46DB8 !important;
@@ -110,7 +127,20 @@ border: none !important;
     text-align: center;
     cursor: pointer;
   }
-  
+  .fc-event-occupied {
+    background-color: #ff4d4f !important;
+    color: #fff !important;
+    text-align: center;
+    font-size: .5rem;
+    cursor: pointer;
+  }
+  .fc-event-available {
+    background-color: #52c41a !important;
+    color: #fff !important;
+    text-align: center;
+    font-size: .5rem;
+    cursor: pointer;
+  }
 }
 @media (max-width: 768px) {
   .fc-toolbar {
@@ -196,6 +226,30 @@ border: none !important;
   .fc-event-blue {
     background-color: #cef2f4 !important;
     color: #000 !important;
+    text-align: center;
+    width: 20px;
+    height: 20px;
+    margin: auto !important;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .fc-event-occupied {
+    background-color: #ff4d4f !important;
+    color: #fff !important;
+    text-align: center;
+    width: 20px;
+    height: 20px;
+    margin: auto !important;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .fc-event-available {
+    background-color: #52c41a !important;
+    color: #fff !important;
     text-align: center;
     width: 20px;
     height: 20px;

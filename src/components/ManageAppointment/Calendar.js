@@ -11,6 +11,7 @@ import {
   Drawer,
   Button,
   Typography,
+  message,
 } from "antd";
 import moment from "moment";
 
@@ -254,14 +255,17 @@ const handleTimeChange = async (time, field, index) => {
           const response = await dispatch(updateAvailability(payload));
 
           if (updateAvailability.fulfilled.match(response)) {
+            message.success('Appointment time updated successfully!');
             console.log("Successfully updated availability");
             const startYear = currentWeek.year();
             const startMonth = currentWeek.month() + 1;
             await fetchAndSetAvailability(startYear, startMonth);
           } else {
+            message.error('Failed to update appointment time');
             console.error("Failed to update appointment:", response.error);
           }
         } catch (error) {
+          message.error('Error updating appointment time');
           console.error("Error updating appointment:", error);
         }
       }

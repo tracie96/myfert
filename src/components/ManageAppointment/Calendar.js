@@ -4,76 +4,100 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { useDispatch, useSelector } from "react-redux";
-import { getAvailability } from "../redux/doctorSlice";
+import { getAvailability, updateAvailability } from "../redux/doctorSlice";
 import "./PatientAppointment/PatientCalendar.css";
 import { useMediaQuery } from "react-responsive";
 import {
   Drawer,
   Button,
-  TimePicker,
-  Space,
   Typography,
-  Divider,
-} from "antd"; 
+} from "antd";
 import moment from "moment";
-import axios from "axios"; // Import axios
 
-const { Text } = Typography; // Import Typography.Text for inline styling
+const { Text } = Typography;
+
+const CustomTimePicker = ({ value, onChange, disabledHours = () => [], disabledMinutes = () => [] }) => {
+  const hours = Array.from({ length: 24 }, (_, i) => i);
+  const minutes = Array.from({ length: 60 }, (_, i) => i);
+  
+  const currentHour = value ? value.hour() : 0;
+  const currentMinute = value ? value.minute() : 0;
+
+  // Get disabled hours and minutes based on current value
+  const disabledHoursList = disabledHours(value) || [];
+  const disabledMinutesList = disabledMinutes(value) || [];
+
+  const handleHourChange = (e) => {
+    const newHour = parseInt(e.target.value);
+    const newTime = moment(value).hour(newHour);
+    onChange(newTime);
+  };
+
+  const handleMinuteChange = (e) => {
+    const newMinute = parseInt(e.target.value);
+    const newTime = moment(value).minute(newMinute);
+    onChange(newTime);
+  };
+
+  return (
+    <div style={{ display: 'flex', gap: '8px' }}>
+      <select
+        value={currentHour}
+        onChange={handleHourChange}
+        style={{ padding: '8px', borderRadius: '4px', border: '1px solid #d9d9d9' }}
+      >
+        {hours.map(hour => (
+          <option 
+            key={hour} 
+            value={hour}
+            disabled={disabledHoursList.includes(hour)}
+          >
+            {hour.toString().padStart(2, '0')}
+          </option>
+        ))}
+      </select>
+      <select
+        value={currentMinute}
+        onChange={handleMinuteChange}
+        style={{ padding: '8px', borderRadius: '4px', border: '1px solid #d9d9d9' }}
+      >
+        {minutes.map(minute => (
+          <option 
+            key={minute} 
+            value={minute}
+            disabled={disabledMinutesList.includes(minute)}
+          >
+            {minute.toString().padStart(2, '0')}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+};
 
 const Calendar = ({ currentWeek, refreshTrigger }) => {
   const [apptEvents, setApptEvents] = useState([]);
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const calendarRef = useRef(null);
   const dispatch = useDispatch();
+  const { appointmentList = [] } = useSelector((state) => state?.doctor);
 
-  // State for event details drawer
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
 
-  // State for edit drawer
-  const [isEditDrawerVisible, setIsEditDrawerVisible] = useState(false);
-  const [editStartTime, setEditStartTime] = useState(null);
-  const [editEndTime, setEditEndTime] = useState(null);
-
-  // New state variables
-  const [appointmentDetails, setAppointmentDetails] = useState(null);
-
-  const { userAuth } = useSelector((state) => state?.authentication);
-  const user = userAuth?.obj;
 
   const [editingKey, setEditingKey] = useState("");
+  const [editedTimes, setEditedTimes] = useState({});
 
-  const fetchAppointmentDetails = useCallback(
-    async (date) => {
-      try {
-        const formattedDate = moment(date).format("YYYY-MM-DD"); // Format the date
-        const response = await axios.get(
-          `https://myfertilitydevapi.azurewebsites.net/api/Doctor/GetAppointmentDetails/${formattedDate}`,
-          {
-            headers: {
-              accept: "text/plain",
-              Authorization: `Bearer ${user?.token}`,
-            },
-          },
-        );
-
-        setAppointmentDetails(response.data);
-      } catch (error) {
-        console.error("Error fetching appointment details:", error);
-      }
-    },
-    [user?.token],
-  );
 
   const updateCalendarEvents = useCallback(
     (availability, startYear, startMonth) => {
-      console.log({availability})
+      console.log({ availability });
 
       const events = availability.flatMap((slot, index) => {
         const start = new Date(slot.date);
         const end = new Date(slot.date);
 
-        // Extract hours and minutes from the slot
         const startHour = slot.start ? slot.start.hour : 0;
         const startMinute = slot.start ? slot.start.minute : 0;
         const endHour = slot.end ? slot.end.hour : 0;
@@ -82,37 +106,37 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
         end.setHours(endHour, endMinute, 0, 0);
         return slot.free
           ? [
-              {
-                id: `${slot.date}_${slot.roleId}_${index}`,
-                title: `Available`,
-                start: start,
-                end: end,
-                classNames: `fc-event-coach-available`,
-                textColor: "white",
-                extendedProps: {
-                  startTime: start.toLocaleTimeString(), 
-                  endTime: end.toLocaleTimeString(), 
-                  slotData: slot, 
-                  date: slot.date,
-                },
+            {
+              id: `${slot.date}_${slot.roleId}_${index}`,
+              title: `Available`,
+              start: start,
+              end: end,
+              classNames: `fc-event-coach-available`,
+              textColor: "white",
+              extendedProps: {
+                startTime: start.toLocaleTimeString(),
+                endTime: end.toLocaleTimeString(),
+                slotData: slot,
+                date: slot.date,
               },
-            ]
+            },
+          ]
           : [
-              {
-                id: `${slot.date}_${slot.roleId}_${index}`,
-                title: `Available`,
-                start: start,
-                end: end,
-                classNames: `fc-event-coach-available`,
-                textColor: "white",
-                extendedProps: {
-                  startTime: start.toLocaleTimeString(),
-                  endTime: end.toLocaleTimeString(), 
-                  slotData: slot,
-                  date: slot.date, 
-                },
+            {
+              id: `${slot.date}_${slot.roleId}_${index}`,
+              title: `Available`,
+              start: start,
+              end: end,
+              classNames: `fc-event-coach-available`,
+              textColor: "white",
+              extendedProps: {
+                startTime: start.toLocaleTimeString(),
+                endTime: end.toLocaleTimeString(),
+                slotData: slot,
+                date: slot.date,
               },
-            ];
+            },
+          ];
       });
       setApptEvents(events);
     },
@@ -144,117 +168,104 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
     fetchAndSetAvailability(startYear, startMonth);
     const intervalId = setInterval(() => {
       fetchAndSetAvailability(startYear, startMonth);
-    }, 5000); // 5 seconds = 5000 ms
+    }, 5000);
 
     return () => clearInterval(intervalId);
   }, [refreshTrigger, fetchAndSetAvailability, currentWeek]);
 
-  // Event click handler
   const handleEventClick = (clickInfo) => {
     setSelectedEvent(clickInfo.event);
     setIsDrawerVisible(true);
-
-    // Format the date from the FullCalendar event to 'YYYY-MM-DD'
-    const formattedDate = moment(clickInfo.event.extendedProps.date).format(
-      "YYYY-MM-DD",
-    );
-
-    // Fetch appointment details when an event is clicked
-    fetchAppointmentDetails(formattedDate);
   };
 
-  // Drawer close handler
   const handleDrawerClose = () => {
     setIsDrawerVisible(false);
     setSelectedEvent(null);
-    setAppointmentDetails(null); // Clear appointment details
     setEditingKey(null);
+    setEditedTimes({});
   };
 
-  // Edit event handler (opens the edit drawer)
-  const handleEditEvent = () => {
-    console.log("Edit event clicked", selectedEvent);
-
-    // Check if appointmentDetails and bookedTimeRange are available
-    if (
-      appointmentDetails &&
-      appointmentDetails.bookedTimeRange &&
-      appointmentDetails.bookedTimeRange.length > 0
-    ) {
-      const startTime = appointmentDetails.bookedTimeRange[0].start;
-      const endTime = appointmentDetails.bookedTimeRange[0].end;
-
-      // Initialize the edit form with the current event times
-      setEditStartTime(
-        moment({
-          hour: startTime.hour,
-          minute: startTime.minute,
-        }),
-      );
-      setEditEndTime(
-        moment({
-          hour: endTime.hour,
-          minute: endTime.minute,
-        }),
-      );
-    } else {
-      console.warn(
-        "Appointment details or bookedTimeRange is missing.  Cannot initialize edit form.",
-      );
-   
-      return;
-    }
-
-    setIsDrawerVisible(false); 
-    setIsEditDrawerVisible(true); // Open the edit drawer
-  };
-
-  // Handle time change in the edit drawer
-  const handleEditTimeChange = (field, time, timeString) => {
-    if (field === "start") {
-      setEditStartTime(time);
-    } else {
-      setEditEndTime(time);
-    }
-  };
-
-  // Save the edited event
-  const handleSaveEdit = () => {
-    console.log(
-      "Saving edited event",
-      selectedEvent,
-      editStartTime,
-      editEndTime,
-    );
-
-    setIsEditDrawerVisible(false);
-    setSelectedEvent(null);
-  };
-
-  // Cancel event handler (placeholder)
-  const handleCancelEvent = () => {
-    setIsDrawerVisible(false);
-    setSelectedEvent(null);
-    setAppointmentDetails(null); // Clear appointment details
-    setEditingKey(null);
-   
-  };
-
-  // Close the edit drawer
-  const handleEditDrawerClose = () => {
-    setIsEditDrawerVisible(false);
-    setSelectedEvent(null);
-  };
-
-  // Function to handle enabling the editing state for a specific time range
+ 
   const startEditing = (key) => {
     setEditingKey(key);
   };
 
-  // Function to handle time change in the time pickers
-  const onTimeChange = (time, timeString, field, index) => {
-    console.log("Time changed:", time, timeString, field, index);
-    // Implement your logic to update the state with the new time
+const handleTimeChange = async (time, field, index) => {
+  if (!time) {
+    setEditedTimes((prev) => ({
+      ...prev,
+      [index]: {
+        ...prev[index],
+        [field]: null,
+      },
+    }));
+    return;
+  }
+
+  const newTime = moment(time);
+
+  // Update state first
+  setEditedTimes((prev) => ({
+    ...prev,
+    [index]: {
+      ...prev[index],
+      [field]: newTime,
+    },
+  }));
+
+  // Wait for state to update, then make API call
+  setTimeout(() => {
+    updateAvailabilityToApi(newTime, field, index);
+  }, 100);
+};
+
+  const updateAvailabilityToApi = async (newTime, field, index) => {
+    if (selectedEvent && appointmentList.length > 0) {
+      const eventDate = moment(selectedEvent.extendedProps.date).format("YYYY-MM-DD");
+      const appointment = appointmentList.find(app =>
+        moment(app.date).format("YYYY-MM-DD") === eventDate
+      );
+
+      if (appointment && appointment.periods && appointment.periods.length > 0) {
+        const period = appointment.periods[index];
+
+        let startTime = moment({ hour: period.start.hour, minute: period.start.minute });
+        let endTime = moment({ hour: period.end.hour, minute: period.end.minute });
+
+        if (field === "start") {
+          startTime = newTime;
+        } else if (field === "end") {
+          endTime = newTime;
+        }
+
+        const payload = {
+          start: {
+            hour: startTime.hour(),
+            minute: startTime.minute()
+          },
+          end: {
+            hour: endTime.hour(),
+            minute: endTime.minute()
+          },
+          appointID: period.appointID
+        };
+
+        try {
+          const response = await dispatch(updateAvailability(payload));
+
+          if (updateAvailability.fulfilled.match(response)) {
+            console.log("Successfully updated availability");
+            const startYear = currentWeek.year();
+            const startMonth = currentWeek.month() + 1;
+            await fetchAndSetAvailability(startYear, startMonth);
+          } else {
+            console.error("Failed to update appointment:", response.error);
+          }
+        } catch (error) {
+          console.error("Error updating appointment:", error);
+        }
+      }
+    }
   };
 
   return (
@@ -270,180 +281,132 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
           right: "dayGridMonth",
         }}
         height={isMobile ? 464 : "1000px"}
-        eventClick={handleEventClick} // Add event click handler
+        eventClick={handleEventClick}
       />
 
       <Drawer
-        title={selectedEvent?.title}
+        title="Existing appointments"
         placement="right"
-        width={500} 
+        width={500}
         onClose={handleDrawerClose}
         open={isDrawerVisible}
         footer={
-          <div style={{ textAlign: "right" }}>
-            <Button onClick={handleCancelEvent} style={{ marginRight: 8 }}>
-              Cancel
-            </Button>
-            <Button
-              type="primary"
-              onClick={handleEditEvent}
-              style={{
-                background: "#00ADEF",
-                padding: "10px 20px",
-              }}
-            >
-             Save
-            </Button>
-          </div>
+          editingKey ? (
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: "8px" }}>
+              <Button
+                onClick={() => {
+                  setEditingKey("");
+                  setEditedTimes({});
+                  handleDrawerClose()
+                }}
+              >
+                Cancel
+              </Button>
+            </div>
+          ) : null
         }
-       
       >
         {selectedEvent && (
-     <div>
-     {appointmentDetails?.bookedTimeRange?.map((timeRange, index) => {
-       const key = `timeRange-${index}`; // Unique key for each time range
-       return (
-         <div key={key} style={{ marginBottom: "20px" }}>
-           <Divider orientation="left">Time Range {index + 1}</Divider>
-           {editingKey === key ? (
-             <div
-               style={{
-                 display: "flex",
-                 alignItems: "center",
-                 gap: "20px",
-                 flexWrap: "wrap",
-               }}
-             >
-               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                 <Text strong>Start Time:</Text>
-                 <TimePicker
-                   defaultValue={
-                     timeRange?.start
-                       ? moment({
-                           hour: timeRange?.start?.hour,
-                           minute: timeRange?.start?.minute,
-                         })
-                       : null
-                   }
-                   format="HH:mm"
-                   onChange={(time, timeString) =>
-                     onTimeChange(time, timeString, "start", index)
-                   }
-                 />
-               </div>
-   
-               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                 <Text strong>End Time:</Text>
-                 <TimePicker
-                   defaultValue={
-                     timeRange?.end
-                       ? moment({
-                           hour: timeRange?.end?.hour,
-                           minute: timeRange?.end?.minute,
-                         })
-                       : null
-                   }
-                   format="HH:mm"
-                   onChange={(time, timeString) =>
-                     onTimeChange(time, timeString, "end", index)
-                   }
-                 />
-               </div>
-   
-               {/* <Space>
-                 <Button size="small" onClick={() => saveEdit(key)} type="primary">
-                   Save
-                 </Button>
-                 <Button size="small" onClick={cancelEdit}>Cancel</Button>
-               </Space> */}
-             </div>
-           ) : (
-             <div
-               style={{
-                 display: "flex",
-                 alignItems: "center",
-                 gap: "20px",
-                 flexWrap: "wrap",
-               }}
-             >
-               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                 <Text strong>Start Time:</Text>
-                 <Text>
-                   {timeRange?.start
-                     ? moment({
-                         hour: timeRange?.start?.hour,
-                         minute: timeRange?.start?.minute,
-                       }).format("HH:mm")
-                     : "N/A"}
-                 </Text>
-               </div>
-   
-               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                 <Text strong>End Time:</Text>
-                 <Text>
-                   {timeRange?.end
-                     ? moment({
-                         hour: timeRange?.end?.hour,
-                         minute: timeRange?.end?.minute,
-                       }).format("HH:mm")
-                     : "N/A"}
-                 </Text>
-               </div>
-   
-               <Button size="small" onClick={() => startEditing(key)}>
-                 Edit
-               </Button>
-             </div>
-           )}
-         </div>
-       );
-     })}
-   </div>
-   
-       
+          <div>
+            {appointmentList
+              .find(
+                (app) =>
+                  moment(app.date).format("YYYY-MM-DD") ===
+                  moment(selectedEvent.extendedProps.date).format("YYYY-MM-DD")
+              )
+              ?.periods?.map((period, index) => {
+                const key = `period-${index}`;
+                return (
+                  <div
+                    key={key}
+                    style={{
+                      marginBottom: "24px",
+                      background: "#f5f5f5",
+                      padding: "16px",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    {editingKey === key ? (
+                      <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                        <div style={{ fontSize: "16px", marginBottom: "8px" }}>
+                          Current:{" "}
+                          {moment({
+                            hour: period.start.hour,
+                            minute: period.start.minute,
+                          }).format("HH:mm")}{" "}
+                          -{" "}
+                          {moment({
+                            hour: period.end.hour,
+                            minute: period.end.minute,
+                          }).format("HH:mm")}
+                        </div>
+                        <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+                          <div style={{ flex: 1 }}>
+                            <Text strong>Start Time</Text>
+                            <CustomTimePicker
+                              value={editedTimes[index]?.start || moment({
+                                hour: period.start.hour,
+                                minute: period.start.minute
+                              })}
+                              onChange={(time) => handleTimeChange(time, "start", index)}
+                            />
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <Text strong>End Time</Text>
+                            <CustomTimePicker
+                              value={editedTimes[index]?.end || moment({
+                                hour: period.end.hour,
+                                minute: period.end.minute
+                              })}
+                              onChange={(time) => handleTimeChange(time, "end", index)}
+                              disabledHours={(time) => {
+                                const startTime = editedTimes[index]?.start || moment({
+                                  hour: period.start.hour,
+                                  minute: period.start.minute
+                                });
+                                return Array.from({ length: startTime.hour() }, (_, i) => i);
+                              }}
+                              disabledMinutes={(time) => {
+                                const startTime = editedTimes[index]?.start || moment({
+                                  hour: period.start.hour,
+                                  minute: period.start.minute
+                                });
+                                if (time && time.hour() === startTime.hour()) {
+                                  return Array.from({ length: startTime.minute() + 1 }, (_, i) => i);
+                                }
+                                return [];
+                              }}
+                            />
+                          </div>
+                        </div>
+                        <div style={{ fontSize: "14px", color: "#1890ff" }}>
+                          Selected time:{" "}
+                          {editedTimes[index]?.start?.format("HH:mm") || "--:--"}{" "}
+                          -{" "}
+                          {editedTimes[index]?.end?.format("HH:mm") || "--:--"}
+                        </div>
+                      </div>
+                    ) : (
+                      <div style={{ fontSize: "16px", marginBottom: "8px" }}>
+                        {moment({
+                          hour: period.start.hour,
+                          minute: period.start.minute,
+                        }).format("HH:mm")}{" "}
+                        -{" "}
+                        {moment({
+                          hour: period.end.hour,
+                          minute: period.end.minute,
+                        }).format("HH:mm")}
+                        <Button type="link" onClick={() => startEditing(key)}>
+                          Edit
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+          </div>
         )}
-      </Drawer>
-
-      <Drawer
-        title="Edit Event Time"
-        placement="right"
-        width={500} // Adjust width as needed
-        onClose={handleEditDrawerClose}
-        open={isEditDrawerVisible}
-        
-        footer={
-          <Space>
-            <Button onClick={handleEditDrawerClose}>Cancel</Button>
-            <Button type="primary" onClick={handleSaveEdit}  
-              style={{
-                background: "#00ADEF",
-                padding: "10px 20px",
-              }}
-            >
-              Save
-            </Button>
-          </Space>
-        }
-      >
-        <p>Select new start and end times:</p>
-        <TimePicker
-          style={{ width: "100%", marginBottom: "16px" }}
-          value={editStartTime}
-          onChange={(time, timeString) =>
-            handleEditTimeChange("start", time, timeString)
-          }
-          format="HH:mm"
-          use12Hours={false}
-        />
-        <TimePicker
-          style={{ width: "100%" }}
-          value={editEndTime}
-          onChange={(time, timeString) =>
-            handleEditTimeChange("end", time, timeString)
-          }
-          format="HH:mm"
-          use12Hours={false}
-        />
       </Drawer>
     </>
   );

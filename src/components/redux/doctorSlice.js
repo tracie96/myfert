@@ -543,6 +543,29 @@ export const cancelAppointment = createAsyncThunk(
   }
 );
 
+export const updateAvailability = createAsyncThunk(
+  "doctor/updateAvailability",
+  async ({ start, end, appointID }, { rejectWithValue, getState }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+
+    try {
+      const response = await axios.post(
+        `${baseUrl}Doctor/UpdateAvailability`,
+        { start, end, appointID },
+        config
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error?.response?.data || error.message);
+    }
+  }
+);
 
 const doctorSlices = createSlice({
   name: "doctor",
@@ -764,6 +787,21 @@ const doctorSlices = createSlice({
       state.loading = true;
       state.error = null;
     });
+
+    builder
+      .addCase(updateAvailability.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateAvailability.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        // You might want to update the availability in your state here
+      })
+      .addCase(updateAvailability.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
 });
 

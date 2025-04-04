@@ -383,12 +383,7 @@ const handleTimeChange = async (time, field, index) => {
                             />
                           </div>
                         </div>
-                        <div style={{ fontSize: "14px", color: "#1890ff" }}>
-                          Selected time:{" "}
-                          {editedTimes[index]?.start?.format("HH:mm") || "--:--"}{" "}
-                          -{" "}
-                          {editedTimes[index]?.end?.format("HH:mm") || "--:--"}
-                        </div>
+                        
                       </div>
                     ) : (
                       <div style={{ fontSize: "16px", marginBottom: "8px" }}>

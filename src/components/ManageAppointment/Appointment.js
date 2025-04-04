@@ -460,9 +460,7 @@ console.log({filteredAppointments})
                                         <span style={{ marginRight: 8 }}>
                                           {formatTimeFromObject(period.start)} - {formatTimeFromObject(period.end)}
                                         </span>
-                                        <span style={{ fontSize: "12px", color: "#999" }}>
-                                          (Booked)
-                                        </span>
+                                      
                                       </div>
                                     ))}
                                   </div>

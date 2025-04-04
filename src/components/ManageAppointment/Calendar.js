@@ -204,6 +204,36 @@ const handleTimeChange = async (time, field, index) => {
   }
 
   const newTime = moment(time);
+  const currentTimes = editedTimes[index] || {};
+  
+  // Get the other time value (either start or end)
+  const otherTimeField = field === 'start' ? 'end' : 'start';
+  const otherTime = currentTimes[otherTimeField];
+
+  // Only validate if both times are set
+  if (field === 'start' && otherTime) {
+    const startHour = newTime.hour();
+    const endHour = otherTime.hour();
+    const startMinute = newTime.minute();
+    const endMinute = otherTime.minute();
+
+    if (startHour > endHour || (startHour === endHour && startMinute >= endMinute)) {
+      message.error('Start time must be before end time');
+      return;
+    }
+  }
+
+  if (field === 'end' && currentTimes.start) {
+    const startHour = currentTimes.start.hour();
+    const endHour = newTime.hour();
+    const startMinute = currentTimes.start.minute();
+    const endMinute = newTime.minute();
+
+    if (endHour < startHour || (endHour === startHour && endMinute <= startMinute)) {
+      message.error('End time must be after start time');
+      return;
+    }
+  }
 
   // Update state first
   setEditedTimes((prev) => ({
@@ -237,6 +267,12 @@ const handleTimeChange = async (time, field, index) => {
           startTime = newTime;
         } else if (field === "end") {
           endTime = newTime;
+        }
+
+        // Validate times before making API call
+        if (startTime.isAfter(endTime) || startTime.isSame(endTime)) {
+          message.error('Start time must be before end time');
+          return;
         }
 
         const payload = {

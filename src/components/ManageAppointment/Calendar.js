@@ -300,7 +300,7 @@ const handleTimeChange = async (time, field, index) => {
                   handleDrawerClose()
                 }}
               >
-                Cancel
+                Save
               </Button>
             </div>
           ) : null

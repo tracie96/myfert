@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Row, Col, Tabs, Button, Table, Card, Input } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import { Row, Col, Tabs, Button, Table, Card, Input, DatePicker } from "antd";
+import { SearchOutlined, CalendarOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { getUpcomingAppointments, getZohoClientID } from "../../redux/doctorSlice";
+import moment from "moment";
 
 export default function AppointmentList() {
   const dispatch = useDispatch();
@@ -10,11 +11,12 @@ export default function AppointmentList() {
   const { upcomingAppointments = [] } = useSelector((state) => state.doctor); 
 
   const [loading] = useState(false);
-  const [setSortConfig] = useState({
+  const [sortConfig, setSortConfig] = useState({
     sortField: null,
     sortOrder: null,
   });
   const [searchParam, setSearchParam] = useState("");
+  const [dateFilter, setDateFilter] = useState(null);
 
   useEffect(() => {
     dispatch(getUpcomingAppointments());
@@ -35,7 +37,7 @@ export default function AppointmentList() {
       sortField: sorter.field,
       sortOrder: sorter.order,
     });
-  }, [setSortConfig]);
+  }, []);
 
   // const handleAccept = useCallback((appointId) => {
   //   dispatch(acceptAppointment({ appointmentId: appointId, status: 1 }))
@@ -51,6 +53,9 @@ export default function AppointmentList() {
   //     });
   // }, [dispatch]);
 
+  const handleDateFilter = (date) => {
+    setDateFilter(date);
+  };
 
   const columns = useMemo(
     () => [
@@ -64,6 +69,7 @@ export default function AppointmentList() {
         title: "Date",
         dataIndex: "appointDate",
         key: "appointDate",
+        sorter: true,
       },
       {
         title: "Start Time",
@@ -139,18 +145,60 @@ export default function AppointmentList() {
       return []; 
     }
 
-    if (!searchParam) return upcomingAppointments;
+    let filtered = upcomingAppointments;
 
-    return upcomingAppointments.filter(
-      (item) =>
-        item.name.toLowerCase().includes(searchParam.toLowerCase()) ||
-        item.appointDate.toLowerCase().includes(searchParam.toLowerCase())
-    );
-  }, [searchParam, upcomingAppointments]);
+    // Filter by search text
+    if (searchParam) {
+      filtered = filtered.filter(
+        (item) =>
+          item.name.toLowerCase().includes(searchParam.toLowerCase()) ||
+          item.appointDate.toLowerCase().includes(searchParam.toLowerCase())
+      );
+    }
 
-  const acceptedAppointments = filteredAppointments.filter(
-    (item) => item.approved === true
-  );
+    // Filter by date
+    if (dateFilter) {
+      const filterDateStr = moment(dateFilter).format("YYYY-MM-DD");
+      filtered = filtered.filter((item) => {
+        // Try to parse the appointment date, handling different possible formats
+        const appointmentDate = moment(item.appointDate);
+        // Compare the dates (ignoring time)
+        return appointmentDate.format("YYYY-MM-DD") === filterDateStr;
+      });
+    }
+
+    // Apply sorting if sortField and sortOrder are defined
+    if (sortConfig.sortField && sortConfig.sortOrder) {
+      const { sortField, sortOrder } = sortConfig;
+      
+      filtered = [...filtered].sort((a, b) => {
+        // For date field, use moment to compare
+        if (sortField === 'appointDate') {
+          const dateA = moment(a[sortField]);
+          const dateB = moment(b[sortField]);
+          
+          if (sortOrder === 'ascend') {
+            return dateA.isBefore(dateB) ? -1 : 1;
+          } else {
+            return dateA.isAfter(dateB) ? -1 : 1;
+          }
+        }
+        
+        // For other fields, use string comparison
+        if (sortOrder === 'ascend') {
+          return a[sortField] > b[sortField] ? 1 : -1;
+        } else {
+          return a[sortField] < b[sortField] ? 1 : -1;
+        }
+      });
+    }
+
+    return filtered;
+  }, [searchParam, dateFilter, upcomingAppointments, sortConfig]);
+
+  // const acceptedAppointments = filteredAppointments.filter(
+  //   (item) => item.approved === true
+  // );
 
 
   return (
@@ -161,16 +209,30 @@ export default function AppointmentList() {
         </p>
         <Tabs
           tabBarExtraContent={
-            <Input
-              placeholder="Search by Name or Date"
-              value={searchParam}
-              prefix={<SearchOutlined />}
-              onChange={(e) => setSearchParam(e.target.value)}
-              style={{ width: 150 }}
-            />
+            <Row gutter={16} align="middle">
+              <Col>
+                <DatePicker 
+                  onChange={handleDateFilter} 
+                  placeholder="Filter by date"
+                  style={{ marginRight: 8 }}
+                  allowClear
+                  format="YYYY-MM-DD"
+                  suffixIcon={<CalendarOutlined />}
+                />
+              </Col>
+              <Col>
+                <Input
+                  placeholder="Search by Name or Date"
+                  value={searchParam}
+                  prefix={<SearchOutlined />}
+                  onChange={(e) => setSearchParam(e.target.value)}
+                  style={{ width: 150 }}
+                />
+              </Col>
+            </Row>
           }
         >
-          <Tabs.TabPane tab="All Meetings" key="1">
+          <Tabs.TabPane tab="My Meetings" key="1">
             <Card>
               <Table
                 columns={columns}
@@ -186,7 +248,7 @@ export default function AppointmentList() {
               />
             </Card>
           </Tabs.TabPane>
-          <Tabs.TabPane tab="Accepted Meetings" key="2">
+          {/* <Tabs.TabPane tab="Accepted Meetings" key="2">
             <Card>
               <Table
                 columns={columns}
@@ -201,7 +263,7 @@ export default function AppointmentList() {
                 rowKey="id"
               />
             </Card>
-          </Tabs.TabPane>
+          </Tabs.TabPane> */}
         
         </Tabs>
       </Col>

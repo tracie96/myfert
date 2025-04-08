@@ -325,7 +325,7 @@ const handleTimeChange = async (time, field, index) => {
       />
 
       <Drawer
-        title="Existing appointments"
+        title="Existing Availabilities"
         placement="right"
         width={500}
         onClose={handleDrawerClose}

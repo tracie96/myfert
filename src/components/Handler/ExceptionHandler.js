@@ -42,7 +42,8 @@ const UnauthorizedErrorHandler = (error, dispatch, data) => {
       toast.error("Session has expired, Login Again");
       dispatch(logoutAction());
     } else {
-      toast.error("Unauthorized error, you dont have access");
+      toast.error("Unauthorized error, redirecting to login");
+      dispatch(logoutAction());
     }
   } else {
     toast.error("Non-401 error occurred:", error);

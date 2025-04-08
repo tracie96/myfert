@@ -54,9 +54,11 @@ const Appointment = () => {
   const [refreshCalendar, setRefreshCalendar] = useState(0);
   const dispatch = useDispatch();
   const { appointmentList = [] } = useSelector((state) => state?.doctor);
+  
   const filteredAppointments = appointmentList.filter(
     (app) => app.roleId === 0
   );
+  
   const visibleAppointments = viewAll
     ? filteredAppointments
     : filteredAppointments.slice(0, 2);
@@ -195,7 +197,6 @@ console.log({filteredAppointments})
               justifyContent: "flex-end",
               alignItems: "center",
               marginBottom: isMobile ? '30px' : '10px'
-
             }}
           >
             <Button

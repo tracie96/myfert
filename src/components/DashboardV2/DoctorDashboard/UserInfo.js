@@ -245,7 +245,7 @@ export default function UserInfo() {
             </Modal>
           ))}
         </Col>
-        <Col xs={24} md={24} lg={24} style={{ paddingBottom: "16px" }}>
+        <Col xs={24} md={24} lg={24} style={{ paddingBottom: "16px", maxWidth: '570px' }}>
           <div>
             {/* FLAGS Section */}
             <div
@@ -282,6 +282,49 @@ export default function UserInfo() {
                 borderStyle: "solid",
               }}
             >
+              <div>
+                <h6 style={{ fontSize: "12px", fontWeight: "bold", color: '#111F4A' }}>
+                  Date: June 1, 2024
+                </h6>
+                <div style={{ marginTop: '25px' }}>
+                  <div style={{ display: "flex", alignItems: "center",  justifyContent: 'space-between', borderBottom: '1px solid rgb(0,0,0, .2)', marginTop: '14px' }}>
+                    <h4 style={{ color: '#111F4A', fontSize: '13px', marginBottom: '12px' }}>PCOS</h4>
+                    <h4 style={{ color: '#111F4A', fontSize: '13px', marginBottom: '12px' }}>Intake Form</h4>
+                    <h4 style={{ color: '#FF0000', fontSize: '13px', marginBottom: '12px' }}>Yes</h4>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center",  justifyContent: 'space-between', borderBottom: '1px solid rgb(0,0,0, .2)', marginTop: '14px' }}>
+                    <h4 style={{ color: '#111F4A', fontSize: '13px', marginBottom: '12px' }}>PCOS</h4>
+                    <h4 style={{ color: '#111F4A', fontSize: '13px', marginBottom: '12px' }}>Intake Form</h4>
+                    <h4 style={{ color: '#FF0000', fontSize: '13px', marginBottom: '12px' }}>Yes</h4>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center",  justifyContent: 'space-between', borderBottom: '1px solid rgb(0,0,0, .2)', marginTop: '14px' }}>
+                    <h4 style={{ color: '#111F4A', fontSize: '13px', marginBottom: '12px' }}>PCOS</h4>
+                    <h4 style={{ color: '#111F4A', fontSize: '13px', marginBottom: '12px' }}>Intake Form</h4>
+                    <h4 style={{ color: '#FF0000', fontSize: '13px', marginBottom: '12px' }}>Yes</h4>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center",  justifyContent: 'space-between', borderBottom: '1px solid rgb(0,0,0, .2)', marginTop: '14px' }}>
+                    <h4 style={{ color: '#111F4A', fontSize: '13px', marginBottom: '12px' }}>PCOS</h4>
+                    <h4 style={{ color: '#111F4A', fontSize: '13px', marginBottom: '12px' }}>Intake Form</h4>
+                    <h4 style={{ color: '#FF0000', fontSize: '13px', marginBottom: '12px' }}>Yes</h4>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center",  justifyContent: 'space-between', borderBottom: '1px solid rgb(0,0,0, .2)', marginTop: '14px' }}>
+                    <h4 style={{ color: '#111F4A', fontSize: '13px', marginBottom: '12px' }}>PCOS</h4>
+                    <h4 style={{ color: '#111F4A', fontSize: '13px', marginBottom: '12px' }}>Intake Form</h4>
+                    <h4 style={{ color: '#FF0000', fontSize: '13px', marginBottom: '12px' }}>Yes</h4>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center",  justifyContent: 'space-between', borderBottom: '1px solid rgb(0,0,0, .2)', marginTop: '14px' }}>
+                    <h4 style={{ color: '#111F4A', fontSize: '13px', marginBottom: '12px' }}>PCOS</h4>
+                    <h4 style={{ color: '#111F4A', fontSize: '13px', marginBottom: '12px' }}>Intake Form</h4>
+                    <h4 style={{ color: '#FF0000', fontSize: '13px', marginBottom: '12px' }}>Yes</h4>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center",  justifyContent: 'space-between', borderBottom: '1px solid rgb(0,0,0, .2)', marginTop: '14px' }}>
+                    <h4 style={{ color: '#111F4A', fontSize: '13px', marginBottom: '12px' }}>PCOS</h4>
+                    <h4 style={{ color: '#111F4A', fontSize: '13px', marginBottom: '12px' }}>Intake Form</h4>
+                    <h4 style={{ color: '#FF0000', fontSize: '13px', marginBottom: '12px' }}>Yes</h4>
+                  </div>
+                </div>
+              </div>
+
               {/* Your flags data here */}
             </div>
 

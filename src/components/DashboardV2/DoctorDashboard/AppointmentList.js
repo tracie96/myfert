@@ -17,7 +17,7 @@ export default function AppointmentList() {
   });
   const [searchParam, setSearchParam] = useState("");
   const [dateFilter, setDateFilter] = useState(null);
-
+console.log({dateFilter})
   useEffect(() => {
     dispatch(getUpcomingAppointments());
   }, [dispatch]);
@@ -156,16 +156,12 @@ export default function AppointmentList() {
       );
     }
 
-    // Filter by date
-    if (dateFilter) {
-      const filterDateStr = moment(dateFilter).format("YYYY-MM-DD");
-      filtered = filtered.filter((item) => {
-        // Try to parse the appointment date, handling different possible formats
-        const appointmentDate = moment(item.appointDate);
-        // Compare the dates (ignoring time)
-        return appointmentDate.format("YYYY-MM-DD") === filterDateStr;
-      });
-    }
+    // Filter to only show today's appointments
+    const today = moment().format("YYYY-MM-DD");
+    filtered = filtered.filter((item) => {
+      const appointmentDate = moment(item.appointDate);
+      return appointmentDate.format("YYYY-MM-DD") === today;
+    });
 
     // Apply sorting if sortField and sortOrder are defined
     if (sortConfig.sortField && sortConfig.sortOrder) {
@@ -194,7 +190,7 @@ export default function AppointmentList() {
     }
 
     return filtered;
-  }, [searchParam, dateFilter, upcomingAppointments, sortConfig]);
+  }, [searchParam, upcomingAppointments, sortConfig]);
 
   // const acceptedAppointments = filteredAppointments.filter(
   //   (item) => item.approved === true

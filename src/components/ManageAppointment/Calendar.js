@@ -76,20 +76,21 @@ const CustomTimePicker = ({ value, onChange, disabledHours = () => [], disabledM
   );
 };
 
-const Calendar = ({ currentWeek, refreshTrigger }) => {
+const Calendar = ({ currentWeek, refreshTrigger, isDrawer }) => {
   const [apptEvents, setApptEvents] = useState([]);
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const calendarRef = useRef(null);
   const dispatch = useDispatch();
   const { appointmentList = [] } = useSelector((state) => state?.doctor);
-
+console.log({currentWeek})
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
-
 
   const [editingKey, setEditingKey] = useState("");
   const [editedTimes, setEditedTimes] = useState({});
 
+  // Use a static week when isDrawer is true
+  const displayWeek = isDrawer ? moment().startOf('week') : currentWeek;
 
   const updateCalendarEvents = useCallback(
     (availability, startYear, startMonth) => {
@@ -164,15 +165,12 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
   );
 
   useEffect(() => {
-    const startYear = currentWeek.year();
-    const startMonth = currentWeek.month() + 1;
-    fetchAndSetAvailability(startYear, startMonth);
-    const intervalId = setInterval(() => {
-      fetchAndSetAvailability(startYear, startMonth);
-    }, 5000);
-
-    return () => clearInterval(intervalId);
-  }, [refreshTrigger, fetchAndSetAvailability, currentWeek]);
+    if (!isDrawer) {
+      const year = displayWeek.year();
+      const month = displayWeek.month() + 1;
+      fetchAndSetAvailability(year, month);
+    }
+  }, [displayWeek, isDrawer, fetchAndSetAvailability]);
 
   const handleEventClick = (clickInfo) => {
     setSelectedEvent(clickInfo.event);
@@ -186,69 +184,68 @@ const Calendar = ({ currentWeek, refreshTrigger }) => {
     setEditedTimes({});
   };
 
- 
   const startEditing = (key) => {
     setEditingKey(key);
   };
 
-const handleTimeChange = async (time, field, index) => {
-  if (!time) {
+  const handleTimeChange = async (time, field, index) => {
+    if (!time) {
+      setEditedTimes((prev) => ({
+        ...prev,
+        [index]: {
+          ...prev[index],
+          [field]: null,
+        },
+      }));
+      return;
+    }
+
+    const newTime = moment(time);
+    const currentTimes = editedTimes[index] || {};
+    
+    // Get the other time value (either start or end)
+    const otherTimeField = field === 'start' ? 'end' : 'start';
+    const otherTime = currentTimes[otherTimeField];
+
+    // Only validate if both times are set
+    if (field === 'start' && otherTime) {
+      const startHour = newTime.hour();
+      const endHour = otherTime.hour();
+      const startMinute = newTime.minute();
+      const endMinute = otherTime.minute();
+
+      if (startHour > endHour || (startHour === endHour && startMinute >= endMinute)) {
+        message.error('Start time must be before end time');
+        return;
+      }
+    }
+
+    if (field === 'end' && currentTimes.start) {
+      const startHour = currentTimes.start.hour();
+      const endHour = newTime.hour();
+      const startMinute = currentTimes.start.minute();
+      const endMinute = newTime.minute();
+
+      if (endHour < startHour || (endHour === startHour && endMinute <= startMinute)) {
+        message.error('End time must be after start time');
+        return;
+      }
+    }
+
+    // Update state first
     setEditedTimes((prev) => ({
       ...prev,
       [index]: {
         ...prev[index],
-        [field]: null,
+        [field]: newTime,
       },
     }));
-    return;
-  }
 
-  const newTime = moment(time);
-  const currentTimes = editedTimes[index] || {};
-  
-  // Get the other time value (either start or end)
-  const otherTimeField = field === 'start' ? 'end' : 'start';
-  const otherTime = currentTimes[otherTimeField];
-
-  // Only validate if both times are set
-  if (field === 'start' && otherTime) {
-    const startHour = newTime.hour();
-    const endHour = otherTime.hour();
-    const startMinute = newTime.minute();
-    const endMinute = otherTime.minute();
-
-    if (startHour > endHour || (startHour === endHour && startMinute >= endMinute)) {
-      message.error('Start time must be before end time');
-      return;
-    }
-  }
-
-  if (field === 'end' && currentTimes.start) {
-    const startHour = currentTimes.start.hour();
-    const endHour = newTime.hour();
-    const startMinute = currentTimes.start.minute();
-    const endMinute = newTime.minute();
-
-    if (endHour < startHour || (endHour === startHour && endMinute <= startMinute)) {
-      message.error('End time must be after start time');
-      return;
-    }
-  }
-
-  // Update state first
-  setEditedTimes((prev) => ({
-    ...prev,
-    [index]: {
-      ...prev[index],
-      [field]: newTime,
-    },
-  }));
-
-  // Wait for state to update, then make API call
-  setTimeout(() => {
-    updateAvailabilityToApi(newTime, field, index);
-  }, 100);
-};
+    // Wait for state to update, then make API call
+    setTimeout(() => {
+      updateAvailabilityToApi(newTime, field, index);
+    }, 100);
+  };
 
   const updateAvailabilityToApi = async (newTime, field, index) => {
     if (selectedEvent && appointmentList.length > 0) {
@@ -293,8 +290,8 @@ const handleTimeChange = async (time, field, index) => {
           if (updateAvailability.fulfilled.match(response)) {
             message.success('Appointment time updated successfully!');
             console.log("Successfully updated availability");
-            const startYear = currentWeek.year();
-            const startMonth = currentWeek.month() + 1;
+            const startYear = displayWeek.year();
+            const startMonth = displayWeek.month() + 1;
             await fetchAndSetAvailability(startYear, startMonth);
           } else {
             message.error('Failed to update appointment time');
@@ -322,6 +319,10 @@ const handleTimeChange = async (time, field, index) => {
         }}
         height={isMobile ? 464 : "1000px"}
         eventClick={handleEventClick}
+        validRange={{
+          start: isDrawer ? displayWeek.startOf('week').format('YYYY-MM-DD') : undefined,
+          end: isDrawer ? displayWeek.endOf('week').format('YYYY-MM-DD') : undefined
+        }}
       />
 
       <Drawer

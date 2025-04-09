@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Calendar from "./Calendar";
 import { Drawer, Button, Checkbox, Row, Col, Space, Avatar, TimePicker } from "antd";
 import moment from "moment";
@@ -19,14 +19,16 @@ import {
   VideoCameraOutlined,
 } from "@ant-design/icons";
 
-import { submitAvailability } from "../redux/doctorSlice";
+import { submitAvailability, getAvailability } from "../redux/doctorSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useMediaQuery } from "react-responsive";
 
 const Appointment = () => {
   const [open, setOpen] = useState(false);
   const [currentWeek, setCurrentWeek] = useState(moment());
+  const [drawerCurrentWeek, setDrawerCurrentWeek] = useState(moment());
   const [drawerKey, setDrawerKey] = useState(0);
+  const [isDrawer, setIsDrawer] = useState(false);
   const [availability, setAvailability] = useState({
     Sunday: [],
     Monday: [],
@@ -49,6 +51,7 @@ const Appointment = () => {
   };
   const showDrawer = () => {
     setDrawerKey((prevKey) => prevKey + 1);
+    setDrawerCurrentWeek(moment());
     setOpen(true);
   };
   const [refreshCalendar, setRefreshCalendar] = useState(0);
@@ -63,7 +66,6 @@ const Appointment = () => {
     ? filteredAppointments
     : filteredAppointments.slice(0, 2);
   const [moreVisible, setMoreVisible] = useState(filteredAppointments.map(() => true));
-console.log({filteredAppointments})
   const onClose = () => {
     setAvailability({
       Sunday: [],
@@ -73,8 +75,9 @@ console.log({filteredAppointments})
       Thursday: [],
       Friday: [],
       Saturday: [],
-    })
+    });
     setOpen(false);
+    setIsDrawer(false);
   };
   const addTimeSlot = (day) => {
     if (availability[day].length < maxSlots) {
@@ -106,8 +109,8 @@ console.log({filteredAppointments})
   const handleSubmitAvailability = () => {
     let startDate;
     let endDate;
-    startDate = currentWeek.startOf("week").format("YYYY-MM-DD");
-    endDate = currentWeek.endOf("week").format("YYYY-MM-DD");
+    startDate = drawerCurrentWeek.startOf("week").format("YYYY-MM-DD");
+    endDate = drawerCurrentWeek.endOf("week").format("YYYY-MM-DD");
 
     const formattedAvailability = Object.entries(availability).map(
       ([day, slots], index) => ({
@@ -130,15 +133,30 @@ console.log({filteredAppointments})
       endDate,
       availability: formattedAvailability,
     };
-    setRefreshCalendar((prev) => prev + 1);
-    dispatch(submitAvailability(payload));
-    onClose();
+
+    dispatch(submitAvailability(payload))
+      .then((response) => {
+        if (submitAvailability.fulfilled.match(response)) {
+          // If submission was successful, fetch the updated availability with the same date range
+          return dispatch(getAvailability({ startDate, endDate }));
+        }
+      })
+      .then(() => {
+        // Update the calendar's current week to match the drawer's week
+        setCurrentWeek(moment(drawerCurrentWeek));
+        // Trigger calendar refresh
+        setRefreshCalendar(prev => prev + 1);
+        onClose();
+      })
+      .catch((error) => {
+        console.error("Error submitting or fetching availability:", error);
+      });
   };
 
   const isPastDay = (day) => {
     const currentDayIndex = moment().day();
     const selectedDayIndex = moment().day(day).day();
-    const isCurrentWeek = moment(currentWeek).isSame(moment(), "week");
+    const isCurrentWeek = moment(drawerCurrentWeek).isSame(moment(), "week");
 
     return isCurrentWeek && selectedDayIndex < currentDayIndex;
   };
@@ -157,25 +175,57 @@ console.log({filteredAppointments})
     };
   };
   const handlePreviousWeek = () => {
-    setCurrentWeek((prev) => moment(prev).subtract(1, "weeks"));
+    const prevWeek = moment(drawerCurrentWeek).subtract(1, "weeks");
+    setDrawerCurrentWeek(prevWeek);
+    
+    // Fetch availability for the previous week
+    const startDate = prevWeek.startOf("week").format("YYYY-MM-DD");
+    const endDate = prevWeek.endOf("week").format("YYYY-MM-DD");
+    dispatch(getAvailability({ startDate, endDate }));
   };
 
   const handleNextWeek = () => {
-    setCurrentWeek((prev) => moment(prev).add(1, "weeks"));
+    const nextWeek = moment(drawerCurrentWeek).add(1, "weeks");
+    setDrawerCurrentWeek(nextWeek);
+    
+    // Fetch availability for the next week
+    const startDate = nextWeek.startOf("week").format("YYYY-MM-DD");
+    const endDate = nextWeek.endOf("week").format("YYYY-MM-DD");
+    dispatch(getAvailability({ startDate, endDate }));
+  };
+
+  // Add useEffect to fetch initial availability when drawer opens
+  useEffect(() => {
+    if (open) {
+      const startDate = drawerCurrentWeek.startOf("week").format("YYYY-MM-DD");
+      const endDate = drawerCurrentWeek.endOf("week").format("YYYY-MM-DD");
+      dispatch(getAvailability({ startDate, endDate }));
+    }
+  }, [open, drawerCurrentWeek, dispatch]);
+
+  // Add Today button handler
+  const handleTodayClick = () => {
+    const today = moment();
+    setDrawerCurrentWeek(today);
+    
+    // Fetch availability for the current week
+    const startDate = today.startOf("week").format("YYYY-MM-DD");
+    const endDate = today.endOf("week").format("YYYY-MM-DD");
+    dispatch(getAvailability({ startDate, endDate }));
   };
 
   // Function to get existing appointments for a specific day
   const getExistingAppointmentsForDay = (day) => {
     const dayIndex = moment().day(day).day(); // Get day index (0-6)
     
-    // Find appointments for the current week
+    // Find appointments for the drawer's selected week
     return filteredAppointments.filter(appointment => {
       const appointmentDate = moment(appointment.date);
       const appointmentDayIndex = appointmentDate.day();
       
-      // Check if the appointment is in the current week
+      // Check if the appointment is in the drawer's selected week
       return appointmentDayIndex === dayIndex && 
-             appointmentDate.isSame(currentWeek, 'week');
+             appointmentDate.isSame(drawerCurrentWeek, 'week');
     });
   };
 
@@ -212,11 +262,11 @@ console.log({filteredAppointments})
               Set Availability
             </Button>
           </div>
-          <div className="mb-4">
+          <div className="appointment-calendar">
             <Calendar
-              availability={availability}
               currentWeek={currentWeek}
               refreshTrigger={refreshCalendar}
+              isDrawer={isDrawer}
             />
           </div>
         </div>
@@ -341,12 +391,12 @@ console.log({filteredAppointments})
                     <Button
                       type="primary"
                       onClick={handleSubmitAvailability}
-                      disabled={currentWeek.isBefore(moment().startOf('week'))}
+                      disabled={drawerCurrentWeek.isBefore(moment().startOf('week'))}
                       style={{
                         background: "#00ADEF",
                         padding: "10px 20px",
                         fontFamily: "Montserrat, sans-serif",
-                        opacity: currentWeek.isBefore(moment().startOf('week')) ? 0.5 : 1
+                        opacity: drawerCurrentWeek.isBefore(moment().startOf('week')) ? 0.5 : 1
                       }}
                     >
                       Set Availability
@@ -397,14 +447,14 @@ console.log({filteredAppointments})
                             fontFamily: "Montserrat, sans-serif"
                           }}
                         >
-                          Week of {currentWeek.startOf("week").format("MMMM D")}
+                          Week of {drawerCurrentWeek.startOf("week").format("MMMM D")}
                         </span>
                         <span style={{ 
                           fontSize: "12px", 
                           color: "#5A5A5A",
                           fontFamily: "Montserrat, sans-serif"
                         }}>
-                          {currentWeek.startOf("week").format("YYYY")}
+                          {drawerCurrentWeek.startOf("week").format("YYYY")}
                         </span>
                       </div>
                       <Button
@@ -415,7 +465,7 @@ console.log({filteredAppointments})
                       />
                       <Button
                         type="link"
-                        onClick={() => setCurrentWeek(moment())}
+                        onClick={handleTodayClick}
                         style={{ 
                           marginLeft: "8px",
                           color: "#00ADEF",
@@ -428,7 +478,7 @@ console.log({filteredAppointments})
                   </Col>
                 </Row>
 
-                {currentWeek.isBefore(moment().startOf('week')) && (
+                {drawerCurrentWeek.isBefore(moment().startOf('week')) && (
                   <div style={{ 
                     textAlign: "center", 
                     padding: "16px",
@@ -514,7 +564,7 @@ console.log({filteredAppointments})
                             {availability[day].length === 0 ? (
                               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                                 <span style={{ color: "grey", fontFamily: "Montserrat, sans-serif" }}>Unavailable</span>
-                                {!isPastDay(day) && !currentWeek.isBefore(moment().startOf('week')) && (
+                                {!isPastDay(day) && !drawerCurrentWeek.isBefore(moment().startOf('week')) && (
                                   <Button
                                     type="link"
                                     onClick={() => addTimeSlot(day)}
@@ -583,7 +633,7 @@ console.log({filteredAppointments})
                                     </Button>
                                   </Space>
                                 ))}
-                                {!isPastDay(day) && !currentWeek.isBefore(moment().startOf('week')) && availability[day].length < maxSlots && (
+                                {!isPastDay(day) && !drawerCurrentWeek.isBefore(moment().startOf('week')) && availability[day].length < maxSlots && (
                                   <Button
                                     type="link"
                                     onClick={() => addTimeSlot(day)}

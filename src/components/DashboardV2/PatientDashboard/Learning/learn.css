@@ -4,6 +4,9 @@
   font-family: "Montserrat", serif;
     padding: 20px;
     margin: auto;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
   }
   .ant-collapse>.ant-collapse-item >.ant-collapse-header {
     color: #fff !important;
@@ -87,4 +90,108 @@ padding: 1rem 7rem;
     font-size: 14px;
     color: #555;
   }
+  
+.hormone-graph {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}
+
+.hormone-graph::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #E8E8E8;
+}
+
+/* Estrogen curve */
+.hormone-graph::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: 
+    repeating-linear-gradient(
+      transparent,
+      transparent 20px,
+      rgba(255, 192, 203, 0.2) 20px,
+      rgba(255, 192, 203, 0.2) 40px
+    );
+  clip-path: path('M 0,200 Q 100,180 200,120 T 400,80 T 600,200');
+}
+
+/* LH curve */
+.hormone-graph .lh-curve {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: 
+    repeating-linear-gradient(
+      transparent,
+      transparent 20px,
+      rgba(255, 0, 0, 0.2) 20px,
+      rgba(255, 0, 0, 0.2) 40px
+    );
+  clip-path: path('M 200,200 Q 300,180 350,50 T 500,200');
+}
+
+/* Progesterone curve */
+.hormone-graph .progesterone-curve {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: 
+    repeating-linear-gradient(
+      transparent,
+      transparent 20px,
+      rgba(128, 0, 128, 0.2) 20px,
+      rgba(128, 0, 128, 0.2) 40px
+    );
+  clip-path: path('M 300,200 Q 400,180 450,80 T 600,200');
+}
+
+.video-list-item {
+  padding: 16px;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.video-list-item:last-child {
+  border-bottom: none;
+}
+
+.play-button {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.play-button:hover {
+  transform: scale(1.1);
+}
+
+.phase-indicator {
+  display: flex;
+  margin-top: 16px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.phase-indicator > div {
+  padding: 8px;
+  color: white;
+  text-align: center;
+  font-size: 14px;
+}
   

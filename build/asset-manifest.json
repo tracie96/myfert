@@ -1,11 +1,11 @@
 {
   "files": {
-    "main.css": "/static/css/main.eec7e3c9.css",
-    "main.js": "/static/js/main.81483ce8.js",
+    "main.css": "/static/css/main.db48fa36.css",
+    "main.js": "/static/js/main.57299597.js",
     "static/js/787.28637dfb.chunk.js": "/static/js/787.28637dfb.chunk.js",
     "static/media/learn.png": "/static/media/learn.4b147d39002e13a19010.png",
-    "static/media/new.png": "/static/media/new.5eebb62ca172e621a336.png",
     "static/media/pharmacist_clinician.jpeg": "/static/media/pharmacist_clinician.fba42df8bf00c9e71db3.jpeg",
+    "static/media/learncycle.svg": "/static/media/learncycle.ef2881627668d243596802ffa177d33f.svg",
     "static/media/fertilityImage.svg": "/static/media/fertilityImage.e0b4c2e1fd3a68caf54d9eb8ff560447.svg",
     "static/media/fertility_educator.jpeg": "/static/media/fertility_educator.14657002e08822407b16.jpeg",
     "static/media/fertility_support.jpeg": "/static/media/fertility_support.2c837226aac828869114.jpeg",
@@ -34,12 +34,12 @@
     "static/media/capsule.png": "/static/media/capsule.f5bcfe66aab44334d25f.png",
     "static/media/mirabutton.svg": "/static/media/mirabutton.8c4bb1d4eb9d220526aaa72f0a3946ac.svg",
     "index.html": "/index.html",
-    "main.eec7e3c9.css.map": "/static/css/main.eec7e3c9.css.map",
-    "main.81483ce8.js.map": "/static/js/main.81483ce8.js.map",
+    "main.db48fa36.css.map": "/static/css/main.db48fa36.css.map",
+    "main.57299597.js.map": "/static/js/main.57299597.js.map",
     "787.28637dfb.chunk.js.map": "/static/js/787.28637dfb.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.eec7e3c9.css",
-    "static/js/main.81483ce8.js"
+    "static/css/main.db48fa36.css",
+    "static/js/main.57299597.js"
   ]
 }

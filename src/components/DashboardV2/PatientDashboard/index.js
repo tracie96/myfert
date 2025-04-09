@@ -215,10 +215,11 @@ export default function PatDash() {
           background: "#F0F8FF",
           padding: isMobile ? "8%" : "10px",
           borderRadius: isMobile ? "0px" : "15px",
-          marginRight: isMobile ? "-25px" : 0,
-          marginLeft: isMobile ? "-25px" : 0,
+          marginRight: isMobile ? "0px" : 0,
+          marginLeft: isMobile ? "0px" : 0,
           boxSizing: "unset",
           width: isMobile ? "auto" : "100%",
+          overflowX: isMobile ? "auto" : "unset",
         }}
       >
         {status === undefined &&

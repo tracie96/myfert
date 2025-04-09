@@ -1948,6 +1948,46 @@ pre code {
   .table-responsive-md > .table-bordered {
     border: 0;
   }
+  .ant-tabs-nav-list{
+    transform: translate(0px, 0px) !important;
+  }
+  .ant-tabs-nav-wrap::after{
+    opacity: 0 !important;
+  }
+  .ant-tabs-nav-wrap::before{
+    opacity: 0 !important;
+  }
+  .ant-tabs-extra-content{
+    width: 100%;
+    margin-top: 15px;
+  }
+
+  .ant-tabs-nav{
+    flex-wrap: wrap;
+    margin-bottom: 0px !important;
+  }
+
+  .ant-tabs-nav::before{
+    border-bottom: none !important;
+  }
+
+  .inside-table-content{
+    display: flex;
+    flex-wrap: wrap;
+    overflow-x: auto;
+  }
+
+  .ant-descriptions-row th{
+    width: 40% !important;
+  }
+  .ant-descriptions-row td{
+    width: 60% !important;
+  }
+
+  .ant-descriptions-view table{
+    table-layout: fixed !important;
+  }
+
 }
 
 @media (max-width: 991.98px) {

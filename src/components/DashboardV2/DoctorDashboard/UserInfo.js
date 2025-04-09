@@ -580,16 +580,18 @@ function SwitchContent({
             <Col xs={24} md={12}>
               {nutrition && (
                 <Descriptions title="Dietary Information" column={1} bordered>
-                  <Descriptions.Item label="Special Diet Program">
+                  <Descriptions.Item  label="Special Diet Program">
+                  <div className="inside-table-content">
                     {nutrition.specialDietProgram && nutrition.specialDietProgram.length > 0 ? (
                       nutrition.specialDietProgram.map((diet, index) => (
-                        <Tag color="blue" key={index} className="m-1">
-                          {diet}
-                        </Tag>
+                          <Tag color="blue" style={{display: 'flex'}} key={index} className="m-1">
+                            {diet}
+                          </Tag>
                       ))
                     ) : (
                       "N/A"
                     )}
+                  </div>
                   </Descriptions.Item>
 
 
@@ -607,15 +609,17 @@ function SwitchContent({
                   </Descriptions.Item>
 
                   <Descriptions.Item label="Adverse List">
-                    {nutrition.adverseList && nutrition.adverseList.length > 0 ? (
-                      nutrition.adverseList.map((adverse, index) => (
-                        <Tag color="red" key={index} className="m-1">
-                          {adverse}
-                        </Tag>
-                      ))
-                    ) : (
-                      "N/A"
-                    )}
+                      <div className="inside-table-content">
+                        {nutrition.adverseList && nutrition.adverseList.length > 0 ? (
+                          nutrition.adverseList.map((adverse, index) => (
+                            <Tag color="red" key={index} className="m-1">
+                              {adverse}
+                            </Tag>
+                          ))
+                        ) : (
+                          "N/A"
+                        )}
+                      </div>
                   </Descriptions.Item>
                   <Descriptions.Item label="Any Food Craving">
                     {nutrition.anyFoodCraving?.yesNo === true
@@ -645,15 +649,17 @@ function SwitchContent({
               {nutrition && (
                 <Descriptions title="Eating Habits" column={1} bordered>
                   <Descriptions.Item label="Eating Habits" style={{ width: '100%' }}>
-                    {nutrition?.eatingHabits?.length > 0 ? (
-                      nutrition.eatingHabits.map((habit, index) => (
-                        <Tag color="green" key={index} className="m-1">
-                          {habit || "N/A"}
-                        </Tag>
-                      ))
-                    ) : (
-                      "N/A"
-                    )}
+                      <div className="inside-table-content">
+                        {nutrition?.eatingHabits?.length > 0 ? (
+                          nutrition.eatingHabits.map((habit, index) => (
+                            <Tag color="green" key={index} className="m-1">
+                              {habit || "N/A"}
+                            </Tag>
+                          ))
+                        ) : (
+                          "N/A"
+                        )}
+                      </div>
                   </Descriptions.Item>
 
                   <Descriptions.Item label="Typical Breakfast">

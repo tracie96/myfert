@@ -341,10 +341,12 @@ console.log({filteredAppointments})
                     <Button
                       type="primary"
                       onClick={handleSubmitAvailability}
+                      disabled={currentWeek.isBefore(moment().startOf('week'))}
                       style={{
                         background: "#00ADEF",
                         padding: "10px 20px",
-                        fontFamily: "Montserrat, sans-serif"
+                        fontFamily: "Montserrat, sans-serif",
+                        opacity: currentWeek.isBefore(moment().startOf('week')) ? 0.5 : 1
                       }}
                     >
                       Set Availability
@@ -368,42 +370,82 @@ console.log({filteredAppointments})
                   >
                     <div
                       style={{
-                        display: "block",
+                        display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
                         width: "100%",
+                        gap: "8px"
                       }}
                     >
                       <Button
                         type="link"
                         onClick={handlePreviousWeek}
                         icon={<LeftCircleTwoTone />}
+                        style={{ fontSize: "20px" }}
                       />
-                      <span
-                        style={{
-                          fontSize: "14px",
-                          fontWeight: "bold",
-                          margin: "0 10px",
+                      <div style={{ 
+                        display: "flex", 
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: "4px"
+                      }}>
+                        <span
+                          style={{
+                            fontSize: "14px",
+                            fontWeight: "bold",
+                            color: "#335CAD",
+                            fontFamily: "Montserrat, sans-serif"
+                          }}
+                        >
+                          Week of {currentWeek.startOf("week").format("MMMM D")}
+                        </span>
+                        <span style={{ 
+                          fontSize: "12px", 
+                          color: "#5A5A5A",
                           fontFamily: "Montserrat, sans-serif"
-                        }}
-                      >
-                        Week
-                      </span>
+                        }}>
+                          {currentWeek.startOf("week").format("YYYY")}
+                        </span>
+                      </div>
                       <Button
                         type="link"
                         onClick={handleNextWeek}
                         icon={<RightCircleTwoTone />}
+                        style={{ fontSize: "20px" }}
                       />
-
-                      <div style={{ marginLeft: 8 }}>
-                        <span style={{ fontSize: "14px", color: "#5A5A5A", fontFamily: "Montserrat, sans-serif" }}>
-                          {currentWeek.startOf("week").format("MMMM D, YYYY")} -{" "}
-                          {currentWeek.endOf("week").format("MMMM D, YYYY")}
-                        </span>
-                      </div>
+                      <Button
+                        type="link"
+                        onClick={() => setCurrentWeek(moment())}
+                        style={{ 
+                          marginLeft: "8px",
+                          color: "#00ADEF",
+                          fontFamily: "Montserrat, sans-serif"
+                        }}
+                      >
+                        Today
+                      </Button>
                     </div>
                   </Col>
                 </Row>
+
+                {currentWeek.isBefore(moment().startOf('week')) && (
+                  <div style={{ 
+                    textAlign: "center", 
+                    padding: "16px",
+                    backgroundColor: "#fff2f0",
+                    borderRadius: "4px",
+                    marginBottom: "16px",
+                    border: "1px solid #ffccc7"
+                  }}>
+                    <p style={{ 
+                      color: "#ff4d4f",
+                      margin: 0,
+                      fontFamily: "Montserrat, sans-serif"
+                    }}>
+                      You cannot set availability for past weeks
+                    </p>
+                  </div>
+                )}
 
                 <label
                   style={{
@@ -441,7 +483,7 @@ console.log({filteredAppointments})
                             {existingAppointments.length > 0 && (
                               <div style={{ marginBottom: 8 }}>
                                 <div style={{ fontSize: "12px", color: "#666", marginBottom: 4, fontFamily: "Montserrat, sans-serif" }}>
-                                  Existing appointments:
+                                  Existing Availabilities:
                                 </div>
                                 {existingAppointments.map((appointment, appIndex) => (
                                   <div key={`existing-${appIndex}`} style={{ marginBottom: 4 }}>
@@ -472,7 +514,7 @@ console.log({filteredAppointments})
                             {availability[day].length === 0 ? (
                               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                                 <span style={{ color: "grey", fontFamily: "Montserrat, sans-serif" }}>Unavailable</span>
-                                {!isPastDay(day) && (
+                                {!isPastDay(day) && !currentWeek.isBefore(moment().startOf('week')) && (
                                   <Button
                                     type="link"
                                     onClick={() => addTimeSlot(day)}
@@ -541,7 +583,7 @@ console.log({filteredAppointments})
                                     </Button>
                                   </Space>
                                 ))}
-                                {!isPastDay(day) && availability[day].length < maxSlots && (
+                                {!isPastDay(day) && !currentWeek.isBefore(moment().startOf('week')) && availability[day].length < maxSlots && (
                                   <Button
                                     type="link"
                                     onClick={() => addTimeSlot(day)}

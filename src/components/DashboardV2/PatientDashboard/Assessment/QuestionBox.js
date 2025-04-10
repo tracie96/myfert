@@ -6,8 +6,6 @@ import "./assesment.css";
 import { getAccessDetails } from "../../../redux/AssessmentController";
 import CheckIcon from "../../../../assets/images/check.svg";
 
-
-
 const CardComponent = ({ card, isClickable, index, handleCardClick, isCompleted }) => (
   <div
     className={`assessment-card ${!isClickable ? "disabled" : ""}`}
@@ -19,9 +17,7 @@ const CardComponent = ({ card, isClickable, index, handleCardClick, isCompleted 
         </div>
       )}
     <div className="card-image">
-   
       <img src={card.icon} alt={card.title} loading="lazy" style={{ width: (index === 4 || index === 7) ? '100%' : '' }} />
-    
     </div>
     <div className="card-title">{card.title}</div>
   </div>
@@ -31,7 +27,7 @@ const QuestionnaireGrid = ({ cards, onCardClick }) => {
   const dispatch = useDispatch();
   const accessDetails = useSelector((state) => state.intake.accessDetails);
   const [currentStep, setCurrentStep] = useState(0);
-
+console.log({currentStep})
   useEffect(() => {
     const storedStep = localStorage.getItem("currentStep");
     if (storedStep) {
@@ -44,9 +40,7 @@ const QuestionnaireGrid = ({ cards, onCardClick }) => {
   }, [dispatch]);
 
   const { userAuth } = useSelector((state) => ({
-  
     userAuth: state.authentication.userAuth,
-    // status: state.patient.status,
   }));
 
   useEffect(() => {
@@ -63,9 +57,13 @@ const QuestionnaireGrid = ({ cards, onCardClick }) => {
   );
 
   const cardList = useMemo(() => {
+    console.log('userAuth:', userAuth); // Debug log
+    const statLevel = userAuth?.obj?.status?.statLevel;
+    console.log('statLevel:', statLevel); // Debug log
+    
     return cards.map((card, index) => {
-      const isClickable = currentStep > 3 || index === 0;
-      // Determine if the card is completed based on accessDetails
+      const isClickable = statLevel >= 4 || index === 0;
+      console.log(`Card ${index} isClickable:`, isClickable); // Debug log
       const isCompleted = accessDetails ? accessDetails[card.meta] : false;
 
       return (
@@ -75,12 +73,12 @@ const QuestionnaireGrid = ({ cards, onCardClick }) => {
             isClickable={isClickable}
             index={index}
             handleCardClick={handleCardClick}
-            isCompleted={isCompleted} // Pass the isCompleted status to the CardComponent
+            isCompleted={isCompleted}
           />
         </Col>
       );
     });
-  }, [cards, handleCardClick, accessDetails, currentStep]);  // Include accessDetails in the dependency array
+  }, [cards, handleCardClick, accessDetails, userAuth]);
 
   return (
     <Container className="mt-4 assessment-container">

@@ -25,13 +25,6 @@ const PatientAppointment = () => {
   const [viewAll, setViewAll] = useState(false);
 
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
-  const filteredAppointments = appointmentList.filter(
-    (app) => app.roleId === 0
-  );
-  const visibleAppointments = viewAll
-    ? filteredAppointments
-    : filteredAppointments.slice(0, 2);
-  const [calendar, setCalendar] = useState(localStorage.getItem("calendar"));
   const [selectedProviders, setSelectedProviders] = useState({
     nurse: false,
     doctor: false,
@@ -40,6 +33,36 @@ const PatientAppointment = () => {
     fertilitySupportPractitioner: false,
     fertilityEducator: false,
   });
+
+  const filterAppointmentsByProvider = (appointments) => {
+    // If no providers are selected, return all appointments
+    if (!Object.values(selectedProviders).some(value => value)) {
+      return appointments;
+    }
+
+    return appointments.filter(appointment => {
+      // Map the roleId to provider type
+      const roleToProviderMap = {
+        0: 'nurse',
+        2: 'doctor',
+        3: 'pharmacistClinician',
+        4: 'nutritionalPractitioner',
+        9: 'fertilitySupportPractitioner',
+        8: 'fertilityEducator'
+      };
+
+      const providerType = roleToProviderMap[appointment.roleId];
+      return providerType && selectedProviders[providerType];
+    });
+  };
+
+  const filteredAppointments = filterAppointmentsByProvider(appointmentList.filter(
+    (app) => app.roleId === 0
+  ));
+  const visibleAppointments = viewAll
+    ? filteredAppointments
+    : filteredAppointments.slice(0, 2);
+  const [calendar, setCalendar] = useState(localStorage.getItem("calendar"));
   const showModal = () => {
     setIsFilterModalVisible(true);
   };
@@ -82,6 +105,8 @@ const PatientAppointment = () => {
       ...selectedProviders,
       [provider]: !selectedProviders[provider],
     });
+    // Refresh appointments when provider selection changes
+    dispatch(getUpcomingAppointments());
   };
   const handleViewAll = () => {
     setViewAll(!viewAll);
@@ -524,7 +549,7 @@ const PatientAppointment = () => {
                       ) : (
                         <>
                           {['nurse', 'doctor', 'pharmacistClinician', 'nutritionalPractitioner', 'fertilitySupportPractitioner', 'fertilityEducator'].map((provider) => (
-                            <div key={provider} style={provider === 'doctor' ? {} : { display: 'none' }}>
+                            <div key={provider}>
                               <label>
                                 <input
                                   type="checkbox"

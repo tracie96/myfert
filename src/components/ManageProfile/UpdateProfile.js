@@ -10,6 +10,7 @@ import { UserAddOutlined } from "@ant-design/icons";
 import ReactInputMask from "react-input-mask";
 import { Spin } from "antd";
 import { getUserProfile, updateProfile } from "../redux/AuthController";
+import { updateProfileUser } from '../redux/profileSlice';
 
 const UpdateProfile = () => {
   const dispatch = useDispatch();
@@ -51,6 +52,7 @@ const UpdateProfile = () => {
         setShowSpinner(true);
         // Include the Cloudinary URL in the values to be submitted
         const updatedValues = { ...values, profile: uploadedFileUrl };
+        dispatch(updateProfileUser(updatedValues));
         const action = dispatch(updateProfile(updatedValues));
         const resultAction = await action;
         console.log(resultAction);

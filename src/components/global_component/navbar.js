@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import CustomModal from "./CustomModal";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutAction } from "../redux/AuthController";
@@ -19,6 +19,14 @@ function Navbar() {
   const isMobile = useMediaQuery({ maxWidth: 767 });
   console.log(isUpdate, setLogout);
   const { userAuth } = useSelector((state) => state.authentication);
+  const profileUser = useSelector((state) => state.profile.userData);
+  const [displayUser, setDisplayUser] = useState(profileUser);
+  useEffect(() => {
+    if (profileUser) {
+      setDisplayUser(profileUser);
+    }
+  }, [profileUser]);
+
   const dispatch = useDispatch();
   const fetchNotificationsList = useCallback(async () => {
     try {
@@ -68,7 +76,7 @@ function Navbar() {
                   <>
                     Welcome,{" "}
                     <b>
-                      {userAuth.obj.firstName} {userAuth.obj.lastName}
+                    {displayUser?.firstName || userAuth.obj.firstName} {displayUser?.lastName || userAuth.obj.lastName}
                     </b>
                   </>
                 )}
@@ -90,7 +98,7 @@ function Navbar() {
                 <>
                   Welcome,{" "}
                   <b>
-                    {userAuth.obj.firstName} {userAuth.obj.lastName}
+                  {displayUser?.firstName || userAuth.obj.firstName} {displayUser?.lastName || userAuth.obj.lastName}
                   </b>
                 </>
               )}

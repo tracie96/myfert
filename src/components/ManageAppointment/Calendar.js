@@ -341,7 +341,7 @@ console.log({currentWeek})
                   handleDrawerClose()
                 }}
               >
-                Save
+                Close
               </Button>
             </div>
           ) : null

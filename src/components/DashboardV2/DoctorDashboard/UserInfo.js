@@ -1212,7 +1212,7 @@ function SwitchContent({
                     } else if (Array.isArray(value)) {
                       // Render arrays (e.g., gastroIntestinal, respiratory, etc.)
                       displayValue = value.map((item, index) => (
-                        <div key={index}>
+                        <div class="inside-table-content" key={index}>
                           <span>{item.yesNo ? 'Yes' : 'No'}</span>: 
                           {item.describe && typeof item.describe === 'string' ? (
                             item.describe.split(',').map((desc, idx) => (
@@ -1226,7 +1226,7 @@ function SwitchContent({
                     } else if (typeof value === 'object') {
                       // Render objects (e.g., diagnosticBoneDensity)
                       displayValue = (
-                        <div>
+                        <div class="inside-table-content">
                           Date: {value.date}, Value: {value.value}, Other Name: {value.otherName}
                         </div>
                       );

@@ -20,6 +20,7 @@ import assessmentSlice from "../redux/assessmentSlice";
 import intakeFormSlice from "../redux/AssessmentController";
 import SubscriptionSlice from "../redux/subscriptionSlice";
 import patientSlice from "../redux/patientSlice";
+import profileSlice from "../redux/profileSlice";
 
 const allReducers = combineReducers({
   authentication: AuthController,
@@ -31,7 +32,8 @@ const allReducers = combineReducers({
   assessment: assessmentSlice,
   intake: intakeFormSlice,
   subscription: SubscriptionSlice,
-  patient: patientSlice
+  patient: patientSlice,
+  profile: profileSlice
 });
 
 const persistConfig = {

@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useState }  from "react";
+import { useSelector } from "react-redux";
 import { Avatar, Dropdown, Menu } from "antd";
 import {
   UserOutlined,
@@ -13,6 +14,14 @@ import { useMediaQuery } from "react-responsive";
 const defaultIconImage = "img/undraw_profile.svg";
 
 const UserDropdown = ({ userAuth, setShowModal }) => {
+  const profileUser = useSelector((state) => state.profile.userData);
+  const [displayUser, setDisplayUser] = useState(profileUser);
+  useEffect(() => {
+    if (profileUser) {
+      setDisplayUser(profileUser);
+    }
+  }, [profileUser]);
+
 
   const menu = (
     <Menu>
@@ -58,7 +67,7 @@ const UserDropdown = ({ userAuth, setShowModal }) => {
         />
         {isMobile?"":
         <span style={{ marginRight: 8, color: "#595959", fontSize: "14px" }}>
-          {userAuth.obj.firstName} {userAuth.obj.lastName}
+          {displayUser?.firstName || userAuth.obj.firstName} {displayUser?.lastName || userAuth.obj.lastName}
         </span>}
         <DownOutlined style={{ color: "#595959", fontSize: "12px" }} />
       </div>

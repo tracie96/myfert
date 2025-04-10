@@ -1987,6 +1987,9 @@ pre code {
   .ant-descriptions-view table{
     table-layout: fixed !important;
   }
+  .ant-tag-blue {
+    margin-bottom: 5px;
+  }
 
 }
 

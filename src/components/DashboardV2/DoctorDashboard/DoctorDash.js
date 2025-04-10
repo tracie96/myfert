@@ -171,7 +171,6 @@ export default function DoctorDash() {
                 dataIndex: "firstname",
                 key: "firstname",
                 sorter: true,
-                responsive: ["xs"]
 
             },
             {

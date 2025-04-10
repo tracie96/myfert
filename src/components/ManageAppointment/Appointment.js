@@ -447,7 +447,7 @@ const Appointment = () => {
                             fontFamily: "Montserrat, sans-serif"
                           }}
                         >
-                          Week of {drawerCurrentWeek.startOf("week").format("MMMM D")}
+                          Week of {drawerCurrentWeek.startOf("week").format("MMMM D")} - {drawerCurrentWeek.endOf("week").format("MMMM D")}
                         </span>
                         <span style={{ 
                           fontSize: "12px", 

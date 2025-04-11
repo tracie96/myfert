@@ -15,14 +15,16 @@ import {
   UserOutlined,
   VideoCameraOutlined,
 } from "@ant-design/icons";
-import { getUpcomingAppointments } from "../../redux/patientSlice";
+import { getUpcomingAppointments, getPatientStatus } from "../../redux/patientSlice";
 import { cancelPatientAppointment } from "../../redux/doctorSlice";
+import { getAccessDetails } from "../../redux/AssessmentController";
 import moment from "moment-timezone";
 
 const PatientAppointment = () => {
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const { appointmentList = [] } = useSelector((state) => state?.doctor);
   const [viewAll, setViewAll] = useState(false);
+  const [patientStatus, setPatientStatus] = useState(null);
 
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
   const [selectedProviders, setSelectedProviders] = useState({
@@ -34,35 +36,94 @@ const PatientAppointment = () => {
     fertilityEducator: false,
   });
 
-  const filterAppointmentsByProvider = (appointments) => {
-    // If no providers are selected, return all appointments
-    if (!Object.values(selectedProviders).some(value => value)) {
-      return appointments;
-    }
+  const [selectedDeliveryTypes, setSelectedDeliveryTypes] = useState({
+    inPerson: false,
+    virtual: false,
+  });
 
-    return appointments.filter(appointment => {
-      // Map the roleId to provider type
-      const roleToProviderMap = {
-        0: 'nurse',
-        2: 'doctor',
-        3: 'pharmacistClinician',
-        4: 'nutritionalPractitioner',
-        9: 'fertilitySupportPractitioner',
-        8: 'fertilityEducator'
-      };
+  const [filteredAppointments, setFilteredAppointments] = useState([]);
+  const dispatch = useDispatch();
 
-      const providerType = roleToProviderMap[appointment.roleId];
-      return providerType && selectedProviders[providerType];
-    });
+  useEffect(() => {
+    const fetchPatientStatus = async () => {
+      try {
+        const result = await dispatch(getPatientStatus());
+        if (result.payload) {
+          setPatientStatus(result.payload);
+        }
+      } catch (err) {
+        console.error("Error fetching patient status:", err);
+      }
+    };
+
+    fetchPatientStatus();
+  }, [dispatch]);
+
+  useEffect(() => {
+    const filterAppointmentsByProvider = (appointments) => {
+      if (!Object.values(selectedProviders).some(value => value)) {
+        return appointments;
+      }
+      return appointments.filter(appointment => {
+        const roleToProviderMap = {
+          0: 'nurse',
+          2: 'doctor',
+          3: 'pharmacistClinician',
+          4: 'nutritionalPractitioner',
+          9: 'fertilitySupportPractitioner',
+          8: 'fertilityEducator'
+        };
+        const providerType = roleToProviderMap[appointment.roleId];
+        return providerType && selectedProviders[providerType];
+      });
+    };
+
+    const filterAppointmentsByDeliveryType = (appointments) => {
+      if (!Object.values(selectedDeliveryTypes).some(value => value)) {
+        return appointments;
+      }
+      return appointments.filter(appointment => {
+        const isVirtual = appointment.meetingLink ? true : false;
+        return (selectedDeliveryTypes.inPerson && !isVirtual) || 
+               (selectedDeliveryTypes.virtual && isVirtual);
+      });
+    };
+
+    const filtered = filterAppointmentsByDeliveryType(
+      filterAppointmentsByProvider(appointmentList.filter(
+        (app) => {
+          if (patientStatus === null || (patientStatus?.initialAssessment === null && patientStatus?.isPaymentComplete === null)) {
+            return app.roleId === 9;
+          }
+          if (patientStatus?.initialAssessment && patientStatus?.isPaymentComplete) {
+            return true;
+          }
+          return app.roleId === 9;
+        }
+      ))
+    );
+    setFilteredAppointments(filtered);
+  }, [appointmentList, selectedProviders, selectedDeliveryTypes, patientStatus]);
+
+  const handleDeliveryTypeChange = (type) => {
+    setSelectedDeliveryTypes(prev => ({
+      ...prev,
+      [type]: !prev[type]
+    }));
   };
 
-  const filteredAppointments = filterAppointmentsByProvider(appointmentList.filter(
-    (app) => app.roleId === 0
-  ));
+  const handleCheckboxChange = (provider) => {
+    setSelectedProviders(prev => ({
+      ...prev,
+      [provider]: !prev[provider]
+    }));
+  };
+
   const visibleAppointments = viewAll
     ? filteredAppointments
     : filteredAppointments.slice(0, 2);
   const [calendar, setCalendar] = useState(localStorage.getItem("calendar"));
+  console.log({ calendar })
   const showModal = () => {
     setIsFilterModalVisible(true);
   };
@@ -77,9 +138,10 @@ const PatientAppointment = () => {
   const handleOk = () => {
     setIsFilterModalVisible(false);
   };
-  const dispatch = useDispatch();
+
   useEffect(() => {
     dispatch(getUpcomingAppointments());
+    dispatch(getAccessDetails());
   }, [dispatch]);
 
   useEffect(() => {
@@ -89,7 +151,6 @@ const PatientAppointment = () => {
       }
     };
 
-
     window.addEventListener("storage", handleStorageChange);
 
     return () => {
@@ -97,17 +158,7 @@ const PatientAppointment = () => {
     };
   }, []);
 
-  const { userAuth } = useSelector((state) => state.authentication);
-  const status = userAuth.obj.status
 
-  const handleCheckboxChange = (provider) => {
-    setSelectedProviders({
-      ...selectedProviders,
-      [provider]: !selectedProviders[provider],
-    });
-    // Refresh appointments when provider selection changes
-    dispatch(getUpcomingAppointments());
-  };
   const handleViewAll = () => {
     setViewAll(!viewAll);
   };
@@ -122,7 +173,6 @@ const PatientAppointment = () => {
       alert('Meeting link is not yet ready.')
     }
   }
-
 
   const handleCancelAppointment = (appointment) => {
     const { appointId } = appointment
@@ -544,11 +594,16 @@ const PatientAppointment = () => {
                         marginTop: "-10px",
                       }}
                     >
-                      {status.statLevel === 0 ? (
-                        <div>Initial Accessers</div>
-                      ) : (
-                        <>
-                          {['nurse', 'doctor', 'pharmacistClinician', 'nutritionalPractitioner', 'fertilitySupportPractitioner', 'fertilityEducator'].map((provider) => (
+                      {['nurse', 'doctor', 'pharmacistClinician', 'nutritionalPractitioner', 'fertilitySupportPractitioner', 'fertilityEducator'].map((provider) => {
+                        // Only show fertility coach if patient status is null
+                        if (patientStatus === null || (patientStatus?.initialAssessment === null && patientStatus?.isPaymentComplete === null)) {
+                          if (provider !== 'fertilitySupportPractitioner') {
+                            return null;
+                          }
+                        }
+                        // Show all providers if both initialAssessment and isPaymentComplete are true
+                        if (patientStatus?.initialAssessment && patientStatus?.isPaymentComplete) {
+                          return (
                             <div key={provider}>
                               <label>
                                 <input
@@ -560,9 +615,26 @@ const PatientAppointment = () => {
                                 {provider.charAt(0).toUpperCase() + provider.slice(1).replace(/([A-Z])/g, ' $1')}
                               </label>
                             </div>
-                          ))}
-                        </>
-                      )}
+                          );
+                        }
+                        // Default case, only show fertility coach
+                        if (provider === 'fertilitySupportPractitioner') {
+                          return (
+                            <div key={provider}>
+                              <label>
+                                <input
+                                  type="checkbox"
+                                  className="checkbox-antd"
+                                  checked={selectedProviders[provider]}
+                                  onChange={() => handleCheckboxChange(provider)}
+                                />
+                                {provider.charAt(0).toUpperCase() + provider.slice(1).replace(/([A-Z])/g, ' $1')}
+                              </label>
+                            </div>
+                          );
+                        }
+                        return null;
+                      })}
                     </div>
                   </div>
 
@@ -603,14 +675,28 @@ const PatientAppointment = () => {
                         marginTop: "-10px",
                       }}
                     >
-                      {['In Person', 'Virtual'].map((deliveryType, index) => (
-                        <div key={index} style={{ marginBottom: "12px" }}>
-                          <label>
-                            <input type="checkbox" style={{ marginRight: "8px" }} />
-                            {deliveryType}
-                          </label>
-                        </div>
-                      ))}
+                      <div style={{ marginBottom: "12px" }}>
+                        <label>
+                          <input 
+                            type="checkbox" 
+                            style={{ marginRight: "8px" }}
+                            checked={selectedDeliveryTypes.inPerson}
+                            onChange={() => handleDeliveryTypeChange('inPerson')}
+                          />
+                          In Person
+                        </label>
+                      </div>
+                      <div>
+                        <label>
+                          <input 
+                            type="checkbox" 
+                            style={{ marginRight: "8px" }}
+                            checked={selectedDeliveryTypes.virtual}
+                            onChange={() => handleDeliveryTypeChange('virtual')}
+                          />
+                          Virtual
+                        </label>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -691,96 +777,47 @@ const PatientAppointment = () => {
                   marginTop: "-10px",
                 }}
               >
-                {calendar !== "auto" || !calendar ? (
-                  <>
-                    <div>Initial Accessers</div>
-                  </>
-                ) : (
-                  <>
-                    <div>
-                      <label>
-                        <input
-                          type="checkbox"
-                          className="checkbox-antd"
-                          checked={selectedProviders.nurse}
-                          onChange={() => handleCheckboxChange("nurse")}
-                        />
-                        Nurse
-                      </label>
-                    </div>
-                    <div>
-                      <label>
-                        <input
-                          type="checkbox"
-                          className="checkbox-antd"
-                          checked={selectedProviders.doctor}
-                          onChange={() => handleCheckboxChange("doctor")}
-                        />
-                        Doctor
-                      </label>
-                    </div>
-                    <div>
-                      <label>
-                        <input
-                          type="checkbox"
-                          className="checkbox-antd"
-                          checked={selectedProviders.pharmacistClinician}
-                          onChange={() =>
-                            handleCheckboxChange("pharmacistClinician")
-                          }
-                        />
-                        Pharmacist Clinician
-                      </label>
-                    </div>
-                    <div>
-                      <label>
-                        <input
-                          type="checkbox"
-                          className="checkbox-antd"
-                          checked={
-                            selectedProviders.nutritionalPractitioner
-                          }
-                          onChange={() =>
-                            handleCheckboxChange(
-                              "nutritionalPractitioner"
-                            )
-                          }
-                        />
-                        Nutritional Practitioner
-                      </label>
-                    </div>
-                    <div>
-                      <label>
-                        <input
-                          type="checkbox"
-                          className="checkbox-antd"
-                          checked={
-                            selectedProviders.fertilitySupportPractitioner
-                          }
-                          onChange={() =>
-                            handleCheckboxChange(
-                              "fertilitySupportPractitioner"
-                            )
-                          }
-                        />
-                        Fertility Support Practitioner
-                      </label>
-                    </div>
-                    <div>
-                      <label>
-                        <input
-                          type="checkbox"
-                          className="checkbox-antd"
-                          checked={selectedProviders.fertilityEducator}
-                          onChange={() =>
-                            handleCheckboxChange("fertilityEducator")
-                          }
-                        />
-                        Fertility Educator
-                      </label>
-                    </div>
-                  </>
-                )}
+                {['nurse', 'doctor', 'pharmacistClinician', 'nutritionalPractitioner', 'fertilitySupportPractitioner', 'fertilityEducator'].map((provider) => {
+                  // Only show fertility coach if patient status is null
+                  if (patientStatus === null || (patientStatus?.initialAssessment === null && patientStatus?.isPaymentComplete === null)) {
+                    if (provider !== 'fertilitySupportPractitioner') {
+                      return null;
+                    }
+                  }
+                  // Show all providers if both initialAssessment and isPaymentComplete are true
+                  if (patientStatus?.initialAssessment && patientStatus?.isPaymentComplete) {
+                    return (
+                      <div key={provider}>
+                        <label>
+                          <input
+                            type="checkbox"
+                            className="checkbox-antd"
+                            checked={selectedProviders[provider]}
+                            onChange={() => handleCheckboxChange(provider)}
+                          />
+                          {provider.charAt(0).toUpperCase() + provider.slice(1).replace(/([A-Z])/g, ' $1')}
+                        </label>
+                      </div>
+                    );
+                  }
+                  // Default case, only show fertility coach
+                  if (provider === 'fertilitySupportPractitioner') {
+                    return (
+                      <div key={provider}>
+                        <label>
+                          <input
+                            type="checkbox"
+                            className="checkbox-antd"
+                            checked={selectedProviders[provider]}
+                            onChange={() => handleCheckboxChange(provider)}
+                          />
+                          {provider.charAt(0).toUpperCase() + provider.slice(1).replace(/([A-Z])/g, ' $1')}
+                        </label>
+                      </div>
+                    );
+                  }
+                  return null;
+                })}
               </div>
             </div>
           </Col>

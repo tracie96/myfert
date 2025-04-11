@@ -3,7 +3,6 @@ import { Container, Row, Col } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { getPatientStatus } from "../../../redux/patientSlice";
 import "./assesment.css";
-import { getAccessDetails } from "../../../redux/AssessmentController";
 import CheckIcon from "../../../../assets/images/check.svg";
 
 const CardComponent = ({ card, isClickable, index, handleCardClick, isCompleted }) => (
@@ -25,19 +24,16 @@ const CardComponent = ({ card, isClickable, index, handleCardClick, isCompleted 
 
 const QuestionnaireGrid = ({ cards, onCardClick }) => {
   const dispatch = useDispatch();
-  const accessDetails = useSelector((state) => state.intake.accessDetails);
+  const patientStatus = useSelector((state) => state.patient.status);
   const [currentStep, setCurrentStep] = useState(0);
 console.log({currentStep})
+
   useEffect(() => {
     const storedStep = localStorage.getItem("currentStep");
     if (storedStep) {
       setCurrentStep(parseInt(storedStep, 10));
     }
   }, []);
-
-  useEffect(() => {
-    dispatch(getAccessDetails());
-  }, [dispatch]);
 
   const { userAuth } = useSelector((state) => ({
     userAuth: state.authentication.userAuth,
@@ -62,9 +58,10 @@ console.log({currentStep})
     console.log('statLevel:', statLevel); // Debug log
     
     return cards.map((card, index) => {
-      const isClickable = statLevel >= 4 || index === 0;
+      // If patientStatus is null, only first card is clickable
+      const isClickable = patientStatus === null ? index === 0 : (statLevel >= 4 || index === 0);
       console.log(`Card ${index} isClickable:`, isClickable); // Debug log
-      const isCompleted = accessDetails ? accessDetails[card.meta] : false;
+      const isCompleted = patientStatus?.initialAssessment || false;
 
       return (
         <Col key={index} className="mb-4 d-flex justify-content-center">
@@ -78,7 +75,7 @@ console.log({currentStep})
         </Col>
       );
     });
-  }, [cards, handleCardClick, accessDetails, userAuth]);
+  }, [cards, handleCardClick, patientStatus, userAuth]);
 
   return (
     <Container className="mt-4 assessment-container">

@@ -1,16 +1,17 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Row, Col, Tabs, Button, Table, Card, Input, DatePicker } from "antd";
+import { Row, Col, Tabs, Button, Table, Card, Input, DatePicker, Checkbox, message } from "antd";
 import { SearchOutlined, CalendarOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { getUpcomingAppointments, getZohoClientID } from "../../redux/doctorSlice";
 import moment from "moment";
+import axios from "axios";
 
 export default function AppointmentList() {
   const dispatch = useDispatch();
 
   const { upcomingAppointments = [] } = useSelector((state) => state.doctor); 
 
-  const [loading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [sortConfig, setSortConfig] = useState({
     sortField: null,
     sortOrder: null,
@@ -39,19 +40,35 @@ console.log({dateFilter})
     });
   }, []);
 
-  // const handleAccept = useCallback((appointId) => {
-  //   dispatch(acceptAppointment({ appointmentId: appointId, status: 1 }))
-  //     .then((result) => {
-  //       if (acceptAppointment.fulfilled.match(result)) {
-  //         message.success(`Appointment ${appointId} accepted.`);
-  //       } else {
-  //         message.error(result.error.message || "Failed to accept the appointment");
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       message.error("An error occurred while accepting the appointment");
-  //     });
-  // }, [dispatch]);
+  const handleMarkAsDone = async (appointId) => {
+    try {
+      setLoading(true);
+      const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
+      const token = userInfo.obj.token || "";
+      const response = await axios.get(
+        `https://myfertilitydevapi.azurewebsites.net/api/Doctor/MarkAppointmentDone/${appointId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            accept: "text/plain",
+            Authorization: `${token}`,
+    
+          },
+        }
+      );
+      
+      if (response.status === 200) {
+        message.success('Appointment marked as done successfully');
+        // Refresh the appointments list
+        dispatch(getUpcomingAppointments());
+      }
+    } catch (error) {
+      message.error('Failed to mark appointment as done');
+      console.error('Error marking appointment as done:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleDateFilter = (date) => {
     setDateFilter(date);
@@ -59,6 +76,18 @@ console.log({dateFilter})
 
   const columns = useMemo(
     () => [
+      {
+        title: "Done",
+        key: "done",
+        width: 80,
+        render: (_, record) => (
+          <Checkbox
+            checked={record.approved}
+            onChange={() => handleMarkAsDone(record.appointId)}
+            disabled={loading}
+          />
+        ),
+      },
       {
         title: "Patient Name",
         dataIndex: "name",
@@ -156,11 +185,14 @@ console.log({dateFilter})
       );
     }
 
-    // Filter to only show today's appointments
-    const today = moment().format("YYYY-MM-DD");
+    // Filter to only show current month's appointments
+    const currentMonth = moment().startOf('month');
+    const nextMonth = moment().endOf('month');
+    
     filtered = filtered.filter((item) => {
-      const appointmentDate = moment(item.appointDate);
-      return appointmentDate.format("YYYY-MM-DD") === today;
+      // Parse the date in DD-MM-YYYY format
+      const appointmentDate = moment(item.appointDate, 'DD-MM-YYYY');
+      return appointmentDate.isBetween(currentMonth, nextMonth, 'day', '[]');
     });
 
     // Apply sorting if sortField and sortOrder are defined
@@ -170,8 +202,8 @@ console.log({dateFilter})
       filtered = [...filtered].sort((a, b) => {
         // For date field, use moment to compare
         if (sortField === 'appointDate') {
-          const dateA = moment(a[sortField]);
-          const dateB = moment(b[sortField]);
+          const dateA = moment(a[sortField], 'DD-MM-YYYY');
+          const dateB = moment(b[sortField], 'DD-MM-YYYY');
           
           if (sortOrder === 'ascend') {
             return dateA.isBefore(dateB) ? -1 : 1;

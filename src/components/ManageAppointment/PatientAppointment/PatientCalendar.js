@@ -382,6 +382,12 @@ const PatientCalendar = ({ selectedProviders }) => {
   //   setAppointmentList(updatedAppointmentList);
   // };
 
+  useEffect(() => {
+    if (selectedProviders) {
+      dispatch(getPatientAvailability({ month: 12, year: 2024 }));
+    }
+  }, [selectedProviders, dispatch]);
+
   return (
     <>
       <FullCalendar

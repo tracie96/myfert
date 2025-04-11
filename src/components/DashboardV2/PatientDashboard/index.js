@@ -111,7 +111,7 @@ export default function PatDash() {
   const [currentStep, setCurrentStep] = useState(0);
   const [userCurrentStep] = useState(0);
   const { userAuth } = useSelector((state) => state.authentication);
-  const { status } = useSelector((state) => state.patient);
+  const [patientStatus, setPatientStatus] = useState({ initialAssessment: null, isPaymentComplete: null });
   const [error, setError] = useState(null);
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const [viewAll, setViewAll] = useState(false);
@@ -138,27 +138,32 @@ export default function PatDash() {
   const handleCancel = () => {
     setIsModalVisible(false);
   };
+
   useEffect(() => {
     let intervalId;
 
     if (userAuth?.obj?.token) {
-      dispatch(getPatientStatus());
+      const fetchPatientStatus = async () => {
+        try {
+          const result = await dispatch(getPatientStatus());
+          if (result.payload) {
+            setPatientStatus(result.payload);
+          }
+        } catch (err) {
+          console.error("Error fetching patient status:", err);
+        }
+      };
 
-      // Fetch status only if it needs updating based on the statLevel
-      if (status?.statLevel <= 1 || status?.statLevel === '' || status?.statLevel === undefined) {
-        intervalId = setInterval(() => {
-          dispatch(getPatientStatus());
-        }, 10000);
-      }
+      fetchPatientStatus();
+      intervalId = setInterval(fetchPatientStatus, 10000);
     }
 
     return () => {
-      // Clear the interval if set
       if (intervalId) {
         clearInterval(intervalId);
       }
     };
-  }, [userAuth?.obj?.token, status?.statLevel, dispatch]);
+  }, [userAuth?.obj?.token, dispatch]);
 
   useEffect(() => {
     const fetchMiraInfo = async () => {
@@ -222,115 +227,109 @@ export default function PatDash() {
           overflowX: isMobile ? "auto" : "unset",
         }}
       >
-        {status === undefined &&
+        {(patientStatus.initialAssessment === null || patientStatus.isPaymentComplete === null) && (
           <>
             <h3 style={{ color: "#335CAD", fontSize: "20px" }}>
               Initial Sign Up Steps:
             </h3>
-          </>}
-        {currentStep < 3 && status?.statLevel <= 3 ?
-          <Steps
-            current={currentStep}
-            progressDot={customDot}
-            direction={isMobile ? "horizontal" : "horizontal"}
-            responsive={false}
-            size="small"
-            style={{
-              marginTop: "10px",
-              display: "flex",
-              flexDirection: isMobile ? "row" : "row",
-              alignItems: isMobile ? "flex-start" : "center",
-
-            }}
-            items={[
-              {
-                title: (
-                  <div style={{ textAlign: "left", fontSize: isMobile ? '12px' : '14px', width: isMobile ? 'auto' : '200px' }}>
-                    <span>Complete Reproductive Health Assessment Form</span>
-                    <div style={{ marginTop: "10px" }}>
-                      <Button
-                        onClick={() => {
-                          navigate("/assessment");
-                        }}
-                        type="primary"
-                        style={{
-                          backgroundColor: "#C2E6F8",
-                          borderColor: "none",
-                          color: "#00ADEF",
-                          width: isMobile ? '80px' : '',
-                          fontSize: isMobile ? '8px' : ''
-                        }}
-                      >
-                        ASSESS
-                      </Button>
+            <Steps
+              current={currentStep}
+              progressDot={customDot}
+              direction={isMobile ? "horizontal" : "horizontal"}
+              responsive={false}
+              size="small"
+              style={{
+                marginTop: "10px",
+                display: "flex",
+                flexDirection: isMobile ? "row" : "row",
+                alignItems: isMobile ? "flex-start" : "center",
+              }}
+              items={[
+                {
+                  title: (
+                    <div style={{ textAlign: "left", fontSize: isMobile ? '12px' : '14px', width: isMobile ? 'auto' : '200px' }}>
+                      <span>Complete Reproductive Health Assessment Form</span>
+                      <div style={{ marginTop: "10px" }}>
+                        <Button
+                          onClick={() => {
+                            navigate("/assessment");
+                          }}
+                          type="primary"
+                          style={{
+                            backgroundColor: "#C2E6F8",
+                            borderColor: "none",
+                            color: "#00ADEF",
+                            width: isMobile ? '80px' : '',
+                            fontSize: isMobile ? '8px' : ''
+                          }}
+                        >
+                          ASSESS
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                ),
-              },
-              {
-                title: (
-                  <div style={{ textAlign: "left", fontSize: isMobile ? '12px' : '14px', width: isMobile ? 'auto' : '200px' }}>
-                    <span>Book Free 15-minute Consult with Fertility Coach</span>
-                    <div style={{ marginTop: isMobile ? "30px" : "10px" }}>
-                      <Button
-                        type="primary"
-                        onClick={() => {
-                          navigate("/patient/calendar");
-                        }}
-                        disabled={currentStep < 1 || currentStep === null}
-                        style={{
-                          backgroundColor: "#C2E6F8",
-                          borderColor: "none",
-                          color: "#00ADEF",
-                          width: isMobile ? '80px' : '',
-                          fontSize: isMobile ? '8px' : ''
-                        }}
-                      >
-                        APPT
-                      </Button>
+                  ),
+                },
+                {
+                  title: (
+                    <div style={{ textAlign: "left", fontSize: isMobile ? '12px' : '14px', width: isMobile ? 'auto' : '200px' }}>
+                      <span>Book Free 15-minute Consult with Fertility Coach</span>
+                      <div style={{ marginTop: isMobile ? "30px" : "10px" }}>
+                        <Button
+                          type="primary"
+                          onClick={() => {
+                            navigate("/patient/calendar");
+                          }}
+                          disabled={currentStep < 1 || currentStep === null}
+                          style={{
+                            backgroundColor: "#C2E6F8",
+                            borderColor: "none",
+                            color: "#00ADEF",
+                            width: isMobile ? '80px' : '',
+                            fontSize: isMobile ? '8px' : ''
+                          }}
+                        >
+                          APPT
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                ),
-              },
-              {
-                title: (
-                  <div style={{ textAlign: "left", fontSize: isMobile ? '12px' : '14px', width: isMobile ? 'auto' : '200px' }}>
-                    <span>Continue Care by visiting the Plan section for Initial Assessment</span>
-                    <div style={{ marginTop: "10px" }}>
-                      <Button
-                        type="primary"
-                        onClick={() => {
-                          navigate("/plans");
-                        }}
-                        disabled={currentStep !== 2 || currentStep === null}
-                        style={{
-                          backgroundColor: "#C2E6F8",
-                          borderColor: "none",
-                          color: "#00ADEF",
-                          width: isMobile ? '80px' : '',
-                          fontSize: isMobile ? '8px' : ''
-                        }}
-                      >
-                        PLAN
-                      </Button>
+                  ),
+                },
+                {
+                  title: (
+                    <div style={{ textAlign: "left", fontSize: isMobile ? '12px' : '14px', width: isMobile ? 'auto' : '200px' }}>
+                      <span>Continue Care by visiting the Plan section for Initial Assessment</span>
+                      <div style={{ marginTop: "10px" }}>
+                        <Button
+                          type="primary"
+                          onClick={() => {
+                            navigate("/plans");
+                          }}
+                          disabled={patientStatus.initialAssessment === null}
+                          style={{
+                            backgroundColor: "#C2E6F8",
+                            borderColor: "none",
+                            color: "#00ADEF",
+                            width: isMobile ? '80px' : '',
+                            fontSize: isMobile ? '8px' : ''
+                          }}
+                        >
+                          PLAN
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                ),
+                  ),
+                },
+              ]}
+            />
+          </>
+        )}
 
-              },
-
-            ]
-            }
-          />
-
-          :
-
+        {(patientStatus.initialAssessment !== null && patientStatus.isPaymentComplete !== null) && (
           <Steps
             current={userCurrentStep}
             progressDot={assessCustomDot}
             direction={isMobile ? "horizontal" : "horizontal"}
             responsive={false}
-
             size="small"
             style={{
               display: "flex",
@@ -363,14 +362,13 @@ export default function PatDash() {
                       </Button>
                     </div>
                   </div>
-
                 ),
               },
               {
                 title: (
                   <div style={{ textAlign: "left", fontSize: isMobile ? '12px' : '14px', display: "flex", flexDirection: "column", height: "100%" }}>
                     <span>Watch the Cycle Tracking Video</span>
-                    <div style={{ marginTop: "auto", display: "flex", flexDirection: "row", gap: "10px" }}> {/* Adjusted this line */}
+                    <div style={{ marginTop: "auto", display: "flex", flexDirection: "row", gap: "10px" }}>
                       <Button
                         type="primary"
                         onClick={() => {
@@ -421,7 +419,7 @@ export default function PatDash() {
                 title: (
                   <div style={{ textAlign: "left", fontSize: isMobile ? '12px' : '14px', display: "flex", flexDirection: "column", height: "100%" }}>
                     <span>Day 3 Bloodwork</span>
-                    <div style={{ marginTop: "auto" }}> {/* Adjusted this line */}
+                    <div style={{ marginTop: "auto" }}>
                       <Button
                         type="primary"
                         onClick={() => {
@@ -439,9 +437,7 @@ export default function PatDash() {
                       </Button>
                     </div>
                   </div>
-
                 ),
-
               },
               {
                 title: (
@@ -465,9 +461,7 @@ export default function PatDash() {
                       </Button>
                     </div>
                   </div>
-
                 ),
-
               },
               {
                 title: (
@@ -491,9 +485,7 @@ export default function PatDash() {
                       </Button>
                     </div>
                   </div>
-
                 ),
-
               },
               {
                 title: (
@@ -517,9 +509,7 @@ export default function PatDash() {
                       </Button>
                     </div>
                   </div>
-
                 ),
-
               },
               {
                 title: (
@@ -531,7 +521,7 @@ export default function PatDash() {
                         onClick={() => {
                           navigate("/plans");
                         }}
-                        disabled={status?.statLevel !== 3}
+                        disabled={currentStep !== 2}
                         style={{
                           backgroundColor: "#C2E6F8",
                           borderColor: "none",
@@ -544,17 +534,13 @@ export default function PatDash() {
                       </Button>
                     </div>
                   </div>
-
                 ),
-
               },
-            ]
-            }
+            ]}
           />
-        }
+        )}
       </div>
       <Row gutter={16}>
-
         <Col xs={24} md={12} style={{ paddingBottom: "16px", paddingTop: 20 }}>
           <div>
             <div
@@ -597,14 +583,12 @@ export default function PatDash() {
                     order: isMobile ? 2 : 1,
                   }}
                 >
-
-
                   {filteredAppointments.length > 0 ? (
                     <div>
                       {visibleAppointments.map((appointment, index) => (
                         <>
                           <div
-                            key={index} // Add a unique key for each appointment
+                            key={index}
                             style={{
                               width: "100%",
                               background: index % 2 === 0 ? "#F2AA9380" : "#B46DB8",
@@ -622,7 +606,6 @@ export default function PatDash() {
                                 marginBottom: '20px'
                               }}
                             >
-                              {/* Column 1 - Clinician Info */}
                               <Col style={{ fontSize: "8px" }} span={8}>
                                 <div style={{ fontSize: "8px", display: "flex", alignItems: "center" }}>
                                   <Avatar style={{ marginRight: "10px" }} icon={<UserOutlined />} />
@@ -630,8 +613,6 @@ export default function PatDash() {
                                 </div>
                                 <div style={{ color: "#7D7D7D" }}>Ongoing Care Plan - Initial Care Team Appointment</div>
                               </Col>
-
-                              {/* Column 2 - Date and Time Info */}
                               <Col style={{ flex: 1, textAlign: "left", fontSize: '10px' }} span={10}>
                                 <div style={{ display: "flex", alignItems: "center", marginBottom: "5px" }}>
                                   <CalendarOutlined style={{ marginRight: "8px" }} />
@@ -648,8 +629,6 @@ export default function PatDash() {
                                   <EnvironmentOutlined style={{ marginRight: "8px" }} /> Virtual or In-person
                                 </div>
                               </Col>
-
-                              {/* Column 3 - Join Button */}
                               <Col span={4} style={{ display: "flex", flexDirection: 'column', alignItems: "center", fontSize: '8px' }}>
                                 <MoreOutlined style={{ fontSize: '10px' }} />
                                 <Button type="primary" style={{ width: 60, marginTop: '10px', borderRadius: 5 }} icon={<VideoCameraOutlined />}>
@@ -661,11 +640,10 @@ export default function PatDash() {
                           <Divider />
                         </>
                       ))}
-
                       {filteredAppointments.length > 2 && (
                         <div
                           onClick={handleViewAll}
-                          style={{ color: "#1E90FF", cursor: "pointer" }} // Added cursor for better UX
+                          style={{ color: "#1E90FF", cursor: "pointer" }}
                         >
                           {viewAll ? (
                             <UpOutlined style={{ marginRight: "10px" }} />
@@ -684,13 +662,10 @@ export default function PatDash() {
                   )}
                 </div>
               ) :
-                <div
-
-                >
+                <div>
                   <p>
                     You have no upcoming appointments.
                   </p>
-
                   <Button
                     type="primary"
                     style={{
@@ -733,7 +708,6 @@ export default function PatDash() {
                 UPCOMING BLOODWORK
               </h3>
             </div>
-
             <div
               style={{
                 padding: "16px 24px",
@@ -748,7 +722,6 @@ export default function PatDash() {
               <p>You have no upcoming bloodwork.</p>
             </div>
           </div>
-
           <div className="mt-4">
             <div
               style={{
@@ -773,7 +746,6 @@ export default function PatDash() {
                 DOCUMENTS
               </h3>
             </div>
-
             <div
               style={{
                 padding: "16px 24px",
@@ -790,8 +762,6 @@ export default function PatDash() {
           </div>
         </Col>
         {isMobile ? <>
-
-          {/* Fixed button on the right */}
           <img
             onClick={showCyleModal}
             src={MiraButton}
@@ -808,8 +778,6 @@ export default function PatDash() {
             alt="mira"
           >
           </img>
-
-          {/* Modal for cycle info */}
           <Modal
             title="Cycle Information"
             visible={isModalVisible}
@@ -871,8 +839,6 @@ export default function PatDash() {
                     <img src={IFM} alt="ifm" style={{ width: "50%", margin: 'auto' }} />
                   </div>
                 </div>
-
-
               ) : cycleInfo && cycleInfo.cycleInfo ? <CircleWithArc cycleInfo={cycleInfo} />
                 : (
                   <div>
@@ -890,7 +856,6 @@ export default function PatDash() {
             </div>
           </Col>}
       </Row>
-
     </div>
   );
 }

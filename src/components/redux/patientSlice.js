@@ -523,6 +523,8 @@ const patientSlices = createSlice({
         state.loading = false;
         state.error = action.payload;
       });
+
+
   },
 });
 

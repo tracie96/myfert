@@ -40,7 +40,7 @@ console.log({dateFilter})
     });
   }, []);
 
-  const handleMarkAsDone = async (appointId) => {
+  const handleMarkAsDone = useCallback(async (appointId) => {
     try {
       setLoading(true);
       const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
@@ -52,7 +52,6 @@ console.log({dateFilter})
             "Content-Type": "application/json",
             accept: "text/plain",
             Authorization: `${token}`,
-    
           },
         }
       );
@@ -68,7 +67,7 @@ console.log({dateFilter})
     } finally {
       setLoading(false);
     }
-  };
+  }, [dispatch]);
 
   const handleDateFilter = (date) => {
     setDateFilter(date);
@@ -165,7 +164,7 @@ console.log({dateFilter})
         ),
       },
     ],
-    []
+    [handleMarkAsDone,loading]
   );
   
   const filteredAppointments = useMemo(() => {

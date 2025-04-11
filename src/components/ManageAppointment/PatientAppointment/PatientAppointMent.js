@@ -66,12 +66,12 @@ const PatientAppointment = () => {
       }
       return appointments.filter(appointment => {
         const roleToProviderMap = {
-          0: 'nurse',
-          2: 'doctor',
-          3: 'pharmacistClinician',
-          4: 'nutritionalPractitioner',
-          9: 'fertilitySupportPractitioner',
-          8: 'fertilityEducator'
+          3: 'doctor',
+          5: 'nurse',
+          6: 'pharmacistClinician',
+          7: 'nutritionalPractitioner',
+          8: 'fertilitySupportPractitioner',
+          9: 'fertilityEducator'
         };
         const providerType = roleToProviderMap[appointment.roleId];
         return providerType && selectedProviders[providerType];

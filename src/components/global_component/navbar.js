@@ -15,6 +15,7 @@ function Navbar() {
   const [isNotifications, setNotifications] = useState(null);
   const [isUpdate, setUpdate] = useState(false);
   const [unReadCount, setUnReadCount] = useState(0);
+  console.log(unReadCount)
   const navigate = useNavigate();
   const isMobile = useMediaQuery({ maxWidth: 767 });
   console.log(isUpdate, setLogout);

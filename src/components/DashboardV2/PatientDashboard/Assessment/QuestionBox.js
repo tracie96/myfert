@@ -58,8 +58,10 @@ console.log({currentStep})
     console.log('statLevel:', statLevel); // Debug log
     
     return cards.map((card, index) => {
-      // If patientStatus is null, only first card is clickable
-      const isClickable = patientStatus === null ? index === 0 : (statLevel >= 4 || index === 0);
+      // Check if both initialAssessment and isPaymentComplete are true
+      const isFullyEnabled = patientStatus?.initialAssessment === true && patientStatus?.isPaymentComplete === true;
+      // If patientStatus is null or either value is null, only first card is clickable
+      const isClickable = isFullyEnabled ? true : (index === 0);
       console.log(`Card ${index} isClickable:`, isClickable); // Debug log
       const isCompleted = patientStatus?.initialAssessment || false;
 

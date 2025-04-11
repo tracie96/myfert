@@ -232,15 +232,20 @@
   }
 
   .fc-toolbar-title {
-    margin-top: -5% !important;
+    margin-top: -0% !important;
   }
 
   .fc-direction-ltr .fc-toolbar>*> :not(:first-child) {
     margin-left: 30%;
+    margin-left: 0%;
+    position: absolute;
+    right: 14%;
+    top: 50%;
+    transform: translateY(-50%);
   }
 
   .fc-dayGridMonth-button {
-    margin-top: -13% !important;
+    margin-top: -12% !important;
     background: #01EEFE !important;
     border: none !important;
   }
@@ -248,8 +253,6 @@
   .fc-today-button {
     background: #C2E6F8 !important;
     border: none !important;
-    margin-top: -10% !important;
-    margin-left: 150px !important;
 
   }
 
@@ -321,6 +324,26 @@
   .fc .fc-daygrid-event {
     font-size: calc(0.5rem + 0.3vw);
   }
+  .fc-toolbar-chunk button[aria-pressed="true"]{
+    position: absolute;
+    right: 0px;
+    float:none !important;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-top:0% !important
+  }
+  .fc-toolbar{
+    position: relative;
+  }
+  .fc .fc-button-group {
+    vertical-align: unset;
+  }
+}
+
+@media (max-width:600px) {
+  .fc-direction-ltr .fc-toolbar>*> :not(:first-child) {
+    right: 27%;
+}
 }
 
 @media (max-width: 400px) {
@@ -354,8 +377,6 @@
   .fc-today-button {
     background: #C2E6F8 !important;
     border: none !important;
-    margin-top: -10% !important;
-    margin-left: 200px !important;
 
   }
 
@@ -368,12 +389,18 @@
   .fc-today-button {
     background: #C2E6F8 !important;
     border: none !important;
-    margin-top: -10% !important;
-    margin-left: 100px !important;
   }
 
   .fc .fc-daygrid-day-number {
     color: #111F4A;
+  }
+  .fc-toolbar{
+    position: relative;
+  }
+  .fc-toolbar-chunk button[aria-pressed="true"]{
+    position: absolute;
+    right: 0px;
+    float:none;
   }
 
 }

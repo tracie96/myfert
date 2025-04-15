@@ -166,7 +166,7 @@ console.log({dateFilter})
         ),
       },
     ],
-    [handleMarkAsDone,loading]
+    [handleMarkAsDone,loading,markedAsDone]
   );
   
   const filteredAppointments = useMemo(() => {

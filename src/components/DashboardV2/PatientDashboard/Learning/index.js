@@ -220,8 +220,8 @@ const LearnInfo = () => {
     "Nunc dignissim risus id metus. Cras ornare tristique elit. Vivamus vestibulum ntulla nec ante. Praesent placerat risus quis eros. Fusce pellentesque suscipit nibh.",
   ];
 
-  const handleStartQuiz = () => {
-    navigate('/menstrual-cycle-quiz');
+  const handleStartQuiz = (quizType) => {
+    navigate('/menstrual-cycle-quiz', { state: { quizType } });
   };
 
   return (
@@ -341,7 +341,7 @@ const LearnInfo = () => {
                     backgroundColor: '#9B6B9B',
                     borderColor: '#9B6B9B'
                   }}
-                  onClick={handleStartQuiz}
+                  onClick={() => handleStartQuiz('menstrual')}
                 >
                   Start Quiz
                 </Button>
@@ -372,9 +372,10 @@ const LearnInfo = () => {
                 <Button 
                   type="primary" 
                   style={{ 
-                    backgroundColor: '#A0A0A0',
-                    borderColor: '#A0A0A0'
+                    backgroundColor: '#00800080',
+                    borderColor: '#00800080'
                   }}
+                  onClick={() => handleStartQuiz('fertile')}
                 >
                   Start Quiz
                 </Button>

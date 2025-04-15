@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Typography, Radio, Space } from 'antd';
 import { LeftOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -96,12 +96,120 @@ const menstrualCycleQuizData = [
   }
 ];
 
+const fertileWindowQuizData = [
+  {
+    question: "What type of cervical mucus indicates peak fertility?",
+    options: [
+      "Thick and sticky",
+      "Dry or absent",
+      "Clear/semi-clear, stretchy, and/or slippery (resembling egg whites)",
+      "Cloudy and pasty"
+    ],
+    answer: 2,
+    explanation: "This type of cervical mucus creates an ideal environment for sperm to swim and survive."
+  },
+  {
+    question: "What does a rise in estrogen indicate in the menstrual cycle?",
+    options: [
+      "The start of menstruation",
+      "Ovulation is likely imminent",
+      "Fertility is declining",
+      "Hormonal imbalance"
+    ],
+    answer: 1,
+    explanation: "A rise in estrogen signals the body is approaching the ovulatory phase and may soon trigger an LH surge."
+  },
+  {
+    question: "How might estrogen patterns differ in people with PCOS or in cycles with delayed ovulation?",
+    options: [
+      "Estrogen levels remain low throughout the cycle",
+      "Estrogen may rise and fall multiple times before ovulation occurs",
+      "Estrogen only rises once during the cycle",
+      "PCOS does not affect estrogen patterns throughout the cycle"
+    ],
+    answer: 1,
+    explanation: "People with PCOS often experience irregular cycles, and fluctuating estrogen levels can indicate failed attempts at ovulation."
+  },
+  {
+    question: "How do threshold LH (Luteinizing Hormone) tests help to identify ovulation?",
+    options: [
+      "By testing only once at the beginning of the cycle",
+      "By identifying the first appearance of cervical mucus",
+      "By detecting a significant surge in LH, usually 24-36 hours before ovulation",
+      "By confirming with a progesterone blood test"
+    ],
+    answer: 2,
+    explanation: "LH tests identify the hormonal surge that triggers ovulation, helping users predict the likely timing of ovulation and therefore their most fertile days."
+  },
+  {
+    question: "When is intercourse most likely to result in pregnancy during the menstrual cycle?",
+    options: [
+      "Any time during the menstrual cycle",
+      "Only on the day of ovulation",
+      "During the 5 days leading up to ovulation and on the day of ovulation",
+      "After ovulation has occurred"
+    ],
+    answer: 2,
+    explanation: "Sperm can survive for up to 5 days in cervical mucus, and having intercourse throughout the fertile window maximizes the chances of sperm meeting the egg."
+  },
+  {
+    question: "What day provides the highest likelihood of conception?",
+    options: [
+      "The day before ovulation",
+      "5 days before ovulation",
+      "7 days after ovulation",
+      "The first day after your menstrual period ends"
+    ],
+    answer: 0,
+    explanation: "It is best to have intercourse throughout the fertile window because you cannot predict the exact day of ovulation. When you are starting to feel slippery at the vulva is a great indication of high estrogen levels, and therefore likely imminent ovulation. LH tests can also help to pinpoint the day before ovulation."
+  },
+  {
+    question: "During the fertile window, is it better to have intercourse every day or every other day?",
+    options: [
+      "Every day, to maximize the chances of fertilization",
+      "Every other day, to maintain optimal sperm quality",
+      "Once during the fertile window is sufficient",
+      "Only on the day of ovulation",
+      "All of the above"
+    ],
+    answer: 4,
+    explanation: "It only takes one well-timed act of intercourse to conceive, and there is no strong evidence pointing to specific frequency within the fertile window leading to better chances. However, because we can't know the exact day of ovulation it's best to start trying when signs point to high estrogen (e.g., seeing peak type cervical mucus), and therefore an ovulation attempt."
+  },
+  {
+    question: "How long can sperm survive in the reproductive tract during the fertile window, aided by high estrogen levels and estrogenic cervical mucus?",
+    options: [
+      "1 day",
+      "2-3 days",
+      "Up to 5 days",
+      "7-10 days"
+    ],
+    answer: 2,
+    explanation: "High estrogen levels during the fertile window lead to the production of estrogenic cervical mucus, which creates an ideal environment for sperm to survive for up to 5 days, increasing the chances of fertilization."
+  },
+  {
+    question: "For individuals with PCOS or those that often experience delayed ovulation (irregular cycles), when should they assume they are in their fertile window?",
+    options: [
+      "Only after an LH surge is detected",
+      "Anytime during an estrogen rise",
+      "On cycle day 14",
+      "During menstruation"
+    ],
+    answer: 1,
+    explanation: "In individuals with PCOS or those that often experience delayed ovulation (irregular cycles), multiple estrogen rises may occur without ovulation. It is safer to assume fertility any time estrogen levels are rising, as ovulation could potentially follow. Waiting for an LH surge can result in missed opportunities, and since LH baseline levels are generally higher in those with PCOS, LH tests may be hard to interpret."
+  }
+];
+
 const MenstrualCycleQuiz = () => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
   const [quizStarted, setQuizStarted] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const quizType = location.state?.quizType || 'menstrual';
+
+  const quizData = quizType === 'menstrual' ? menstrualCycleQuizData : fertileWindowQuizData;
+  const quizTitle = quizType === 'menstrual' ? 'MENSTRUAL CYCLE 101 QUIZ' : 'FERTILE WINDOW QUIZ';
 
   const handleAnswer = (e) => {
     setSelectedAnswers({
@@ -111,7 +219,7 @@ const MenstrualCycleQuiz = () => {
   };
 
   const handleNext = () => {
-    if (currentQuestion < menstrualCycleQuizData.length - 1) {
+    if (currentQuestion < quizData.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
     } else {
       setShowResults(true);
@@ -121,7 +229,7 @@ const MenstrualCycleQuiz = () => {
   const calculateScore = () => {
     let correct = 0;
     Object.keys(selectedAnswers).forEach(question => {
-      if (selectedAnswers[question] === menstrualCycleQuizData[question].answer) {
+      if (selectedAnswers[question] === quizData[question].answer) {
         correct++;
       }
     });
@@ -154,7 +262,7 @@ const MenstrualCycleQuiz = () => {
         </div>
         
         <Title level={2} style={{ color: '#8B3A8B', marginBottom: '24px' }}>
-          MENSTRUAL CYCLE 101 QUIZ
+          {quizTitle}
         </Title>
 
         <div style={{ maxWidth: '800px' }}>
@@ -162,7 +270,7 @@ const MenstrualCycleQuiz = () => {
           
           <Paragraph>
             This is a great chance to assess how much you've learned. The questions will focus on the{' '}
-            <Text style={{ color: '#8B3A8B' }}>Menstrual Cycle 101</Text>, so make sure you review as much as needed.
+            <Text style={{ color: '#8B3A8B' }}>{quizType === 'menstrual' ? 'Menstrual Cycle 101' : 'Fertile Window'}</Text>, so make sure you review as much as needed.
           </Paragraph>
           
           <Paragraph>
@@ -204,7 +312,7 @@ const MenstrualCycleQuiz = () => {
 
   if (showResults) {
     const score = calculateScore();
-    const passed = score === menstrualCycleQuizData.length;
+    const passed = score === quizData.length;
 
     return (
       <div style={{ padding: '24px', maxWidth: '800px' }}>
@@ -220,12 +328,12 @@ const MenstrualCycleQuiz = () => {
             {passed ? 'Congratulations!' : 'Keep Learning!'}
           </Title>
           <Paragraph>
-            You scored {score} out of {menstrualCycleQuizData.length}
+            You scored {score} out of {quizData.length}
           </Paragraph>
         </div>
 
         <div style={{ marginBottom: '40px' }}>
-          {menstrualCycleQuizData.map((q, index) => (
+          {quizData.map((q, index) => (
             <div key={index} style={{ marginBottom: '24px' }}>
               <Text strong>Question {index + 1}: {q.question}</Text>
               <br />
@@ -270,10 +378,10 @@ const MenstrualCycleQuiz = () => {
 
       <div style={{ maxWidth: '800px' }}>
         <div style={{ marginBottom: '24px' }}>
-          <Text>Question {currentQuestion + 1} of {menstrualCycleQuizData.length}</Text>
+          <Text>Question {currentQuestion + 1} of {quizData.length}</Text>
         </div>
 
-        <Title level={4}>{menstrualCycleQuizData[currentQuestion].question}</Title>
+        <Title level={4}>{quizData[currentQuestion].question}</Title>
 
         <Radio.Group
           onChange={handleAnswer}
@@ -281,7 +389,7 @@ const MenstrualCycleQuiz = () => {
           style={{ width: '100%', marginTop: '24px' }}
         >
           <Space direction="vertical" style={{ width: '100%' }}>
-            {menstrualCycleQuizData[currentQuestion].options.map((option, index) => (
+            {quizData[currentQuestion].options.map((option, index) => (
               <Radio 
                 key={index} 
                 value={index} 
@@ -312,7 +420,7 @@ const MenstrualCycleQuiz = () => {
               borderRadius: '24px'
             }}
           >
-            {currentQuestion === menstrualCycleQuizData.length - 1 ? 'Finish' : 'Next'}
+            {currentQuestion === quizData.length - 1 ? 'Finish' : 'Next'}
           </Button>
         </div>
       </div>

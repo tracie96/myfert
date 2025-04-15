@@ -351,6 +351,7 @@ const getRouter = createBrowserRouter(
         <Route path="newchart" element={<NewHormoneChart />} />
         
         <Route path="menstrual-cycle-quiz" element={<MenstrualCycleQuiz />} />
+        <Route path="learning/quiz" element={<MenstrualCycleQuiz />} />
 
         <Route path="plans" element={<SubscriptionPlanV2 />} />
         <Route path="payment-details" element={<PaymentDetails />} />

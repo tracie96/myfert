@@ -4,7 +4,6 @@
   font-family: "Montserrat", serif;
     padding: 20px;
     margin: auto;
-  max-width: 1200px;
   margin: 0 auto;
   padding: 24px;
   }
@@ -194,4 +193,9 @@ padding: 1rem 7rem;
   text-align: center;
   font-size: 14px;
 }
-  
+strong{
+  color: inherit !important;
+}
+.ant-col {
+  font-family: 'Montserrat';
+}

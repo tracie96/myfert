@@ -245,6 +245,7 @@ import PatientAppointmentList from "../DashboardV2/PatientDashboard/AppontmentLi
 import LabsAndRequisitions from "../DashboardV2/DoctorDashboard/Lab";
 import MedicationTable from "../DashboardV2/DoctorDashboard/Medications";
 import MedScreen from "../DashboardV2/PatientDashboard/Meds";
+import MenstrualCycleQuiz from "../DashboardV2/PatientDashboard/Learning/MenstrualCycleQuiz";
 
 //#endregion
 
@@ -348,6 +349,8 @@ const getRouter = createBrowserRouter(
         <Route path="assessment" element={<Assessment />} />
         <Route path="chart" element={<HormoneChart />} />
         <Route path="newchart" element={<NewHormoneChart />} />
+        
+        <Route path="menstrual-cycle-quiz" element={<MenstrualCycleQuiz />} />
 
         <Route path="plans" element={<SubscriptionPlanV2 />} />
         <Route path="payment-details" element={<PaymentDetails />} />

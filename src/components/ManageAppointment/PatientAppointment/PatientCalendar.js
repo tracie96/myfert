@@ -147,6 +147,25 @@ const PatientCalendar = ({ selectedProviders }) => {
           return []; // Skip invalid slot data
         }
   
+        // Check if this provider type is selected
+        const roleToProviderMap = {
+          3: 'doctor',
+          5: 'nurse',
+          6: 'pharmacistClinician',
+          7: 'nutritionalPractitioner',
+          8: 'fertilitySupportPractitioner',
+          9: 'fertilityEducator'
+        };
+        const providerType = roleToProviderMap[slot.roleId];
+        
+        // If no providers are selected, show all events
+        // If providers are selected, only show events for selected providers
+        if (selectedProviders && Object.values(selectedProviders).some(value => value)) {
+          if (!selectedProviders[providerType]) {
+            return []; // Skip events for unselected providers
+          }
+        }
+  
         // Construct a unique key for each event based on roleName and date
         const eventKey = `${slot.roleName}-${slot.date}`;
   
@@ -195,7 +214,7 @@ const PatientCalendar = ({ selectedProviders }) => {
         return prevEvents;
       });
     },
-    [roleColorMap, setApptEvents]
+    [roleColorMap, setApptEvents, selectedProviders]
   );
   
   

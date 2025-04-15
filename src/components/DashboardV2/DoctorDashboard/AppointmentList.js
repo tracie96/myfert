@@ -18,6 +18,7 @@ export default function AppointmentList() {
   });
   const [searchParam, setSearchParam] = useState("");
   const [dateFilter, setDateFilter] = useState(null);
+  const [markedAsDone, setMarkedAsDone] = useState({});
 console.log({dateFilter})
   useEffect(() => {
     dispatch(getUpcomingAppointments());
@@ -58,6 +59,7 @@ console.log({dateFilter})
       
       if (response.status === 200) {
         message.success('Appointment marked as done successfully');
+        setMarkedAsDone(prev => ({ ...prev, [appointId]: true }));
         // Refresh the appointments list
         dispatch(getUpcomingAppointments());
       }
@@ -81,7 +83,7 @@ console.log({dateFilter})
         width: 80,
         render: (_, record) => (
           <Checkbox
-            checked={record.approved}
+            checked={markedAsDone[record.appointId] || false}
             onChange={() => handleMarkAsDone(record.appointId)}
             disabled={loading}
           />

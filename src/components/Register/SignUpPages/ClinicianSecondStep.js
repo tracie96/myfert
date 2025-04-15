@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Row, Col, Button, Modal, Input } from "antd";
 import { NavLink } from "react-router-dom";
 import fertilityImage from "../../../assets/images/auth/fertilityImage.svg";
-import janeImg from "../../../assets/images/jane.svg";
+// import janeImg from "../../../assets/images/jane.svg";
 import { useNavigate } from "react-router-dom";
 
 const ClinicianSecondStep = () => {
@@ -85,11 +85,7 @@ const ClinicianSecondStep = () => {
           </div>
         </Col>
         <Col span={12} style={{ textAlign: "center" }}>
-          <img
-            src={janeImg}
-            alt="Jane"
-            style={{ maxWidth: "100%", height: "auto" }}
-          />
+         
         </Col>
       </Row>
 

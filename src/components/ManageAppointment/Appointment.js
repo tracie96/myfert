@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Calendar from "./Calendar";
-import { Drawer, Button, Checkbox, Row, Col, Space, Avatar, TimePicker } from "antd";
+import { Drawer, Button, Checkbox, Row, Col, Space, TimePicker } from "antd";
 import moment from "moment";
 import {
   MinusCircleOutlined,
@@ -8,16 +8,7 @@ import {
   RightCircleTwoTone,
   PlusCircleTwoTone,
 } from "@ant-design/icons";
-import {
-  CalendarOutlined,
-  ClockCircleOutlined,
-  DownOutlined,
-  EnvironmentOutlined,
-  MoreOutlined,
-  UpOutlined,
-  UserOutlined,
-  VideoCameraOutlined,
-} from "@ant-design/icons";
+
 
 import { submitAvailability, getAvailability } from "../redux/doctorSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -40,15 +31,7 @@ const Appointment = () => {
   });
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const maxSlots = 5;
-  const [viewAll, setViewAll] = useState(false);
-  const handleViewAll = () => {
-    setViewAll(!viewAll);
-  };
-  const toggleMore = (index) => {
-    setMoreVisible(prevState =>
-      prevState.map((visible, i) => (i === index ? !visible : visible))
-    );
-  };
+  
   const showDrawer = () => {
     setDrawerKey((prevKey) => prevKey + 1);
     setDrawerCurrentWeek(moment());
@@ -57,15 +40,12 @@ const Appointment = () => {
   const [refreshCalendar, setRefreshCalendar] = useState(0);
   const dispatch = useDispatch();
   const { appointmentList = [] } = useSelector((state) => state?.doctor);
-  
+
   const filteredAppointments = appointmentList.filter(
     (app) => app.roleId === 0
   );
-  
-  const visibleAppointments = viewAll
-    ? filteredAppointments
-    : filteredAppointments.slice(0, 2);
-  const [moreVisible, setMoreVisible] = useState(filteredAppointments.map(() => true));
+
+ 
   const onClose = () => {
     setAvailability({
       Sunday: [],
@@ -167,7 +147,7 @@ const Appointment = () => {
     const startMinute = moment(startTime, "HH:mm").minute();
 
     return {
-      disabledHours: () => Array.from({ length: startHour }, (_, i) => i), 
+      disabledHours: () => Array.from({ length: startHour }, (_, i) => i),
       disabledMinutes: (selectedHour) =>
         selectedHour === startHour
           ? Array.from({ length: startMinute }, (_, i) => i)
@@ -177,7 +157,7 @@ const Appointment = () => {
   const handlePreviousWeek = () => {
     const prevWeek = moment(drawerCurrentWeek).subtract(1, "weeks");
     setDrawerCurrentWeek(prevWeek);
-    
+
     // Fetch availability for the previous week
     const startDate = prevWeek.startOf("week").format("YYYY-MM-DD");
     const endDate = prevWeek.endOf("week").format("YYYY-MM-DD");
@@ -187,7 +167,7 @@ const Appointment = () => {
   const handleNextWeek = () => {
     const nextWeek = moment(drawerCurrentWeek).add(1, "weeks");
     setDrawerCurrentWeek(nextWeek);
-    
+
     // Fetch availability for the next week
     const startDate = nextWeek.startOf("week").format("YYYY-MM-DD");
     const endDate = nextWeek.endOf("week").format("YYYY-MM-DD");
@@ -207,7 +187,7 @@ const Appointment = () => {
   const handleTodayClick = () => {
     const today = moment();
     setDrawerCurrentWeek(today);
-    
+
     // Fetch availability for the current week
     const startDate = today.startOf("week").format("YYYY-MM-DD");
     const endDate = today.endOf("week").format("YYYY-MM-DD");
@@ -217,15 +197,15 @@ const Appointment = () => {
   // Function to get existing appointments for a specific day
   const getExistingAppointmentsForDay = (day) => {
     const dayIndex = moment().day(day).day(); // Get day index (0-6)
-    
+
     // Find appointments for the drawer's selected week
     return filteredAppointments.filter(appointment => {
       const appointmentDate = moment(appointment.date);
       const appointmentDayIndex = appointmentDate.day();
-      
+
       // Check if the appointment is in the drawer's selected week
-      return appointmentDayIndex === dayIndex && 
-             appointmentDate.isSame(drawerCurrentWeek, 'week');
+      return appointmentDayIndex === dayIndex &&
+        appointmentDate.isSame(drawerCurrentWeek, 'week');
     });
   };
 
@@ -271,91 +251,8 @@ const Appointment = () => {
           </div>
         </div>
         <div className="col-lg-12 mb-4">
-          <div className="card shadow mb-4">
-            <div className="card-body">
-            <div className="user" style={{ maxWidth: "600px", margin: "auto", padding: "20px", border: "1px solid #f0f0f0", borderRadius: "8px", backgroundColor: "#fff" }}>
-      <div className="form-group">
-        <h3 style={{ color: "#333", marginBottom: "15px", fontWeight: "bold" }}>
-          Upcoming Appointment
-        </h3>
-      </div>
       
-      {filteredAppointments.length > 0 ? (
-        <div>
-          {visibleAppointments.map((appointment, index) => (
-            <div
-              key={index}
-              style={{
-                borderBottom: "1px solid #e0e0e0",
-                padding: "15px 0",
-                fontSize: "14px",
-                position: "relative",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <p style={{ fontWeight: "bold", color: "#333" }}>
-                  <Avatar style={{ backgroundColor: "#1E90FF", marginRight: "8px" }} icon={<UserOutlined />} />
-                  Patient Gullbringa
-                </p>
-                {moreVisible[index] ? (
-                  <MoreOutlined style={{ fontSize: '18px', color: "#1E90FF", cursor: "pointer" }} onClick={() => toggleMore(index)} />
-                ) : (
-                  <Button type="link" onClick={() => toggleMore(index)} style={{ color: "#ff4d4f" }}>
-                    Cancel
-                  </Button>
-                )}
-              </div>
-
-              <div style={{ color: "#666" }}>
-                <p>
-                  <CalendarOutlined style={{ marginRight: "8px" }} />
-                  {new Date(appointment.date).toLocaleDateString("en-Us", { month: "short", day: "numeric", year: "numeric" })}
-                </p>
-                <p>
-                  <ClockCircleOutlined style={{ marginRight: "8px" }} />
-                  {new Date(appointment.date).toLocaleTimeString("en-US", { hour: '2-digit', minute: '2-digit' })}
-                </p>
-                <p>
-                  <EnvironmentOutlined style={{ marginRight: "8px" }} />
-                  Virtual or In-person
-                </p>
-              </div>
-
-              <div style={{ textAlign: "center", marginTop: "10px" }}>
-                <Button type="primary" icon={<VideoCameraOutlined />} style={{ backgroundColor: "#1E90FF", border: "none", width: "100%", marginBottom: "8px" }}>
-                  Join
-                </Button>
-                <p style={{ fontSize: "13px", color: "#888", margin: "5px 0 0" }}>
-                  Ongoing Care Plan - Initial Care Team Appointment
-                </p>
-              </div>
-            </div>
-          ))}
-
-          {filteredAppointments.length > 2 && (
-            <div onClick={handleViewAll} style={{ color: "#1E90FF", textAlign: "center", marginTop: "15px", cursor: "pointer" }}>
-              {viewAll ? <UpOutlined style={{ marginRight: "8px" }} /> : <DownOutlined style={{ marginRight: "8px" }} />}
-              {viewAll ? "View Less" : "View All"}
-            </div>
-          )}
-        </div>
-      ) : (
-        <div style={{ textAlign: "center", color: "#888", fontSize: "14px" }}>
-          <p>You have no upcoming appointment.</p>
-          <p>The earliest appointment you can schedule with your provider is:</p>
-        </div>
-      )}
-    </div>
-              <form className="user mt-4">
-                <div className="form-group col-lg-12">
-                  <label className="form-label ml-1 font-weight-bold">
-                    Recommended appointment schedule:
-                  </label>
-                  <p className="ml-1 text-sm" style={{ color: "black" }}>
-                    Dependent on the patient's plan (Day 3 or ProSPr)
-                  </p>
-                </div>
-              </form>
+           
               <Drawer
                 key={drawerKey}
                 title={
@@ -433,8 +330,8 @@ const Appointment = () => {
                         icon={<LeftCircleTwoTone />}
                         style={{ fontSize: "20px" }}
                       />
-                      <div style={{ 
-                        display: "flex", 
+                      <div style={{
+                        display: "flex",
                         flexDirection: "column",
                         alignItems: "center",
                         gap: "4px"
@@ -449,8 +346,8 @@ const Appointment = () => {
                         >
                           Week of {drawerCurrentWeek.startOf("week").format("MMMM D")} - {drawerCurrentWeek.endOf("week").format("MMMM D")}
                         </span>
-                        <span style={{ 
-                          fontSize: "12px", 
+                        <span style={{
+                          fontSize: "12px",
                           color: "#5A5A5A",
                           fontFamily: "Montserrat, sans-serif"
                         }}>
@@ -466,7 +363,7 @@ const Appointment = () => {
                       <Button
                         type="link"
                         onClick={handleTodayClick}
-                        style={{ 
+                        style={{
                           marginLeft: "8px",
                           color: "#00ADEF",
                           fontFamily: "Montserrat, sans-serif"
@@ -479,15 +376,15 @@ const Appointment = () => {
                 </Row>
 
                 {drawerCurrentWeek.isBefore(moment().startOf('week')) && (
-                  <div style={{ 
-                    textAlign: "center", 
+                  <div style={{
+                    textAlign: "center",
                     padding: "16px",
                     backgroundColor: "#fff2f0",
                     borderRadius: "4px",
                     marginBottom: "16px",
                     border: "1px solid #ffccc7"
                   }}>
-                    <p style={{ 
+                    <p style={{
                       color: "#ff4d4f",
                       margin: 0,
                       fontFamily: "Montserrat, sans-serif"
@@ -520,7 +417,7 @@ const Appointment = () => {
                   <Col span={24}>
                     {Object.keys(availability).map((day) => {
                       const existingAppointments = getExistingAppointmentsForDay(day);
-                      
+
                       return (
                         <Row key={day} style={{ marginBottom: 8 }}>
                           <Col span={8}>
@@ -538,10 +435,10 @@ const Appointment = () => {
                                 {existingAppointments.map((appointment, appIndex) => (
                                   <div key={`existing-${appIndex}`} style={{ marginBottom: 4 }}>
                                     {appointment.periods && appointment.periods.map((period, periodIndex) => (
-                                      <div 
-                                        key={`period-${periodIndex}`} 
-                                        style={{ 
-                                          display: "flex", 
+                                      <div
+                                        key={`period-${periodIndex}`}
+                                        style={{
+                                          display: "flex",
                                           alignItems: "center",
                                           backgroundColor: "#f5f5f5",
                                           padding: "4px 8px",
@@ -553,7 +450,7 @@ const Appointment = () => {
                                         <span style={{ marginRight: 8 }}>
                                           {formatTimeFromObject(period.start)} - {formatTimeFromObject(period.end)}
                                         </span>
-                                      
+
                                       </div>
                                     ))}
                                   </div>
@@ -568,10 +465,10 @@ const Appointment = () => {
                                   <Button
                                     type="link"
                                     onClick={() => addTimeSlot(day)}
-                                    style={{ 
-                                      padding: "4px 8px", 
-                                      color: "#1890ff", 
-                                      display: "flex", 
+                                    style={{
+                                      padding: "4px 8px",
+                                      color: "#1890ff",
+                                      display: "flex",
                                       alignItems: "center",
                                       fontFamily: "Montserrat, sans-serif"
                                     }}
@@ -637,10 +534,10 @@ const Appointment = () => {
                                   <Button
                                     type="link"
                                     onClick={() => addTimeSlot(day)}
-                                    style={{ 
-                                      padding: "4px 0", 
-                                      color: "#1890ff", 
-                                      display: "flex", 
+                                    style={{
+                                      padding: "4px 0",
+                                      color: "#1890ff",
+                                      display: "flex",
                                       alignItems: "center",
                                       fontFamily: "Montserrat, sans-serif"
                                     }}
@@ -658,8 +555,7 @@ const Appointment = () => {
                   </Col>
                 </Row>
               </Drawer>
-            </div>
-          </div>
+         
         </div>
       </div>
     </>

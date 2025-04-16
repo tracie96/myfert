@@ -10,6 +10,7 @@ import * as Yup from "yup";
 import axios from "axios";
 import { useMediaQuery } from "react-responsive";
 import moment from "moment-timezone";
+import { gapi } from "gapi-script";
 
 import { addAppointment, getUpcomingAppointments } from "../../redux/patientSlice";
 import {
@@ -29,6 +30,10 @@ import { List, Card, Typography, Tag, message } from "antd";
 import "./PatientCalendar.css";
 
 const { Text } = Typography;
+const CLIENT_ID = "27830352971-dnfen1869qi6vhgepnf5aak5bu3u5269.apps.googleusercontent.com";
+const API_KEY = "AIzaSyDZqT-peouV8vv_OsoSVTlNKEIFi_OES5g";
+const SCOPES = "https://www.googleapis.com/auth/calendar";
+const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
 
 const PatientCalendar = ({ selectedProviders }) => {
   const calendarRef = useRef(null);
@@ -43,6 +48,95 @@ const PatientCalendar = ({ selectedProviders }) => {
     }),
     []
   );
+
+const [events, setEvents] = useState([]);
+useEffect(() => {
+  function start() {
+    gapi.client
+      .init({
+        apiKey: API_KEY,
+        clientId: CLIENT_ID,
+        discoveryDocs: [DISCOVERY_DOC],
+        scope: SCOPES,
+      })
+      .then(() => {
+        const authInstance = gapi.auth2.getAuthInstance();
+        if (authInstance.isSignedIn.get()) {
+          listUpcomingEvents();
+        }
+      })
+      .catch((error) => {
+        console.error('Error initializing GAPI client shashikant 1:', error);
+      });
+  }
+  gapi.load('client:auth2', start);
+}, []);
+
+const handleAuthClick = () => {
+  gapi.auth2.getAuthInstance().signIn().then(() => {
+   // listUpcomingEvents();
+   var event = {
+    'summary': 'Google I/O 2015',
+    'location': '800 Howard St., San Francisco, CA 94103',
+    'description': 'A chance to hear more about Google\'s developer products.',
+    'start': {
+      'dateTime': '2015-05-28T09:00:00-07:00',
+      'timeZone': 'America/Los_Angeles'
+    },
+    'end': {
+      'dateTime': '2015-05-28T17:00:00-07:00',
+      'timeZone': 'America/Los_Angeles'
+    },
+    'recurrence': [
+      'RRULE:FREQ=DAILY;COUNT=2'
+    ],
+    'attendees': [
+      {'email': 'lpage@example.com'},
+      {'email': 'sbrin@example.com'}
+    ],
+    'reminders': {
+      'useDefault': false,
+      'overrides': [
+        {'method': 'email', 'minutes': 24 * 60},
+        {'method': 'popup', 'minutes': 10}
+      ]
+    }
+  };
+
+  var request  = gapi.client.calendar.events.insert({
+    'calendarId': 'primary',
+    'resource': event
+  });
+  request.execute(event=> {
+    window.open(event.htmlLink, '_blank');
+  });
+  
+  });
+};
+
+const listUpcomingEvents = () => {
+  if (!gapi.client.calendar) {
+    console.error('Google Calendar API not loaded yet.');
+    return;
+  }
+  gapi.client.calendar.events
+      .list({
+        calendarId: 'primary',
+        timeMin: new Date().toISOString(),
+        showDeleted: false,
+        singleEvents: true,
+        maxResults: 10,
+        orderBy: 'startTime',
+      })
+      .then((response) => {
+        const events = response.result.items;
+        setEvents(events);
+      })
+      .catch((error) => {
+        console.error('Error fetching events shashikant2:', error);
+      });
+
+    };
 
   const [apptEvents, setApptEvents] = useState([]);
   const {
@@ -594,6 +688,18 @@ const PatientCalendar = ({ selectedProviders }) => {
           </Button>,
         ]}
       >
+       <div>
+      <button onClick={handleAuthClick}>Authorize Google Calendar</button>
+      <ul>
+        {events.map((event) => (
+          <li key={event.id}>
+            {event.summary} - {event.start?.dateTime || event.start?.date}
+          </li>
+        ))}
+      </ul>
+      <div>
+    </div>
+    </div>
         {selectedClinician && (
           <>
             <Row gutter={0} style={{ marginBottom: 16 }}>

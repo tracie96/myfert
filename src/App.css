@@ -1990,6 +1990,32 @@ pre code {
   .ant-tag-blue {
     margin-bottom: 5px;
   }
+    .labCard {
+      flex-wrap: wrap;
+    }
+  
+    .childCard {
+      flex: unset !important;
+      width: 100%;
+    }
+  
+    .listCard {
+      flex-wrap: wrap !important;
+      width: 80% !important;
+    }
+
+    .listCardSideBorder{
+      display: none;
+    }
+
+    .listCardContent{
+      flex: unset !important;
+    }
+
+    .bloodWorkFileStyle{
+      width: 100% !important;
+    }
+
 
 }
 

@@ -141,12 +141,28 @@ const PatientCalendar = ({ selectedProviders }) => {
   const updateCalendarEvents = useCallback(
     (availability, startYear, startMonth) => {
       const uniqueEvents = new Map();
-      const events = availability.flatMap((slot) => {
+      console.log({uniqueEvents})
+      // Group slots by date and role
+      const groupedSlots = availability.reduce((acc, slot) => {
         if (!slot || !slot.roleName || !slot.date) {
           console.error('Invalid slot data:', slot);
-          return []; // Skip invalid slot data
+          return acc;
         }
-  
+
+        const key = `${slot.date}_${slot.roleId}`;
+        if (!acc[key]) {
+          acc[key] = {
+            date: slot.date,
+            roleId: slot.roleId,
+            roleName: slot.roleName,
+            slots: []
+          };
+        }
+        acc[key].slots.push(slot);
+        return acc;
+      }, {});
+
+      const events = Object.values(groupedSlots).flatMap(group => {
         // Check if this provider type is selected
         const roleToProviderMap = {
           3: 'doctor',
@@ -156,7 +172,7 @@ const PatientCalendar = ({ selectedProviders }) => {
           8: 'fertilitySupportPractitioner',
           9: 'fertilityEducator'
         };
-        const providerType = roleToProviderMap[slot.roleId];
+        const providerType = roleToProviderMap[group.roleId];
         
         // If no providers are selected, show all events
         // If providers are selected, only show events for selected providers
@@ -165,47 +181,26 @@ const PatientCalendar = ({ selectedProviders }) => {
             return []; // Skip events for unselected providers
           }
         }
-  
-        // Construct a unique key for each event based on roleName and date
-        const eventKey = `${slot.roleName}-${slot.date}`;
-  
-        // If this event has already been processed, skip it
-        if (uniqueEvents.has(eventKey)) {
-          return []; // Skip duplicate events
-        }
-  
-        // Add the event key to the set to track that it's been processed
-        uniqueEvents.set(eventKey, true);
-  
-        const backgroundColor = roleColorMap[slot.roleId] || "gray";
-  
-        // Return the event
-        return slot.free
-          ? [
-              {
-                id: `${slot.date}_${slot.roleId}`,
-                title: slot.roleName, // Using the distinct role name as the label
-                start: new Date(slot.date),
-                end: new Date(slot.date),
-                classNames: `fc-event-${backgroundColor}`,
-                textColor: "white",
-              },
-            ]
-          : [
-              {
-                id: `${slot.date}_${slot.roleId}`,
-                title: `Booked`,
-                start: new Date(slot.date),
-                end: new Date(slot.date),
-                classNames: "fc-event-green",
-                textColor: "white",
-              },
-            ];
+
+        // Check if all slots for this date and role are free: false
+        const allSlotsBooked = group.slots.every(slot => !slot.free);
+        const backgroundColor = roleColorMap[group.roleId] || "gray";
+
+        return [
+          {
+            id: `${group.date}_${group.roleId}`,
+            title: allSlotsBooked ? 'Booked' : group.roleName,
+            start: new Date(group.date),
+            end: new Date(group.date),
+            classNames: allSlotsBooked ? 'fc-event-green' : `fc-event-${backgroundColor}`,
+            textColor: "white",
+          }
+        ];
       });
-  
+
       // Log the generated events to check what is being returned
       console.log('Generated events:', events);
-  
+
       setApptEvents((prevEvents) => {
         // Only update events if they are different from the previous state
         if (JSON.stringify(prevEvents) !== JSON.stringify(events)) {

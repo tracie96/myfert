@@ -4,7 +4,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { useDispatch, useSelector } from "react-redux";
-import { getAvailability, updateAvailability } from "../redux/doctorSlice";
+import { getAvailability, updateAvailability, deleteAppointment, getUpcomingAppointments } from "../redux/doctorSlice";
 import "./PatientAppointment/PatientCalendar.css";
 import { useMediaQuery } from "react-responsive";
 import {
@@ -305,6 +305,22 @@ console.log({currentWeek})
     }
   };
 
+  const handleDeleteAppointment = async (appointmentId) => {
+    try {
+      await dispatch(deleteAppointment(appointmentId)).unwrap();
+      // Refresh the appointments list after deletion
+      dispatch(getUpcomingAppointments());
+      // Close the drawer and clear selected event
+      handleDrawerClose();
+            const year = displayWeek.year();
+      const month = displayWeek.month() + 1;
+      fetchAndSetAvailability(year, month);
+      message.success('Appointment deleted successfully');
+    } catch (error) {
+      message.error('Failed to delete appointment');
+    }
+  };
+
   return (
     <>
       <FullCalendar
@@ -374,12 +390,12 @@ console.log({currentWeek})
                           {moment({
                             hour: period.start.hour,
                             minute: period.start.minute,
-                          }).format("HH:mm")}{" "}
+                          }).format("hh:mm A")}{" "}
                           -{" "}
                           {moment({
                             hour: period.end.hour,
                             minute: period.end.minute,
-                          }).format("HH:mm")}
+                          }).format("hh:mm A")}
                         </div>
                         <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
                           <div style={{ flex: 1 }}>
@@ -423,19 +439,30 @@ console.log({currentWeek})
                         
                       </div>
                     ) : (
-                      <div style={{ fontSize: "16px", marginBottom: "8px" }}>
-                        {moment({
-                          hour: period.start.hour,
-                          minute: period.start.minute,
-                        }).format("HH:mm")}{" "}
-                        -{" "}
-                        {moment({
-                          hour: period.end.hour,
-                          minute: period.end.minute,
-                        }).format("HH:mm")}
-                        <Button type="link" onClick={() => startEditing(key)}>
-                          Edit
-                        </Button>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <div style={{ fontSize: "16px" }}>
+                          {moment({
+                            hour: period.start.hour,
+                            minute: period.start.minute,
+                          }).format("hh:mm A")}{" "}
+                          -{" "}
+                          {moment({
+                            hour: period.end.hour,
+                            minute: period.end.minute,
+                          }).format("hh:mm A")}
+                        </div>
+                        <div>
+                          <Button type="link" onClick={() => startEditing(key)}>
+                            Edit
+                          </Button>
+                          <Button 
+                            type="link" 
+                            danger
+                            onClick={() => handleDeleteAppointment(period?.appointID)}
+                          >
+                            Delete
+                          </Button>
+                        </div>
                       </div>
                     )}
                   </div>

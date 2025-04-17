@@ -567,6 +567,29 @@ export const updateAvailability = createAsyncThunk(
   }
 );
 
+export const deleteAppointment = createAsyncThunk(
+  "doctor/deleteAppointment",
+  async (appointmentId, { rejectWithValue, getState }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        Accept: "text/plain",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+
+    try {
+      const response = await axios.get(
+        `${baseUrl}Doctor/DeleteAppointment/${appointmentId}`,
+        config
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error?.response?.data || error.message);
+    }
+  }
+);
+
 const doctorSlices = createSlice({
   name: "doctor",
   initialState: {
@@ -799,6 +822,26 @@ const doctorSlices = createSlice({
         // You might want to update the availability in your state here
       })
       .addCase(updateAvailability.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    builder
+      .addCase(deleteAppointment.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteAppointment.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        // Remove the deleted appointment from the state
+        if (state.upcomingAppointments) {
+          state.upcomingAppointments = state.upcomingAppointments.filter(
+            appointment => appointment.appointId !== action.meta.arg
+          );
+        }
+      })
+      .addCase(deleteAppointment.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

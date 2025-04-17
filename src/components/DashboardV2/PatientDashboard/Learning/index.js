@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Col, Collapse, Row } from "antd";
 import "./learn.css";
 import { useMediaQuery } from "react-responsive";
-import learnImage from "../../../../assets/images/learnn-image.svg";
 import { useNavigate } from "react-router-dom";
 
 import { Button, Typography, List } from "antd";
@@ -80,10 +79,26 @@ const LearnInfo = () => {
               </div>
             ) : (
               <>
-                <img src={learnImage} alt="Learning about fertility" style={{width:"100%"}}/>
-                <p style={{ marginTop: '15px', color: '#666' }}>Timing Menstrual Cycle Bloodwork, Identifying the Fertile Window, and Using Ovulation Tests</p>
+                 <iframe
+                  src='https://www.loom.com/embed/cf0959fd0b8d4344939a9feac194502e'
+                  title="Menstrual Cycle 101"
+                  frameBorder="0"
+                  allowFullScreen
+                  webkitallowfullscreen
+                  mozallowfullscreen
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    borderRadius: '8px'
+                  }}
+                />
               </>
             )}
+         <p style={{ marginTop: '15px', color: '#666' }}>Timing Menstrual Cycle Bloodwork, Identifying the Fertile Window, and Using Ovulation Tests</p>
+
           </div>
         </Col>
         <Col xs={24} sm={10}>

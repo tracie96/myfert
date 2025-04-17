@@ -10,17 +10,39 @@ const { Title, Text } = Typography;
 
 const { Panel } = Collapse;
 
-
 const LearnInfo = () => {
   const [isFaqOpen, setIsFaqOpen] = useState(false);
+  const [selectedVideo, setSelectedVideo] = useState(null);
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const navigate = useNavigate();
-  const summaryPoints = [
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam tincidunt mauris eu risus. Vestibulum auctor dapibus neque.",
-    "Praesent placerat risus quis eros. Fusce pellentesque suscipit nibh. Cras ornare tristique elit. Vivamus vestibulum ntulla nec ante.",
-    "Cras ornare tristique elit. Vivamus vestibulum ntulla nec ante.",
-    "Nunc dignissim risus id metus. Cras ornare tristique elit. Vivamus vestibulum ntulla nec ante. Praesent placerat risus quis eros. Fusce pellentesque suscipit nibh.",
+
+  const videos = [
+    {
+      id: 'menstrual',
+      title: 'Menstrual Cycle 101',
+      duration: '19:17',
+      completed: false,
+      url: 'https://www.loom.com/embed/cf0959fd0b8d4344939a9feac194502e'
+    },
+    {
+      id: 'fertile',
+      title: 'Identifying the Fertile Window',
+      duration: '10:45',
+      completed: false,
+      url: 'https://www.loom.com/embed/f683c921a51140498060e8302f9e61f3'
+    },
+    {
+      id: 'bloodwork',
+      title: 'Timing Menstrual Cycle Bloodwork',
+      duration: '6:09',
+      completed: false,
+      url: 'https://www.loom.com/embed/2c595f7fc62e4c86beca9ee15bbd51ed'
+    }
   ];
+
+  const handleVideoSelect = (video) => {
+    setSelectedVideo(video);
+  };
 
   const handleStartQuiz = (quizType) => {
     navigate('/menstrual-cycle-quiz', { state: { quizType } });
@@ -37,8 +59,31 @@ const LearnInfo = () => {
             boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
             height: '100%'
           }}>
-            <img src={learnImage} alt="Learning about fertility" style={{width:"100%"}}/>
-            <p style={{ marginTop: '15px', color: '#666' }}>Timing Menstrual Cycle Bloodwork, Identifying the Fertile Window, and Using Ovulation Tests</p>
+            {selectedVideo ? (
+              <div style={{ width: '100%', position: 'relative', paddingBottom: '56.25%' }}>
+                <iframe
+                  src={selectedVideo.url}
+                  title="Menstrual Cycle 101"
+                  frameBorder="0"
+                  allowFullScreen
+                  webkitallowfullscreen
+                  mozallowfullscreen
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    borderRadius: '8px'
+                  }}
+                />
+              </div>
+            ) : (
+              <>
+                <img src={learnImage} alt="Learning about fertility" style={{width:"100%"}}/>
+                <p style={{ marginTop: '15px', color: '#666' }}>Timing Menstrual Cycle Bloodwork, Identifying the Fertile Window, and Using Ovulation Tests</p>
+              </>
+            )}
           </div>
         </Col>
         <Col xs={24} sm={10}>
@@ -54,14 +99,17 @@ const LearnInfo = () => {
               <div style={{ color: '#666', float: 'right', marginTop: '-45px' }}>50:26</div>
               <List
                 itemLayout="horizontal"
-                dataSource={[
-                  { title: 'Understanding Cycle Hormones', duration: '4:16', completed: true },
-                  { title: 'Menstrual Cycle 101', duration: '19:17', completed: false },
-                  { title: 'Identifying the Fertile Window', duration: '10:45', completed: false },
-                  { title: 'Timing Menstrual Cycle Bloodwork', duration: '6:09', completed: false }
-                ]}
+                dataSource={videos}
                 renderItem={item => (
-                  <List.Item style={{ padding: '12px 0', borderBottom: '1px solid #f0f0f0' }}>
+                  <List.Item 
+                    style={{ 
+                      padding: '12px 0', 
+                      borderBottom: '1px solid #f0f0f0',
+                      cursor: 'pointer',
+                      backgroundColor: selectedVideo?.id === item.id ? '#f5f5f5' : 'transparent'
+                    }}
+                    onClick={() => handleVideoSelect(item)}
+                  >
                     <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
                       {item.completed ? (
                         <div style={{ color: '#52c41a', marginRight: '10px' }}>✓</div>
@@ -235,32 +283,6 @@ const LearnInfo = () => {
           </div>
         </Col>
       </Row>
-
-      <div style={{ textAlign: "left", marginTop: '5%' , display:'none'}}>
-        <Title level={4}>SUMMARY</Title>
-        <List
-          dataSource={summaryPoints}
-          renderItem={(item) => (
-            <List.Item style={{ padding: "4px 0", border: "none" }}>
-              <Text>- {item}</Text>
-            </List.Item>
-          )}
-        />
-        <div style={{ marginTop: "20px" }}>
-          <Button
-            type="primary"
-            size="large"
-            style={{
-              backgroundColor: "#DAA520",
-              borderColor: "#DAA520",
-              color: "white",
-              boxShadow: "0 4px 6px rgba(0,0,0,0.2)",
-            }}
-          >
-            Take Quiz!
-          </Button>
-        </div>
-      </div>
 
       <div style={{ position: "relative", marginTop: "50px" }}>
         <Row

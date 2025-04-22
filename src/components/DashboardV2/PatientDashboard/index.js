@@ -115,6 +115,7 @@ export default function PatDash() {
   const [error, setError] = useState(null);
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const [viewAll, setViewAll] = useState(false);
+
   const filteredAppointments = appointmentList.filter(
     (app) => app.roleId === 0
   );
@@ -207,15 +208,142 @@ export default function PatDash() {
   return (
     <div>
       <Row gutter={16} style={{ padding: "0 5%" }}>
-        <div style={{ color: "#000000" }}>
+        <div style={{ color: "#000000", display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
           <p>
             Fertility is not just a journey; it's a testament to the strength
             and resilience of the human spirit. Keep it up and improve your
             health!
           </p>
+          {/* <Button 
+            type="primary"
+            onClick={() => setShowChecklist(!showChecklist)}
+            style={{
+              backgroundColor: "#C2E6F8",
+              borderColor: "none",
+              color: "#00ADEF",
+            }}
+          >
+            {showChecklist ? "Hide Checklist" : "Show Checklist"}
+          </Button> */}
         </div>
       </Row>
-      <div
+        <div
+          style={{
+            background: "#F0F8FF",
+            padding: isMobile ? "20px" : "24px",
+            boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.1)"
+          }}
+        >
+          <h3 style={{ color: "#335CAD", fontSize: "14px", marginBottom: "20px" }}>
+            Complete the checklist below to access our services!
+          </h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px" ,   width:'400px',
+}}>
+            <div style={{ 
+              display: "flex", 
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: "8px"
+            }}>
+              <div style={{ 
+                display: "flex", 
+                alignItems: "center",
+                flex: "1",
+                minWidth: isMobile ? "100%" : "auto"
+              }}>
+                <input 
+                  type="checkbox" 
+                  checked
+                  style={{ 
+                    width: "20px", 
+                    height: "20px",
+                    borderRadius: "4px",
+                    border: "2px solid #335CAD",
+                    cursor: "pointer",
+                    marginRight: "8px",
+                    flexShrink: 0
+                  }} 
+                />
+                <span style={{ 
+                  fontSize: "14px", 
+                  color: "#333",
+                  marginRight: "8px"
+                }}>
+                  Complete all Intake Forms
+                </span>
+              </div>
+              <Button
+                onClick={() => navigate("/assessment")}
+                type="primary"
+                style={{
+                  backgroundColor: "#C2E6F8",
+                  borderColor: "none",
+                  color: "#00ADEF",
+                  width: "80px",
+                  height: "32px",
+                  fontSize: "14px",
+                  padding: "4px 12px",
+                  marginLeft: isMobile ? "28px" : "0",
+                  flexShrink: 0
+                }}
+              >
+                ASSESS
+              </Button>
+            </div>
+            <div style={{ 
+              display: "flex", 
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: "8px"
+            }}>
+              <div style={{ 
+                display: "flex", 
+                alignItems: "center",
+                flex: "1",
+                minWidth: isMobile ? "100%" : "auto"
+              }}>
+                <input 
+                  type="checkbox" 
+                  style={{ 
+                    width: "20px", 
+                    height: "20px",
+                    borderRadius: "4px",
+                    border: "2px solid #335CAD",
+                    cursor: "pointer",
+                    marginRight: "8px",
+                    flexShrink: 0
+                  }} 
+                />
+                <span style={{ 
+                  fontSize: "14px", 
+                  color: "#333",
+                  marginRight: "8px"
+                }}>
+                  Watch the Learn Videos
+                </span>
+              </div>
+              <Button
+                onClick={() => navigate("/learn")}
+                type="primary"
+                style={{
+                  backgroundColor: "#C2E6F8",
+                  borderColor: "none",
+                  color: "#00ADEF",
+                  width: "80px",
+                  height: "32px",
+                  fontSize: "14px",
+                  padding: "4px 12px",
+                  marginLeft: isMobile ? "28px" : "0",
+                  flexShrink: 0
+                }}
+              >
+                LEARN
+              </Button>
+            </div>
+          </div>
+        </div>
+  
+         <div
         style={{
           background: "#F0F8FF",
           padding: isMobile ? "8%" : "10px",
@@ -223,13 +351,14 @@ export default function PatDash() {
           marginRight: isMobile ? "0px" : 0,
           marginLeft: isMobile ? "0px" : 0,
           boxSizing: "unset",
+          display: "hidden",
           width: isMobile ? "auto" : "100%",
           overflowX: isMobile ? "auto" : "unset",
         }}
       >
         {(patientStatus.initialAssessment === null || patientStatus.isPaymentComplete === null) && (
           <>
-            <h3 style={{ color: "#335CAD", fontSize: "20px" }}>
+            <h3 style={{ color: "#335CAD", fontSize: "20px", display:'none' }}>
               Initial Sign Up Steps:
             </h3>
             <Steps
@@ -240,7 +369,7 @@ export default function PatDash() {
               size="small"
               style={{
                 marginTop: "10px",
-                display: "flex",
+                display: "none",
                 flexDirection: isMobile ? "row" : "row",
                 alignItems: isMobile ? "flex-start" : "center",
               }}
@@ -563,7 +692,7 @@ export default function PatDash() {
                   marginBottom: 0,
                 }}
               >
-                Appointments
+                SERVICES
               </h3>
             </div>
             <div

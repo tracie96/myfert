@@ -237,8 +237,7 @@ export default function PatDash() {
           <h3 style={{ color: "#335CAD", fontSize: "14px", marginBottom: "20px" }}>
             Complete the checklist below to access our services!
           </h3>
-          <div style={{ display: "flex", flexDirection: "column", gap: "16px" ,   width:'400px',
-}}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
             <div style={{ 
               display: "flex", 
               alignItems: "center",
@@ -253,15 +252,18 @@ export default function PatDash() {
               }}>
                 <input 
                   type="checkbox" 
-                  checked
+                  defaultChecked
                   style={{ 
                     width: "20px", 
                     height: "20px",
-                    borderRadius: "4px",
-                    border: "2px solid #335CAD",
+                    borderRadius: "6px",
+                    border: "none",
                     cursor: "pointer",
                     marginRight: "8px",
-                    flexShrink: 0
+                    flexShrink: 0,
+                    appearance: "none",
+                    // backgroundColor: "#00ADEF",
+                    position: "relative"
                   }} 
                 />
                 <span style={{ 
@@ -307,11 +309,13 @@ export default function PatDash() {
                   style={{ 
                     width: "20px", 
                     height: "20px",
-                    borderRadius: "4px",
-                    border: "2px solid #335CAD",
+                    borderRadius: "6px",
+                    border: "none",
                     cursor: "pointer",
                     marginRight: "8px",
-                    flexShrink: 0
+                    flexShrink: 0,
+                    appearance: "none",
+                    position: "relative"
                   }} 
                 />
                 <span style={{ 
@@ -985,6 +989,39 @@ export default function PatDash() {
             </div>
           </Col>}
       </Row>
+      <style>
+        {`
+          input[type="checkbox"] {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            margin-right: 8px;
+            flex-shrink: 0;
+            background-color: #E2E8F0;
+            position: relative;
+            transition: background-color 0.2s;
+          }
+
+          input[type="checkbox"]:checked {
+            background-color: #00ADEF;
+          }
+
+          input[type="checkbox"]:checked:after {
+            content: "";
+            position: absolute;
+            left: 6px;
+            top: 2px;
+            width: 6px;
+            height: 12px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+          }
+        `}
+      </style>
     </div>
   );
 }

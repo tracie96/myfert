@@ -478,7 +478,7 @@ export default function PatDash() {
             responsive={false}
             size="small"
             style={{
-              display: "flex",
+              display: "none",
               flexDirection: isMobile ? "row" : "row",
               alignItems: isMobile ? "flex-start" : "",
               overflowX: "auto",

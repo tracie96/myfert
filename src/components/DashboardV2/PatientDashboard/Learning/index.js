@@ -43,8 +43,43 @@ const LearnInfo = () => {
     setSelectedVideo(video);
   };
 
-  const handleStartQuiz = (quizType) => {
-    navigate('/menstrual-cycle-quiz', { state: { quizType } });
+  const handleStartQuiz = (quizType, buttonColor) => {
+    let colors = {};
+    switch(quizType) {
+      case 'menstrual':
+        colors = {
+          primary: '#9B6B9B',
+          text: '#8B3A8B',
+          background: '#F8F0F8',
+          buttonColor: buttonColor || '#9B6B9B'
+        };
+        break;
+      case 'fertile':
+        colors = {
+          primary: '#00800080',
+          text: '#2F946C',
+          background: '#F0F8F0',
+          buttonColor: buttonColor || '#00800080'
+        };
+        break;
+      case 'timing':
+        colors = {
+          primary: '#EE3838',
+          text: '#EE3838',
+          background: '#EE38381A',
+          buttonColor: buttonColor || '#EE3838'
+        };
+ 
+        break;
+        default:
+          colors = {
+            primary: '#9B6B9B',
+            text: '#8B3A8B',
+            background: '#F8F0F8',
+            buttonColor: buttonColor || '#9B6B9B'
+          };
+    }
+    navigate('/menstrual-cycle-quiz', { state: { quizType, colors } });
   };
 
   return (
@@ -206,7 +241,7 @@ const LearnInfo = () => {
                     backgroundColor: '#9B6B9B',
                     borderColor: '#9B6B9B'
                   }}
-                  onClick={() => handleStartQuiz('menstrual')}
+                  onClick={() => handleStartQuiz('menstrual', '#9B6B9B')}
                 >
                   Start Quiz
                 </Button>
@@ -240,7 +275,7 @@ const LearnInfo = () => {
                     backgroundColor: '#00800080',
                     borderColor: '#00800080'
                   }}
-                  onClick={() => handleStartQuiz('fertile')}
+                  onClick={() => handleStartQuiz('fertile', '#00800080')}
                 >
                   Start Quiz
                 </Button>
@@ -275,7 +310,7 @@ const LearnInfo = () => {
                     backgroundColor: '#EE3838',
                     borderColor: '#EE3838'
                   }}
-                  onClick={() => handleStartQuiz('timing')}
+                  onClick={() => handleStartQuiz('timing', '#EE3838')}
                 >
                   Start Quiz
                 </Button>

@@ -115,6 +115,17 @@ export default function PatDash() {
   const [error, setError] = useState(null);
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const [viewAll, setViewAll] = useState(false);
+  const [checklistItems, setChecklistItems] = useState({
+    intakeForms: false,
+    learnVideos: false
+  });
+
+  const handleChecklistChange = (item) => {
+    setChecklistItems(prev => ({
+      ...prev,
+      [item]: !prev[item]
+    }));
+  };
 
   const filteredAppointments = appointmentList.filter(
     (app) => app.roleId === 0
@@ -237,7 +248,7 @@ export default function PatDash() {
           <h3 style={{ color: "#335CAD", fontSize: "14px", marginBottom: "20px" }}>
             Complete the checklist below to access our services!
           </h3>
-          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px", width:"400px" }}>
             <div style={{ 
               display: "flex", 
               alignItems: "center",
@@ -252,7 +263,8 @@ export default function PatDash() {
               }}>
                 <input 
                   type="checkbox" 
-                  defaultChecked
+                  checked={checklistItems.intakeForms}
+                  onChange={() => handleChecklistChange('intakeForms')}
                   style={{ 
                     width: "20px", 
                     height: "20px",
@@ -262,7 +274,6 @@ export default function PatDash() {
                     marginRight: "8px",
                     flexShrink: 0,
                     appearance: "none",
-                    // backgroundColor: "#00ADEF",
                     position: "relative"
                   }} 
                 />
@@ -306,6 +317,8 @@ export default function PatDash() {
               }}>
                 <input 
                   type="checkbox" 
+                  checked={checklistItems.learnVideos}
+                  onChange={() => handleChecklistChange('learnVideos')}
                   style={{ 
                     width: "20px", 
                     height: "20px",
@@ -801,11 +814,15 @@ export default function PatDash() {
                   </p>
                   <Button
                     type="primary"
+                    onClick={() => window.open("https://myfertilitylabs.simplybook.me/v2/", "_blank")}
                     style={{
                       height: 46,
                       boxShadow: "0px 4px 4px 0px #00000040",
                       background: "#00ADEF",
+                      opacity: checklistItems.intakeForms && checklistItems.learnVideos ? 1 : 0.5,
+                      cursor: checklistItems.intakeForms && checklistItems.learnVideos ? 'pointer' : 'not-allowed'
                     }}
+                    disabled={!checklistItems.intakeForms || !checklistItems.learnVideos}
                   >
                     <div
                       style={{ color: "white", textDecoration: "none" }}

@@ -207,6 +207,12 @@ const MenstrualCycleQuiz = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const quizType = location.state?.quizType || 'menstrual';
+  const colors = location.state?.colors || {
+    primary: '#8B3A8B',
+    text: '#8B3A8B',
+    background: '#F8F0F8',
+    buttonColor: '#8B3A8B'
+  };
 
   const quizData = quizType === 'menstrual' ? menstrualCycleQuizData : fertileWindowQuizData;
   const quizTitle = quizType === 'menstrual' ? 'MENSTRUAL CYCLE 101 QUIZ' : 'FERTILE WINDOW QUIZ';
@@ -255,13 +261,13 @@ const MenstrualCycleQuiz = () => {
             type="link" 
             icon={<LeftOutlined />} 
             onClick={handleBack}
-            style={{ color: '#8B3A8B', paddingLeft: 0 }}
+            style={{ color: colors.text, paddingLeft: 0 }}
           >
             Back to Learn
           </Button>
         </div>
         
-        <Title level={2} style={{ color: '#8B3A8B', marginBottom: '24px' }}>
+        <Title level={2} style={{ color: colors.text, marginBottom: '24px' }}>
           {quizTitle}
         </Title>
 
@@ -270,7 +276,7 @@ const MenstrualCycleQuiz = () => {
           
           <Paragraph>
             This is a great chance to assess how much you've learned. The questions will focus on the{' '}
-            <Text style={{ color: '#8B3A8B' }}>{quizType === 'menstrual' ? 'Menstrual Cycle 101' : 'Fertile Window'}</Text>, so make sure you review as much as needed.
+            <Text style={{ color: colors.text }}>{quizType === 'menstrual' ? 'Menstrual Cycle 101' : 'Fertile Window'}</Text>, so make sure you review as much as needed.
           </Paragraph>
           
           <Paragraph>
@@ -295,8 +301,8 @@ const MenstrualCycleQuiz = () => {
               size="large"
               onClick={() => setQuizStarted(true)}
               style={{ 
-                backgroundColor: '#8B3A8B',
-                borderColor: '#8B3A8B',
+                backgroundColor: colors.buttonColor,
+                borderColor: colors.buttonColor,
                 padding: '0 40px',
                 height: '48px',
                 borderRadius: '24px'
@@ -355,7 +361,7 @@ const MenstrualCycleQuiz = () => {
           <Button onClick={resetQuiz} style={{ marginRight: '12px' }}>
             Try Again
           </Button>
-          <Button type="primary" onClick={handleBack} style={{ backgroundColor: '#8B3A8B', borderColor: '#8B3A8B' }}>
+          <Button type="primary" onClick={handleBack} style={{ backgroundColor: colors.buttonColor, borderColor: colors.buttonColor }}>
             Back to Learn
           </Button>
         </div>
@@ -370,7 +376,7 @@ const MenstrualCycleQuiz = () => {
           type="link" 
           icon={<LeftOutlined />} 
           onClick={handleBack}
-          style={{ color: '#8B3A8B', paddingLeft: 0 }}
+          style={{ color: colors.text, paddingLeft: 0 }}
         >
           Back to Learn
         </Button>
@@ -413,8 +419,8 @@ const MenstrualCycleQuiz = () => {
             onClick={handleNext}
             disabled={selectedAnswers[currentQuestion] === undefined}
             style={{ 
-              backgroundColor: '#8B3A8B',
-              borderColor: '#8B3A8B',
+              backgroundColor: colors.buttonColor,
+              borderColor: colors.buttonColor,
               padding: '0 40px',
               height: '48px',
               borderRadius: '24px'

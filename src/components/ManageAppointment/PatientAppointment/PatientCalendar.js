@@ -10,9 +10,6 @@ import * as Yup from "yup";
 import axios from "axios";
 import { useMediaQuery } from "react-responsive";
 import moment from "moment-timezone";
-import { gapi } from "gapi-script";
-import { Calendar, momentLocalizer } from 'react-big-calendar';
-import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 import { addAppointment, getUpcomingAppointments } from "../../redux/patientSlice";
 import {
@@ -32,11 +29,6 @@ import { List, Card, Typography, Tag, message } from "antd";
 import "./PatientCalendar.css";
 
 const { Text } = Typography;
-const localizer = momentLocalizer(moment);
-const CLIENT_ID_MAIL = process.env.REACT_APP_MAIL_CLIENT_ID;
-const API_KEY_MAIL = process.env.REACT_APP_MAIL_API_KEY;
-const SCOPES = "https://www.googleapis.com/auth/calendar";
-const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
 
 const PatientCalendar = ({ selectedProviders }) => {
   const calendarRef = useRef(null);
@@ -51,118 +43,6 @@ const PatientCalendar = ({ selectedProviders }) => {
     }),
     []
   );
-
-const [events, setEvents] = useState([]);
-useEffect(() => {
-  function start() {
-    gapi.client
-      .init({
-        apiKey: API_KEY_MAIL,
-        clientId: CLIENT_ID_MAIL,
-        discoveryDocs: [DISCOVERY_DOC],
-        scope: SCOPES,
-      })
-      .then(() => {
-        const authInstance = gapi.auth2.getAuthInstance();
-
-        // Optional: auto sign-in if already authenticated
-        if (authInstance.isSignedIn.get()) {
-          listUpcomingEvents();
-        }
-
-        // Listen to sign-in state changes
-        authInstance.isSignedIn.listen((isSignedIn) => {
-          if (isSignedIn) {
-            listUpcomingEvents();
-          }
-        });
-      });
-  }
-
-  gapi.load('client:auth2', start);
-}, []);
-
-
-const handleAuthClick = () => {
-  gapi.auth2.getAuthInstance().signIn().then(() => {
-    createEvent();
-  });
-};
-
-const createEvent = () => {
-  const event = {
-   // summary: 'availability slot Doctor 2025',
-    location: '800 Howard St., San Francisco, CA 94103',
-    description: 'A chance to hear more about Google\'s developer products.',
-    start: {
-      dateTime: '2025-04-28T09:00:00-07:00',
-      timeZone: 'America/Los_Angeles'
-    },
-    end: {
-      dateTime: '2025-04-28T17:00:00-07:00',
-      timeZone: 'America/Los_Angeles'
-    },
-    recurrence: [
-      'RRULE:FREQ=DAILY;COUNT=2'
-    ],
-    attendees: [
-      { email: 'lpage@example.com' },
-      { email: 'sbrin@example.com' }
-    ],
-    reminders: {
-      useDefault: false,
-      overrides: [
-        { method: 'email', minutes: 1440 },  // 24 hours
-        { method: 'popup', minutes: 8 }
-      ]
-    }
-  };
-
-  const request = gapi.client.calendar.events.insert({
-    calendarId: 'primary',
-    resource: event,
-  });
-
-  request.execute(event => {
-    console.log('Event created:', event);
-    listUpcomingEvents();
-    // console.log('Event created:', event);
-    // listUpcomingEvents(); // Refresh the calendar on the same page
-  });
-};
-
-
-
-const listUpcomingEvents = () => {
-  gapi.client.calendar.events
-    .list({
-      calendarId: 'primary',
-      timeMin: new Date().toISOString(),
-      showDeleted: false,
-      singleEvents: true,
-      maxResults: 10,
-      orderBy: 'startTime',
-    })
-    .then((response) => {
-      const googleEvents = response.result.items;
-
-      const formattedEvents = googleEvents.map((event) => {
-        const start = new Date(event.start.dateTime || event.start.date);
-        const end = new Date(event.end.dateTime || event.end.date);
-
-        return {
-          title: event.summary || '(No Title)',
-          start,
-          end,
-        };
-      });
-
-      setEvents(formattedEvents);
-    })
-    .catch((error) => {
-      console.error('Error fetching events:', error);
-    });
-};
 
   const [apptEvents, setApptEvents] = useState([]);
   const {
@@ -728,21 +608,6 @@ const listUpcomingEvents = () => {
           </Button>,
         ]}
       >
-       <div>
-       <button onClick={handleAuthClick}>Authorize Google Calendar</button>
-       </div>
-      <div>
-
-    <Calendar
-      localizer={localizer}
-      events={events}
-      startAccessor="start"
-      endAccessor="end"
-      style={{ height: 600, margin: '20px' }}
-    />
-      <div>
-    </div>
-    </div>
         {selectedClinician && (
           <>
             <Row gutter={0} style={{ marginBottom: 16 }}>

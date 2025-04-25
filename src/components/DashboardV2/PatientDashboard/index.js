@@ -810,7 +810,7 @@ export default function PatDash() {
               ) :
                 <div>
                   <p>
-                    You have no upcoming appointments.
+                  Manage my appointments and plan.
                   </p>
                   <Button
                     type="primary"

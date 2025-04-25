@@ -54,7 +54,7 @@ const ClinicianSecondStep = () => {
         email used for both Mira and the Jane app.
       </p>
       <p style={{ fontSize: "15px", color: "#000" }}>
-        If you don’t have an account, please access the links below to create
+        If you don't have an account, please access the links below to create
         your account!
       </p>
       <hr style={{ background: "#EFD0BD", width: "200px", height: "2px" }} />
@@ -163,6 +163,27 @@ const ClinicianSecondStep = () => {
           </NavLink>
         </Button>
       </Modal>
+
+      <Button
+        type="primary"
+        style={{
+          width: "100%",
+          backgroundColor: '#D9D9D9',
+          borderColor: '#D9D9D9',
+          color: '#FFFFFF',
+          padding: '0 40px',
+          height: '48px',
+          borderRadius: '24px',
+          fontSize: '24px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '8px'
+        }}
+        disabled
+      >
+        Book Now <span style={{ fontSize: '20px' }}>↗</span>
+      </Button>
     </div>
   );
 };

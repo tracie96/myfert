@@ -79,7 +79,7 @@ export const deletePatientBloodWork = createAsyncThunk(
     const user = getState()?.authentication?.userAuth;
     try {
       const response = await axios.get(
-        `https://myfertilitydevapi.azurewebsites.net/api/Doctor/DeleteDocument/${bloodWorkId}`,
+        `https://myfertilitydevapi-prod.azurewebsites.net/api/Doctor/DeleteDocument/${bloodWorkId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -152,7 +152,7 @@ export const getPatientMed = createAsyncThunk(
   async (patientId, { rejectWithValue, getState, dispatch }) => {
     const user = getState()?.authentication?.userAuth;
     try {
-      const response = await axios.get(`https://myfertilitydevapi.azurewebsites.net/api/Doctor/GetPatientMed/${patientId}`, {
+      const response = await axios.get(`https://myfertilitydevapi-prod.azurewebsites.net/api/Doctor/GetPatientMed/${patientId}`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${user?.obj?.token}`,

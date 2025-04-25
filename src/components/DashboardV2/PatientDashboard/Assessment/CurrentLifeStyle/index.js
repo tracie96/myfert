@@ -914,7 +914,7 @@ const CurrentLifeStyle = ({ onComplete }) => {
     };
 
     fetch(
-      "https://myfertilitydevapi.azurewebsites.net/api/Patient/AddHealthLifestyle",
+      "https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/AddHealthLifestyle",
       {
         method: "POST",
         headers: {

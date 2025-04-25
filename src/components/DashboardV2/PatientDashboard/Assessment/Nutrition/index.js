@@ -510,7 +510,7 @@ const Nutrition = ({ onComplete }) => {
     const transformedData = transformNutritionData(answers);
 
     fetch(
-      "https://myfertilitydevapi.azurewebsites.net/api/Patient/AddNutrition",
+      "https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/AddNutrition",
       {
         method: "POST",
         headers: {

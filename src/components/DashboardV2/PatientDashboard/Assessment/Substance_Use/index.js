@@ -312,7 +312,7 @@ const SubstanceUse = ({ onComplete }) => {
     const token = userInfo.obj.token || "";
 
     fetch(
-      "https://myfertilitydevapi.azurewebsites.net/api/Patient/AddSubstanceUse",
+      "https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/AddSubstanceUse",
       {
         method: "POST",
         headers: {

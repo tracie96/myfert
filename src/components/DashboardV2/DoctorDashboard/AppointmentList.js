@@ -47,7 +47,7 @@ console.log({dateFilter})
       const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
       const token = userInfo.obj.token || "";
       const response = await axios.get(
-        `https://myfertilitydevapi.azurewebsites.net/api/Doctor/MarkAppointmentDone/${appointId}`,
+        `https://myfertilitydevapi-prod.azurewebsites.net/api/Doctor/MarkAppointmentDone/${appointId}`,
         {
           headers: {
             "Content-Type": "application/json",

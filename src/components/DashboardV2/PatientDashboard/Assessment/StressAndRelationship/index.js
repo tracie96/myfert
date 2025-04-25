@@ -363,7 +363,7 @@ const StressAndRelationship = ({ onComplete }) => {
     };
   
     // Send data to API
-    fetch("https://myfertilitydevapi.azurewebsites.net/api/Patient/AddStress", {
+    fetch("https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/AddStress", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

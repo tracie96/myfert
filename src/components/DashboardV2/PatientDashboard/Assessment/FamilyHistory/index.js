@@ -574,7 +574,7 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
     // Submit the API request
     try {
         const response = await fetch(
-            "https://myfertilitydevapi.azurewebsites.net/api/Patient/AddPersonalFamily",
+            "https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/AddPersonalFamily",
             {
                 method: "POST",
                 headers: {

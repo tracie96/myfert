@@ -940,7 +940,7 @@ const ReproductiveHealth = ({ onComplete }) => {
       const token = userInfo.obj?.token || "";
   
       const response = await fetch(
-        "https://myfertilitydevapi.azurewebsites.net/api/Patient/AddReproductiveHealth",
+        "https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/AddReproductiveHealth",
         {
           method: "POST",
           headers: {

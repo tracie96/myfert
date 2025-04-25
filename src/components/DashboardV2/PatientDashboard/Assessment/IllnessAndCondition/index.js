@@ -765,7 +765,7 @@ const IllnessAndCondition = ({ onComplete }) => {
     };
     const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
     const token = userInfo.obj.token || "";
-    fetch("https://myfertilitydevapi.azurewebsites.net/api/Patient/AddIllnessConditions", {
+    fetch("https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/AddIllnessConditions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

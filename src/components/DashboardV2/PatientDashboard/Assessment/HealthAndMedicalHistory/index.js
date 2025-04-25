@@ -546,7 +546,7 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
       const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
       const token = userInfo.obj.token || "";
       const response = await fetch(
-        "https://myfertilitydevapi.azurewebsites.net/api/Patient/AddHealthMedicalHistory",
+        "https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/AddHealthMedicalHistory",
         {
           method: "POST",
           headers: {

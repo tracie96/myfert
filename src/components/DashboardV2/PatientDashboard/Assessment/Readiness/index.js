@@ -214,7 +214,7 @@ const Readiness = ({ onComplete }) => {
       const transformedData = transformReadinessData(answers)
 
     fetch(
-      "https://myfertilitydevapi.azurewebsites.net/api/Patient/AddReadiness",
+      "https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/AddReadiness",
       {
         method: "POST",
         headers: {

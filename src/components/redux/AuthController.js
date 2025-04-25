@@ -227,7 +227,7 @@ export const updateEmail = createAsyncThunk(
   async ({ email, session, newEmail }, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        "https://myfertilitydevapi.azurewebsites.net/api/Auth/UpdateEmail",
+        "https://myfertilitydevapi-prod.azurewebsites.net/api/Auth/UpdateEmail",
         { email, session, newEmail },
         {
           headers: {

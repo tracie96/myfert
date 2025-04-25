@@ -1304,7 +1304,7 @@ const SymptomReview = ({ onComplete }) => {
       const token = userInfo.obj.token || "";
 
       fetch(
-        "https://myfertilitydevapi.azurewebsites.net/api/Patient/AddSymptoms",
+        "https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/AddSymptoms",
         {
           method: "POST",
           headers: {

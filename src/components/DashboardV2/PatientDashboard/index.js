@@ -248,7 +248,7 @@ export default function PatDash() {
           <h3 style={{ color: "#335CAD", fontSize: "14px", marginBottom: "20px" }}>
             Complete the checklist below to access our services!
           </h3>
-          <div style={{ display: "flex", flexDirection: "column", gap: "16px", width:"400px" }}>
+          <div class="wrapButton">
             <div style={{ 
               display: "flex", 
               alignItems: "center",
@@ -288,17 +288,8 @@ export default function PatDash() {
               <Button
                 onClick={() => navigate("/assessment")}
                 type="primary"
-                style={{
-                  backgroundColor: "#C2E6F8",
-                  borderColor: "none",
-                  color: "#00ADEF",
-                  width: "80px",
-                  height: "32px",
-                  fontSize: "14px",
-                  padding: "4px 12px",
-                  marginLeft: isMobile ? "28px" : "0",
-                  flexShrink: 0
-                }}
+                className = "assessButton"
+                
               >
                 ASSESS
               </Button>
@@ -340,19 +331,9 @@ export default function PatDash() {
                 </span>
               </div>
               <Button
+              className="learnButton"
                 onClick={() => navigate("/learn")}
                 type="primary"
-                style={{
-                  backgroundColor: "#C2E6F8",
-                  borderColor: "none",
-                  color: "#00ADEF",
-                  width: "80px",
-                  height: "32px",
-                  fontSize: "14px",
-                  padding: "4px 12px",
-                  marginLeft: isMobile ? "28px" : "0",
-                  flexShrink: 0
-                }}
               >
                 LEARN
               </Button>
@@ -809,9 +790,6 @@ export default function PatDash() {
                 </div>
               ) :
                 <div>
-                  <p>
-                    You have no upcoming appointments.
-                  </p>
                   <Button
                     type="primary"
                     onClick={() => window.open("https://myfertilitylabs.simplybook.me/v2/", "_blank")}

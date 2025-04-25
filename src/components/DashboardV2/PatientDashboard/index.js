@@ -241,6 +241,7 @@ export default function PatDash() {
         <div
           style={{
             background: "#F0F8FF",
+            display: "none",
             padding: isMobile ? "20px" : "24px",
             boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.1)"
           }}
@@ -368,7 +369,6 @@ export default function PatDash() {
           marginRight: isMobile ? "0px" : 0,
           marginLeft: isMobile ? "0px" : 0,
           boxSizing: "unset",
-          display: "hidden",
           width: isMobile ? "auto" : "100%",
           overflowX: isMobile ? "auto" : "unset",
         }}
@@ -386,7 +386,6 @@ export default function PatDash() {
               size="small"
               style={{
                 marginTop: "10px",
-                display: "none",
                 flexDirection: isMobile ? "row" : "row",
                 alignItems: isMobile ? "flex-start" : "center",
               }}
@@ -478,7 +477,6 @@ export default function PatDash() {
             responsive={false}
             size="small"
             style={{
-              display: "none",
               flexDirection: isMobile ? "row" : "row",
               alignItems: isMobile ? "flex-start" : "",
               overflowX: "auto",

@@ -155,7 +155,7 @@ console.log(userAuth)
           <span>PATIENT LIST</span>
         </NavLink>
       </Menu.Item>
-      <Menu.Item key="2" icon={<FaCalendarAlt style={{ color: "#00ADEF" }} />}>
+      {/* <Menu.Item key="2" icon={<FaCalendarAlt style={{ color: "#00ADEF" }} />}>
         <NavLink to="/doctor/appointment" style={{ textDecoration: "none" }}>
           <span className="no-underline">CALENDAR</span>
         </NavLink>
@@ -164,7 +164,7 @@ console.log(userAuth)
         <NavLink to="/doctor/appointments" style={{ textDecoration: "none" }}>
           <span>APPOINTMENTS</span>
         </NavLink>
-      </Menu.Item>
+      </Menu.Item> */}
       <Menu.Item key="4" icon={<FaFlask style={{ color: "#00ADEF" }} />}>
         <NavLink to="/doctor/labs" style={{ textDecoration: "none" }}>
           <span>LABS</span>

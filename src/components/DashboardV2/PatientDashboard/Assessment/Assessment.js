@@ -36,11 +36,6 @@ export default function Assessment() {
           <p>Thanks a bunch!</p>
         </div>
         <div>
-          <hr
-            style={{ background: "#EFD0BD", width: "200px", height: "7px" }}
-          />
-        </div>
-        <div>
           <QuestionnaireGrid
             cards={cards.map((card) => ({
               ...card

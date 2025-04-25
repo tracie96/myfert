@@ -179,6 +179,7 @@ import UnderDevelopment from "../ErrorPages/UnderDevelopment";
 //#region Auth
 import Login from "../Login/Login";
 import Register from "../Register/Register";
+import PatientSignup from "../Register/SignUpPages/PatientSignup";
 import AdminLogin from "../Login/AdminLogin";
 import ForgotPassword from "../ForgotPassword/ForgotPassword";
 import ResetPassword from "../ForgotPassword/ResetPassword";
@@ -308,6 +309,7 @@ const getRouter = createBrowserRouter(
         <Route path="/" element={<ProtectedRoute allowedRoles={allowedDoctorRoles} />} />
         <Route path="admin" element={<AdminLogin />} />
         <Route path="register" element={<Register />} />
+        <Route path="patientSignup" element={<PatientSignup />} />
         <Route path="clinician" element={<ClinicianSecondStep />} />
         <Route path="clinicianSignup" element={<DoctorSignup />} />
         <Route path="clinicianRegister" element={<DoctorRegister />} />

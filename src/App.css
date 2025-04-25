@@ -625,6 +625,34 @@ pre code {
   overflow-y: scroll;
 }
 
+.assessButton {
+  background-color: #C2E6F8;
+    color: #00ADEF;
+    width: 80px;
+    height: 32px;
+    font-size: 14px;
+    padding: 4px 12px;
+    margin-left: 0;
+    flex-shrink: 0;
+}
+.wrapButton {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 400px
+}
+.learnButton {
+  background-color: #C2E6F8;
+  border-color: none;
+  color: #00ADEF;
+  width: 80px;
+  height: 32px;
+  font-size: 14px;
+  padding: 4px 12px;
+  margin-left: 0;
+  flex-shrink: 0
+}
+
 .container,
 .container-fluid,
 .container-sm,
@@ -2014,6 +2042,34 @@ pre code {
 
     .bloodWorkFileStyle{
       width: 100% !important;
+    }
+    .assessButton {
+      background-color: #C2E6F8;
+      color: #00ADEF;
+      width: auto;
+      height: auto;
+      font-size: 11px;
+      padding: 3px 9px;
+      margin-left: auto;
+      flex-shrink: 0;
+      margin-top:5px;
+    }
+    .wrapButton {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 100%
+    }
+    .learnButton {
+      background-color: #C2E6F8;
+      color: #00ADEF;
+      width: auto;
+      height: auto;
+      font-size: 11px;
+      padding: 3px 9px;
+      margin-left: auto;
+      flex-shrink: 0;
+      margin-top:5px;
     }
 
 

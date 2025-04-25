@@ -7,12 +7,10 @@ import { useMediaQuery } from "react-responsive";
 // Import React Icons
 import { 
   FaQrcode, 
-  FaCalendarAlt, 
   FaPills, 
   FaChartPie, 
   FaFileAlt, 
   FaInfoCircle, 
-  FaAddressBook, 
   FaFlask, 
   FaInbox, 
   FaLink, 
@@ -125,7 +123,7 @@ console.log(userAuth)
           <span>LABS</span>
         </NavLink>
       </Menu.Item>
-      <Menu.Item key="6" icon={<FaCalendarAlt style={{ color: "#00ADEF" }} />}>
+      {/* <Menu.Item key="6" icon={<FaCalendarAlt style={{ color: "#00ADEF" }} />}>
         <NavLink to="/patient/calendar" style={{ textDecoration: "none" }}>
           <span className="no-underline">CALENDAR</span>
         </NavLink>
@@ -134,7 +132,7 @@ console.log(userAuth)
         <NavLink to="/patient/appointment" style={{ textDecoration: "none" }}>
           <span className="no-underline">APPOINTMENT</span>
         </NavLink>
-      </Menu.Item>
+      </Menu.Item> */}
       <Menu.Item key="8" icon={<FaInfoCircle style={{ color: "#00ADEF" }} />}>
         <NavLink to="/learn" style={{ textDecoration: "none" }}>
           <span className="no-underline">LEARN</span>

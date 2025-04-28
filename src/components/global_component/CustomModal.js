@@ -22,7 +22,6 @@ const CustomModal = ({
     >
       <Modal.Header
         closeButton
-        style={{ background: "#01ACEE", color: "#fff" }}
       >
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>

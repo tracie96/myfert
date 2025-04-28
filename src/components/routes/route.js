@@ -247,6 +247,7 @@ import LabsAndRequisitions from "../DashboardV2/DoctorDashboard/Lab";
 import MedicationTable from "../DashboardV2/DoctorDashboard/Medications";
 import MedScreen from "../DashboardV2/PatientDashboard/Meds";
 import MenstrualCycleQuiz from "../DashboardV2/PatientDashboard/Learning/MenstrualCycleQuiz";
+import Services from "../DashboardV2/PatientDashboard/Services";
 
 //#endregion
 
@@ -381,6 +382,7 @@ const getRouter = createBrowserRouter(
 
         #endregion #region Appointment
         <Route path="patient/calendar" element={<PatientAppointment />} />
+        <Route path="patient/services" element={<Services />} />
         <Route path="patient/appointment" element={<PatientAppointmentList />} />
 
         <Route path="doctor/appointments" element={<AppointmentList />} />

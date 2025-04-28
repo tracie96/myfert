@@ -15,7 +15,9 @@ import {
   FaInbox, 
   FaLink, 
   FaListOl, 
-  FaBars 
+  FaBars, 
+  FaServicestack,
+  FaNotesMedical
 } from "react-icons/fa";
 
 export const GetSideBar = () => {
@@ -24,7 +26,6 @@ export const GetSideBar = () => {
   const { Sider } = Layout;
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const location = useLocation();
-console.log(userAuth)
   const showDrawer = () => {
     setVisible(true);
   };
@@ -123,16 +124,22 @@ console.log(userAuth)
           <span>LABS</span>
         </NavLink>
       </Menu.Item>
-      {/* <Menu.Item key="6" icon={<FaCalendarAlt style={{ color: "#00ADEF" }} />}>
-        <NavLink to="/patient/calendar" style={{ textDecoration: "none" }}>
-          <span className="no-underline">CALENDAR</span>
+      <Menu.Item key="6" icon={<FaServicestack style={{ color: "#00ADEF" }} />}>
+        <NavLink to="/patient/services" style={{ textDecoration: "none" }}>
+          <span className="no-underline">SERVICES</span>
         </NavLink>
       </Menu.Item>
-      <Menu.Item key="6" icon={<FaAddressBook style={{ color: "#00ADEF" }} />}>
+      <Menu.Item key="6" icon={<FaNotesMedical style={{ color: "#00ADEF" }} />}>
         <NavLink to="/patient/appointment" style={{ textDecoration: "none" }}>
-          <span className="no-underline">APPOINTMENT</span>
+          <span className="no-underline">NOTES</span>
         </NavLink>
-      </Menu.Item> */}
+        </Menu.Item>
+
+        <Menu.Item key="7" icon={<FaNotesMedical style={{ color: "#00ADEF" }} />}>
+        <NavLink to="/patient/appointment" style={{ textDecoration: "none" }}>
+          <span className="no-underline">DOCUMENTS</span>
+        </NavLink>
+      </Menu.Item>
       <Menu.Item key="8" icon={<FaInfoCircle style={{ color: "#00ADEF" }} />}>
         <NavLink to="/learn" style={{ textDecoration: "none" }}>
           <span className="no-underline">LEARN</span>

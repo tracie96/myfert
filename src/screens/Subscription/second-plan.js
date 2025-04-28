@@ -1,6 +1,6 @@
 import React from "react";
 import { Row, Col, Button } from "antd";
-import SubscriptionBanner from "../../assets/images/bg/subscription_home-logo.png";
+import SubscriptionBanner from "../../assets/images/bg/subscription_home-logo.svg";
 import { Typography } from "antd";
 import { useSelector } from "react-redux";
 import { useMediaQuery } from "react-responsive";

@@ -320,6 +320,11 @@ const MenstrualCycleQuiz = () => {
     const score = calculateScore();
     const passed = score === quizData.length;
 
+    // Store quiz completion status
+    if (passed) {
+      localStorage.setItem('quizPassed', 'true');
+    }
+
     return (
       <div style={{ padding: '24px', maxWidth: '800px' }}>
         <Title level={2} style={{ marginBottom: '24px' }}>Quiz Results</Title>

@@ -119,13 +119,22 @@ export default function PatDash() {
     intakeForms: false,
     learnVideos: false
   });
+  const [showBookInfo, setShowBookInfo] = React.useState(true);
 
-  const handleChecklistChange = (item) => {
+  const checkLearningProgress = () => {
+    // Check if all required videos are watched and quiz is completed
+    const allVideosCompleted = localStorage.getItem('allVideosCompleted') === 'true';
+    const quizPassed = localStorage.getItem('quizPassed') === 'true';
+
     setChecklistItems(prev => ({
       ...prev,
-      [item]: !prev[item]
+      learnVideos: allVideosCompleted && quizPassed
     }));
   };
+
+  useEffect(() => {
+    checkLearningProgress();
+  }, []);
 
   const filteredAppointments = appointmentList.filter(
     (app) => app.roleId === 0
@@ -216,6 +225,7 @@ export default function PatDash() {
     setCurrentStep(step);
     localStorage.setItem("currentStep", step);
   };
+
   return (
     <div>
       <Row gutter={16} style={{ padding: "0 5%" }}>
@@ -238,110 +248,108 @@ export default function PatDash() {
           </Button> */}
         </div>
       </Row>
-        <div
-          style={{
-            background: "#F0F8FF",
-            padding: isMobile ? "20px" : "24px",
-            boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.1)"
-          }}
-        >
-          <h3 style={{ color: "#335CAD", fontSize: "14px", marginBottom: "20px" }}>
-            Complete the checklist below to access our services!
-          </h3>
-          <div class="wrapButton">
-            <div style={{ 
-              display: "flex", 
+      <div
+        style={{
+          background: "#F0F8FF",
+          padding: isMobile ? "20px" : "24px",
+          boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.1)"
+        }}
+      >
+        <h3 style={{ color: "#335CAD", fontSize: "14px", marginBottom: "20px" }}>
+          Complete the checklist below to access our services!
+        </h3>
+        <div class="wrapButton">
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: "8px"
+          }}>
+            <div style={{
+              display: "flex",
               alignItems: "center",
-              flexWrap: "wrap",
-              gap: "8px"
+              flex: "1",
+              minWidth: isMobile ? "100%" : "auto"
             }}>
-              <div style={{ 
-                display: "flex", 
-                alignItems: "center",
-                flex: "1",
-                minWidth: isMobile ? "100%" : "auto"
+              <input
+                type="checkbox"
+                checked={patientStatus.initialAssessment !== null}
+                style={{
+                  width: "20px",
+                  height: "20px",
+                  borderRadius: "6px",
+                  border: "none",
+                  cursor: "pointer",
+                  marginRight: "8px",
+                  flexShrink: 0,
+                  appearance: "none",
+                  position: "relative"
+                }}
+              />
+              <span style={{
+                fontSize: "14px",
+                color: "#333",
+                marginRight: "8px"
               }}>
-                <input 
-                  type="checkbox" 
-                  checked={checklistItems.intakeForms}
-                  onChange={() => handleChecklistChange('intakeForms')}
-                  style={{ 
-                    width: "20px", 
-                    height: "20px",
-                    borderRadius: "6px",
-                    border: "none",
-                    cursor: "pointer",
-                    marginRight: "8px",
-                    flexShrink: 0,
-                    appearance: "none",
-                    position: "relative"
-                  }} 
-                />
-                <span style={{ 
-                  fontSize: "14px", 
-                  color: "#333",
-                  marginRight: "8px"
-                }}>
-                  Complete all Intake Forms
-                </span>
-              </div>
-              <Button
-                onClick={() => navigate("/assessment")}
-                type="primary"
-                className = "assessButton"
-                
-              >
-                ASSESS
-              </Button>
+                Complete all Intake Forms
+              </span>
             </div>
-            <div style={{ 
-              display: "flex", 
+            <Button
+              onClick={() => navigate("/assessment")}
+              type="primary"
+              className="assessButton"
+
+            >
+              ASSESS
+            </Button>
+          </div>
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: "8px"
+          }}>
+            <div style={{
+              display: "flex",
               alignItems: "center",
-              flexWrap: "wrap",
-              gap: "8px"
+              flex: "1",
+              minWidth: isMobile ? "100%" : "auto"
             }}>
-              <div style={{ 
-                display: "flex", 
-                alignItems: "center",
-                flex: "1",
-                minWidth: isMobile ? "100%" : "auto"
+              <input
+                type="checkbox"
+                checked={checklistItems.learnVideos}
+                style={{
+                  width: "20px",
+                  height: "20px",
+                  borderRadius: "6px",
+                  border: "none",
+                  cursor: "pointer",
+                  marginRight: "8px",
+                  flexShrink: 0,
+                  appearance: "none",
+                  position: "relative"
+                }}
+              />
+              <span style={{
+                fontSize: "14px",
+                color: "#333",
+                marginRight: "8px"
               }}>
-                <input 
-                  type="checkbox" 
-                  checked={checklistItems.learnVideos}
-                  onChange={() => handleChecklistChange('learnVideos')}
-                  style={{ 
-                    width: "20px", 
-                    height: "20px",
-                    borderRadius: "6px",
-                    border: "none",
-                    cursor: "pointer",
-                    marginRight: "8px",
-                    flexShrink: 0,
-                    appearance: "none",
-                    position: "relative"
-                  }} 
-                />
-                <span style={{ 
-                  fontSize: "14px", 
-                  color: "#333",
-                  marginRight: "8px"
-                }}>
-                  Watch the Learn Videos
-                </span>
-              </div>
-              <Button
+                Watch the Learn Videos
+              </span>
+            </div>
+            <Button
               className="learnButton"
-                onClick={() => navigate("/learn")}
-                type="primary"
-              >
-                LEARN
-              </Button>
-            </div>
+              onClick={() => navigate("/learn")}
+              type="primary"
+            >
+              LEARN
+            </Button>
           </div>
         </div>
-  
-         <div
+      </div>
+
+      <div
         style={{
           background: "#F0F8FF",
           padding: isMobile ? "8%" : "10px",
@@ -356,7 +364,7 @@ export default function PatDash() {
       >
         {(patientStatus.initialAssessment === null || patientStatus.isPaymentComplete === null) && (
           <>
-            <h3 style={{ color: "#335CAD", fontSize: "20px", display:'none' }}>
+            <h3 style={{ color: "#335CAD", fontSize: "20px", display: 'none' }}>
               Initial Sign Up Steps:
             </h3>
             <Steps
@@ -790,24 +798,75 @@ export default function PatDash() {
                 </div>
               ) :
                 <div>
-                  <Button
-                    type="primary"
-                    onClick={() => window.open("https://myfertilitylabs.simplybook.me/v2/", "_blank")}
-                    style={{
-                      height: 46,
-                      boxShadow: "0px 4px 4px 0px #00000040",
-                      background: "#00ADEF",
-                      opacity: checklistItems.intakeForms && checklistItems.learnVideos ? 1 : 0.5,
-                      cursor: checklistItems.intakeForms && checklistItems.learnVideos ? 'pointer' : 'not-allowed'
-                    }}
-                    disabled={!checklistItems.intakeForms || !checklistItems.learnVideos}
-                  >
-                    <div
-                      style={{ color: "white", textDecoration: "none" }}
-                    >
-                      Book Appointment
+                  {/* Book Your Appointment Info Box */}
+                  {showBookInfo && (
+                    <div>
+                      <p>Manage my appointments and plan</p>
+                      <div
+                        style={{
+                          background: '#FDECEC',
+                          borderRadius: 10,
+                          padding: '24px 32px 16px 32px',
+                          marginBottom: 24,
+                          position: 'relative',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+                        }}
+                      >
+                        <span
+                          style={{
+                            position: 'absolute',
+                            top: 16,
+                            right: 24,
+                            fontSize: 24,
+                            color: '#222',
+                            cursor: 'pointer',
+                            lineHeight: 1,
+                          }}
+                          onClick={() => setShowBookInfo(false)}
+                          aria-label="Close"
+                        >
+                          &times;
+                        </span>
+                        <div>
+                          <span style={{ fontWeight: 700, color: '#335CAD' }}>
+                            Book Your Appointment
+                          </span>
+                          <div style={{ marginTop: 16, color: '#222'}}>
+                            <p style={{ marginBottom: 12 }}>
+                              To book your appointments, please create a separate account for our booking system.
+                            </p>
+                            <p style={{ marginBottom: 12 }}>
+                              Start by booking your <b>Initial Assessments</b>. You can book single appointments or purchase an <b>Intro Package</b> which comes with a free Mira Starter Kit.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        style={{
+                          background: '#3BA9F4',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: 8,
+                          padding: '12px 36px',
+                          fontWeight: 600,
+                          boxShadow: '0 4px 10px #3ba9f422',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 8,
+                          marginTop: 16,
+                          opacity: (patientStatus.initialAssessment !== null && checklistItems.learnVideos) ? 1 : 0.5,
+                          pointerEvents: (patientStatus.initialAssessment !== null && checklistItems.learnVideos) ? 'auto' : 'none'
+                        }}
+                        onClick={() => window.open('/patient/services')}
+                      >
+                        Book Now
+                      </button>
                     </div>
-                  </Button>
+                  )}
+                  {/* End Book Your Appointment Info Box */}
                 </div>
               }
             </div>
@@ -927,7 +986,7 @@ export default function PatDash() {
                     It looks like your Mira account hasn't been set up yet, or the email you used for Mira doesn't match the one for MFL.
                   </p>
                 </div>
-                
+
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                   <img src={IFM} alt="ifm" style={{ width: "50%", margin: 'auto' }} />
                 </div>
@@ -958,7 +1017,7 @@ export default function PatDash() {
                 />
               ) : error ? (
                 <div>
-                  <div style={{ display: 'flex', justifyContent: 'center',width: '100%', marginTop:-80 }}>
+                  <div style={{ display: 'flex', justifyContent: 'center', width: '100%', marginTop: -80 }}>
                     <p style={{ textAlign: "center", color: "#FF0000", width: '70%' }}>
                       It looks like your Mira account hasn't been set up yet, or the email you used for Mira doesn't match the one for MFL.
                     </p>
@@ -970,16 +1029,16 @@ export default function PatDash() {
               ) : cycleInfo && cycleInfo.cycleInfo ? <CircleWithArc cycleInfo={cycleInfo} />
                 : (
                   <div>
-                  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-                    <p style={{ textAlign: "center", color: "red", width: '70%' }}>
-                      It looks like your Mira account hasn't been set up yet, or the email you used for Mira doesn't match the one for MFL.
-                    </p>
+                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+                      <p style={{ textAlign: "center", color: "red", width: '70%' }}>
+                        It looks like your Mira account hasn't been set up yet, or the email you used for Mira doesn't match the one for MFL.
+                      </p>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                      <img src={IFM} alt="ifm" style={{ width: "50%", margin: 'auto' }} />
+                    </div>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    <img src={IFM} alt="ifm" style={{ width: "50%", margin: 'auto' }} />
-                  </div>
-                </div>
-              
+
                 )}
             </div>
           </Col>}

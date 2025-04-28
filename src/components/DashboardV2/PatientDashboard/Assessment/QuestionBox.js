@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useCallback, useState } from "react";
+import React, { useEffect, useMemo, useCallback } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { getPatientStatus } from "../../../redux/patientSlice";
@@ -25,15 +25,8 @@ const CardComponent = ({ card, isClickable, index, handleCardClick, isCompleted 
 const QuestionnaireGrid = ({ cards, onCardClick }) => {
   const dispatch = useDispatch();
   const patientStatus = useSelector((state) => state.patient.status);
-  const [currentStep, setCurrentStep] = useState(0);
-console.log({currentStep})
 
-  useEffect(() => {
-    const storedStep = localStorage.getItem("currentStep");
-    if (storedStep) {
-      setCurrentStep(parseInt(storedStep, 10));
-    }
-  }, []);
+
 
   const { userAuth } = useSelector((state) => ({
     userAuth: state.authentication.userAuth,
@@ -53,16 +46,12 @@ console.log({currentStep})
   );
 
   const cardList = useMemo(() => {
-    console.log('userAuth:', userAuth); // Debug log
-    const statLevel = userAuth?.obj?.status?.statLevel;
-    console.log('statLevel:', statLevel); // Debug log
     
     return cards.map((card, index) => {
       // Check if both initialAssessment and isPaymentComplete are true
       const isFullyEnabled = patientStatus?.initialAssessment === true && patientStatus?.isPaymentComplete === true;
       // If patientStatus is null or either value is null, only first card is clickable
       const isClickable = isFullyEnabled ? true : (index === 0);
-      console.log(`Card ${index} isClickable:`, isClickable); // Debug log
       const isCompleted = patientStatus?.initialAssessment || false;
 
       return (
@@ -77,7 +66,7 @@ console.log({currentStep})
         </Col>
       );
     });
-  }, [cards, handleCardClick, patientStatus, userAuth]);
+  }, [cards, handleCardClick, patientStatus]);
 
   return (
     <Container className="mt-4 assessment-container">

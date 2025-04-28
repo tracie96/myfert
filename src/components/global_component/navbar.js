@@ -12,6 +12,7 @@ import { useMediaQuery } from "react-responsive";
 function Navbar() {
   const [showModal, setShowModal] = useState(false);
   const [isLogout, setLogout] = useState(true);
+  console.log({isLogout})
   const [isNotifications, setNotifications] = useState(null);
   const [isUpdate, setUpdate] = useState(false);
   const [unReadCount, setUnReadCount] = useState(0);
@@ -235,30 +236,71 @@ function Navbar() {
         show={showModal}
         onHide={handleCloseModal}
         size="md"
-        classes="bg-primary py-2  text-white"
-        title={isLogout ? "Ready to Leave?" : ""}
+        classes="logout-modal"
+        
         body={
-          <>
-            Select "Logout" below if you are ready to end your current session.
-          </>
+          <div style={{
+            padding: '12px 32px 16px 32px',
+            color: '#222',
+            fontSize: '1.1rem',
+            lineHeight: 1.6,
+            textAlign: 'center',
+          }}>
+            Select <span style={{ color: '#335cad', fontWeight: 600, background: '#e6eaf2', padding: '2px 8px', borderRadius: 6 }}>
+              "Logout"
+            </span> if you are ready to end your current session.
+          </div>
         }
         footer={
-          <>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            gap: 16,
+            padding: '20px 32px 28px 32px',
+            background: '#f8fafc',
+            borderBottomLeftRadius: 16,
+            borderBottomRightRadius: 16,
+            borderTop: '1px solid #e6eaf2',
+          }}>
             <button
-              className="btn btn-secondary"
-              type="button"
+              style={{
+                minWidth: 110,
+                padding: '10px 0',
+                borderRadius: 8,
+                fontWeight: 600,
+                fontSize: '1rem',
+                border: 'none',
+                background: '#e6eaf2',
+                color: '#335cad',
+                transition: 'background 0.2s',
+                cursor: 'pointer',
+              }}
+              onMouseOver={e => (e.currentTarget.style.background = '#d0d8e8')}
+              onMouseOut={e => (e.currentTarget.style.background = '#e6eaf2')}
               onClick={handleCloseModal}
             >
               Cancel
             </button>
             <button
-              className="btn btn-primary"
+              style={{
+                minWidth: 110,
+                padding: '10px 0',
+                borderRadius: 8,
+                fontWeight: 600,
+                fontSize: '1rem',
+                border: 'none',
+                background: '#335cad',
+                color: '#fff',
+                transition: 'background 0.2s',
+                cursor: 'pointer',
+              }}
+              onMouseOver={e => (e.currentTarget.style.background = '#274080')}
+              onMouseOut={e => (e.currentTarget.style.background = '#335cad')}
               onClick={handleLogout}
-              style={{ background: "#01ACEE" }}
             >
               Logout
             </button>
-          </>
+          </div>
         }
       />
     </>

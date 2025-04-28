@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Col, Collapse, Row } from "antd";
 import "./learn.css";
 import { useMediaQuery } from "react-responsive";
@@ -12,10 +12,7 @@ const { Panel } = Collapse;
 const LearnInfo = () => {
   const [isFaqOpen, setIsFaqOpen] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState(null);
-  const isMobile = useMediaQuery({ maxWidth: 767 });
-  const navigate = useNavigate();
-
-  const videos = [
+  const [videos, setVideos] = useState([
     {
       id: 'menstrual',
       title: 'Menstrual Cycle 101',
@@ -37,11 +34,35 @@ const LearnInfo = () => {
       completed: false,
       url: 'https://www.loom.com/embed/2c595f7fc62e4c86beca9ee15bbd51ed'
     }
-  ];
+  ]);
+  const isMobile = useMediaQuery({ maxWidth: 767 });
+  const navigate = useNavigate();
 
+  // Track video completion
   const handleVideoSelect = (video) => {
     setSelectedVideo(video);
+    // Mark video as completed when selected
+    const updatedVideos = videos.map(v => 
+      v.id === video.id ? { ...v, completed: true } : v
+    );
+    setVideos(updatedVideos);
+    localStorage.setItem('completedVideos', JSON.stringify(updatedVideos));
+    
+    // Check if all videos are completed
+    const allVideosCompleted = updatedVideos.every(v => v.completed);
+    if (allVideosCompleted) {
+      localStorage.setItem('allVideosCompleted', 'true');
+    }
   };
+
+  // Load completed videos from localStorage on component mount
+  useEffect(() => {
+    const savedVideos = localStorage.getItem('completedVideos');
+    if (savedVideos) {
+      const parsedVideos = JSON.parse(savedVideos);
+      setVideos(parsedVideos);
+    }
+  }, []);
 
   const handleStartQuiz = (quizType, buttonColor) => {
     let colors = {};
@@ -69,15 +90,14 @@ const LearnInfo = () => {
           background: '#EE38381A',
           buttonColor: buttonColor || '#EE3838'
         };
- 
         break;
-        default:
-          colors = {
-            primary: '#9B6B9B',
-            text: '#8B3A8B',
-            background: '#F8F0F8',
-            buttonColor: buttonColor || '#9B6B9B'
-          };
+      default:
+        colors = {
+          primary: '#9B6B9B',
+          text: '#8B3A8B',
+          background: '#F8F0F8',
+          buttonColor: buttonColor || '#9B6B9B'
+        };
     }
     navigate('/menstrual-cycle-quiz', { state: { quizType, colors } });
   };

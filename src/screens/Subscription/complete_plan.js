@@ -4,7 +4,7 @@ import { DownOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import "./subscription.css"
-import SubscriptionBanner from "../../assets/images/bg/subscription_home-logo.png";
+import SubscriptionBanner from "../../assets/images/bg/subscription_home-logo.svg";
 import { fetchSubscriptionPlans } from "../../components/redux/subscriptionSlice";
 import { useMediaQuery } from "react-responsive";
 
@@ -12,7 +12,7 @@ const CompletePlan = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { plans, loading, error } = useSelector((state) => state.subscription);
-  const isPaymentComplete = useSelector((state) => state.authentication.userAuth.obj.isPaymentComplete);
+  const isPaymentComplete = useSelector((state) => state.authentication.usrAuth.obj.isPaymentComplete);
   const isMobile = useMediaQuery({ maxWidth: 767 });
   useEffect(() => {
     dispatch(fetchSubscriptionPlans());

@@ -5,10 +5,10 @@ import { getPatientStatus } from "../../../redux/patientSlice";
 import "./assesment.css";
 import CheckIcon from "../../../../assets/images/check.svg";
 
-const CardComponent = ({ card, isClickable, index, handleCardClick, isCompleted }) => (
+const CardComponent = ({ card, index, handleCardClick, isCompleted }) => (
   <div
-    className={`assessment-card ${!isClickable ? "disabled" : ""}`}
-    onClick={isClickable ? () => handleCardClick(card.component) : null}
+    className={`assessment-card`}
+    onClick={() => handleCardClick(card.component) }
   >
      {isCompleted && (
         <div className="checkmark-overlay">
@@ -49,16 +49,16 @@ const QuestionnaireGrid = ({ cards, onCardClick }) => {
     
     return cards.map((card, index) => {
       // Check if both initialAssessment and isPaymentComplete are true
-      const isFullyEnabled = patientStatus?.initialAssessment === true && patientStatus?.isPaymentComplete === true;
+      // const isFullyEnabled = patientStatus?.initialAssessment === true && patientStatus?.isPaymentComplete === true;
       // If patientStatus is null or either value is null, only first card is clickable
-      const isClickable = isFullyEnabled ? true : (index === 0);
+      // const isClickable = isFullyEnabled ? true : (index === 0);
       const isCompleted = patientStatus?.initialAssessment || false;
 
       return (
         <Col key={index} className="mb-4 d-flex justify-content-center">
           <CardComponent
             card={card}
-            isClickable={isClickable}
+            // isClickable={isClickable}
             index={index}
             handleCardClick={handleCardClick}
             isCompleted={isCompleted}

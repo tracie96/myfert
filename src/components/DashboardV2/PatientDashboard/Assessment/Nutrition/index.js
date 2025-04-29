@@ -584,7 +584,7 @@ const Nutrition = ({ onComplete }) => {
                   value={option}
                   style={{ display: "block", marginBottom: "10px" }}
                 >
-                  {option}
+                  <span style={{ verticalAlign: 'text-bottom' }}>{option}</span>
                 </Radio>
               ))}
             </Radio.Group>
@@ -659,7 +659,7 @@ const Nutrition = ({ onComplete }) => {
                 value={option}
                 style={{ display: "block", marginBottom: "10px" }}
               >
-                {option}
+                <span style={{ verticalAlign: 'text-bottom' }}>{option}</span>
               </Radio>
             ))}
             {answers[question.name] === "No" && (
@@ -766,7 +766,7 @@ const Nutrition = ({ onComplete }) => {
                   value={option}
                   style={{ display: "block", marginBottom: "10px" }}
                 >
-                  {option}
+                  <span style={{ verticalAlign: 'text-bottom' }}>{option}</span>
                 </Radio>
               ))}
             </Radio.Group>

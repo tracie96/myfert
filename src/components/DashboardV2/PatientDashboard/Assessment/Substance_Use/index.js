@@ -470,7 +470,7 @@ const SubstanceUse = ({ onComplete }) => {
                     )}
                   </>
                 ) : (
-                  option
+                  <span style={{ verticalAlign: 'text-bottom' }}>{option}</span>
                 )}
               </Radio>
             ))}
@@ -491,7 +491,7 @@ const SubstanceUse = ({ onComplete }) => {
                   value={option}
                   style={{ display: "block", marginBottom: "10px" }}
                 >
-                  {option}
+                  <span style={{ verticalAlign: 'text-bottom' }}>{option}</span>
                 </Radio>
               ))}
             </Radio.Group>
@@ -515,7 +515,7 @@ const SubstanceUse = ({ onComplete }) => {
                   value={option}
                   style={{ display: "block", marginBottom: "10px" }}
                 >
-                  {option}
+                  <span style={{ verticalAlign: 'text-bottom' }}>{option}</span>
                 </Radio>
               ))}
             </Radio.Group>

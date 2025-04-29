@@ -1506,7 +1506,7 @@ const SymptomReview = ({ onComplete }) => {
                       )}
                     </>
                   ) : (
-                    option
+                    <span style={{ verticalAlign: 'text-bottom' }}>{option}</span>
                   )}
                 </Radio>
               ))}
@@ -1700,7 +1700,7 @@ const SymptomReview = ({ onComplete }) => {
                   value={option}
                   style={{ display: "block", marginBottom: "10px" }}
                 >
-                  {option}
+                  <span style={{ verticalAlign: 'text-bottom' }}>{option}</span>
                 </Radio>
               ))}
             </Radio.Group>

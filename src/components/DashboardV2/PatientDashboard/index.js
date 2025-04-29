@@ -262,14 +262,14 @@ export default function PatDash() {
           <div style={{
             display: "flex",
             alignItems: "center",
-            flexWrap: "wrap",
-            gap: "8px"
+            flexWrap: "nowrap",
+            gap: "8px",
+            justifyContent: "space-between",
           }}>
             <div style={{
               display: "flex",
               alignItems: "center",
-              flex: "1",
-              minWidth: isMobile ? "100%" : "auto"
+              minWidth : "0"
             }}>
               <input
                 type="checkbox"
@@ -289,7 +289,7 @@ export default function PatDash() {
               <span style={{
                 fontSize: "14px",
                 color: "#333",
-                marginRight: "8px"
+                whiteSpace: "nowrap"
               }}>
                 Complete all Intake Forms
               </span>
@@ -306,14 +306,13 @@ export default function PatDash() {
           <div style={{
             display: "flex",
             alignItems: "center",
-            flexWrap: "wrap",
-            gap: "8px"
+            flexWrap: "nowrap",
+            gap: "8px",
+            justifyContent: "space-between",
           }}>
             <div style={{
               display: "flex",
               alignItems: "center",
-              flex: "1",
-              minWidth: isMobile ? "100%" : "auto"
             }}>
               <input
                 type="checkbox"
@@ -333,7 +332,7 @@ export default function PatDash() {
               <span style={{
                 fontSize: "14px",
                 color: "#333",
-                marginRight: "8px"
+                whiteSpace: "nowrap",
               }}>
                 Watch the Learn Videos
               </span>

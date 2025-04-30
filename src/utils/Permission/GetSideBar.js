@@ -17,7 +17,6 @@ import {
   FaListOl, 
   FaBars, 
   FaServicestack,
-  FaNotesMedical
 } from "react-icons/fa";
 
 export const GetSideBar = () => {
@@ -129,17 +128,17 @@ export const GetSideBar = () => {
           <span className="no-underline">SERVICES</span>
         </NavLink>
       </Menu.Item>
-      <Menu.Item key="6" icon={<FaNotesMedical style={{ color: "#00ADEF" }} />}>
+      {/* <Menu.Item key="6" icon={<FaNotesMedical style={{ color: "#00ADEF" }} />}>
         <NavLink to="/patient/appointment" style={{ textDecoration: "none" }}>
           <span className="no-underline">NOTES</span>
         </NavLink>
-        </Menu.Item>
+        </Menu.Item> */}
 
-        <Menu.Item key="7" icon={<FaNotesMedical style={{ color: "#00ADEF" }} />}>
+        {/* <Menu.Item key="7" icon={<FaNotesMedical style={{ color: "#00ADEF" }} />}>
         <NavLink to="/patient/appointment" style={{ textDecoration: "none" }}>
           <span className="no-underline">DOCUMENTS</span>
         </NavLink>
-      </Menu.Item>
+      </Menu.Item> */}
       <Menu.Item key="8" icon={<FaInfoCircle style={{ color: "#00ADEF" }} />}>
         <NavLink to="/learn" style={{ textDecoration: "none" }}>
           <span className="no-underline">LEARN</span>

@@ -306,7 +306,7 @@ const GeneralIntakeForm = ({ onComplete }) => {
               >
                 {option === "Other" ? (
                   <>
-                    {option}
+                    <span style={{ verticalAlign: 'text-bottom' }}>{option}</span>
                     {answers[question.name] === "Other" && (
                       <>
                         <br />
@@ -330,7 +330,8 @@ const GeneralIntakeForm = ({ onComplete }) => {
                     )}
                   </>
                 ) : (
-                  option
+                <span style={{ verticalAlign: 'text-bottom' }}>{option}</span>
+
                 )}
               </Radio>
             ))}

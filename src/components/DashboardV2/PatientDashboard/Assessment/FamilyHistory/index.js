@@ -651,7 +651,7 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
                 value={option}
                 style={{ display: "block", marginBottom: "10px" }}
               >
-                {option}
+                <span style={{ verticalAlign: 'text-bottom' }}>{option}</span>
               </Radio>
             ))}
           </Radio.Group>
@@ -742,7 +742,7 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
                     )}
                   </>
                 ) : (
-                  option
+                  <span style={{ verticalAlign: 'text-bottom' }}>{option}</span>
                 )}
               </Radio>
             ))}
@@ -1051,7 +1051,7 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
                   value={option}
                   style={{ display: "block", marginBottom: "10px" }}
                 >
-                  {option}
+                  <span style={{ verticalAlign: 'text-bottom' }}>{option}</span>
                 </Radio>
               ))}
             </Radio.Group>

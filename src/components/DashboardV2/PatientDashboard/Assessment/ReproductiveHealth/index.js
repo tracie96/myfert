@@ -1179,7 +1179,7 @@ const ReproductiveHealth = ({ onComplete }) => {
                    style={{ display: "block", marginBottom: "10px" }}
                    disabled={isDisabled}
                  >
-                   {option}
+                  <span style={{ verticalAlign: 'text-bottom' }}>{option}</span>
                  </Radio>
                  {option === "Other" && answers[subQuestion.name]?.includes("Other") && (
                    <Input
@@ -1286,7 +1286,7 @@ const ReproductiveHealth = ({ onComplete }) => {
                     )}
                   </>
                 ) : (
-                  option
+                  <span style={{ verticalAlign: 'text-bottom' }}>{option}</span>
                 )}
               </Radio>
             )})}
@@ -1624,7 +1624,7 @@ const ReproductiveHealth = ({ onComplete }) => {
                   style={{ display: "block", marginBottom: "10px" }}
                   // disabled={isUnsureOrNoneSelected && option !== "Unsure" && option !== "None"}
                 >
-                  {option}
+                  <span style={{ verticalAlign: 'text-bottom' }}>{option}</span>
                 </Radio>
               )})}
             </Radio.Group>

@@ -165,7 +165,7 @@ const LearnInfo = () => {
             height: '100%'
           }}>
             <div>
-              <Title level={4} style={{ marginBottom: '20px' }}>Cycle Tracking Videos</Title>
+              <Title level={4} style={{ marginBottom: '20px', fontSize:"15px" }}>Cycle Tracking Videos</Title>
               <div style={{ color: '#666', float: 'right', marginTop: '-45px' }}>50:26</div>
               <List
                 itemLayout="horizontal"

@@ -347,9 +347,19 @@ const LabsAndRequisitions = () => {
             <div className="p-6 mt-4" style={{ padding: "0 1%" }}>
                 <p style={{ fontWeight: 'bold', marginBottom: '30px' }}>LABS AND REQUISITIONS</p>
 
-                <div class = "labCard" style={{ display: 'flex', gap: 20 }}>
-                    <div class="childCard" style={{ flex: 1 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div className="labCard" style={{ 
+                    display: 'flex', 
+                    gap: 20,
+                    flexDirection: window.innerWidth <= 768 ? 'column' : 'row' 
+                }}>
+                    <div className="childCard" style={{ flex: 1 }}>
+                        <div style={{ 
+                            display: 'flex', 
+                            justifyContent: 'space-between', 
+                            alignItems: 'center',
+                            flexDirection: window.innerWidth <= 480 ? 'column' : 'row',
+                            gap: window.innerWidth <= 480 ? '10px' : '0'
+                        }}>
                             <div
                                 style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
                                 onClick={() => openModal('editLabResult')}
@@ -357,47 +367,80 @@ const LabsAndRequisitions = () => {
                                 <EditOutlined style={{ fontSize: '16px', color: '#1890ff' }} />
                                 <Text strong>Edit Lab Result</Text>
                             </div>
-                            <Text type="secondary">
+                            <Text type="secondary" style={{ textAlign: window.innerWidth <= 480 ? 'center' : 'right' }}>
                                 Last updated: {files.length > 0 ? moment(files[files.length - 1].date).format('MMMM DD, YYYY') : 'N/A'}
-                            </Text>                        </div>
+                            </Text>
+                        </div>
 
                         <Card style={{ border: '1px solid #C2E6F8' }} className='mt-1'>
                             <List
                                 dataSource={files}
                                 renderItem={(file) => (
-                                    <List.Item style={{ borderBottom: '1px solid #f0f0f0', padding: '12px 16px' }}>
-                                        <div class="listCard" style={{ display: 'flex', alignItems: 'center', gap: 15, width: '100%' }}>
-                                            <div class="listCardSideBorder" style={{ width: '3px', height: '40px', backgroundColor: 'red' }}></div>
+                                    <List.Item style={{ 
+                                        borderBottom: '1px solid #f0f0f0', 
+                                        padding: '12px 16px',
+                                        flexDirection: window.innerWidth <= 480 ? 'column' : 'row',
+                                        gap: window.innerWidth <= 480 ? '10px' : '0'
+                                    }}>
+                                        <div className="listCard" style={{ 
+                                            display: 'flex', 
+                                            alignItems: window.innerWidth <= 480 ? 'flex-start' : 'center',
+                                            gap: 15, 
+                                            width: '100%',
+                                            flexDirection: window.innerWidth <= 480 ? 'column' : 'row'
+                                        }}>
+                                            <div className="listCardSideBorder" style={{ 
+                                                width: window.innerWidth <= 480 ? '100%' : '3px',
+                                                height: window.innerWidth <= 480 ? '3px' : '40px',
+                                                backgroundColor: 'red' 
+                                            }}></div>
 
-                                            <div class="listCardContent" style={{ flex: 1 }}>
+                                            <div className="listCardContent" style={{ 
+                                                flex: 1,
+                                                width: window.innerWidth <= 480 ? '100%' : 'auto'
+                                            }}>
                                                 <Text style={{ fontWeight: 500 }}>{file.name}</Text>
                                                 <br />
                                             </div>
-                                            <div class="listCardContent" style={{ flex: 1 }}>
+                                            <div className="listCardContent" style={{ 
+                                                flex: 1,
+                                                width: window.innerWidth <= 480 ? '100%' : 'auto'
+                                            }}>
                                                 <Text style={{ fontWeight: 500 }}>
                                                     {file.date ? moment(file.date).format('MMMM DD, YYYY') : 'No date available'}
                                                 </Text>
                                                 <br />
                                             </div>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                            <div style={{ 
+                                                display: 'flex', 
+                                                alignItems: 'center', 
+                                                gap: 8,
+                                                width: window.innerWidth <= 480 ? '100%' : 'auto'
+                                            }}>
                                                 <FilePdfOutlined style={{ color: 'red', fontSize: 24 }} />
                                                 <Link style={{ color: '#1890ff' }} onClick={() => handleDownload(file.id)}>
                                                     {file.filename || 'LabResults.pdf'}
                                                 </Link>
                                             </div>
-                                            <div style={{ display: 'flex', gap: 10 }}>
-
+                                            <div style={{ 
+                                                display: 'flex', 
+                                                gap: 10,
+                                                width: window.innerWidth <= 480 ? '100%' : 'auto',
+                                                justifyContent: window.innerWidth <= 480 ? 'flex-end' : 'flex-start'
+                                            }}>
                                                 <DeleteOutlined style={{ color: 'red', cursor: 'pointer' }} onClick={() => handleDelete(file.id)} />
                                             </div>
                                         </div>
                                     </List.Item>
                                 )}
                             />
-
                         </Card>
                     </div>
 
-                    <Card class="bloodWorkFileStyle"   style={{ border: '1px solid #C2E6F8', width: '35%' }} className='mt-4'>
+                    <Card className="bloodWorkFileStyle mt-4" style={{ 
+                        border: '1px solid #C2E6F8', 
+                        width: window.innerWidth <= 768 ? '100%' : '35%'
+                    }}>
                         {bloodWorkFile2?.map((file, index) => (
                             <Card key={index} style={{border: 'none', boxShadow: 'none' }}>
                                 <Text strong>{index === 0 ? 'Day 1 Requisition' : 'Day 2 Requisition'}</Text>

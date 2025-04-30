@@ -131,9 +131,12 @@ const LearnInfo = () => {
                     borderRadius: '8px'
                   }}
                 />
+               <p style={{ marginTop: '15px', color: '#666' }}>Timing Menstrual Cycle Bloodwork, Identifying the Fertile Window, and Using Ovulation Tests</p>
+
               </div>
             ) : (
-              <>
+              <div style={{ width: '100%', position: 'relative', paddingBottom: '56.25%' }}>
+
                  <iframe
                   src='https://www.loom.com/embed/cf0959fd0b8d4344939a9feac194502e'
                   title="Menstrual Cycle 101"
@@ -150,7 +153,7 @@ const LearnInfo = () => {
                     borderRadius: '8px'
                   }}
                 />
-              </>
+              </div>
             )}
          <p style={{ marginTop: '15px', color: '#666' }}>Timing Menstrual Cycle Bloodwork, Identifying the Fertile Window, and Using Ovulation Tests</p>
 

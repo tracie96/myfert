@@ -7,7 +7,7 @@ import PatientSignup from "./SignUpPages/PatientSignup";
 import "./Register.css"; // Import the CSS file
 import DoctorRegister from "./SignUpPages/DoctorOverview";
 
-const Register = ({ navigator }) => {
+const Register = () => {
   const [userRole, setUserRole] = useState(null);
   const [isClinicianHovered, setIsClinicianHovered] = useState(false);
   const [isPatientHovered, setIsPatientHovered] = useState(false);

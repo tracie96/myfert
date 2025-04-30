@@ -424,7 +424,7 @@ const MenstrualCycleQuiz = () => {
             onClick={handleNext}
             disabled={selectedAnswers[currentQuestion] === undefined}
             style={{ 
-              backgroundColor: selectedAnswers[currentQuestion] === undefined ? '#D9D9D9' : colors.buttonColor,
+              backgroundColor: selectedAnswers[currentQuestion] === undefined ? '#999' : colors.buttonColor,
               borderColor: selectedAnswers[currentQuestion] === undefined ? '#D9D9D9' : colors.buttonColor,
               color: selectedAnswers[currentQuestion] === undefined ? '#FFFFFF' : undefined,
               padding: '0 40px',

@@ -202,8 +202,9 @@ const LabsAndRequisitions = () => {
                 message.error('You can only upload a maximum of 2 files.');
                 return Upload.LIST_IGNORE;
             }
-            if (file.type !== 'application/pdf') {
-                message.error('Only PDF files are allowed.');
+            const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+            if (!allowedTypes.includes(file.type)) {
+                message.error('Only PDF, JPG, and PNG files are allowed.');
                 return Upload.LIST_IGNORE;
             }
     
@@ -289,8 +290,9 @@ const LabsAndRequisitions = () => {
                     multiple={false}
                     showUploadList={true}
                     beforeUpload={(file) => {
-                        if (file.type !== 'application/pdf') {
-                            message.error('Only PDF files are allowed.');
+                        const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+                        if (!allowedTypes.includes(file.type)) {
+                            message.error('Only PDF, JPG, and PNG files are allowed.');
                             return Upload.LIST_IGNORE;
                         }
                         setNewLabResultFile(file);
@@ -398,13 +400,13 @@ const LabsAndRequisitions = () => {
                     <Card class="bloodWorkFileStyle"   style={{ border: '1px solid #C2E6F8', width: '35%' }} className='mt-4'>
                         {bloodWorkFile2?.map((file, index) => (
                             <Card key={index} style={{border: 'none', boxShadow: 'none' }}>
-                                <Text strong>Day 1 Requisition</Text>
+                                <Text strong>{index === 0 ? 'Day 1 Requisition' : 'Day 2 Requisition'}</Text>
                                 <List.Item  style={{ borderBottom: '1px solid #f0f0f0', padding: '12px 16px' }}>
                                     <div class="labCard" style={{ display: 'flex', alignItems: 'center', gap: 15, width: '100%' }}>
                                         <div class="listCardSideBorder" style={{ width: '3px', height: '40px', backgroundColor: 'red' }}></div>
 
                                         <div style={{ flex: 1 }}>
-                                            <Text style={{ fontWeight: 500 }}>{file.name}</Text>
+                                            {/* <Text style={{ fontWeight: 500 }}>{file.name}</Text> */}
                                             <br />
                                         </div>
 

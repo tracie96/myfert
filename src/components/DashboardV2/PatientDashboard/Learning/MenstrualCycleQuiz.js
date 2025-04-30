@@ -255,7 +255,11 @@ const MenstrualCycleQuiz = () => {
 
   if (!quizStarted) {
     return (
-      <div style={{ padding: '24px' }}>
+      <div style={{ 
+        padding: window.innerWidth <= 480 ? '16px' : '24px',
+        maxWidth: '100%',
+        overflowX: 'hidden'
+      }}>
         <div style={{ marginBottom: '24px' }}>
           <Button 
             type="link" 
@@ -267,35 +271,43 @@ const MenstrualCycleQuiz = () => {
           </Button>
         </div>
         
-        <Title level={2} style={{ color: colors.text, marginBottom: '24px' }}>
+        <Title level={2} style={{ 
+          color: colors.text, 
+          marginBottom: '24px',
+          fontSize: window.innerWidth <= 480 ? '24px' : '30px'
+        }}>
           {quizTitle}
         </Title>
 
         <div style={{ maxWidth: '800px' }}>
-          <Title level={4}>Welcome!</Title>
+          <Title level={4} style={{ fontSize: window.innerWidth <= 480 ? '18px' : '20px' }}>Welcome!</Title>
           
-          <Paragraph>
+          <Paragraph style={{ fontSize: window.innerWidth <= 480 ? '14px' : '16px' }}>
             This is a great chance to assess how much you've learned. The questions will focus on the{' '}
             <Text style={{ color: colors.text }}>{quizType === 'menstrual' ? 'Menstrual Cycle 101' : 'Fertile Window'}</Text>, so make sure you review as much as needed.
           </Paragraph>
           
-          <Paragraph>
+          <Paragraph style={{ fontSize: window.innerWidth <= 480 ? '14px' : '16px' }}>
             You will need a <Text strong>100%</Text> in order to pass.
           </Paragraph>
           
-          <Paragraph>
+          <Paragraph style={{ fontSize: window.innerWidth <= 480 ? '14px' : '16px' }}>
             But don't worry – you have multiple attempts!
           </Paragraph>
           
-          <Paragraph>
+          <Paragraph style={{ fontSize: window.innerWidth <= 480 ? '14px' : '16px' }}>
             Our goal is to make sure you have the knowledge and confidence to successfully track your health!
           </Paragraph>
           
-          <Paragraph>
+          <Paragraph style={{ fontSize: window.innerWidth <= 480 ? '14px' : '16px' }}>
             Goodluck!
           </Paragraph>
 
-          <div style={{ marginTop: '40px' }}>
+          <div style={{ 
+            marginTop: '40px',
+            display: 'flex',
+            justifyContent: window.innerWidth <= 480 ? 'center' : 'flex-start'
+          }}>
             <Button 
               type="primary"
               size="large"
@@ -305,7 +317,8 @@ const MenstrualCycleQuiz = () => {
                 borderColor: colors.buttonColor,
                 padding: '0 40px',
                 height: '48px',
-                borderRadius: '24px'
+                borderRadius: '24px',
+                width: window.innerWidth <= 480 ? '100%' : 'auto'
               }}
             >
               Start Quiz
@@ -320,41 +333,71 @@ const MenstrualCycleQuiz = () => {
     const score = calculateScore();
     const passed = score === quizData.length;
 
-    // Store quiz completion status
     if (passed) {
       localStorage.setItem('quizPassed', 'true');
     }
 
     return (
-      <div style={{ padding: '24px', maxWidth: '800px' }}>
-        <Title level={2} style={{ marginBottom: '24px' }}>Quiz Results</Title>
+      <div style={{ 
+        padding: window.innerWidth <= 480 ? '16px' : '24px', 
+        maxWidth: '800px',
+        overflowX: 'hidden'
+      }}>
+        <Title level={2} style={{ 
+          marginBottom: '24px',
+          fontSize: window.innerWidth <= 480 ? '24px' : '30px'
+        }}>Quiz Results</Title>
         
         <div style={{ 
-          padding: '24px',
+          padding: window.innerWidth <= 480 ? '16px' : '24px',
           background: passed ? '#F6FFED' : '#FFF2F0',
           borderRadius: '8px',
           marginBottom: '24px'
         }}>
-          <Title level={4} style={{ color: passed ? '#52C41A' : '#FF4D4F' }}>
+          <Title level={4} style={{ 
+            color: passed ? '#52C41A' : '#FF4D4F',
+            fontSize: window.innerWidth <= 480 ? '18px' : '20px'
+          }}>
             {passed ? 'Congratulations!' : 'Keep Learning!'}
           </Title>
-          <Paragraph>
+          <Paragraph style={{ fontSize: window.innerWidth <= 480 ? '14px' : '16px' }}>
             You scored {score} out of {quizData.length}
           </Paragraph>
         </div>
 
         <div style={{ marginBottom: '40px' }}>
           {quizData.map((q, index) => (
-            <div key={index} style={{ marginBottom: '24px' }}>
-              <Text strong>Question {index + 1}: {q.question}</Text>
+            <div key={index} style={{ 
+              marginBottom: '24px',
+              padding: window.innerWidth <= 480 ? '16px' : '24px',
+              border: '1px solid #f0f0f0',
+              borderRadius: '8px'
+            }}>
+              <Text strong style={{ fontSize: window.innerWidth <= 480 ? '14px' : '16px' }}>
+                Question {index + 1}: {q.question}
+              </Text>
               <br />
-              <Text type={selectedAnswers[index] === q.answer ? 'success' : 'danger'}>
+              <Text 
+                type={selectedAnswers[index] === q.answer ? 'success' : 'danger'}
+                style={{ fontSize: window.innerWidth <= 480 ? '14px' : '16px' }}
+              >
                 Your answer: {q.options[selectedAnswers[index]]}
               </Text>
               <br />
-              <Text type="success">Correct answer: {q.options[q.answer]}</Text>
+              <Text 
+                type="success"
+                style={{ fontSize: window.innerWidth <= 480 ? '14px' : '16px' }}
+              >
+                Correct answer: {q.options[q.answer]}
+              </Text>
               {q.explanation && (
-                <Paragraph type="secondary" style={{ marginTop: '8px' }}>
+                <Paragraph 
+                  type="secondary" 
+                  style={{ 
+                    marginTop: '8px',
+                    fontSize: window.innerWidth <= 480 ? '14px' : '16px'
+                  }}
+                >
                   {q.explanation}
                 </Paragraph>
               )}
@@ -362,11 +405,31 @@ const MenstrualCycleQuiz = () => {
           ))}
         </div>
 
-        <div style={{ textAlign: 'right' }}>
-          <Button onClick={resetQuiz} style={{ marginRight: '12px' }}>
+        <div style={{ 
+          textAlign: 'right',
+          display: 'flex',
+          flexDirection: window.innerWidth <= 480 ? 'column' : 'row',
+          gap: window.innerWidth <= 480 ? '12px' : '0',
+          justifyContent: window.innerWidth <= 480 ? 'stretch' : 'flex-end'
+        }}>
+          <Button 
+            onClick={resetQuiz} 
+            style={{ 
+              marginRight: window.innerWidth <= 480 ? '0' : '12px',
+              width: window.innerWidth <= 480 ? '100%' : 'auto'
+            }}
+          >
             Try Again
           </Button>
-          <Button type="primary" onClick={handleBack} style={{ backgroundColor: colors.buttonColor, borderColor: colors.buttonColor }}>
+          <Button 
+            type="primary" 
+            onClick={handleBack} 
+            style={{ 
+              backgroundColor: colors.buttonColor, 
+              borderColor: colors.buttonColor,
+              width: window.innerWidth <= 480 ? '100%' : 'auto'
+            }}
+          >
             Back to Learn
           </Button>
         </div>
@@ -375,7 +438,11 @@ const MenstrualCycleQuiz = () => {
   }
 
   return (
-    <div style={{ padding: '24px' }}>
+    <div style={{ 
+      padding: window.innerWidth <= 480 ? '16px' : '24px',
+      maxWidth: '100%',
+      overflowX: 'hidden'
+    }}>
       <div style={{ marginBottom: '24px' }}>
         <Button 
           type="link" 
@@ -389,27 +456,35 @@ const MenstrualCycleQuiz = () => {
 
       <div style={{ maxWidth: '800px' }}>
         <div style={{ marginBottom: '24px' }}>
-          <Text>Question {currentQuestion + 1} of {quizData.length}</Text>
+          <Text style={{ fontSize: window.innerWidth <= 480 ? '14px' : '16px' }}>
+            Question {currentQuestion + 1} of {quizData.length}
+          </Text>
         </div>
 
-        <Title level={4}>{quizData[currentQuestion].question}</Title>
+        <Title level={4} style={{ fontSize: window.innerWidth <= 480 ? '18px' : '20px' }}>
+          {quizData[currentQuestion].question}
+        </Title>
 
         <Radio.Group
           onChange={handleAnswer}
           value={selectedAnswers[currentQuestion]}
           style={{ width: '100%', marginTop: '24px' }}
         >
-          <Space direction="vertical" style={{ width: '100%' }}>
+          <Space 
+            direction="vertical" 
+            style={{ width: '100%' }}
+          >
             {quizData[currentQuestion].options.map((option, index) => (
               <Radio 
                 key={index} 
                 value={index} 
                 style={{ 
                   marginBottom: '16px',
-                  padding: '12px',
+                  padding: window.innerWidth <= 480 ? '8px' : '12px',
                   width: '100%',
                   border: '1px solid #D9D9D9',
-                  borderRadius: '8px'
+                  borderRadius: '8px',
+                  fontSize: window.innerWidth <= 480 ? '14px' : '16px'
                 }}
               >
                 {option}
@@ -418,7 +493,12 @@ const MenstrualCycleQuiz = () => {
           </Space>
         </Radio.Group>
 
-        <div style={{ marginTop: '40px', textAlign: 'right' }}>
+        <div style={{ 
+          marginTop: '40px', 
+          textAlign: 'right',
+          display: 'flex',
+          justifyContent: window.innerWidth <= 480 ? 'stretch' : 'flex-end'
+        }}>
           <Button
             type="primary"
             onClick={handleNext}
@@ -429,7 +509,8 @@ const MenstrualCycleQuiz = () => {
               color: selectedAnswers[currentQuestion] === undefined ? '#FFFFFF' : undefined,
               padding: '0 40px',
               height: '48px',
-              borderRadius: '24px'
+              borderRadius: '24px',
+              width: window.innerWidth <= 480 ? '100%' : 'auto'
             }}
           >
             {currentQuestion === quizData.length - 1 ? 'Finish' : 'Next'}

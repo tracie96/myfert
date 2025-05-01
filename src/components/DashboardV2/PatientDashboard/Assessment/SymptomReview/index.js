@@ -30,7 +30,7 @@ const questions = [
       { text: "Heat intolerance", name: "heat_intolerance" },
       { text: "Night waking", name: "night_walking" },
       { text: "Nightmares", name: "nightmares" },
-      { text: "Can’t remember dreams", name: "cant_remember_dreams" },
+      { text: "Can't remember dreams", name: "cant_remember_dreams" },
       { text: "Low body temperature", name: "low_body_temperature" },
     ],
   },
@@ -1624,26 +1624,55 @@ const SymptomReview = ({ onComplete }) => {
               type="primary"
               style={{
                 background: "#335CAD",
-                padding: 20,
-                fontSize: "15px",
+                padding: isMobile ? "10px" : "20px",
+                fontSize: isMobile ? "14px" : "15px",
                 fontWeight: "bold",
+                width: "100%",
+                textAlign: "left",
+                whiteSpace: "normal",
+                height: "auto",
+                lineHeight: "1.4"
               }}
             >
               {question.sub}
             </Button>
 
             {question.subQuestions.map((subQuestion) => (
-              <div key={subQuestion.name} style={{ marginTop: 20 }}>
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <div style={{ flex: 1, fontSize: "15px", color: "#000" }}>
+              <div 
+                key={subQuestion.name} 
+                style={{ 
+                  marginTop: 20,
+                  padding: isMobile ? "10px" : "20px",
+                  backgroundColor: "#f5f5f5",
+                  borderRadius: "8px"
+                }}
+              >
+                <div style={{ 
+                  display: "flex", 
+                  flexDirection: isMobile ? "column" : "row",
+                  alignItems: isMobile ? "flex-start" : "center",
+                  gap: isMobile ? "10px" : "0"
+                }}>
+                  <div style={{ 
+                    flex: 1, 
+                    fontSize: isMobile ? "14px" : "15px", 
+                    color: "#000",
+                    marginBottom: isMobile ? "10px" : "0"
+                  }}>
                     {subQuestion.text}
                   </div>
-                  <div style={{ display: "flex" }}>
+                  <div style={{ 
+                    display: "flex",
+                    flexDirection: isMobile ? "column" : "row",
+                    gap: isMobile ? "10px" : "20px",
+                    width: isMobile ? "100%" : "auto"
+                  }}>
                     <Radio
                       style={{
-                        marginRight: "10px",
+                        marginRight: isMobile ? "0" : "10px",
                         color: "#000",
-                        fontSize: "15px",
+                        fontSize: isMobile ? "14px" : "15px",
+                        whiteSpace: "nowrap"
                       }}
                       checked={answers[subQuestion.name] === "mild"}
                       onChange={() => handleChange("mild", subQuestion.name)}
@@ -1652,22 +1681,22 @@ const SymptomReview = ({ onComplete }) => {
                     </Radio>
                     <Radio
                       style={{
-                        marginRight: "10px",
+                        marginRight: isMobile ? "0" : "10px",
                         color: "#000",
-                        fontSize: "15px",
+                        fontSize: isMobile ? "14px" : "15px",
+                        whiteSpace: "nowrap"
                       }}
                       checked={answers[subQuestion.name] === "moderate"}
-                      onChange={() =>
-                        handleChange("moderate", subQuestion.name)
-                      }
+                      onChange={() => handleChange("moderate", subQuestion.name)}
                     >
                       Moderate
                     </Radio>
                     <Radio
                       style={{
-                        marginRight: "10px",
+                        marginRight: isMobile ? "0" : "10px",
                         color: "#000",
-                        fontSize: "15px",
+                        fontSize: isMobile ? "14px" : "15px",
+                        whiteSpace: "nowrap"
                       }}
                       checked={answers[subQuestion.name] === "severe"}
                       onChange={() => handleChange("severe", subQuestion.name)}

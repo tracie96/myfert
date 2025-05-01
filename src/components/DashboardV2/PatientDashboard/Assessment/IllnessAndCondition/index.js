@@ -15,12 +15,12 @@ const questions = [
     name: "healthConditions",
     sub: "Respiratory",
     question:
-      "Check YES = a condition you currently have, Check PAST = a condition you’ve had in the past.",
+      "Check YES = a condition you currently have, Check PAST = a condition you've had in the past.",
     title: "Medical History: Illnesses/Conditions",
     subQuestions: [
       { name: "irritableBowel", text: "Irritable bowel syndrome" },
       { name: "gerd", text: "GERD (reflux)" },
-      { name: "crohns", text: "Crohn’s disease/ulcerative colitis" },
+      { name: "crohns", text: "Crohn's disease/ulcerative colitis" },
       { name: "peptic_ulcer", text: "Peptic ulcer disease" },
       { name: "celiac", text: "Celiac disease" },
       { name: "gallstones", text: "Gallstones" },
@@ -31,7 +31,7 @@ const questions = [
     name: "healthConditions",
     sub: "Urinary/Genital",
     question:
-      "Check YES = a condition you currently have, Check PAST = a condition you’ve had in the past.",
+      "Check YES = a condition you currently have, Check PAST = a condition you've had in the past.",
     title: "Medical History: Illnesses/Conditions",
     subQuestions: [
       { name: "kidney_stones", text: " Kidney stones" },
@@ -54,7 +54,7 @@ const questions = [
     name: "healthConditions",
     sub: "Endocrine/Metabolic",
     question:
-      "Check YES = a condition you currently have, Check PAST = a condition you’ve had in the past.",
+      "Check YES = a condition you currently have, Check PAST = a condition you've had in the past.",
     title: "Medical History: Illnesses/Conditions",
     subQuestions: [
       { name: "diabetes", text: "Diabetes" },
@@ -76,7 +76,7 @@ const questions = [
     name: "healthConditions",
     sub: "Inflammatory/Immune",
     question:
-      "Check YES = a condition you currently have, Check PAST = a condition you’ve had in the past.",
+      "Check YES = a condition you currently have, Check PAST = a condition you've had in the past.",
     title: "Medical History: Illnesses/Conditions",
     subQuestions: [
       { name: "rheumatoid_arthritis", text: "Rheumatoid arthritis" },
@@ -98,7 +98,7 @@ const questions = [
     name: "healthConditions",
     sub: "Musculoskeletal",
     question:
-      "Check YES = a condition you currently have, Check PAST = a condition you’ve had in the past.",
+      "Check YES = a condition you currently have, Check PAST = a condition you've had in the past.",
     title: "Medical History: Illnesses/Conditions",
     subQuestions: [
       { name: "fibromyalgia", text: "Fibromyalgia" },
@@ -111,7 +111,7 @@ const questions = [
     name: "healthConditions",
     sub: "Skin",
     question:
-      "Check YES = a condition you currently have, Check PAST = a condition you’ve had in the past.",
+      "Check YES = a condition you currently have, Check PAST = a condition you've had in the past.",
     title: "Medical History: Illnesses/Conditions",
     subQuestions: [
       { name: "eczema", text: "Eczema" },
@@ -125,7 +125,7 @@ const questions = [
     name: "healthConditions",
     sub: "Cardiovascular",
     question:
-      "Check YES = a condition you currently have, Check PAST = a condition you’ve had in the past.",
+      "Check YES = a condition you currently have, Check PAST = a condition you've had in the past.",
     title: "Medical History: Illnesses/Conditions",
     subQuestions: [
       { name: "angina", text: "Angina" },
@@ -148,7 +148,7 @@ const questions = [
     name: "healthConditions",
     sub: "Neurologic/Emotional",
     question:
-      "Check YES = a condition you currently have, Check PAST = a condition you’ve had in the past.",
+      "Check YES = a condition you currently have, Check PAST = a condition you've had in the past.",
     title: "Medical History: Illnesses/Conditions",
     subQuestions: [
       { name: "epilepsy_seizures", text: "Epilepsy/Seizures" },
@@ -159,7 +159,7 @@ const questions = [
       { name: "anxiety", text: "Anxiety" },
       { name: "Autism", text: "Autism" },
       { name: "multiple_sclerosis", text: "Multiple sclerosis" },
-      { name: "Parkinson’s disease", text: "parkinson’s_disease" },
+      { name: "Parkinson's disease", text: "parkinson's_disease" },
       { name: "dementia", text: "Dementia" },
     ],
   },
@@ -168,7 +168,7 @@ const questions = [
     name: "healthConditions",
     sub: "Cancer",
     question:
-      "Check YES = a condition you currently have, Check PAST = a condition you’ve had in the past.",
+      "Check YES = a condition you currently have, Check PAST = a condition you've had in the past.",
     title: "Medical History: Illnesses/Conditions",
     subQuestions: [
       { name: "lung", text: "Lung" },
@@ -833,26 +833,35 @@ const IllnessAndCondition = ({ onComplete }) => {
                 marginTop: "10px",
                 marginBottom: "10px",
                 background: "#335CAD",
-                padding: 10,
-                fontSize: "15px",
+                padding: isMobile ? "5px" : "10px",
+                fontSize: isMobile ? "13px" : "15px",
                 fontWeight: "bold",
+                width: isMobile ? "100%" : "auto",
               }}
             >
               {question.question}
             </Button>
             <p
-              style={{ color: "#00ADEF", fontSize: "15px", fontWeight: "bold" }}
+              style={{ 
+                color: "#00ADEF", 
+                fontSize: isMobile ? "13px" : "15px", 
+                fontWeight: "bold",
+                marginBottom: "10px"
+              }}
             >
               {question.sub}
             </p>
+            <div style={{ marginBottom: "10px" }}>
               <Checkbox
                 checked={isNA}
                 onChange={(e) => handleChange(e.target.checked, `${question.name}_na`)}
+                style={{ fontSize: isMobile ? "13px" : "14px" }}
               >
                 N/A
               </Checkbox>
+            </div>
             <div style={{ marginBottom: "10px" }}>
-              <label>Date:</label>
+              <label style={{ fontSize: isMobile ? "13px" : "14px" }}>Date:</label>
               <br />
               <Input
                 type="date"
@@ -862,14 +871,14 @@ const IllnessAndCondition = ({ onComplete }) => {
                 onChange={(e) =>
                   handleChange(e.target.value, question.dateName)
                 }
-                style={{ width: "200px" }}
+                style={{ width: isMobile ? "100%" : "200px" }}
                 disabled={isNA}
               />
             </div>
             <div style={{ marginBottom: "10px" }}>
               {question.radioOptions.map((option, index) => (
                 <div key={index} style={{ marginBottom: "5px" }}>
-                  <label>{option.label}:</label>
+                  <label style={{ fontSize: isMobile ? "13px" : "14px" }}>{option.label}:</label>
                   <br />
                   <Input
                     type="text"
@@ -884,7 +893,7 @@ const IllnessAndCondition = ({ onComplete }) => {
                         `${question.radioName}_${option.value}`,
                       )
                     }
-                    style={{ width: "200px" }}
+                    style={{ width: isMobile ? "100%" : "200px" }}
                     disabled={isNA}
                   />
                 </div>
@@ -892,9 +901,9 @@ const IllnessAndCondition = ({ onComplete }) => {
             </div>
           </div>
         );
-}
+      }
 
-        case "hospitalization":
+      case "hospitalization":
         return (
           <div key={question.name} style={{ marginBottom: "20px" }}>
             {answers[question.name]?.map((entry, index) => (
@@ -903,7 +912,7 @@ const IllnessAndCondition = ({ onComplete }) => {
                   marginBottom: "16px",
                   border: "1px solid #ddd",
                   borderRadius: "8px",
-                  padding: "16px",
+                  padding: isMobile ? "10px" : "16px",
                   width: "100%",
                   boxShadow: "#ccc",
                 }}
@@ -929,6 +938,7 @@ const IllnessAndCondition = ({ onComplete }) => {
                       )
                     }
                     className="input_questtionnaire"
+                    style={{ width: "100%" }}
                   />
                   <Input
                     type="text"
@@ -943,10 +953,12 @@ const IllnessAndCondition = ({ onComplete }) => {
                       )
                     }
                     className="input_questtionnaire"
+                    style={{ width: "100%" }}
                   />
                   <Button
                     type="danger"
                     onClick={() => removeHospitalization(index, question.name)}
+                    style={{ width: isMobile ? "100%" : "auto" }}
                   >
                     <DeleteOutlined style={{ color: "red" }} />
                   </Button>
@@ -960,7 +972,9 @@ const IllnessAndCondition = ({ onComplete }) => {
                 marginBottom: "10px",
                 fontWeight: 700,
                 background: "#00ADEF",
-                padding: 10,
+                padding: isMobile ? "5px" : "10px",
+                width: isMobile ? "100%" : "auto",
+                fontSize: isMobile ? "13px" : "14px"
               }}
               onClick={() => addHospitalization(question.name)}
             >
@@ -976,9 +990,10 @@ const IllnessAndCondition = ({ onComplete }) => {
               type="primary"
               style={{
                 background: "#335CAD",
-                padding: 20,
-                fontSize: "15px",
+                padding: isMobile ? "10px" : "20px",
+                fontSize: isMobile ? "13px" : "15px",
                 fontWeight: "bold",
+                width: isMobile ? "100%" : "auto",
               }}
             >
               {question.sub}
@@ -986,11 +1001,25 @@ const IllnessAndCondition = ({ onComplete }) => {
 
             {question.subQuestions.map((subQuestion) => (
               <div key={subQuestion.name} style={{ marginTop: 20 }}>
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <div style={{ flex: 1, fontSize: "15px", color: "#000" }}>
+                <div style={{ 
+                  display: "flex", 
+                  alignItems: "center",
+                  flexDirection: isMobile ? "column" : "row",
+                  gap: isMobile ? "10px" : "0"
+                }}>
+                  <div style={{ 
+                    flex: 1, 
+                    fontSize: isMobile ? "13px" : "15px", 
+                    color: "#000",
+                    width: isMobile ? "100%" : "auto"
+                  }}>
                     {subQuestion.text}
                   </div>
-                  <div style={{ display: "flex" }}>
+                  <div style={{ 
+                    display: "flex",
+                    width: isMobile ? "100%" : "auto",
+                    justifyContent: isMobile ? "space-between" : "flex-start"
+                  }}>
                     <Radio
                       style={{ marginRight: "10px" }}
                       checked={answers[subQuestion.name] === "yes"}
@@ -1008,14 +1037,18 @@ const IllnessAndCondition = ({ onComplete }) => {
                 </div>
               </div>
             ))}
-<Input
-  placeholder="Others"
-  style={{ marginTop: 20 }}
-  value={answers[`${question.name}_others`] || ""}
-  onChange={(e) =>
-    handleChange(e.target.value.trim(), `${question.name}_others`)
-  }
-/>          </div>
+            <Input
+              placeholder="Others"
+              style={{ 
+                marginTop: 20,
+                width: "100%"
+              }}
+              value={answers[`${question.name}_others`] || ""}
+              onChange={(e) =>
+                handleChange(e.target.value.trim(), `${question.name}_others`)
+              }
+            />
+          </div>
         );
 
       default:
@@ -1033,19 +1066,28 @@ const IllnessAndCondition = ({ onComplete }) => {
     ((currentQuestionIndex + 1) / totalQuestions) * 100;
 
   return (
-    <Row gutter={16} style={{ padding: "0 5%" }}>
+    <Row gutter={16} style={{ padding: isMobile ? "0 2%" : "0 5%" }}>
       <Col xs={24} sm={24} md={24} lg={24} xl={24}>
         <FormWrapper name="FEMALE INTAKE QUESTIONNAIRE" />
         <Progress
           percent={Math.round(progressPercentage)}
           strokeColor={progressColor}
         />
-        <h3 style={{ margin: "20px 0", color: "#F2AA93" }}>
+        <h3 style={{ 
+          margin: "20px 0", 
+          color: "#F2AA93",
+          fontSize: isMobile ? "16px" : "18px"
+        }}>
           {label}
           {questions[currentQuestionIndex].title}
         </h3>
 
-        <h3 style={{ margin: "20px 0", color: "#000", fontWeight:"600", fontSize: "15px" }}>
+        <h3 style={{ 
+          margin: "20px 0", 
+          color: "#000", 
+          fontWeight:"600", 
+          fontSize: isMobile ? "13px" : "15px" 
+        }}>
           {questions[currentQuestionIndex].question}
         </h3>
         {renderInput(questions[currentQuestionIndex])}

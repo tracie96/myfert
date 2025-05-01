@@ -53,7 +53,7 @@ const questions = [
     name: "engage_in_regular_exercise",
   },
   {
-    title: "How confident are you of your ability to organize and follow through on the previous question’s health-related activities?",
+    title: "How confident are you of your ability to organize and follow through on the previous question's health-related activities?",
     type: "confidence_scale_with_textarea",
     question:
       "Rate on a scale of 5 (very confident), to 1 (not confident at all):",
@@ -253,7 +253,8 @@ const Readiness = ({ onComplete }) => {
                 style={{
                   color: "#335CAD",
                   fontWeight: "bold",
-                  fontSize: "14px",
+                  fontSize: isMobile ? "12px" : "14px",
+                  marginBottom: isMobile ? "5px" : "10px"
                 }}
               >
                 {question.sub}
@@ -263,13 +264,14 @@ const Readiness = ({ onComplete }) => {
                 {/* {question.title} */}
               </p>
             )}
-            <br />
             <div
               style={{
                 display: "flex",
-                justifyContent: "space-around",
+                justifyContent: "space-between",
                 marginTop: "10px",
-                width: isMobile ? "100%" : 400,
+                width: "100%",
+                maxWidth: isMobile ? "100%" : "400px",
+                gap: isMobile ? "5px" : "10px"
               }}
             >
               {[...Array(5)].map((_, i) => (
@@ -277,11 +279,11 @@ const Readiness = ({ onComplete }) => {
                   key={i}
                   onClick={() => handleChange(i + 1, question.name)}
                   style={{
-                    width: "30px",
-                    height: "30px",
+                    width: isMobile ? "40px" : "30px",
+                    height: isMobile ? "40px" : "30px",
                     border: "1px solid #00ADEF",
                     display: "flex",
-                    padding: 30,
+                    padding: isMobile ? 20 : 30,
                     justifyContent: "center",
                     alignItems: "center",
                     cursor: "pointer",
@@ -292,6 +294,7 @@ const Readiness = ({ onComplete }) => {
                         : "transparent",
                     color:
                       answers[question.name] === i + 1 ? "#fff" : "#00ADEF",
+                    fontSize: isMobile ? "14px" : "16px"
                   }}
                 >
                   {i + 1}
@@ -302,29 +305,39 @@ const Readiness = ({ onComplete }) => {
         );
       case "long_textarea":
         return (
-          <div style={{ flexDirection: "column" }}>
+          <div style={{ flexDirection: "column", width: "100%" }}>
             <Input.TextArea
               className="input_questtionnaire"
               name={question.name}
               value={answers[question.name] || ""}
               onChange={(e) => handleChange(e.target.value, question.name)}
-              rows={4}
-              style={{ marginTop: "10px" }}
+              rows={isMobile ? 3 : 4}
+              style={{ 
+                marginTop: "10px",
+                width: "100%",
+                fontSize: isMobile ? "14px" : "16px"
+              }}
             />
           </div>
         );
       case "confidence_scale_with_textarea":
         return (
-          <div style={{ marginTop: "20px" }}>
-            <p style={{ marginBottom: "10px", color: "#000" }}>
+          <div style={{ marginTop: "20px", width: "100%" }}>
+            <p style={{ 
+              marginBottom: "10px", 
+              color: "#000",
+              fontSize: isMobile ? "12px" : "14px"
+            }}>
               {question.sub}
             </p>
             <div
               style={{
                 display: "flex",
-                justifyContent: "space-around",
+                justifyContent: "space-between",
                 marginTop: "10px",
-                width: 400,
+                width: "100%",
+                maxWidth: isMobile ? "100%" : "400px",
+                gap: isMobile ? "5px" : "10px"
               }}
             >
               {[...Array(5)].map((_, i) => (
@@ -332,11 +345,11 @@ const Readiness = ({ onComplete }) => {
                   key={i}
                   onClick={() => handleChange(i + 1, question.name)}
                   style={{
-                    width: "30px",
-                    height: "30px",
+                    width: isMobile ? "40px" : "30px",
+                    height: isMobile ? "40px" : "30px",
                     border: "1px solid #00ADEF",
                     display: "flex",
-                    padding: 30,
+                    padding: isMobile ? 20 : 30,
                     justifyContent: "center",
                     alignItems: "center",
                     cursor: "pointer",
@@ -347,13 +360,20 @@ const Readiness = ({ onComplete }) => {
                         : "transparent",
                     color:
                       answers[question.name] === i + 1 ? "#fff" : "#00ADEF",
+                    fontSize: isMobile ? "14px" : "16px"
                   }}
                 >
                   {i + 1}
                 </div>
               ))}
             </div>
-            <p style={{ marginTop: "10px", color: "#000", fontWeight:"600", }}>
+            <p style={{ 
+              marginTop: "10px", 
+              color: "#000", 
+              fontWeight:"600",
+              fontSize: isMobile ? "12px" : "14px",
+              lineHeight: "1.4"
+            }}>
               If you are not confident of your ability, what aspects of yourself
               or your life lead you to question your capacity to follow through?
             </p>
@@ -364,8 +384,12 @@ const Readiness = ({ onComplete }) => {
               onChange={(e) =>
                 handleChange(e.target.value, `${question.name}_details`)
               }
-              rows={4}
-              style={{ marginTop: "10px", width: "100%" }}
+              rows={isMobile ? 3 : 4}
+              style={{ 
+                marginTop: "10px", 
+                width: "100%",
+                fontSize: isMobile ? "14px" : "16px"
+              }}
             />
           </div>
         );
@@ -388,13 +412,26 @@ const Readiness = ({ onComplete }) => {
           percent={Math.round(progressPercentage)}
           strokeColor={progressColor}
         />
-        <h3 style={{ margin: "20px 0", color: "#F2AA93" }}>
+        <h3 style={{ margin: "20px 0", color: "#F2AA93", fontSize: isMobile ? "18px" : "24px" }}>
           Readiness Assessment
         </h3>
-        <i style={{ margin: "20px 0", color: "#000", fontWeight:"400", fontSize: "15px" }}>
+        <i style={{ 
+          margin: "20px 0", 
+          color: "#000", 
+          fontWeight:"400", 
+          fontSize: isMobile ? "13px" : "15px",
+          display: "block",
+          lineHeight: "1.4"
+        }}>
           {questions[currentQuestionIndex].question}
         </i>
-        <h5 style={{ margin: "20px 0", color: "#000", fontWeight:"600", fontSize: "15px" }}>
+        <h5 style={{ 
+          margin: "20px 0", 
+          color: "#000", 
+          fontWeight:"600", 
+          fontSize: isMobile ? "14px" : "15px",
+          lineHeight: "1.4"
+        }}>
           {label}{questions[currentQuestionIndex]?.title}
         </h5>
         {renderInput(questions[currentQuestionIndex])}

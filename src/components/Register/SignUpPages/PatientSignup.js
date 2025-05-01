@@ -300,6 +300,7 @@ const PatientSignup = () => {
       [name]: value,
     }));
   };
+  console.log(formValues)
 
   const handleFinish = async (values) => {
     const allFormValues = { ...formValues, ...values };
@@ -329,10 +330,11 @@ const PatientSignup = () => {
         weight: parseFloat(allFormValues.Weight) || 0,
         MetricImperial: unit === "Metric",
         Pronouns: selectedPronoun?.value,
-        Gender: "Male",
-        PartnerSex: "Female",
+        Gender: "Female",
+        PartnerSex: allFormValues.PartnerFirstName ? "Male" : undefined,
         PartnerPronouns: selectedPartnerPronoun?.value,
         dob: dob,
+        PartnerDob: allFormValues.PartnerDob,
       };
 
       const response = await dispatch(postRegister(processedValues));

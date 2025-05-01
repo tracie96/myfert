@@ -970,6 +970,17 @@ export default function PatDash() {
             onOk={handleOk}
             centered
             onCancel={handleCancel}
+            width={600}
+            bodyStyle={{ 
+              display: 'flex', 
+              justifyContent: 'flex-start', 
+              alignItems: 'center',
+              padding: '40px 0',
+              marginLeft: '-24px'
+            }}
+            style={{
+              maxWidth: '100%'
+            }}
             footer={[
               <Button key="cancel" onClick={handleCancel}>
                 Cancel
@@ -977,7 +988,17 @@ export default function PatDash() {
             ]}
           >
             {cycleInfo && cycleInfo.cycleInfo ? (
-              <CircleWithArc cycleInfo={cycleInfo} dummyInfo={cycleData} />
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'flex-start', 
+                alignItems: 'center',
+                width: '100%',
+                height: '100%',
+                marginLeft: 0,
+                paddingLeft: 0
+              }}>
+                <CircleWithArc cycleInfo={cycleInfo} dummyInfo={cycleData} />
+              </div>
             ) : (
               <div>
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
@@ -985,7 +1006,7 @@ export default function PatDash() {
                     It looks like your Mira account hasn't been set up yet, or the email you used for Mira doesn't match the one for MFL.
                   </p>
                 </div>
-
+                
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                   <img src={IFM} alt="ifm" style={{ width: "50%", margin: 'auto' }} />
                 </div>

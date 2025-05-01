@@ -52,6 +52,7 @@ const PatientAppointment = () => {
   const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
 
   const [events, setEvents] = useState([]);
+  console.log({events})
   useEffect(() => {
     function start() {
       gapi.client
@@ -79,7 +80,7 @@ const PatientAppointment = () => {
     }
 
     gapi.load('client:auth2', start);
-  }, []);
+  }, [API_KEY_MAIL, CLIENT_ID_MAIL]);
 
 
   const handleAuthClick = () => {

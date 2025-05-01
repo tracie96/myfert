@@ -18,7 +18,7 @@ import FormWrapper from "../FormWrapper";
 import "./styles.css";
 import { useMediaQuery } from "react-responsive";
 import { DeleteTwoTone, EditTwoTone } from "@ant-design/icons";
-import { backBtnTxt, exitBtnTxt } from "../../../../../utils/constant";
+import { backBtnTxt, exitBtnTxt, saveAndContinueBtn, submitBtn } from "../../../../../utils/constant";
 
 const { Option } = Select;
 
@@ -1217,8 +1217,8 @@ const CurrentLifeStyle = ({ onComplete }) => {
           )}
         </h3>
         {renderInput(questions[currentQuestionIndex])}
-        <div
-          style={{ margin: "20px 0", marginTop: isMobile ? 50 : 200, height: 40, position: 'fixedp' }}
+            <div
+          style={{ margin: "20px 0", marginTop: isMobile ? 50 : 200 }}
           className="button_group"
         >
           {isMobile ? (
@@ -1240,9 +1240,8 @@ const CurrentLifeStyle = ({ onComplete }) => {
                 type="primary"
                 className="submit-button"
                 onClick={handleSubmit}
-                style={{padding:'20px', height:'48px'}}
               >
-                Submit
+                {submitBtn}
               </Button>
               {isMobile ? (
                 <Button onClick={handleExit} className="previous-button">
@@ -1265,7 +1264,7 @@ const CurrentLifeStyle = ({ onComplete }) => {
                 className="save-button"
                 onClick={handleSave}
               >
-                Save & Continue
+                {saveAndContinueBtn}
               </Button>
               {isMobile ? (
                 <Button onClick={handleExit} className="previous-button">

@@ -139,8 +139,11 @@ function Login() {
                 onChange={handleChange("email")}
                 style={{
                   height: "41px",
+                  fontSize: "16px",
                   background: "#E4E5E7",
                   border: "none",
+                  touchAction: "manipulation",
+                  WebkitAppearance: "none",
                 }}
               />
             </Form.Item>
@@ -159,8 +162,11 @@ function Login() {
                   border: "none",
                   textAlign: "center",
                   display: "flex",
+                  fontSize: "16px",
                   justifyContent: "center",
                   alignItems: "center",
+                  touchAction: "manipulation",
+                  WebkitAppearance: "none",
                 }}
               />
             </Form.Item>

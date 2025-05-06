@@ -159,3 +159,28 @@ html {
     width: 100%;
   }
 }
+
+/* Login component specific styles */
+.login-container input,
+.login-container .ant-input,
+.login-container .ant-input-password,
+.login-container .ant-input-password input {
+  font-size: 16px !important;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-appearance: none;
+  touch-action: manipulation;
+}
+
+/* Additional form styles */
+.form-container input,
+.form-container .ant-input,
+.form-container .ant-input-password input {
+  font-size: 16px !important;
+}
+
+/* General anti-zoom styles */
+input, textarea, select, button {
+  font-size: 16px !important;
+  touch-action: manipulation;
+}

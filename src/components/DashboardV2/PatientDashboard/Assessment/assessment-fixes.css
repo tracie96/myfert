@@ -1,0 +1,38 @@
+/* Prevent zoom on form inputs for Assessment module */
+.input_questionnaire,
+input.input_questionnaire,
+.input_questtionnaire,
+input.input_questtionnaire,
+.form-container input,
+.ant-input,
+.ant-input-password input,
+input[type="text"],
+input[type="date"],
+input[type="number"],
+select,
+textarea {
+  font-size: 16px !important;
+  -webkit-text-size-adjust: 100% !important;
+  -webkit-appearance: none !important;
+  touch-action: manipulation !important;
+}
+
+/* Apply to Radio buttons and checkboxes */
+.ant-radio-wrapper,
+.ant-checkbox-wrapper,
+.ant-radio-wrapper span,
+.ant-checkbox-wrapper span {
+  font-size: 16px !important;
+}
+
+/* Ensure all interactive elements have minimum touch target size */
+button, 
+.ant-btn,
+[role="button"],
+input, 
+select, 
+textarea {
+  min-height: 44px !important;
+  min-width: 44px !important;
+  touch-action: manipulation !important;
+} 

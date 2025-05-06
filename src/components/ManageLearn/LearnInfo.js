@@ -19,7 +19,6 @@ const LearnInfo = ({ tabInfo }) => {
     showSpinner: false,
     previewLinkDto: [],
   });
-  console.log(userAuth);
   const fetchPreviewLinkListData = useCallback(async () => {
     setState((prevState) => ({ ...prevState, showSpinner: true }));
     try {

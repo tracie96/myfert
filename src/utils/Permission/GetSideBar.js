@@ -43,18 +43,13 @@ export const GetSideBar = () => {
         return "3";
       case "/patient/meds":
           return "5";
-      case "/patient/appointment":
-        return "10";
-      case "/plans":
-        return "7";
-      case "/pre-plan":
-        return "9";
-      case "/second-plan":
+      case "/learn":
         return "8";
       case "/patient/labs":
         return "9";
-      case "/calendar":
+      case "/patient/services":
         return "6";
+     
       default:
         return "1";
     }

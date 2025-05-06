@@ -1,6 +1,6 @@
 import React, { useEffect, useState }  from "react";
-import { useSelector } from "react-redux";
-import { Avatar, Dropdown, Menu } from "antd";
+import { useSelector, useDispatch } from "react-redux";
+import { Dropdown, Menu } from "antd";
 import {
   UserOutlined,
   DownOutlined,
@@ -10,18 +10,31 @@ import {
 } from "@ant-design/icons";
 import { NavLink } from "react-router-dom";
 import { useMediaQuery } from "react-responsive";
+import { getUserProfile } from "../redux/AuthController";
 
 const defaultIconImage = "img/undraw_profile.svg";
 
 const UserDropdown = ({ userAuth, setShowModal }) => {
   const profileUser = useSelector((state) => state.profile.userData);
   const [displayUser, setDisplayUser] = useState(profileUser);
-  useEffect(() => {
-    if (profileUser) {
-      setDisplayUser(profileUser);
-    }
-  }, [profileUser]);
+  const dispatch = useDispatch();
 
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      const response = await dispatch(getUserProfile());
+      console.log({response});
+      if (response.payload) {
+        setDisplayUser(response.payload.picture);
+      }
+    };
+    
+    fetchUserProfile();
+  }, [dispatch]);
+
+  const handleLogout = async () => {
+  
+    setShowModal(true);
+  };
 
   const menu = (
     <Menu>
@@ -35,7 +48,7 @@ const UserDropdown = ({ userAuth, setShowModal }) => {
         <NavLink to="/settings">Settings</NavLink>
       </Menu.Item>
       <Menu.Divider />
-      <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={() => setShowModal(true)}>
+      <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
         <button
           style={{
             border: "none",
@@ -58,13 +71,14 @@ const UserDropdown = ({ userAuth, setShowModal }) => {
         onClick={(e) => e.preventDefault()}
         style={{ display: "flex", alignItems: "center"}}
       >
-        <Avatar
-          src={userAuth.obj.profile ?? defaultIconImage}
+        <img src={displayUser || defaultIconImage} alt={userAuth.obj.firstName} style={{ width: 42, height: 32, borderRadius: "50%", marginRight: 8 }} />
+        {/* <Avatar
+          src={displayUser?.profile || userAuth.obj.profile || defaultIconImage}
           alt={userAuth.obj.firstName}
           icon={<UserOutlined />}
           size="small"
           style={{ marginRight: 8 }}
-        />
+        /> */}
         {isMobile?"":
         <span style={{ marginRight: 8, color: "#595959", fontSize: "14px" }}>
           {displayUser?.firstName || userAuth.obj.firstName} {displayUser?.lastName || userAuth.obj.lastName}

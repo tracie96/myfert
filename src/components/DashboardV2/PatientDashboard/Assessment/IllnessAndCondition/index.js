@@ -519,7 +519,7 @@ const IllnessAndCondition = ({ onComplete }) => {
       case "multi_yes_no":
         const hasValidAnswer = question.subQuestions.some(
           (subQuestion) =>
-            answers[subQuestion.name] === "yes" || answers[subQuestion.name] === "no"
+              answers[subQuestion.name] === "yes" || answers[subQuestion.name] === "no" || answers[subQuestion.name] === "n/a"
         );
   
         const hasOthersAnswer =
@@ -1032,6 +1032,12 @@ const IllnessAndCondition = ({ onComplete }) => {
                       onChange={() => handleChange("no", subQuestion.name)}
                     >
                       Past
+                    </Radio>
+                    <Radio
+                      checked={answers[subQuestion.name] === "n/a"}
+                      onChange={() => handleChange("n/a", subQuestion.name)}
+                    >
+                      N/A
                     </Radio>
                   </div>
                 </div>

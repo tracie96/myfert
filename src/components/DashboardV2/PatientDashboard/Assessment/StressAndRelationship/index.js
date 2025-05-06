@@ -443,7 +443,7 @@ const StressAndRelationship = ({ onComplete }) => {
   };
 
   const renderInput = (question) => {
-    switch (question.type) {
+    switch (question?.type) {
       case "radio":
         return (
           <Radio.Group

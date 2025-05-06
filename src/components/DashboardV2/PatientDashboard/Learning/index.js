@@ -14,25 +14,39 @@ const LearnInfo = () => {
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [videos, setVideos] = useState([
     {
+      id: 'understanding',
+      title: 'Understanding Cycle Hormones',
+      duration: '4:16',
+      completed: false,
+      url: 'https://www.youtube.com/embed/BXe6zn0m7h4'
+    },
+    {
       id: 'menstrual',
       title: 'Menstrual Cycle 101',
       duration: '19:17',
       completed: false,
-      url: 'https://www.loom.com/embed/cf0959fd0b8d4344939a9feac194502e'
+      url: 'https://www.youtube.com/embed/FhW76RjE7RY'
     },
     {
       id: 'fertile',
       title: 'Identifying the Fertile Window',
       duration: '10:45',
       completed: false,
-      url: 'https://www.loom.com/embed/f683c921a51140498060e8302f9e61f3'
+      url: 'https://www.youtube.com/embed/nrs_mhEOis0'
     },
     {
       id: 'bloodwork',
       title: 'Timing Menstrual Cycle Bloodwork',
       duration: '6:09',
       completed: false,
-      url: 'https://www.loom.com/embed/2c595f7fc62e4c86beca9ee15bbd51ed'
+      url: 'https://www.youtube.com/embed/btZOPyzBXVk'
+    },
+    {
+      id: 'optional',
+      title: 'Using Ovulation Tests',
+      duration: '9:59',
+      completed: false,
+      url: 'https://www.youtube.com/embed/vOsXmnIw1Gk'
     }
   ]);
   const isMobile = useMediaQuery({ maxWidth: 767 });
@@ -114,14 +128,19 @@ const LearnInfo = () => {
             height: '100%'
           }}>
             {selectedVideo ? (
-              <div style={{ width: '100%', position: 'relative', paddingBottom: '56.25%' }}>
+              <div style={{ 
+                width: '100%', 
+                position: 'relative', 
+                paddingBottom: isMobile ? '75%' : '56.25%',
+                maxHeight: isMobile ? '500px' : 'auto'
+              }}>
                 <iframe
                   src={selectedVideo.url}
-                  title="Menstrual Cycle 101"
+                  title={selectedVideo.title}
                   frameBorder="0"
                   allowFullScreen
-                  webkitallowfullscreen
-                  mozallowfullscreen
+                  webkitallowfullscreen="true"
+                  mozallowfullscreen="true"
                   style={{
                     position: 'absolute',
                     top: 0,
@@ -131,19 +150,24 @@ const LearnInfo = () => {
                     borderRadius: '8px'
                   }}
                 />
-               <p style={{ marginTop: '15px', color: '#666' }}>Timing Menstrual Cycle Bloodwork, Identifying the Fertile Window, and Using Ovulation Tests</p>
+               <p style={{ marginTop: isMobile ? '20px' : '15px', color: '#666' }}>Timing Menstrual Cycle Bloodwork, Identifying the Fertile Window, and Using Ovulation Tests</p>
 
               </div>
             ) : (
-              <div style={{ width: '100%', position: 'relative', paddingBottom: '56.25%' }}>
+              <div style={{ 
+                width: '100%', 
+                position: 'relative', 
+                paddingBottom: isMobile ? '75%' : '56.25%',
+                maxHeight: isMobile ? '500px' : 'auto'
+              }}>
 
                  <iframe
-                  src='https://www.loom.com/embed/cf0959fd0b8d4344939a9feac194502e'
-                  title="Menstrual Cycle 101"
+                  src="https://www.youtube.com/embed/BXe6zn0m7h4"
+                  title="Understanding Cycle Hormones"
                   frameBorder="0"
                   allowFullScreen
-                  webkitallowfullscreen
-                  mozallowfullscreen
+                  webkitallowfullscreen="true"
+                  mozallowfullscreen="true"
                   style={{
                     position: 'absolute',
                     top: 0,
@@ -155,7 +179,7 @@ const LearnInfo = () => {
                 />
               </div>
             )}
-         <p style={{ marginTop: '15px', color: '#666' }}>Timing Menstrual Cycle Bloodwork, Identifying the Fertile Window, and Using Ovulation Tests</p>
+         <p style={{ marginTop: isMobile ? '20px' : '15px', color: '#666' }}>Timing Menstrual Cycle Bloodwork, Identifying the Fertile Window, and Using Ovulation Tests</p>
 
           </div>
         </Col>

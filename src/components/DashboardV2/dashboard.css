@@ -42,3 +42,6 @@ ul{
 .ant-steps-item-title{
   display: block !important; 
 }
+.ant-tabs .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn{
+  color: #01acee !important;
+}

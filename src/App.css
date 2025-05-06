@@ -128,8 +128,28 @@ hr {
   overflow: visible;
 }
 input, textarea, select, button {
-  font-size: 16px;
+  font-size: 16px !important;
+  font-size: max(16px, 1rem) !important; /* Ensures minimum font size is 16px */
+  touch-action: manipulation; /* Prevents double-tap zoom */
+  -webkit-text-size-adjust: 100%; /* Prevents iOS text size adjustment */
 }
+
+/* Additional mobile-specific fixes */
+@media screen and (max-width: 768px) {
+  input, textarea, select, button {
+    font-size: 16px !important; /* Prevents zoom on iOS */
+  }
+  
+  /* Target Ant Design form controls */
+  .ant-input, 
+  .ant-input-password input,
+  .ant-select-selection-search-input,
+  .ant-picker-input > input,
+  .ant-input-number-input {
+    font-size: 16px !important;
+  }
+}
+
 h1,
 h2,
 h3,
@@ -3893,10 +3913,6 @@ input[type="button"].btn-block {
 
 .input-group-prepend {
   margin-right: -1px;
-}
-
-.input-group-append {
-  margin-left: -1px;
 }
 
 .input-group-text {

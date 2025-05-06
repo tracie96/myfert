@@ -206,25 +206,61 @@ const questions = [
 const StressAndRelationship = ({ onComplete }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
-  const totalQuestions = questions.length;
+  const [isQuestionsLoaded, setIsQuestionsLoaded] = useState(false);
+  const [questionLoadError, setQuestionLoadError] = useState(null);
+  const totalQuestions = questions?.length || 0;
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const isMobile = useMediaQuery({ maxWidth: 767 });
 
   useEffect(() => {
-    const savedIndex = parseInt(
-      localStorage.getItem("currentQuestionIndex5"),
-      10,
-    );
-    const savedAnswers = JSON.parse(localStorage.getItem("answers"));
-    if (!isNaN(savedIndex) && savedAnswers) {
-      setCurrentQuestionIndex(savedIndex);
-      setAnswers(savedAnswers);
+    // Validate questions array is not empty
+    if (questions && Array.isArray(questions) && questions.length > 0) {
+      console.log("Questions loaded successfully: ", questions.length);
+      setIsQuestionsLoaded(true);
+      setQuestionLoadError(null);
+    } else {
+      const errorMsg = 'Questions array is empty or invalid';
+      console.error(errorMsg, questions);
+      setIsQuestionsLoaded(false);
+      setQuestionLoadError(errorMsg);
     }
-  }, []);
+
+    // Load saved data
+    try {
+      const savedIndex = parseInt(
+        localStorage.getItem("currentQuestionIndex5"),
+        10,
+      );
+      const savedAnswers = JSON.parse(localStorage.getItem("answers"));
+      if (!isNaN(savedIndex) && savedAnswers) {
+        setCurrentQuestionIndex(savedIndex < totalQuestions ? savedIndex : 0);
+        setAnswers(savedAnswers);
+      }
+    } catch (error) {
+      console.error('Error loading saved data:', error);
+      // Reset to defaults
+      localStorage.setItem("currentQuestionIndex5", "0");
+      setCurrentQuestionIndex(0);
+    }
+  }, [totalQuestions]);
+
+  // Add a safety check to prevent accessing an invalid question
+  const getCurrentQuestion = () => {
+    if (!questions || !Array.isArray(questions) || questions.length === 0) {
+      return null;
+    }
+    
+    if (currentQuestionIndex < 0 || currentQuestionIndex >= questions.length) {
+      console.error(`Invalid question index: ${currentQuestionIndex}`);
+      return null;
+    }
+    
+    return questions[currentQuestionIndex];
+  };
 
   const validateQuestion = () => {
-    const question = questions[currentQuestionIndex];
+    const question = getCurrentQuestion();
   
     switch (question.type) {
       case "checkbox": {
@@ -303,14 +339,28 @@ const StressAndRelationship = ({ onComplete }) => {
     </span>
   );
   const handleSave = () => {
+    if (!getCurrentQuestion()) {
+      message.error("Cannot save: Question data is not properly loaded. Please refresh the page.");
+      return;
+    }
+    
     if (!validateQuestion()) {
       message.error("Please answer the current question before saving.");
       return;
     }
-    localStorage.setItem("currentQuestionIndex5", 0);
-    localStorage.setItem("answers", JSON.stringify(answers));
-    if (currentQuestionIndex < totalQuestions - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    
+    try {
+      localStorage.setItem("currentQuestionIndex5", currentQuestionIndex.toString());
+      localStorage.setItem("answers", JSON.stringify(answers));
+      
+      if (currentQuestionIndex < totalQuestions - 1) {
+        setCurrentQuestionIndex(currentQuestionIndex + 1);
+      }
+      
+      message.success("Progress saved successfully!");
+    } catch (error) {
+      console.error("Error saving progress:", error);
+      message.error("Failed to save progress. Please try again.");
     }
   };
   const handlePrevious = () => {
@@ -329,70 +379,91 @@ const StressAndRelationship = ({ onComplete }) => {
     navigate("/assessment");
   };
   const handleSubmit = () => {
+    if (!getCurrentQuestion()) {
+      message.error("Cannot submit: Question data is not properly loaded. Please refresh the page.");
+      return;
+    }
+    
     if (!validateQuestion()) {
       message.error("Please answer the current question before Submitting.");
       return;
     }
+    
     // Map form data to API structure
-    const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
-    const token = userInfo.obj.token || "";
-    const mappedData = {
-      excessStress: answers.do_you_feel_stress === "Yes",
-      easyToHandleStress: answers.can_you_handle_stress === "Yes",
-      stressFromWork: answers.health_stress_work || 0,
-      stressFromFamily: answers.health_stress_family || 0,
-      stressFromSocial: answers.health_stress_social || 0,
-      stressFromFinances: answers.health_stress_financies || 0,
-      stressFromHealth: answers.health_stress_health || 0,
-      stressFromOther: answers.health_stress_other || 0,
-      relaxationTechniques: answers.relaxation_techniques === "Yes",
-      oftenRelaxationTechniques: answers.how_often_reaxation || "N/A",
-      typeRelaxationTechniques: answers.special_nutritional_program?.join(", ") || "N/A",
-      soughtCounselling: answers.have_you_sought_counselling === "Yes",
-      currentlyInTherapy: answers.current_therapy === "Yes",
-      describeTherapy: answers.where_and_where_received_medical_care || "N/A",
-      abused: answers.been_abused === "Yes",
-      hobbiesLeisure: "N/A", 
-      maritalStatus: answers.marital_status || "N/A",
-      whoDoYouLiveWith: answers.who_do_you_live_with || "N/A",
-      currentOccupation: answers.current_occupation?.trim() || "N/A",
-      previousOccupation: answers.previous_occupation?.trim() || "N/A",
-      emotionalSupport: answers.resourcces_for_emotional_support || [],
-      religiousPractice: answers.spiritual_practice === "Yes",
-      typeReligiousPractice:answers.spiritual_practice_desciption || "N/A",
-    };
+    try {
+      const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
+      const token = userInfo.obj?.token || "";
+      
+      if (!token) {
+        message.error("Authentication failed. Please log in again.");
+        return;
+      }
+      
+      const mappedData = {
+        excessStress: answers.do_you_feel_stress === "Yes",
+        easyToHandleStress: answers.can_you_handle_stress === "Yes",
+        stressFromWork: answers.health_stress_work || 0,
+        stressFromFamily: answers.health_stress_family || 0,
+        stressFromSocial: answers.health_stress_social || 0,
+        stressFromFinances: answers.health_stress_financies || 0,
+        stressFromHealth: answers.health_stress_health || 0,
+        stressFromOther: answers.health_stress_other || 0,
+        relaxationTechniques: answers.relaxation_techniques === "Yes",
+        oftenRelaxationTechniques: answers.how_often_reaxation || "N/A",
+        typeRelaxationTechniques: answers.special_nutritional_program?.join(", ") || "N/A",
+        soughtCounselling: answers.have_you_sought_counselling === "Yes",
+        currentlyInTherapy: answers.current_therapy === "Yes",
+        describeTherapy: answers.where_and_where_received_medical_care || "N/A",
+        abused: answers.been_abused === "Yes",
+        hobbiesLeisure: "N/A", 
+        maritalStatus: answers.marital_status || "N/A",
+        whoDoYouLiveWith: answers.who_do_you_live_with || "N/A",
+        currentOccupation: answers.current_occupation?.trim() || "N/A",
+        previousOccupation: answers.previous_occupation?.trim() || "N/A",
+        emotionalSupport: answers.resourcces_for_emotional_support || [],
+        religiousPractice: answers.spiritual_practice === "Yes",
+        typeReligiousPractice:answers.spiritual_practice_desciption || "N/A",
+      };
   
-    // Send data to API
-    fetch("https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/AddStress", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        accept: "text/plain",
-        Authorization: `${token}`,
-
-      },
-      body: JSON.stringify(mappedData),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to submit the form");
-        }
-        return response.json();
+      // Send data to API
+      fetch("https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/AddStress", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          accept: "text/plain",
+          Authorization: `${token}`,
+        },
+        body: JSON.stringify(mappedData),
       })
-      .then(() => {
-        message.success("Form submitted successfully!");
-        dispatch(completeCard("/questionnaire/5"));
-        localStorage.setItem("currentQuestionIndex5", 0);
-        localStorage.setItem("answers", JSON.stringify(answers));
-        navigate("/assessment");
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-        message.error("Failed to submit the form. Please try again.");
-      });
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`Failed to submit the form: ${response.status} ${response.statusText}`);
+          }
+          return response.json();
+        })
+        .then(() => {
+          message.success("Form submitted successfully!");
+          dispatch(completeCard("/questionnaire/5"));
+          localStorage.setItem("currentQuestionIndex5", "0");
+          localStorage.setItem("answers", JSON.stringify(answers));
+          navigate("/assessment");
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          message.error("Failed to submit the form. Please try again.");
+        });
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      message.error("Failed to submit the form. Please try again.");
+    }
   };
   
   const renderSubQuestions = (subQuestions) => {
+    if (!subQuestions || !Array.isArray(subQuestions) || subQuestions.length === 0) {
+      console.warn('No valid subQuestions provided:', subQuestions);
+      return null;
+    }
+    
     return subQuestions.map((subQuestion, index) => (
       <div key={index} style={{ marginTop: "20px" }}>
         <p>{subQuestion.type !== "text" && subQuestion.question}</p>
@@ -404,7 +475,7 @@ const StressAndRelationship = ({ onComplete }) => {
          ]}
        >
          <Input
-           placeholder={subQuestion.question}
+           placeholder={subQuestion.question || ""}
            value={answers[subQuestion.name] || ""}
            onChange={(e) => handleChange(e.target.value, subQuestion.name)}
            className="input_questtionnaire"
@@ -427,7 +498,7 @@ const StressAndRelationship = ({ onComplete }) => {
             value={answers[subQuestion.name]}
             style={{ width: "100%" }}
           >
-            {subQuestion.options.map((option, idx) => (
+            {(subQuestion.options || []).map((option, idx) => (
               <Radio
                 key={idx}
                 value={option}
@@ -443,7 +514,12 @@ const StressAndRelationship = ({ onComplete }) => {
   };
 
   const renderInput = (question) => {
-    switch (question?.type) {
+    if (!question || !question.type) {
+      console.error('Invalid question or question type:', question);
+      return null;
+    }
+    
+    switch (question.type) {
       case "radio":
         return (
           <Radio.Group
@@ -452,7 +528,7 @@ const StressAndRelationship = ({ onComplete }) => {
             value={answers[question.name]}
             style={{ width: "100%" }}
           >
-            {question.options.map((option, index) => (
+            {(question.options || []).map((option, index) => (
               <Radio
                 key={index}
                 value={option}
@@ -494,7 +570,7 @@ const StressAndRelationship = ({ onComplete }) => {
             value={answers[question.name]}
             style={{ width: "100%" }}
           >
-            {question.options.map((option, index) => (
+            {(question.options || []).map((option, index) => (
               <Radio
                 key={index}
                 value={option}
@@ -566,7 +642,7 @@ const StressAndRelationship = ({ onComplete }) => {
               type="primary"
               style={{ background: "#335CAD", padding: 20 }}
             >
-              {question.sub}
+              {question.sub || ""}
             </Button>
             <br />
             <Select
@@ -576,7 +652,7 @@ const StressAndRelationship = ({ onComplete }) => {
               onChange={(value) => handleChange(value, question.name)}
               style={{ marginTop: "10px", width: "100%" }}
             >
-              {question.selectOptions.map((option, index) => (
+              {(question.selectOptions || []).map((option, index) => (
                 <Option key={index} value={option}>
                   {option}
                 </Option>
@@ -594,7 +670,7 @@ const StressAndRelationship = ({ onComplete }) => {
             value={answers[question.name] || []}
             className="checkbox-group"
           >
-            {question.options.map((option, index) => (
+            {(question.options || []).map((option, index) => (
               <Checkbox key={index} value={option} className="checkbox-item">
                 {option === "Other" ? (
                   <>
@@ -634,7 +710,7 @@ const StressAndRelationship = ({ onComplete }) => {
               value={answers[question.name]}
               style={{ width: "100%" }}
             >
-              {question.options.map((option, index) => (
+              {(question.options || []).map((option, index) => (
                 <Radio
                   key={index}
                   value={option}
@@ -644,12 +720,13 @@ const StressAndRelationship = ({ onComplete }) => {
                 </Radio>
               ))}
             </Radio.Group>
-            {answers[question.name] === "Yes" &&
+            {answers[question.name] === "Yes" && question.subQuestions &&
               renderSubQuestions(question.subQuestions)}
           </div>
         );
 
       default:
+        console.warn('Unknown question type:', question.type);
         return null;
     }
   };
@@ -667,21 +744,43 @@ const StressAndRelationship = ({ onComplete }) => {
           percent={Math.round(progressPercentage)}
           strokeColor={progressColor}
         />
-        <h3 style={{ margin: "20px 0", color: "#F2AA93" }}>   
-        {label}
-          {questions[currentQuestionIndex]?.title
-            ?  questions[currentQuestionIndex]?.title
-            : "Stress"}
-        </h3>
+        
+        {!isQuestionsLoaded ? (
+          <div style={{ margin: "40px 0", textAlign: "center" }}>
+            <h3>Loading questions...</h3>
+            <p>If questions don't appear, please try refreshing the page.</p>
+            {questionLoadError && (
+              <p style={{ color: "red" }}>Error: {questionLoadError}</p>
+            )}
+          </div>
+        ) : (
+          <>
+            <h3 style={{ margin: "20px 0", color: "#F2AA93" }}>   
+              {label}
+              {getCurrentQuestion()?.title || "Stress"}
+            </h3>
 
-        <h3 style={{ margin: "20px 0", color: "#000", fontWeight:"600", fontSize: "15px" }}>
-          {questions[currentQuestionIndex]?.question}
-          <i style={{ color: "#335CAD", fontWeight: "bold" }}>
-            {" "}
-            {questions[currentQuestionIndex]?.sub}
-          </i>
-        </h3>
-        {renderInput(questions[currentQuestionIndex])}
+            {getCurrentQuestion() ? (
+              <>
+                <h3 style={{ margin: "20px 0", color: "#000", fontWeight:"600", fontSize: "15px" }}>
+                  {getCurrentQuestion().question || ""}
+                  {getCurrentQuestion().sub && (
+                    <i style={{ color: "#335CAD", fontWeight: "bold" }}>
+                      {" "}
+                      {getCurrentQuestion().sub}
+                    </i>
+                  )}
+                </h3>
+                {renderInput(getCurrentQuestion())}
+              </>
+            ) : (
+              <div style={{ margin: "20px 0", color: "#000", fontWeight:"600", fontSize: "15px" }}>
+                No question available. This could be due to an error loading the questions.
+                Please try refreshing the page or contact support if the issue persists.
+              </div>
+            )}
+          </>
+        )}
 
         <div
           style={{ margin: "20px 0", marginTop: isMobile ? 50 : 200 }}

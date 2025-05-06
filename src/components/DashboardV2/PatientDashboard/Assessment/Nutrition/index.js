@@ -741,7 +741,7 @@ const Nutrition = ({ onComplete }) => {
               name={question.name}
               value={answers[question.name] || ""}
               onChange={(value) => handleChange(value, question.name)}
-              style={{ marginTop: "10px", width: "50%" }}
+              style={{ width: "292px", marginTop: "10px" }}
             >
               {question.selectOptions.map((option, index) => (
                 <Option key={index} value={option}>

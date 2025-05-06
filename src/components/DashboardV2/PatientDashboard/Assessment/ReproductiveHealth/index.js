@@ -1644,7 +1644,7 @@ const ReproductiveHealth = ({ onComplete }) => {
     ((currentQuestionIndex + 1) / totalQuestions) * 100;
 
   return (
-<Row gutter={16} style={{ padding: "0 5%", height:"80vh" }}>
+<Row gutter={16} style={{ padding: "0 5%" }}>
   <Col
     xs={24}
     sm={24}
@@ -1668,7 +1668,6 @@ const ReproductiveHealth = ({ onComplete }) => {
         overflowY: "auto", 
         marginTop: "2%", 
         paddingRight: "20px",
-        height:"70%",
       }}
     >
       <div 

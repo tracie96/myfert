@@ -978,7 +978,7 @@ const CurrentLifeStyle = ({ onComplete }) => {
       case "text":
         return (
           <Input
-            style={{ width: "300px", borderColor: "#bcbcbc" }}
+            style={{ width: "292px", borderColor: "#bcbcbc" }}
             name={question.name}
             value={answers[question.name] || ""}
             onChange={(e) => handleChange(e.target.value, question.name)}
@@ -997,6 +997,7 @@ const CurrentLifeStyle = ({ onComplete }) => {
       case "select":
         return (
           <Select
+            style={{ width: "292px" }}
             className="select_questtionnaire"
             name={question.name}
             value={answers[question.name] || ""}

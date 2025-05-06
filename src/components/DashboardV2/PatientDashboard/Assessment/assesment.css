@@ -198,6 +198,12 @@ width: 150px !important;}
   margin-bottom: 30px;
 }
 
+@media only screen and (max-width: 600px) {
+  .info-box {
+    width: 100%;
+  }
+}
+
 .info-header {
   display: flex;
   align-items: center;

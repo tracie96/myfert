@@ -256,7 +256,7 @@ const GeneralIntakeForm = ({ onComplete }) => {
         return (
           <Input
             type="date"
-            style={{ width: "300px", borderColor: "#bcbcbc" }}
+            style={{ width: "292px", borderColor: "#bcbcbc" }}
             name={question.name}
             value={answers[question.name] || ""}
             required
@@ -266,6 +266,7 @@ const GeneralIntakeForm = ({ onComplete }) => {
       case "select":
         return (
           <Select
+          style={{ width: "292px" }}
             className="select_questtionnaire"
             name={question.name}
             value={answers[question.name] || ""}

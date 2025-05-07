@@ -85,6 +85,13 @@ width: 150px !important;}
   gap: 10px;
 }
 
+.checkbox-input-gr {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 10px;
+}
+
 .checkbox-item {
   width: calc(
     50% - 10px
@@ -200,6 +207,15 @@ width: 150px !important;}
 
 @media only screen and (max-width: 600px) {
   .info-box {
+    width: 100%;
+  }
+  .checkbox-input-gr {
+    grid-template-columns: 1fr;
+  }
+  .input-number-box input {
+    text-align: center !important;
+  }
+  .select_questtionnaire {
     width: 100%;
   }
 }

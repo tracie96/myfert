@@ -853,7 +853,8 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
                     max={10}
                     value={answers[question.name] || 1}
                     onChange={(value) => handleChange(value, question.name)}
-                    style={{ width: "100%" }}
+                    className="input-number-box"
+                    style={{ width: "100%", minWidth: "42px" }}
                     disabled={answers[`${question.name}_na`] || false}
                   />
                 </Col>
@@ -922,12 +923,7 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
       case "checkbox_with_input":
         return (
           <div
-            style={{
-              marginTop: "20px",
-              display: "grid",
-              gridTemplateColumns: "1fr 2fr",
-              gap: "10px",
-            }}
+          className="checkbox-input-gr"
           >
             {question.options.map((option, idx) => (
               <React.Fragment key={idx}>

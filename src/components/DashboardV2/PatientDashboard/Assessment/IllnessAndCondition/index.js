@@ -519,7 +519,7 @@ const IllnessAndCondition = ({ onComplete }) => {
       case "multi_yes_no":
         const hasValidAnswer = question.subQuestions.some(
           (subQuestion) =>
-              answers[subQuestion.name] === "mild" || answers[subQuestion.name] === "moderate" || answers[subQuestion.name] === "severe"
+              answers[subQuestion.name] === "yes" || answers[subQuestion.name] === "no" || answers[subQuestion.name] === "n/a"
         );
   
         const hasOthersAnswer =
@@ -593,62 +593,62 @@ const IllnessAndCondition = ({ onComplete }) => {
     const apiData = {
       gastroIntestinal: [
         {
-          yesNo: answers.irritableBowel === "mild" || answers.irritableBowel === "moderate" || answers.irritableBowel === "severe" || answers.crohns === "mild" || answers.crohns === "moderate" || answers.crohns === "severe" || answers.peptic_ulcer === "mild" || answers.peptic_ulcer === "moderate" || answers.peptic_ulcer === "severe",
-          describe: `${answers.irritableBowel ? `Irritable Bowel (${answers.irritableBowel}), ` : ""}${answers.crohns ? `Crohns (${answers.crohns}), ` : ""}${answers.peptic_ulcer ? `Peptic Ulcer (${answers.peptic_ulcer})` : ""}`,
+          yesNo: answers.irritableBowel === "yes" || answers.crohns === "yes" || answers.peptic_ulcer === "yes",
+          describe: `${answers.irritableBowel === "yes" ? "Irritable Bowel, " : ""}${answers.crohns === "yes" ? "Crohns, " : ""}${answers.peptic_ulcer === "yes" ? "Peptic Ulcer" : ""}`,
         },
       ],
       respiratory: [
         {
-          yesNo: answers.lung === "mild" || answers.lung === "moderate" || answers.lung === "severe",
-          describe: answers.lung ? `Lung (${answers.lung})` : "",
+          yesNo: answers.lung === "yes",
+          describe: answers.lung === "yes" ? "Lung" : "",
         },
       ],
       urinary: [
         {
-          yesNo: answers.kidney_stones === "mild" || answers.kidney_stones === "moderate" || answers.kidney_stones === "severe" || answers.interstitial_cystitis === "mild" || answers.interstitial_cystitis === "moderate" || answers.interstitial_cystitis === "severe",
-          describe: `${answers.kidney_stones ? `Kidney Stones (${answers.kidney_stones}), ` : ""}${answers.interstitial_cystitis ? `Interstitial Cystitis (${answers.interstitial_cystitis})` : ""}`,
+          yesNo: answers.kidney_stones === "yes" || answers.interstitial_cystitis === "yes",
+          describe: `${answers.kidney_stones === "yes" ? "Kidney Stones, " : ""}${answers.interstitial_cystitis === "yes" ? "Interstitial Cystitis" : ""}`,
         },
       ],
       endocrine: [
         {
-          yesNo: answers.hyperglycemia === "mild" || answers.hyperglycemia === "moderate" || answers.hyperglycemia === "severe" || answers.eating_disorder === "mild" || answers.eating_disorder === "moderate" || answers.eating_disorder === "severe" || answers["metabolic_syndrome/insulin_resistance"] === "mild" || answers["metabolic_syndrome/insulin_resistance"] === "moderate" || answers["metabolic_syndrome/insulin_resistance"] === "severe",
-          describe: `${answers.hyperglycemia ? `Hyperglycemia (${answers.hyperglycemia}), ` : ""}${answers.eating_disorder ? `Eating Disorder (${answers.eating_disorder}), ` : ""}${answers["metabolic_syndrome/insulin_resistance"] ? `Metabolic Syndrome/Insulin Resistance (${answers["metabolic_syndrome/insulin_resistance"]})` : ""}`,
+          yesNo: answers.hyperglycemia === "yes" || answers.eating_disorder === "yes" || answers["metabolic_syndrome/insulin_resistance"] === "yes" ,
+          describe: `${answers.hyperglycemia === "yes" ? "Hyperglycemia, " : ""}${answers.eating_disorder === "yes" ? "Eating Disorder, " : ""}${answers["metabolic_syndrome/insulin_resistance"] === "yes" ? "Metabolic Syndrome/Insulin Resistance" : ""}`,
         },
       ],
       inflammatory: [
         {
-          yesNo: answers.gout === "mild" || answers.gout === "moderate" || answers.gout === "severe",
-          describe: answers.gout ? `Gout (${answers.gout})` : "",
+          yesNo: answers.gout === "yes",
+          describe: answers.gout === "yes" ? "Gout" : "",
         },
       ],
       musculoskeletal: [
         {
-          yesNo: answers.fibromyalgia === "mild" || answers.fibromyalgia === "moderate" || answers.fibromyalgia === "severe",
-          describe: answers.fibromyalgia ? `Fibromyalgia (${answers.fibromyalgia})` : "",
+          yesNo: answers.fibromyalgia === "yes",
+          describe: answers.fibromyalgia === "yes" ? "Fibromyalgia" : "",
         },
       ],
       skin: [
         {
-          yesNo: answers.acne === "mild" || answers.acne === "moderate" || answers.acne === "severe" || answers.psoriasis === "mild" || answers.psoriasis === "moderate" || answers.psoriasis === "severe" || answers.eczema === "mild" || answers.eczema === "moderate" || answers.eczema === "severe",
-          describe: `${answers.acne ? `Acne (${answers.acne}), ` : ""}${answers.psoriasis ? `Psoriasis (${answers.psoriasis}), ` : ""}${answers.eczema ? `Eczema (${answers.eczema})` : ""}`,
+          yesNo: answers.acne === "yes" || answers.psoriasis === "yes" || answers.eczema === "yes",
+          describe: `${answers.acne === "yes" ? "Acne, " : ""}${answers.psoriasis === "yes" ? "Psoriasis, " : ""}${answers.eczema === "yes" ? "Eczema" : ""}`,
         },
       ],
       cardiovascular: [
         {
-          yesNo: answers.hypertension === "mild" || answers.hypertension === "moderate" || answers.hypertension === "severe" || answers.stroke === "mild" || answers.stroke === "moderate" || answers.stroke === "severe" || answers.high_blood_fats === "mild" || answers.high_blood_fats === "moderate" || answers.high_blood_fats === "severe" || answers.rheumatic_fever === "mild" || answers.rheumatic_fever === "moderate" || answers.rheumatic_fever === "severe" || answers.murmur === "mild" || answers.murmur === "moderate" || answers.murmur === "severe",
-          describe: `${answers.hypertension ? `Hypertension (${answers.hypertension}), ` : ""}${answers.stroke ? `Stroke (${answers.stroke}), ` : ""}${answers.high_blood_fats ? `High Blood Fats (${answers.high_blood_fats}), ` : ""}${answers.rheumatic_fever ? `Rheumatic Fever (${answers.rheumatic_fever}), ` : ""}${answers.murmur ? `Murmur (${answers.murmur})` : ""}`,
+          yesNo: answers.hypertension === "yes" || answers.stroke === "yes" || answers.high_blood_fats === "yes" || answers.rheumatic_fever === "yes" || answers.murmur === "yes",
+          describe: `${answers.hypertension === "yes" ? "Hypertension, " : ""}${answers.stroke === "yes" ? "Stroke, " : ""}${answers.high_blood_fats === "yes" ? "High Blood Fats, " : ""}${answers.rheumatic_fever === "yes" ? "Rheumatic Fever, " : ""}${answers.murmur === "yes" ? "Murmur" : ""}`,
         },
       ],
       neurologic: [
         {
-          yesNo: answers.epilepsy_seizures === "mild" || answers.epilepsy_seizures === "moderate" || answers.epilepsy_seizures === "severe" || answers["ADD/ADHD"] === "mild" || answers["ADD/ADHD"] === "moderate" || answers["ADD/ADHD"] === "severe" || answers.headaches === "mild" || answers.headaches === "moderate" || answers.headaches === "severe" || answers.migraines === "mild" || answers.migraines === "moderate" || answers.migraines === "severe" || answers.depression === "mild" || answers.depression === "moderate" || answers.depression === "severe",
-          describe: `${answers.epilepsy_seizures ? `Epilepsy/Seizures (${answers.epilepsy_seizures}), ` : ""}${answers["ADD/ADHD"] ? `ADD/ADHD (${answers["ADD/ADHD"]}), ` : ""}${answers.headaches ? `Headaches (${answers.headaches}), ` : ""}${answers.migraines ? `Migraines (${answers.migraines}), ` : ""}${answers.depression ? `Depression (${answers.depression})` : ""}`,
+          yesNo: answers.epilepsy_seizures === "yes" || answers["ADD/ADHD"] === "yes" || answers.headaches === "yes" || answers.migraines === "yes" || answers.depression === "yes",
+          describe: `${answers.epilepsy_seizures === "yes" ? "Epilepsy/Seizures, " : ""}${answers["ADD/ADHD"] === "yes" ? "ADD/ADHD, " : ""}${answers.headaches === "yes" ? "Headaches, " : ""}${answers.migraines === "yes" ? "Migraines, " : ""}${answers.depression === "yes" ? "Depression" : ""}`,
         },
       ],
       cancer: [
         {
-          yesNo: answers.breast === "mild" || answers.breast === "moderate" || answers.breast === "severe" || answers.colon === "mild" || answers.colon === "moderate" || answers.colon === "severe",
-          describe: `${answers.breast ? `Breast (${answers.breast}), ` : ""}${answers.colon ? `Colon (${answers.colon})` : ""}`,
+          yesNo: answers.breast === "yes" || answers.colon === "yes",
+          describe: `${answers.breast === "yes" ? "Breast, " : ""}${answers.colon === "yes" ? "Colon" : ""}`,
         },
       ],
       diagnosticBoneDensity: {
@@ -991,83 +991,53 @@ const IllnessAndCondition = ({ onComplete }) => {
               style={{
                 background: "#335CAD",
                 padding: isMobile ? "10px" : "20px",
-                fontSize: isMobile ? "14px" : "15px",
+                fontSize: isMobile ? "13px" : "15px",
                 fontWeight: "bold",
-                width: "100%",
-                textAlign: "left",
-                whiteSpace: "normal",
-                height: "auto",
-                lineHeight: "1.4"
+                width: isMobile ? "100%" : "auto",
               }}
             >
               {question.sub}
             </Button>
 
             {question.subQuestions.map((subQuestion) => (
-              <div 
-                key={subQuestion.name} 
-                style={{ 
-                  marginTop: 20,
-                  padding: isMobile ? "10px" : "20px",
-                  backgroundColor: "#f5f5f5",
-                  borderRadius: "8px"
-                }}
-              >
+              <div key={subQuestion.name} style={{ marginTop: 20 }}>
                 <div style={{ 
                   display: "flex", 
+                  alignItems: "center",
                   flexDirection: isMobile ? "column" : "row",
-                  alignItems: isMobile ? "flex-start" : "center",
                   gap: isMobile ? "10px" : "0"
                 }}>
                   <div style={{ 
                     flex: 1, 
-                    fontSize: isMobile ? "14px" : "15px", 
+                    fontSize: isMobile ? "13px" : "15px", 
                     color: "#000",
-                    marginBottom: isMobile ? "10px" : "0"
+                    width: isMobile ? "100%" : "auto"
                   }}>
                     {subQuestion.text}
                   </div>
                   <div style={{ 
                     display: "flex",
-                    flexDirection: isMobile ? "column" : "row",
-                    gap: isMobile ? "10px" : "20px",
-                    width: isMobile ? "100%" : "auto"
+                    width: isMobile ? "100%" : "auto",
+                    justifyContent: isMobile ? "space-between" : "flex-start"
                   }}>
                     <Radio
-                      style={{
-                        marginRight: isMobile ? "0" : "10px",
-                        color: "#000",
-                        fontSize: isMobile ? "14px" : "15px",
-                        whiteSpace: "nowrap"
-                      }}
-                      checked={answers[subQuestion.name] === "mild"}
-                      onChange={() => handleChange("mild", subQuestion.name)}
+                      style={{ marginRight: "10px" }}
+                      checked={answers[subQuestion.name] === "yes"}
+                      onChange={() => handleChange("yes", subQuestion.name)}
                     >
-                      Mild
+                      Yes
                     </Radio>
                     <Radio
-                      style={{
-                        marginRight: isMobile ? "0" : "10px",
-                        color: "#000",
-                        fontSize: isMobile ? "14px" : "15px",
-                        whiteSpace: "nowrap"
-                      }}
-                      checked={answers[subQuestion.name] === "moderate"}
-                      onChange={() => handleChange("moderate", subQuestion.name)}
+                      checked={answers[subQuestion.name] === "no"}
+                      onChange={() => handleChange("no", subQuestion.name)}
                     >
-                      Moderate
+                      Past
                     </Radio>
                     <Radio
-                      style={{
-                        marginRight: isMobile ? "0" : "10px",
-                        color: "#000",
-                        fontSize: isMobile ? "14px" : "15px",
-                        whiteSpace: "nowrap"
-                      }}
-                      checked={answers[subQuestion.name] === "severe"}
-                      onChange={() => handleChange("severe", subQuestion.name)}
+                      checked={answers[subQuestion.name] === "n/a"}
+                      onChange={() => handleChange("n/a", subQuestion.name)}
                     >
-                      Severe
+                      N/A
                     </Radio>
                   </div>
                 </div>

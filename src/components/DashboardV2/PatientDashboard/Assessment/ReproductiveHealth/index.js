@@ -733,7 +733,7 @@ const ReproductiveHealth = ({ onComplete }) => {
   
   
   const handlePrevious = () => {
-    const question = questions[currentQuestionIndex];
+    // const question = questions[currentQuestionIndex];
     
     let getPmsSymtom = JSON.parse(localStorage.getItem("answers"));
     if(getPmsSymtom.is_pms_symptom === "No"){

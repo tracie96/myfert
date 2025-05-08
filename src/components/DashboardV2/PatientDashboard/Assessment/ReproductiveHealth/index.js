@@ -119,6 +119,7 @@ const questions = [
       "Calendar/ rhythm method",
       "Cervical Position",
       "Cervical Firmness",
+      "none",
       "Other",
     ],
   },
@@ -204,7 +205,7 @@ const questions = [
         question: "Severity",
         type: "radio",
         label: "Severity",
-        options: ["Mild", "Moderate", "Severe"],
+        options: ["Mild", "Moderate", "Severe","None"],
         name: "duration_per_cycle_severity_pelvic_pain",
       },
     ],
@@ -263,7 +264,7 @@ const questions = [
     type: "number_with_radio",
     title: "Cycle Information",
     name: "pms_sympton",
-    sub_question: "Mid-Cycle Pain: PELVIC PAIN (not during menstrual bleeding)",
+    sub_question: "PELVIC PAIN (not during menstrual bleeding)",
     subQuestions: [
       {
         type: "checkbox",
@@ -284,17 +285,18 @@ const questions = [
           "Unsure"
         ],
       },
-      // {
-      //   type: "number_with_radio_sub",
-      //   label: "",
-      //   options: ["Unsure"],
-      //   name: "pms_sympton_check",
-      // },
+      {
+        question: "PMS Duration per Cycle",
+        type: "number_with_radio_sub",
+        label: "",
+        options: ["Unsure","None"],
+        name: "pms_sympton_check",
+      },
       {
         question: "PMS Severity",
         type: "radio",
         label: "Severity",
-        options: ["Mild", "Moderate", "Severe"],
+        options: ["Mild", "Moderate", "Severe", "None"],
         name: "pms_sympton_severity",
       },
     ],
@@ -720,6 +722,10 @@ const ReproductiveHealth = ({ onComplete }) => {
     localStorage.setItem("currentQuestionIndex5", currentQuestionIndex + 1);
     localStorage.setItem("answers", JSON.stringify(answers));
     
+    if(question.name === "is_pms_symptom" && answers.is_pms_symptom === "No"){
+      setCurrentQuestionIndex(currentQuestionIndex + 2);
+      return;
+    }
     if (currentQuestionIndex < totalQuestions - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
@@ -727,6 +733,13 @@ const ReproductiveHealth = ({ onComplete }) => {
   
   
   const handlePrevious = () => {
+    const question = questions[currentQuestionIndex];
+    
+    let getPmsSymtom = JSON.parse(localStorage.getItem("answers"));
+    if(getPmsSymtom.is_pms_symptom === "No"){
+      setCurrentQuestionIndex(currentQuestionIndex - 2);
+      return;
+    }
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
     }
@@ -1467,7 +1480,7 @@ const ReproductiveHealth = ({ onComplete }) => {
                 </Paragraph>
               </div>
             )}
-            <p>{question.sub_question}</p>
+            <p style={{color:"#000"}}>{question.sub_question}</p>
             {renderSubQuestions(question.subQuestions)}
           </div>
         );

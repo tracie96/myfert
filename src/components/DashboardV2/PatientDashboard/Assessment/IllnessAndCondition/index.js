@@ -861,7 +861,7 @@ const IllnessAndCondition = ({ onComplete }) => {
               </Checkbox>
             </div>
             <div style={{ marginBottom: "10px" }}>
-              <label style={{ fontSize: isMobile ? "13px" : "14px" }}>Date:</label>
+              <label style={{ color:"#000", fontSize: isMobile ? "13px" : "14px" }}>Date:</label>
               <br />
               <Input
                 type="date"
@@ -878,7 +878,7 @@ const IllnessAndCondition = ({ onComplete }) => {
             <div style={{ marginBottom: "10px" }}>
               {question.radioOptions.map((option, index) => (
                 <div key={index} style={{ marginBottom: "5px" }}>
-                  <label style={{ fontSize: isMobile ? "13px" : "14px" }}>{option.label}:</label>
+                  <label style={{ color:"#000", fontSize: isMobile ? "13px" : "14px" }}>{option.label}:</label>
                   <br />
                   <Input
                     type="text"

@@ -675,7 +675,7 @@ const SymptomReview = ({ onComplete }) => {
     if (question.type === "multi_yes_no") {
       const hasValidAnswer = question.subQuestions.some(
         (subQuestion) =>
-          answers[subQuestion.name] === "mild" || answers[subQuestion.name] === "moderate" || answers[subQuestion.name] === "severe"
+          answers[subQuestion.name] === "mild" || answers[subQuestion.name] === "moderate" || answers[subQuestion.name] === "severe" || answers[subQuestion.name] === "N/A"
       );
   
       const hasOthersAnswer =
@@ -1702,6 +1702,18 @@ const SymptomReview = ({ onComplete }) => {
                       onChange={() => handleChange("severe", subQuestion.name)}
                     >
                       Severe
+                    </Radio>
+                    <Radio
+                      style={{
+                        marginRight: isMobile ? "0" : "10px",
+                        color: "#000",
+                        fontSize: isMobile ? "14px" : "15px",
+                        whiteSpace: "nowrap"
+                      }}
+                      checked={answers[subQuestion.name] === "N/A"}
+                      onChange={() => handleChange("N/A", subQuestion.name)}
+                    >
+                      N/A
                     </Radio>
                   </div>
                 </div>

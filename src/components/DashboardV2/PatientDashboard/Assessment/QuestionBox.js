@@ -2,19 +2,23 @@ import React, { useEffect, useMemo, useCallback } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { getPatientStatus } from "../../../redux/patientSlice";
+import { getAccessDetails } from "../../../redux/AssessmentController";
 import "./assesment.css";
 import CheckIcon from "../../../../assets/images/check.svg";
+import { ClockCircleOutlined } from "@ant-design/icons";
 
 const CardComponent = ({ card, index, handleCardClick, isCompleted }) => (
   <div
     className={`assessment-card`}
     onClick={() => handleCardClick(card.component) }
   >
-     {isCompleted && (
-        <div className="checkmark-overlay">
-          <img src={CheckIcon} className="checkmark-icon" alt="check" />
-        </div>
+    <div className="checkmark-overlay">
+      {isCompleted ? (
+        <img src={CheckIcon} className="checkmark-icon" alt="check" />
+      ) : (
+        <ClockCircleOutlined style={{ color: '#faad14', fontSize: 24 }} />
       )}
+    </div>
     <div className="card-image">
       <img src={card.icon} alt={card.title} loading="lazy" style={{ width: (index === 4 || index === 7) ? '100%' : '' }} />
     </div>
@@ -24,9 +28,7 @@ const CardComponent = ({ card, index, handleCardClick, isCompleted }) => (
 
 const QuestionnaireGrid = ({ cards, onCardClick }) => {
   const dispatch = useDispatch();
-  const patientStatus = useSelector((state) => state.patient.status);
-
-
+  const accessDetails = useSelector((state) => state.intake.accessDetails);
 
   const { userAuth } = useSelector((state) => ({
     userAuth: state.authentication.userAuth,
@@ -38,6 +40,12 @@ const QuestionnaireGrid = ({ cards, onCardClick }) => {
     }
   }, [userAuth?.obj?.token, dispatch]);
 
+  useEffect(() => {
+    if (userAuth?.obj?.token) {
+      dispatch(getAccessDetails());
+    }
+  }, [userAuth?.obj?.token, dispatch]);
+
   const handleCardClick = useCallback(
     (component) => {
       onCardClick(component);
@@ -46,19 +54,14 @@ const QuestionnaireGrid = ({ cards, onCardClick }) => {
   );
 
   const cardList = useMemo(() => {
-    
     return cards.map((card, index) => {
-      // Check if both initialAssessment and isPaymentComplete are true
-      // const isFullyEnabled = patientStatus?.initialAssessment === true && patientStatus?.isPaymentComplete === true;
-      // If patientStatus is null or either value is null, only first card is clickable
-      // const isClickable = isFullyEnabled ? true : (index === 0);
-      const isCompleted = patientStatus?.initialAssessment || false;
-
+      const isCompleted = accessDetails?.[card.meta] === true;
+      console.log({accessDetails})
+      console.log('card.meta:', card.meta, 'accessDetails:', accessDetails, 'isCompleted:', isCompleted);
       return (
         <Col key={index} className="mb-4 d-flex justify-content-center">
           <CardComponent
             card={card}
-            // isClickable={isClickable}
             index={index}
             handleCardClick={handleCardClick}
             isCompleted={isCompleted}
@@ -66,7 +69,7 @@ const QuestionnaireGrid = ({ cards, onCardClick }) => {
         </Col>
       );
     });
-  }, [cards, handleCardClick, patientStatus]);
+  }, [cards, handleCardClick, accessDetails]);
 
   return (
     <Container className="mt-4 assessment-container">

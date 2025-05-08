@@ -29,6 +29,7 @@ const PatientSignup = () => {
     useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [showShowPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [showCollectionNoticeModal, setShowCollectionNoticeModal] = useState(false);
   const [feet, setFeet] = useState('');
   const [inches, setInches] = useState('');
   const [form] = Form.useForm();
@@ -431,6 +432,9 @@ const PatientSignup = () => {
   const handleShowPrivacyModal = () => {
     setShowPrivacyModal(true);
   };
+  const handleShowCollectionNoticeModal = () => {
+    setShowCollectionNoticeModal(true);
+  };
 
   const handleCloseModal = () => {
     setShowTermsConditionsModal(false);
@@ -440,6 +444,9 @@ const PatientSignup = () => {
   };
   const handleClosePrivacyModal = () => {
     setShowPrivacyModal(false);
+  };
+  const handleCloseCollectionNoticeModal = () => {
+    setShowCollectionNoticeModal(false);
   };
   console.log(dob);
   const customizeRequiredMark = (label, { required }) => (
@@ -1191,74 +1198,6 @@ const PatientSignup = () => {
                                           </div>
                                         )}
                                       </Form.Item>
-                                      {/* Do Not remove the below code without proper testing */}
-                                      {/* <Form.Item
-                                        label=""
-                                        name="Height"
-                                        rules={[
-                                          {
-                                            required: true,
-                                            message: "Please enter your height",
-                                          },
-                                          {
-                                            validator: (_, value) => {
-                                              if (!value) {
-                                                return Promise.reject("Height is required");
-                                              }
-                                              const isValid = unit === "Metric"
-                                                ? value >= 50 && value <= 250
-                                                : value >= 1 && value <= 8;
-                                              return isValid
-                                                ? Promise.resolve()
-                                                : Promise.reject(
-                                                  `Height must be valid for ${unit}, should be between ${unit === "Metric" ? "50 cm and 250 cm" : "1 ft and 8 ft"
-                                                  }`
-                                                );
-                                            },
-                                          },
-                                        ]}
-                                      // ToDo: remove this code after testing
-                                      // rules={[
-                                      //   {
-                                      //     required: true,
-                                      //     message: "Please enter your height",
-                                      //   },
-                                      //   {
-                                      //     validator: (_, value) => {
-                                      //       if (!value) {
-                                      //         return Promise.reject("Height is required");
-                                      //       }
-                                      //       const isValid = unit === "Metric"
-                                      //         ? value >= 50 && value <= 250
-                                      //         : value >= 20 && value <= 100;
-                                      //       return isValid
-                                      //         ? Promise.resolve()
-                                      //         : Promise.reject(`Height must be valid for ${unit}, should be between 
-                                      //         ${unit === "Metric" ? "50 cm and 250 cm" : "20 inches and 100 inches"}
-                                      //         `);
-                                      //     },
-                                      //   },
-                                      // ]}
-                                      >
-                                        <div
-                                          style={{
-                                            display: "flex",
-                                            alignItems: "center",
-                                          }}
-                                        >
-                                          <Input
-                                            type="number"
-                                            className="input_questionnaire"
-                                            placeholder="Enter Height"
-                                            value={heightOfPatient}
-                                            onChange={(e) => setHeightOfPatient(e.target.value)}
-                                            style={{ marginRight: "10px" }}
-                                          />
-                                          <span>
-                                            {unit === "Metric" ? "cm" : "ft."}
-                                          </span>
-                                        </div>
-                                      </Form.Item> */}
                                     </div>
                                     <div className="col-lg-4 col-sm-4">
                                       <Form.Item
@@ -1534,6 +1473,14 @@ const PatientSignup = () => {
                                           >
                                             {" "}
                                             Privacy Policy
+                                          </span>
+                                          , and
+                                          <span
+                                            className="text-primary"
+                                            onClick={handleShowCollectionNoticeModal}
+                                          >
+                                            {" "}
+                                            Collection Notice
                                           </span>
                                         </Checkbox>
                                       </FormItem>
@@ -1873,9 +1820,50 @@ const PatientSignup = () => {
             <Row>
               <div className="d-flex flex-column col-md-8 offset-md-2 col-sm-12 mt-2 text-black">
                 <center className="mb-3">
-                  <p className="font-weight-bold">What is Lorem Ipsum?</p>
+                  <p className="font-weight-bold">Collection Notice</p>
                   <p>
-                    Lorem Ipsum is simply dummy text of the printing and
+                    Notice of Collection of Health Information<br/>
+                    My Fertility Labs (MFL) is committed to protecting your personal health information. We collect,
+                    use, and disclose your health information to provide you with fertility care services and comply
+                    with legal obligations.
+                  </p>
+                  <p>
+                    Patients have the right to access and correct their health information. For more information on
+                    your privacy rights, contact the Privacy Officer, at privacy@myfertilitylabs.com, or refer to our
+                    Privacy Policy.
+                  </p>
+                  <p>
+                    Patients may withdraw or limit consent for specific uses of their health information by
+                    contacting the Privacy Officer, at privacy@myfertilitylabs.com, subject to legal and regulatory
+                    obligations.
+                  </p>
+                  <p className="font-weight-bold">Why We Collect Your Information:</p>
+                  <ul style={{ textAlign: 'left' }}>
+                    <li>To provide diagnostics, treatment plans, and related health services.</li>
+                    <li>Provide telehealth services, care related to general and reproductive health, and
+                    personalized treatment plans.</li>
+                    <li>To facilitate communication, billing, and scheduling.</li>
+                    <li>To comply with legal and regulatory requirements.</li>
+                  </ul>
+                  <p className="font-weight-bold">Legal Authority for Collection:</p>
+                  <ul style={{ textAlign: 'left' }}>
+                    <li>Health Information Act, Section 20(b): Collection for the provision of health services.</li>
+                    <li>Health Information Act, Section 21(1)(a): Collection authorized for diagnostic and
+                    treatment purposes.</li>
+                  </ul>
+                  <p className="font-weight-bold">Questions? Contact Us:</p>
+                  <p>
+                    If you have any questions about the collection of your health information, please contact:<br/>
+                    Privacy Officer, privacy@myfertilitylabs.com
+                  </p>
+                  <p>
+                    By proceeding with your registration, you confirm that you have read and understood this
+                    notice.
+                  </p>
+                  <hr/>
+                  <p className="font-weight-bold">Privacy Policy</p>
+                  <p>
+                    Lorem Ipsum is simply dummy text of the printing and
                     typesetting industry. Lorem Ipsum has been the industry's
                     standard dummy text ever since the 1500s, when an unknown
                     printer took a galley of type and scrambled it to make a
@@ -1893,23 +1881,6 @@ const PatientSignup = () => {
                     also reproduced in their exact original form, accompanied by
                     English versions from the 1914 translation by H. Rackham.
                   </p>
-                  <p className="font-weight-bold">Where can I get some?</p>
-                  <p>
-                    There are many variations of passages of Lorem Ipsum
-                    available, but the majority have suffered alteration in some
-                    form, by injected humour, or randomised words which don't
-                    look even slightly believable. If you are going to use a
-                    passage of Lorem Ipsum, you need to be sure there isn't
-                    anything embarrassing hidden in the middle of text. All the
-                    Lorem Ipsum generators on the Internet tend to repeat
-                    predefined chunks as necessary, making this the first true
-                    generator on the Internet. It uses a dictionary of over 200
-                    Latin words, combined with a handful of model sentence
-                    structures, to generate Lorem Ipsum which looks reasonable.
-                    The generated Lorem Ipsum is therefore always free from
-                    repetition, injected humour, or non-characteristic words
-                    etc.
-                  </p>
                 </center>
               </div>
             </Row>
@@ -1921,6 +1892,72 @@ const PatientSignup = () => {
               className="btn btn-secondary mr-2"
               type="button"
               onClick={handleClosePrivacyModal}
+            >
+              Close
+            </button>
+          </>
+        }
+      />
+      <CustomModal
+        show={showCollectionNoticeModal}
+        onHide={handleCloseCollectionNoticeModal}
+        size="lg"
+        title={"Collection Notice"}
+        body={
+          <>
+            <Row>
+              <div className="d-flex flex-column col-md-8 offset-md-2 col-sm-12 mt-2 text-black">
+                <center className="mb-3">
+                  <p className="font-weight-bold">Notice of Collection of Health Information</p>
+                  <p>
+                    My Fertility Labs (MFL) is committed to protecting your personal health information. We collect,
+                    use, and disclose your health information to provide you with fertility care services and comply
+                    with legal obligations.
+                  </p>
+                  <p>
+                    Patients have the right to access and correct their health information. For more information on
+                    your privacy rights, contact the Privacy Officer, at privacy@myfertilitylabs.com, or refer to our
+                    Privacy Policy.
+                  </p>
+                  <p>
+                    Patients may withdraw or limit consent for specific uses of their health information by
+                    contacting the Privacy Officer, at privacy@myfertilitylabs.com, subject to legal and regulatory
+                    obligations.
+                  </p>
+                  <p className="font-weight-bold">Why We Collect Your Information:</p>
+                  <ul style={{ textAlign: 'left' }}>
+                    <li>To provide diagnostics, treatment plans, and related health services.</li>
+                    <li>Provide telehealth services, care related to general and reproductive health, and
+                    personalized treatment plans.</li>
+                    <li>To facilitate communication, billing, and scheduling.</li>
+                    <li>To comply with legal and regulatory requirements.</li>
+                  </ul>
+                  <p className="font-weight-bold">Legal Authority for Collection:</p>
+                  <ul style={{ textAlign: 'left' }}>
+                    <li>Health Information Act, Section 20(b): Collection for the provision of health services.</li>
+                    <li>Health Information Act, Section 21(1)(a): Collection authorized for diagnostic and
+                    treatment purposes.</li>
+                  </ul>
+                  <p className="font-weight-bold">Questions? Contact Us:</p>
+                  <p>
+                    If you have any questions about the collection of your health information, please contact:<br/>
+                    Privacy Officer, privacy@myfertilitylabs.com
+                  </p>
+                  <p>
+                    By proceeding with your registration, you confirm that you have read and understood this
+                    notice.
+                  </p>
+                </center>
+              </div>
+            </Row>
+          </>
+        }
+        footer={
+          <>
+            <button
+              className="btn btn-secondary mr-2"
+              type="button"
+              onClick={handleCloseCollectionNoticeModal}
             >
               Close
             </button>

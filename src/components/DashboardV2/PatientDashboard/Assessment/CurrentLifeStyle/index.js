@@ -945,7 +945,7 @@ const CurrentLifeStyle = ({ onComplete }) => {
         <p>{subQuestion.type !== "text" && subQuestion.question}</p>
         {subQuestion.type === "text" && (
           <>
-            <p>Type:</p>
+            <p style={{color:"#000"}}>Type:</p>
             <Input
               value={answers[subQuestion.name] || ""}
               onChange={(e) => handleChange(e.target.value, subQuestion.name)}
@@ -955,7 +955,7 @@ const CurrentLifeStyle = ({ onComplete }) => {
         )}
         {subQuestion.type === "select" && (
           <>
-            <p>{subQuestion.label}</p>
+            <p style={{color:"#000"}}>{subQuestion.label}</p>
             <Select
               placeholder="Select an option"
               value={answers[subQuestion.name] || ""}

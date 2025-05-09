@@ -860,7 +860,7 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
                   </Checkbox>
                 </div>
                 {option.selectName && (
-                  <div style={{ display: "flex", alignItems: "center" }}>
+                  <div style={{ display: "flex", alignItems: "center", width: isMobile ? "100%" : "20%" }}>
                     <Select
                       name={option.selectName}
                       value={answers[option.selectName] || undefined}

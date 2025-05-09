@@ -342,7 +342,7 @@ const SubstanceUse = ({ onComplete }) => {
   const renderSubQuestions = (subQuestions) => {
     return subQuestions.map((subQuestion, index) => (
       <div key={index} style={{ marginTop: "20px" }}>
-        <p style={{ fontWeight: "bold", color: "#000" }}>
+        <p style={{ color: "#000" }}>
           {subQuestion.type !== "text" && subQuestion.question}
         </p>
         {subQuestion.type === "text" && (
@@ -413,7 +413,7 @@ const SubstanceUse = ({ onComplete }) => {
   const renderNewSubQuestions = (subQuestions) => {
     return subQuestions.map((subQuestion, index) => (
       <div key={index} style={{ marginTop: "20px" }}>
-        <p>{subQuestion.question}</p>
+        <p style={{color:"#000"}}>{subQuestion.question}</p>
         {subQuestion.type === "inputNumber" && (
           <InputNumber
             name={subQuestion.name}

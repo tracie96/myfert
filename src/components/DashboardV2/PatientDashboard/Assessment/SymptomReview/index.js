@@ -481,13 +481,13 @@ const questions = [
   {
     type: "hospitalization",
     name: "current_medication",
-    question: "Current medications (include prescription and over-the-counter)",
+    question: "Current medications (include prescription and over-the-counter) (Optional)",
     title: "Medications/Supplements",
   },
   {
     type: "hospitalization",
     name: "nutritional_supplement",
-    question: "Nutritional supplements (vitamins/minerals/herbs etc",
+    question: "Nutritional supplements (vitamins/minerals/herbs etc) (Optional)",
     title: "Medications/Supplements",
   },
 
@@ -683,6 +683,11 @@ const SymptomReview = ({ onComplete }) => {
         answers[`${question.name}_others`] !== "";
   
       return hasValidAnswer || hasOthersAnswer;
+    }
+  
+    // Skip validation for optional hospitalization questions
+    if (question.type === "hospitalization") {
+      return true;
     }
   
     if (question.subQuestions && Array.isArray(question.subQuestions)) {
@@ -1318,8 +1323,9 @@ const SymptomReview = ({ onComplete }) => {
         .then((response) => response.json())
         .then((data) => {
           console.log("Transformed Data:", transformedData);
-          dispatch(completeCard("/questionnaire/3"));
-          localStorage.setItem("currentQuestionIndex3", 0);
+          message.success("Form submitted successfully!");
+          dispatch(completeCard("/questionnaire/9"));
+          localStorage.setItem("currentQuestionIndex9", 0);
           localStorage.setItem("answers", JSON.stringify(answers));
           navigate("/assessment");
           console.log("Success:", data);
@@ -1332,11 +1338,6 @@ const SymptomReview = ({ onComplete }) => {
       console.log(error);
     }
 
-    message.success("Form submitted successfully!");
-    dispatch(completeCard("/questionnaire/9"));
-    localStorage.setItem("currentQuestionIndex9", 0);
-    localStorage.setItem("transformedAnswers", JSON.stringify(transformedData));
-    navigate("/assessment");
   };
 
   const addHospitalization = (name) => {
@@ -1654,7 +1655,8 @@ const SymptomReview = ({ onComplete }) => {
                   display: "flex", 
                   flexDirection: isMobile ? "column" : "row",
                   alignItems: isMobile ? "flex-start" : "center",
-                  gap: isMobile ? "10px" : "0"
+                  gap: isMobile ? "10px" : "20px",
+                  width: isMobile ? "100%" : "auto"
                 }}>
                   <div style={{ 
                     flex: 1, 

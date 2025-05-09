@@ -235,7 +235,31 @@ export default function PatDash() {
   }, [userAuth?.obj?.token, dispatch]);
 
   const getAccessDetailsStatus = () => {
-    return Object.values(accessDetails || {}).every(value => value === true);
+    if (!accessDetails) return false;
+    
+    // Check all required sections
+    const requiredSections = [
+      'reproductiveHealth',
+      'generalInformation',
+      'healthLifestyle',
+      'nutrition',
+      'substanceUse',
+      'stressRelationship',
+      'healthMedical',
+      'personalFamily',
+      'illnessConditions',
+      'symptomsReview',
+      'readinessHealth'
+    ];
+
+    // Check if all required sections are complete
+    const allSectionsComplete = requiredSections.every(section => accessDetails[section] === true);
+
+    // Check if symptom review and medication sections are complete
+    const symptomReviewComplete = accessDetails.symptomsReview === true;
+    const medicationComplete = accessDetails.medication === true;
+
+    return allSectionsComplete && symptomReviewComplete && medicationComplete;
   };
 
   return (

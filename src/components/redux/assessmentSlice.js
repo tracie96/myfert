@@ -70,7 +70,7 @@ const initialState = [
     component: "/questionnaire/9",
     icon: "https://res.cloudinary.com/tracysoft/image/upload/v1738258156/8_xonkbe.svg",
     isComplete: false,
-    meta:"symptomReview"
+    meta:"symptomsReview"
   },
   {
     title: "Readiness and Health Goals",

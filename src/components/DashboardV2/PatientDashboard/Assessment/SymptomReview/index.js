@@ -1516,6 +1516,9 @@ const SymptomReview = ({ onComplete }) => {
       case "hospitalization":
         return (
           <div key={question.name} style={{ marginBottom: "20px" }}>
+            <p style={{ color: "#666", marginBottom: "10px", fontStyle: "italic" }}>
+              (Optional) {question.question}
+            </p>
             {answers[question.name]?.map((entry, index) => (
               <div
                 style={{
@@ -1612,7 +1615,7 @@ const SymptomReview = ({ onComplete }) => {
               onClick={() => addHospitalization(question.name)}
             >
               {" "}
-              + {question.name === 'current_medication' ? 'Add Hospitalization' : 'Add Nutrition'}
+              + {question.name === 'current_medication' ? 'Add Medication' : 'Add Supplement'}
             </Button>
           </div>
         );

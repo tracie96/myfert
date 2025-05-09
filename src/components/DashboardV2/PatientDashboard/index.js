@@ -3,6 +3,7 @@ import { Row, Col, Button, Spin, Steps, Avatar, Divider, Modal } from "antd";
 // import PeriodCycleTracker from "../../../screens/PatientDashboard/Cycle/cycle";
 import { useDispatch } from "react-redux";
 import { getMiraInfo } from "../../redux/AuthController";
+import { getAccessDetails } from "../../redux/AssessmentController";
 import { LoadingOutlined } from "@ant-design/icons";
 import "../dashboard.css";
 import { useSelector } from "react-redux";
@@ -120,6 +121,7 @@ export default function PatDash() {
     learnVideos: false
   });
   const [showBookInfo, setShowBookInfo] = React.useState(true);
+  const accessDetails = useSelector((state) => state.intake.accessDetails);
 
   const checkLearningProgress = () => {
     // Check if all required videos are watched and quiz is completed
@@ -226,6 +228,16 @@ export default function PatDash() {
     localStorage.setItem("currentStep", step);
   };
 
+  useEffect(() => {
+    if (userAuth?.obj?.token) {
+      dispatch(getAccessDetails());
+    }
+  }, [userAuth?.obj?.token, dispatch]);
+
+  const getAccessDetailsStatus = () => {
+    return Object.values(accessDetails || {}).every(value => value === true);
+  };
+
   return (
     <div>
       <Row gutter={16} style={{ padding: "0 5%" }}>
@@ -273,7 +285,7 @@ export default function PatDash() {
             }}>
               <input
                 type="checkbox"
-                checked={patientStatus.initialAssessment !== null}
+                checked={getAccessDetailsStatus()}
                 style={{
                   width: "20px",
                   height: "20px",

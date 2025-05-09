@@ -633,7 +633,7 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
   const renderSubQuestions = (subQuestions) => {
     return subQuestions.map((subQuestion, index) => (
       <div key={index} style={{ marginTop: "20px" }}>
-        <p>{subQuestion.type !== "text" && subQuestion.question}</p>
+        <p style={{color:"#000"}}>{subQuestion.type !== "text" && subQuestion.question}</p>
         {subQuestion.type === "text" && (
           <Input
             placeholder={subQuestion.question}
@@ -991,7 +991,7 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
                     </Checkbox>
                   </div>
                   {option.selectName && (
-                    <div style={{ display: "flex", alignItems: "center" }}>
+                    <div style={{ display: "flex", alignItems: "center", width: isMobile ? "100%" : "20%" }}>
                       <Select
                         name={option.selectName}
                         value={answers[option.selectName] || undefined}

@@ -854,7 +854,7 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
                     value={answers[question.name] || 1}
                     onChange={(value) => handleChange(value, question.name)}
                     className="input-number-box"
-                    style={{ width: "100%", minWidth: "42px" }}
+                    style={{ width: "40%", minWidth: "42px" }}
                     disabled={answers[`${question.name}_na`] || false}
                   />
                 </Col>

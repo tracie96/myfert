@@ -123,14 +123,18 @@ export default function PatDash() {
   const [showBookInfo, setShowBookInfo] = React.useState(true);
   const accessDetails = useSelector((state) => state.intake.accessDetails);
 
-  const checkLearningProgress = () => {
-    // Check if all required videos are watched and quiz is completed
-    const allVideosCompleted = localStorage.getItem('allVideosCompleted') === 'true';
-    const quizPassed = localStorage.getItem('quizPassed') === 'true';
+  const getAccessDetailsStatus = () => {
+    if (!accessDetails) return false;
+    return Object.values(accessDetails).every(value => value === true);
+  };
 
+  const checkLearningProgress = () => {
+    // Check if any quiz has been opened
+    const hasOpenedQuiz = localStorage.getItem('hasOpenedQuiz') === 'true';
+    
     setChecklistItems(prev => ({
       ...prev,
-      learnVideos: allVideosCompleted && quizPassed
+      learnVideos: hasOpenedQuiz
     }));
   };
 
@@ -234,33 +238,6 @@ export default function PatDash() {
     }
   }, [userAuth?.obj?.token, dispatch]);
 
-  const getAccessDetailsStatus = () => {
-    if (!accessDetails) return false;
-    
-    // Check all required sections
-    const requiredSections = [
-      'reproductiveHealth',
-      'generalInformation',
-      'healthLifestyle',
-      'nutrition',
-      'substanceUse',
-      'stressRelationship',
-      'healthMedical',
-      'personalFamily',
-      'illnessConditions',
-      'symptomsReview',
-      'readinessHealth'
-    ];
-
-    // Check if all required sections are complete
-    const allSectionsComplete = requiredSections.every(section => accessDetails[section] === true);
-
-    // Check if symptom review and medication sections are complete
-    const symptomReviewComplete = accessDetails.symptomsReview === true;
-    const medicationComplete = accessDetails.medication === true;
-
-    return allSectionsComplete && symptomReviewComplete && medicationComplete;
-  };
 
   return (
     <div>
@@ -892,8 +869,8 @@ export default function PatDash() {
                           alignItems: 'center',
                           gap: 8,
                           marginTop: 16,
-                          opacity: (patientStatus.initialAssessment !== null && checklistItems.learnVideos) ? 1 : 0.5,
-                          pointerEvents: (patientStatus.initialAssessment !== null && checklistItems.learnVideos) ? 'auto' : 'none'
+                          opacity: (checklistItems.learnVideos) ? 1 : 0.5,
+                          pointerEvents: ( checklistItems.learnVideos) ? 'auto' : 'none'
                         }}
                         onClick={() => window.open('/patient/services')}
                       >

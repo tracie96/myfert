@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Typography, Radio, Space } from 'antd';
 import { LeftOutlined } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -216,6 +216,11 @@ const MenstrualCycleQuiz = () => {
 
   const quizData = quizType === 'menstrual' ? menstrualCycleQuizData : fertileWindowQuizData;
   const quizTitle = quizType === 'menstrual' ? 'MENSTRUAL CYCLE 101 QUIZ' : 'FERTILE WINDOW QUIZ';
+
+  useEffect(() => {
+    localStorage.setItem('hasOpenedQuiz', 'true');
+    console.log('MenstrualCycleQuiz opened, hasOpenedQuiz set to:', localStorage.getItem('hasOpenedQuiz'));
+  }, []);
 
   const handleAnswer = (e) => {
     setSelectedAnswers({

@@ -91,6 +91,7 @@ import Services from "../DashboardV2/PatientDashboard/Services";
 import TermsOfService from "../../pages/TermsOfService";
 import CollectionNotice from "../../pages/CollectionNotice";
 import PrivacyPolicy from "../../pages/PrivacyPolicy";
+import ConfidentialityAgreement from "../../pages/ConfidentialityAgreement";
 
 //#endregion
 
@@ -160,6 +161,7 @@ const getRouter = createBrowserRouter(
         <Route path="terms-of-service" element={<TermsOfService />} />
         <Route path="collection-notice" element={<CollectionNotice />} />
         <Route path="privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="confidentiality-agreement" element={<ConfidentialityAgreement />} />
 
         <Route path="/forgot-password/:id?" element={<ResetPassword />} />
 

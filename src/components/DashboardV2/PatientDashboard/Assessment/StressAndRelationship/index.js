@@ -356,9 +356,7 @@ const StressAndRelationship = ({ onComplete }) => {
       if (currentQuestionIndex < totalQuestions - 1) {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
       }
-      
-      message.success("Progress saved successfully!");
-    } catch (error) {
+          } catch (error) {
       console.error("Error saving progress:", error);
       message.error("Failed to save progress. Please try again.");
     }
@@ -600,9 +598,10 @@ const StressAndRelationship = ({ onComplete }) => {
           <div style={{ padding: "0 10px" }}>
             <div style={{ marginTop: "10px" }}>
               <Slider
-                min={1}
+                min={0}
                 max={10}
                 marks={{
+                  0: "0",
                   1: "1",
                   2: "2",
                   3: "3",
@@ -614,7 +613,7 @@ const StressAndRelationship = ({ onComplete }) => {
                   9: "9",
                   10: "10",
                 }}
-                value={answers[question.name] || 1}
+                value={answers[question.name] || 0}
                 onChange={(value) => handleChange(value, question.name)}
                 style={{ width: isMobile ? "100%" : "50%" }}
               />

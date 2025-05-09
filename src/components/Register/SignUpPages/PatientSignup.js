@@ -1439,15 +1439,7 @@ const PatientSignup = () => {
                                         <Checkbox>
                                           I have read and accept the terms of
                                           the
-                                          <span
-                                            className="text-primary"
-                                            onClick={() => window.open('/terms-of-service', '_blank')}
-                                            style={{ cursor: 'pointer' }}
-                                          >
-                                            {" "}
-                                            Consent & Agreement
-                                          </span>
-                                          ,
+                                         
                                           <span
                                             className="text-primary"
                                             onClick={() => window.open('/terms-of-service', '_blank')}

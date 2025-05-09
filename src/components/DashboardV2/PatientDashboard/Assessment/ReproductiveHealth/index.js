@@ -1197,6 +1197,7 @@ const ReproductiveHealth = ({ onComplete }) => {
                  {option === "Other" && answers[subQuestion.name]?.includes("Other") && (
                    <Input
                      className="input_questionnaire"
+
                      placeholder="Please specify"
                      name={`${subQuestion.name}_other`}
                      value={answers[`${subQuestion.name}_other`] || ""}
@@ -1204,7 +1205,7 @@ const ReproductiveHealth = ({ onComplete }) => {
                      onChange={(e) =>
                        handleChange(e.target.value, `${subQuestion.name}_other`)
                      }
-                     style={{ marginTop: "5px" }}
+                     style={{ marginTop: "5px",width: "100%" }}
                    />
                  )}
                </div>

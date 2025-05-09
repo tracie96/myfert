@@ -320,10 +320,7 @@ const DoctorSignup = ({ userRole }) => {
     }
   }, [dispatch, values.email]);
 
-  //#region Modal show
-  const handleShowModal = () => {
-    setShowTermsConditionsModal(true);
-  };
+
   const handleCloseModal = () => {
     setShowTermsConditionsModal(false);
   };
@@ -687,26 +684,14 @@ const DoctorSignup = ({ userRole }) => {
                                       I have read and accept the terms of the
                                       <span
                                         className="text-primary"
-                                        onClick={handleShowModal}
+                                        onClick={() => window.open('/confidentiality-agreement', '_blank')}
+                                        style={{ cursor: 'pointer' }}
                                       >
                                         {" "}
-                                        Consent & Agreement
+                                        Confidentiality Agreement
                                       </span>
-                                      ,
-                                      <span
-                                        className="text-primary"
-                                        onClick={handleShowModal}
-                                      >
-                                        {" "}
-                                        Terms of Services
-                                      </span>
-                                      , and
-                                      <span
-                                        className="text-primary"
-                                        onClick={handleShowModal}
-                                      >
-                                        Privacy Policy
-                                      </span>
+                                     
+                                      
                                     </Checkbox>
                                   </FormItem>
                                 </div>

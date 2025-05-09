@@ -696,12 +696,13 @@ const Nutrition = ({ onComplete }) => {
             <label style={{ marginBottom: "10px", fontWeight: "bold" }}>
               {question.label || "Select Time"}
             </label>
+            <br/>
             <Select
               placeholder="Select time"
               className="select_time_dropdown"
               value={answers[question.name] || ""}
               onChange={(value) => handleChange(value, question.name)}
-              style={{ width: "100%" }}
+              style={{ width: isMobile?"100%":"30%" }}
             >
               {timeOptions.map((time) => (
                 <Option key={time} value={time}>

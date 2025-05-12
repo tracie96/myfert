@@ -90,14 +90,14 @@ const LabScreen = () => {
 
     useEffect(() => {
         // Fetch lab requisitions (type 1)
-        dispatch(getPatientLabs(1)).then((result) => {
+        dispatch(getPatientLabs(2)).then((result) => {
             if (getPatientLabs.fulfilled.match(result)) {
                 setLabRequisitions(result.payload);
             }
         });
 
         // Fetch lab results (type 2)
-        dispatch(getPatientLabs(2)).then((result) => {
+        dispatch(getPatientLabs(1)).then((result) => {
             if (getPatientLabs.fulfilled.match(result)) {
                 setLabResults(result.payload);
             }

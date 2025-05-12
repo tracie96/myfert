@@ -70,15 +70,6 @@ const SettingsPage = () => {
                             alt="loginImage"
                             style={{ width: "150px" }}
                           />
-                          <form className="d-flex" role="search">
-                            <NavLink
-                              to="/"
-                              className="btn btn-primary btn-user btn-block"
-                              style={{ background: '#00ADEF', border: 'none' }}
-                            >
-                              <span>Sign In</span>
-                            </NavLink>
-                          </form>
                         </nav>
                         <div className="card o-hidden border-0 my-3">
                           <div className="card-body p-5">
@@ -291,15 +282,6 @@ const SettingsPage = () => {
                       alt="loginImage"
                       style={{ width: "150px" }}
                     />
-                    <form className="d-flex" role="search">
-                      <NavLink
-                        to="/"
-                        className="btn btn-primary btn-user btn-block"
-                        style={{background:'#00ADEF', border:'none'}}
-                      >
-                        <span>Sign In</span>
-                      </NavLink>
-                    </form>
                   </nav>
                   <div className="card o-hidden border-0 my-3">
                     <div className="card-body p-5">

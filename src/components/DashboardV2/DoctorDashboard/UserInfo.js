@@ -248,7 +248,7 @@ export default function UserInfo() {
         <Col xs={24} md={24} lg={24} style={{ paddingBottom: "16px", maxWidth: '570px' }}>
           <div>
             {/* FLAGS Section */}
-            <div
+            {/* <div
               style={{
                 width: "100%",
                 backgroundColor: "#335CAD",
@@ -270,8 +270,8 @@ export default function UserInfo() {
               >
                 FLAGS
               </h3>
-            </div>
-            <div
+            </div> */}
+            {/* <div
               style={{
                 padding: "16px 24px",
                 borderRadius: 12,
@@ -281,8 +281,8 @@ export default function UserInfo() {
                 borderColor: "#C2E6F8",
                 borderStyle: "solid",
               }}
-            >
-              <div>
+            > */}
+              {/* <div> */}
                 {/* <h6 style={{ fontSize: "12px", fontWeight: "bold", color: '#111F4A' }}>
                   Date: June 1, 2024
                 </h6> */}
@@ -323,10 +323,10 @@ export default function UserInfo() {
                     <h4 style={{ color: '#FF0000', fontSize: '13px', marginBottom: '12px' }}>Yes</h4>
                   </div>
                 </div> */}
-              </div>
+              {/* </div> */}
 
               {/* Your flags data here */}
-            </div>
+            {/* </div> */}
 
             {/* MOST RECENT BLOODWORK Section */}
             <div className="mt-4">
@@ -369,11 +369,11 @@ export default function UserInfo() {
             </div>
           </div>
 
-          <div style={{ width: "100%" }}>
+          {/* <div style={{ width: "100%" }}>
             <p style={{ textAlign: "center" }}>
               No cycle information available.
             </p>
-          </div>
+          </div> */}
         </Col>
       </Row>
     </Row>

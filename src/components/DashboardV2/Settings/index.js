@@ -58,10 +58,10 @@ const SettingsPage = () => {
             <Content>
               <div className="full-width-container">
                 <Row gutter={24} style={{ minHeight: "100vh" }}>
-                  <Col span={2} className="column-1" style={{ backgroundColor: "#EFD0BD" }}></Col>
-                  <Col span={20} className="column-2">
+                  <Col span={2} className="column-1"></Col>
+                  <Col>
                     <div className="form-scrollable">
-                      <div className="col-xl-9 col-lg-10 col-md-12">
+                      <div>
                         <nav className="navbar mt-3">
                           <img
                             className="float-left"
@@ -262,7 +262,7 @@ const SettingsPage = () => {
                       </div>
                     </div>
                   </Col>
-                  <Col span={2} className="column-3" style={{ backgroundColor: "#EFD0BD" }}></Col>
+                  <Col span={2} className="column-3"></Col>
                 </Row>
               </div>
             </Content>
@@ -270,10 +270,10 @@ const SettingsPage = () => {
           <TabPane tab="Terms of Use" key="4">
           <div className="full-width-container">
           <Row gutter={24} style={{ minHeight: "100vh" }}>
-            <Col span={2} className="column-1" style={{ backgroundColor: "#EFD0BD" }}></Col>
-            <Col span={20} className="column-2">
+            <Col span={2} className="column-1"></Col>
+            <Col>
               <div className="form-scrollable">
-                <div className="col-xl-9 col-lg-10 col-md-12">
+                <div>
                   <nav className="navbar mt-3">
                     <img
                       className="float-left"
@@ -387,7 +387,7 @@ const SettingsPage = () => {
                 </div>
               </div>
             </Col>
-            <Col span={2} className="column-3" style={{ backgroundColor: "#EFD0BD" }}></Col>
+            <Col span={2} className="column-3"></Col>
           </Row>
         </div>
           </TabPane>

@@ -74,7 +74,7 @@ export const getPatientStatus = createAsyncThunk(
 );
 export const getPatientLabs = createAsyncThunk(
   "patient/getPatientLabs",
-  async (_, { rejectWithValue, getState, dispatch }) => {
+  async (fileType, { rejectWithValue, getState, dispatch }) => {
     const user = getState()?.authentication?.userAuth;
     const config = {
       headers: {
@@ -84,7 +84,7 @@ export const getPatientLabs = createAsyncThunk(
     };
     try {
       const response = await axios.get(
-        `${baseUrl}Patient/GetPatientDocument/1`,
+        `${baseUrl}Patient/GetPatientDocument/${fileType}`,
         config
       );
       console.log(response);

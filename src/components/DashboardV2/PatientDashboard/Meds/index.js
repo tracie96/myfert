@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Typography, Row, Col, List } from "antd";
+import { Typography, Row, Col, Table } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import Lab from "../../../../assets/images/meds.svg";
 import Capsule from "../../../../assets/images/capsule.png";
@@ -7,16 +7,16 @@ import { getPatientMed } from "../../../redux/patientSlice";
 
 const { Title, Text } = Typography;
 
+
 const MedScreen = () => {
     const userAuth = JSON.parse(localStorage.getItem("patient") || "{}");
     const dispatch = useDispatch();
 
-    const med = useSelector((state) => state.patient.medications); // Get medications from Redux store
+    const med = useSelector((state) => state.patient.medication); // Get medications from Redux store
     useEffect(() => {
-
         dispatch(getPatientMed(userAuth.userRef));
-
-    }, [userAuth.userRef,dispatch]);
+        console.log('Medications from Redux:', med);
+    }, [userAuth.userRef, dispatch, med]);
 
 
     return (
@@ -42,6 +42,10 @@ const MedScreen = () => {
 
                 <br />
                 <div style={{ borderRadius: 5, marginTop: 30 }}>
+                    {/* Debug output for Redux data */}
+                    <div style={{ marginBottom: 16, color: 'red', fontSize: 12 }}>
+                        {/* Redux medications: {JSON.stringify(med)} */}
+                    </div>
                     <div
                         style={{
                             padding: "16px 24px",
@@ -54,50 +58,51 @@ const MedScreen = () => {
                             marginTop: -10,
                         }}
                     >
-                        <List
-                            dataSource={med}
-                            renderItem={(medication) => (
-                                <List.Item style={{ borderBottom: '1px solid #f0f0f0', padding: '12px 16px' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 15, width: '100%' }}>
-                                        {/* Vertical Red Line */}
-                                        <div style={{ width: '3px', height: '40px', backgroundColor: '#E26A4E' }}></div>
-
-                                        {/* Icon + Name */}
-                                        <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 8 }}>
-                                            <img src={Capsule} alt="pill" style={{ width: 24, height: 24 }} />
-                                            <Text style={{ fontWeight: 600 }}>{medication.name || "Unknown Medication"}</Text>
-                                        </div>
-
-                                        {/* Dose */}
-                                        <div style={{ flex: 1 }}>
-                                            <Text>{medication.dose || '500 mg'}</Text>
-                                        </div>
-
-                                        {/* Amount */}
-                                        <div style={{ flex: 1 }}>
-                                            <Text>{medication.amount || '1 tablet'}</Text>
-                                        </div>
-
-                                        {/* Route */}
-                                        <div style={{ flex: 1 }}>
-                                            <Text>{medication.route || 'PO'}</Text>
-                                        </div>
-
-                                        {/* Frequency */}
-                                        <div style={{ flex: 1 }}>
-                                            <Text>{medication.frequency || 'Once a day'}</Text>
-                                        </div>
-
-                                        {/* Status */}
-                                        <div style={{ flex: 1 }}>
-                                            <Text style={{ fontWeight: 500, color: medication.status === 'Active' ? '#52c41a' : '#d9d9d9' }}>
-                                                {medication.status || 'Pending'}
-                                            </Text>
-                                        </div>
-                                    </div>
-                                </List.Item>
-                            )}
+                        <Table
+                          columns={[
+                            {
+                              title: "Name",
+                              dataIndex: "drugName",
+                              key: "name",
+                              render: text => (
+                                <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                  <img src={Capsule} alt="pill" style={{ width: 24, height: 24, marginRight: 6 }} />
+                                  <b>{text || 'Unknown Medication'}</b>
+                                </span>
+                              )
+                            },
+                            { title: "Dose", dataIndex: "dose", key: "dose", render: text => text || 'N/A' },
+                            { title: "Amount", dataIndex: "amount", key: "amount", render: text => text || 'N/A' },
+                            { title: "Route", dataIndex: "route", key: "route", render: text => text || 'N/A' },
+                            { title: "Frequency", dataIndex: "frequency", key: "frequency", render: text => text || 'N/A' },
+                          ]}
+                          dataSource={med}
+                          rowKey={(record, idx) => idx}
+                          pagination={false}
+                          style={{ background: 'transparent' }}
                         />
+                    </div>
+                </div>
+            </Col>
+            <Col xs={24} md={6}>
+                <div
+                    style={{
+                        background: "#fff",
+                        border: "1px solid #C2E6F8",
+                        borderRadius: 12,
+                        padding: 24,
+                        height: "100%",
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "flex-start"
+                    }}
+                >
+                    <Title level={5} style={{ marginBottom: 16, fontWeight: 700 }}>Current Prescription</Title>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                        <img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4c4.svg" alt="PDF" style={{ width: 32, height: 32 }} />
+                        <a href="/path/to/E-prescription.pdf" target="_blank" rel="noopener noreferrer" style={{ color: "#1890ff", fontWeight: 500 }}>
+                            E-prescription.pdf
+                        </a>
                     </div>
                 </div>
             </Col>

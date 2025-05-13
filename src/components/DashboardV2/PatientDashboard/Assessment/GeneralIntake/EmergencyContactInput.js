@@ -20,7 +20,7 @@ const EmergencyContactInput = ({ value = {}, onChange }) => {
     </span>
   );
   const isMobile = useMediaQuery({ maxWidth: 767 });
-
+  const { phoneType} = value;
 
   return (
     <Form
@@ -55,6 +55,7 @@ const EmergencyContactInput = ({ value = {}, onChange }) => {
           <Col span={8}>
             <Select
               className="select_questtionnaire"
+              value={phoneType}
               onChange={(value) => handleChange("phoneType", value)}
               placeholder="Contact"
               style={{ width: "100%" }}

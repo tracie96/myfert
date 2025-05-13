@@ -540,7 +540,7 @@ const Nutrition = ({ onComplete }) => {
         <p style={{ color: "#000", fontWeight: "bold" }}>
           {subQuestion.question}
         </p>
-        <p>{subQuestion.label}</p>
+        <p style={{ color: "#000" }}>{subQuestion.label}</p>
         <Radio.Group
           name={subQuestion.name}
           onChange={(e) => handleChange(e.target.value, subQuestion.name)}

@@ -135,10 +135,17 @@ const questions = [
   },
   {
     question: "Are you currently using any recreational drugs?",
-    type: "radio",
+    type: "long_radio",
     sub: "Other Substances",
     name: "using_recreational_drugs",
     options: ["Yes", "No"],
+    subQuestions: [
+      {
+        question: "Please specify which recreational drugs:",
+        type: "text",
+        name: "recreational_drugs_type",
+      },
+    ],
   },
   {
     question: "Have you ever used IV or inhaled recreational drugs?",
@@ -214,14 +221,35 @@ const SubstanceUse = ({ onComplete }) => {
       } else {
         nextQuestionIndex = 2;
       }
-    }
-    if (currentQuestionIndex === 6) {
+    } else if (currentQuestionIndex === 1) {
+      // After answering "Have you attempted to quit?"
+      if (answers["smoke_currently"] === "Yes") {
+        // If currently smoking, skip the "smoked previously" question
+        nextQuestionIndex = 3; // Skip to "Are you regularly exposed to second-hand smoke?"
+      } else {
+        nextQuestionIndex = 2; // Go to "Have you smoked previously"
+      }
+    } else if (currentQuestionIndex === 2) {
+      // After "Have you smoked previously"
+      nextQuestionIndex = 3;
+    } else if (currentQuestionIndex === 4) {
+      // After answering weekly alcohol consumption
+      if (answers["exposed_to_smoke"] === "None") {
+        nextQuestionIndex = 5; // Go to "Previous alcohol intake"
+      } else {
+        nextQuestionIndex = 6; // Skip to "Have you ever had a problem with alcohol?"
+      }
+    } else if (currentQuestionIndex === 5) {
+      // After "Previous alcohol intake"
+      nextQuestionIndex = 6;
+    } else if (currentQuestionIndex === 6) {
       if (answers["alcohol_problem"] === "Yes") {
         nextQuestionIndex = 7;
       } else {
         nextQuestionIndex = 8;
       }
     }
+
     localStorage.setItem("currentQuestionIndex4", 0);
     localStorage.setItem("answers", JSON.stringify(answers));
     if (
@@ -241,6 +269,12 @@ const SubstanceUse = ({ onComplete }) => {
         previousQuestionIndex = 0;
       } else {
         previousQuestionIndex = 1;
+      }
+    } else if (currentQuestionIndex === 6) {
+      if (answers["exposed_to_smoke"] === "None") {
+        previousQuestionIndex = 5;
+      } else {
+        previousQuestionIndex = 4;
       }
     } else if (currentQuestionIndex === 8) {
       if (answers["alcohol_problem"] === "No") {
@@ -296,7 +330,7 @@ const SubstanceUse = ({ onComplete }) => {
       problemAlcoholExplain: answers.packs_per_day_expain || "",
       getHelpForDrinking: answers.considered_help_for_alcohol === "Yes",
       currentlyRecreationalDrugs: answers.using_recreational_drugs === "Yes",
-      currentlyRecreationalDrugsType: "",
+      currentlyRecreationalDrugsType: answers.recreational_drugs_type || "",
       everUsedRecreationalDrugs: answers.inhaled_drugs === "Yes",
     };
   };

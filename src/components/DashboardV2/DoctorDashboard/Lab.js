@@ -309,41 +309,6 @@ const LabsAndRequisitions = () => {
                 {newLabResultFile && <Text>Selected File: {newLabResultFile.name}</Text>}
             </Modal>
 
-            <Modal
-                title="LAB RESULTS"
-                open={isEditModalVisible}
-                width={800}
-                onCancel={() => closeModal('editLabResult')}
-                footer={[
-                    <Button key="cancel" onClick={() => closeModal('editLabResult')}>
-                        Cancel
-                    </Button>,
-                    <Button key="save" type="primary" style={{ background: "green" }}>
-                        Save Changes
-                    </Button>,
-                ]}
-            >
-                <List
-                    dataSource={files}
-                    renderItem={(file) => (
-                        <List.Item>
-                            <div style={{ display: 'flex', alignItems: 'center', width: '100%', gap: 15 }}>
-                                <div style={{ width: '3px', height: '40px', backgroundColor: 'red' }}></div>
-                                <Text>{file.name}</Text>
-                                <Text>{moment(file.date).format('MMMM DD, YYYY')}</Text>
-                                <FilePdfOutlined style={{ color: 'red', fontSize: 24 }} />
-                                <Link onClick={() => handleDownload(file.id)}>{file.filename || 'LabResults.pdf'}</Link>
-                                <EditOutlined style={{ color: '#1890ff', cursor: 'pointer' }} onClick={() => openModal('editLabResult')} />
-                                <DeleteOutlined style={{ color: 'red', cursor: 'pointer' }} onClick={() => handleDelete(file.id)} />
-                            </div>
-                        </List.Item>
-                    )}
-                />
-                <Button type="primary" style={{
-                    marginTop: 10, background: "#00ADEF",
-                }} key={'new'} onClick={() => openModal('newLabResult')} >+ New Lab Result</Button>
-            </Modal>
-
             <div className="p-6 mt-4" style={{ padding: "0 1%" }}>
                 <p style={{ fontWeight: 'bold', marginBottom: '30px' }}>LABS AND REQUISITIONS</p>
 
@@ -371,6 +336,12 @@ const LabsAndRequisitions = () => {
                                 Last updated: {files.length > 0 ? moment(files[files.length - 1].date).format('MMMM DD, YYYY') : 'N/A'}
                             </Text>
                         </div>
+
+                        <Button type="primary" style={{
+                            marginTop: 10, 
+                            marginBottom: 10,
+                            background: "#00ADEF",
+                        }} onClick={() => openModal('newLabResult')}>+ New Lab Result</Button>
 
                         <Card style={{ border: '1px solid #C2E6F8' }} className='mt-1'>
                             <List
@@ -482,6 +453,38 @@ const LabsAndRequisitions = () => {
                 </div>
 
             </div>
+
+            <Modal
+                title="LAB RESULTS"
+                open={isEditModalVisible}
+                width={800}
+                onCancel={() => closeModal('editLabResult')}
+                footer={[
+                    <Button key="cancel" onClick={() => closeModal('editLabResult')}>
+                        Cancel
+                    </Button>,
+                    <Button key="save" type="primary" style={{ background: "green" }}>
+                        Save Changes
+                    </Button>,
+                ]}
+            >
+                <List
+                    dataSource={files}
+                    renderItem={(file) => (
+                        <List.Item>
+                            <div style={{ display: 'flex', alignItems: 'center', width: '100%', gap: 15 }}>
+                                <div style={{ width: '3px', height: '40px', backgroundColor: 'red' }}></div>
+                                <Text>{file.name}</Text>
+                                <Text>{moment(file.date).format('MMMM DD, YYYY')}</Text>
+                                <FilePdfOutlined style={{ color: 'red', fontSize: 24 }} />
+                                <Link onClick={() => handleDownload(file.id)}>{file.filename || 'LabResults.pdf'}</Link>
+                                <EditOutlined style={{ color: '#1890ff', cursor: 'pointer' }} onClick={() => openModal('editLabResult')} />
+                                <DeleteOutlined style={{ color: 'red', cursor: 'pointer' }} onClick={() => handleDelete(file.id)} />
+                            </div>
+                        </List.Item>
+                    )}
+                />
+            </Modal>
         </>
     );
 };

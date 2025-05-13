@@ -115,7 +115,10 @@ const LearnInfo = () => {
     }
     navigate('/menstrual-cycle-quiz', { state: { quizType, colors } });
   };
-
+  useEffect(() => {
+    localStorage.setItem('hasOpenedQuiz', 'true');
+    console.log('MenstrualCycleQuiz opened, hasOpenedQuiz set to:', localStorage.getItem('hasOpenedQuiz'));
+  }, []);
   return (
     <div className="cycle-tracking-container">
       <Row gutter={[16, 16]} style={{ marginBottom: '40px' }}>

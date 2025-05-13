@@ -11,7 +11,6 @@ import {
   InputNumber,
   message,
   Checkbox,
-  Form,
 } from "antd";
 import { useNavigate } from "react-router-dom"; // useNavigate for react-router v6
 import { useDispatch } from "react-redux";
@@ -20,6 +19,8 @@ import FormWrapper from "../FormWrapper";
 import "../assesment.css";
 import { useMediaQuery } from "react-responsive";
 import { backBtnTxt, exitBtnTxt, saveAndContinueBtn, submitBtn } from "../../../../../utils/constant";
+import Paragraph from "antd/es/typography/Paragraph";
+import Title from "antd/es/typography/Title";
 
 const { Option } = Select;
 
@@ -129,13 +130,13 @@ const questions = [
   },
   {
     question:
-      "When, where and from whom did you last receive medical or health care?",
+      "What are your hobbies and leisure activities?",
     type: "long_textarea",
-    name: "where_and_where_received_medical_care",
+    name: "hobbies_and_leisure_activities",
   },
   {
     question: "Marital Status",
-    type: "radio",
+    type: "checkbox",
     title: "Relationships",
     name: "marital_status",
     options: [
@@ -163,7 +164,29 @@ const questions = [
     name: "current_occupation",
   },
 
-
+  {
+    question: "Describe the duration and severity of pain during menstrual bleeding.",
+    type: "number_with_radio",
+    title: "Cycle Information",
+    name: "duration_per_cycle",
+    sub_question: "Duration per Cycle",
+    question_description: "Period Pain: ",
+    question_description_answer: "PELVIC PAIN/ CRAMPS",
+    subQuestions: [
+      {
+        type: "number_with_radio_sub",
+        name: "duration_per_cycle_pelvic_pain",
+      },
+     
+      {
+        question: "Severity",
+        type: "radio",
+        label: "Severity",
+        options: ["Mild", "Moderate", "Severe","None"],
+        name: "duration_per_cycle_severity_pelvic_pain",
+      },
+    ],
+  },
  
 
   {
@@ -201,6 +224,31 @@ const questions = [
       },
     ],
   },
+  {
+    question: "Based on your current occupation:",
+    type: "occupation_schedule",
+    name: "occupation_schedule",
+    subQuestions: [
+      {
+        question: "Weekly schedule",
+        type: "inputNumber",
+        name: "occupation_weekly_hours",
+        suffix: "hours"
+      },
+      {
+        question: "Type",
+        type: "radio",
+        name: "occupation_type",
+        options: [
+          "Daytime",
+          "Evening",
+          "Nighttime",
+          "Rotating Shift",
+          "On-call"
+        ]
+      }
+    ]
+  },
 ];
 
 const StressAndRelationship = ({ onComplete }) => {
@@ -212,6 +260,13 @@ const StressAndRelationship = ({ onComplete }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const isMobile = useMediaQuery({ maxWidth: 767 });
+
+  const subQuestions_question = [
+    { name: 'days light bleeding' },
+    { name: 'days moderate bleeding' },
+    { name: 'days heavy bleeding' },
+    { name: 'days very heavy bleeding' }
+  ];
 
   useEffect(() => {
     // Validate questions array is not empty
@@ -464,30 +519,41 @@ const StressAndRelationship = ({ onComplete }) => {
     
     return subQuestions.map((subQuestion, index) => (
       <div key={index} style={{ marginTop: "20px" }}>
-        <p>{subQuestion.type !== "text" && subQuestion.question}</p>
-        {subQuestion.type === "text" && (
-         <Form.Item
-         name={subQuestion.name}
-         rules={[
-           { required: true, message: "This field is required." },
-         ]}
-       >
-         <Input
-           placeholder={subQuestion.question || ""}
-           value={answers[subQuestion.name] || ""}
-           onChange={(e) => handleChange(e.target.value, subQuestion.name)}
-           className="input_questtionnaire"
-         />
-       </Form.Item>
-       
+        <p style={{ fontWeight: "bold" }}>{subQuestion.question}</p>
+        { subQuestion.type === "number_with_radio_sub" && subQuestion.name === "menstrual_bleeding_sub" && (
+          <>
+            <div>
+              {subQuestions_question && subQuestions_question.map((subQuestion, index) => {
+                const nameSubQuestion = subQuestion.name.replace(/ /g, '_');
+                return(
+                <div key={nameSubQuestion || index} className="question-container">
+                  <InputNumber
+                    name={nameSubQuestion}
+                    value={answers[nameSubQuestion] || undefined}
+                    min={ 0 }
+                    onChange={(value) => handleChange(value, nameSubQuestion)}
+                    className="input_questionnaire"
+                  />
+                  <span className="question-text">
+                    {" "+subQuestion.name || 'Default Name'} 
+                  </span>
+                  <div style={{ marginBottom: '10px' }}></div>
+                </div>
+                )})}
+            </div>
+          </>
         )}
-        {subQuestion.type === "inputNumber" && (
-          <InputNumber
-            name={subQuestion.name}
-            value={answers[subQuestion.name] || 0}
-            onChange={(value) => handleChange(value, subQuestion.name)}
-            className="input_questtionnaire"
-          />
+        { subQuestion.type === "number_with_radio_sub" && subQuestion.name !== "menstrual_bleeding_sub" && (
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <InputNumber
+              name={subQuestion.name}
+              value={answers[subQuestion.name] || 0}
+              onChange={(value) => handleChange(value, subQuestion.name)}
+              className="input_questtionnaire"
+              style={{ marginRight: 8 }}
+            />
+            <span>{subQuestion.suffix || ""}</span>
+          </div>
         )}
         {subQuestion.type === "radio" && (
           <Radio.Group
@@ -559,7 +625,29 @@ const StressAndRelationship = ({ onComplete }) => {
             ))}
           </Radio.Group>
         );
-
+        case "number_with_radio":
+          return (
+            <div className="input_container" style={{ marginBottom: "20px" }}>
+              {question.isCyleInfo && (
+                <div className="info-box">
+                  <Title
+                    level={5}
+                    className="info-title"
+                    style={{ color: "#335CAD" }}
+                  >
+                    Cycle Length
+                  </Title>
+                  <Paragraph>
+                    For this form, your cycle length is counted from the first day
+                    of menstrual bleeding (any days of spotting will remain in the
+                    previous cycle) until the day before your next period begins.
+                  </Paragraph>
+                </div>
+              )}
+              <p style={{color:"#000"}}>{question.sub_question}</p>
+              {renderSubQuestions(question.subQuestions)}
+            </div>
+          );
       case "radiowithselect":
         return (
           <Radio.Group
@@ -755,13 +843,14 @@ const StressAndRelationship = ({ onComplete }) => {
         ) : (
           <>
             <h3 style={{ margin: "20px 0", color: "#F2AA93" }}>   
-              {label}
+            
               {getCurrentQuestion()?.title || "Stress"}
             </h3>
 
             {getCurrentQuestion() ? (
               <>
                 <h3 style={{ margin: "20px 0", color: "#000", fontWeight:"600", fontSize: "15px" }}>
+                {label}
                   {getCurrentQuestion().question || ""}
                   {getCurrentQuestion().sub && (
                     <i style={{ color: "#335CAD", fontWeight: "bold" }}>

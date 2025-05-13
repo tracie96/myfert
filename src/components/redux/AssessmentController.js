@@ -56,6 +56,36 @@ export const getGeneralInformation = createAsyncThunk(
   },
 );
 
+export const getGeneralInformationPatient = createAsyncThunk(
+  "Patient/GetGeneralInformation", // Unique action type prefix
+  async (_, { getState }) => { //  No id parameter needed, use _ to indicate unused parameter
+      console.log("Fetching access details...");
+
+      const user = getState()?.authentication?.userAuth;
+      const token = user?.obj?.token;
+
+      const config = {
+          headers: {
+              accept: "text/plain",
+              Authorization: `Bearer ${token}`,
+          },
+      };
+
+      try {
+          const response = await axios.get(
+              `${baseUrl}/Patient/GetGeneralInformation`,
+              config,
+          );
+
+          console.log("Access details response:", response);
+          return response.data;
+      } catch (error) {
+          console.error("Error fetching access details:", error);
+          return handleApiError(error); // Use the error handling function
+      }
+  },
+);
+
 export const getAccessDetails = createAsyncThunk(
   "Patient/GetAccessDetails", // Unique action type prefix
   async (_, { getState }) => { //  No id parameter needed, use _ to indicate unused parameter
@@ -391,6 +421,7 @@ const initialState = {
   loading: false,
   error: null,
   accessDetails: {},
+  patientGeneralInfo:{},
 };
 
 const intakeFormSlice = createSlice({
@@ -399,6 +430,19 @@ const intakeFormSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     // For getGeneralInformation
+    builder
+      .addCase(getGeneralInformationPatient.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getGeneralInformationPatient.fulfilled, (state, action) => {
+        state.loading = false;
+        state.patientGeneralInfo = action.payload; // Set the fetched data
+      })
+      .addCase(getGeneralInformationPatient.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      });
     builder
       .addCase(getGeneralInformation.pending, (state) => {
         state.loading = true;

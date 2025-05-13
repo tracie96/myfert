@@ -12,11 +12,11 @@ import {
 import { useNavigate } from "react-router-dom";
 import FormWrapper from "../FormWrapper";
 import EmergencyContactInput from "./EmergencyContactInput";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { completeCard } from "../../../../redux/assessmentSlice";
 import "../assesment.css";
 import { useMediaQuery } from "react-responsive";
-import { submitGeneralInformation } from "../../../../redux/AssessmentController";
+import { submitGeneralInformation, getGeneralInformationPatient } from "../../../../redux/AssessmentController";
 import { backBtnTxt, exitBtnTxt, saveAndContinueBtn, submitBtn } from "../../../../../utils/constant";
 // import CryptoJS from "crypto-js";
 
@@ -85,12 +85,63 @@ const questions = [
 
 const GeneralIntakeForm = ({ onComplete }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [dataLoadedFromAPI, setDataLoadedFromAPI] = useState(false);
   const [answers, setAnswers] = useState({});
   const totalQuestions = questions.length;
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const isMobile = useMediaQuery({ maxWidth: 767 });
   // const SECRET_KEY = "default_secret_key";
+  const patientGeneralInfo = useSelector((state) => state.intake?.patientGeneralInfo);
+
+  useEffect(() => {
+    dispatch(getGeneralInformationPatient());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (!dataLoadedFromAPI) {
+      const savedAnswers = JSON.parse(localStorage.getItem("answers"));
+      const savedIndex = parseInt(localStorage.getItem("currentQuestionIndex"), 10);
+  
+      if (patientGeneralInfo && Object.keys(patientGeneralInfo).length > 0) {
+        const howDidYouHearOptions = questions.find(
+          (q) => q.name === "how_did_you_hear"
+        )?.options || [];
+  
+        const mappedAnswers = {
+          age: patientGeneralInfo.age || "",
+          geneticBackground: patientGeneralInfo.geneticBackground || "",
+          where_received_medical_care: patientGeneralInfo.whereMedicalCare || "",
+          when_received_medical_care: patientGeneralInfo.whenMedicalCare || "",
+          whom_received_medical_care: patientGeneralInfo.whomMedicalCare || "",
+          emergency_contact: {
+            contact: patientGeneralInfo.emergencyContact || "",
+            relationship: patientGeneralInfo.emergencyRelationship || "",
+            phoneHome: patientGeneralInfo.emergencyPhoneHome || "",
+            phoneCell: patientGeneralInfo.emergencyPhoneCell || "",
+            phoneWork: patientGeneralInfo.emergencyPhoneWork || "",
+          },
+          how_did_you_hear: patientGeneralInfo.howDidHearAbout || "",
+        };
+  
+        if (
+          mappedAnswers.how_did_you_hear &&
+          !howDidYouHearOptions.includes(mappedAnswers.how_did_you_hear)
+        ) {
+          mappedAnswers.how_did_you_hear = "Other";
+          mappedAnswers["how_did_you_hear_other"] =
+            patientGeneralInfo.howDidHearAbout;
+        }
+        setAnswers(mappedAnswers);
+        setCurrentQuestionIndex(0);
+        setDataLoadedFromAPI(true);
+      } else if (!patientGeneralInfo && savedAnswers && !isNaN(savedIndex)) {
+        setAnswers(savedAnswers);
+        setCurrentQuestionIndex(savedIndex);
+        setDataLoadedFromAPI(true);
+      }
+    }
+  }, [patientGeneralInfo, dataLoadedFromAPI]);
 
   useEffect(() => {
     const savedIndex = parseInt(
@@ -104,6 +155,16 @@ const GeneralIntakeForm = ({ onComplete }) => {
       setAnswers(savedAnswers);
     }
   }, []);
+  
+  // useEffect(() => {
+  //   const savedIndex = parseInt(localStorage.getItem("currentQuestionIndex"), 10);
+  //   const savedAnswers = JSON.parse(localStorage.getItem("answers"));
+  
+  //   if (!isNaN(savedIndex) && savedAnswers && !dataLoadedFromAPI) {
+  //     setCurrentQuestionIndex(savedIndex);
+  //     setAnswers(savedAnswers);
+  //   }
+  // }, [dataLoadedFromAPI]);
 
   // useEffect(() => {
   //   // Save state to localStorage
@@ -374,7 +435,7 @@ const GeneralIntakeForm = ({ onComplete }) => {
             </>
           )}
         </h3>{" "}
-        {renderInput(questions[currentQuestionIndex])}
+        {dataLoadedFromAPI && renderInput(questions[currentQuestionIndex])}
         <div
           style={{ margin: "20px 0", marginTop: isMobile ? 50 : 200 }}
           className="button_group"

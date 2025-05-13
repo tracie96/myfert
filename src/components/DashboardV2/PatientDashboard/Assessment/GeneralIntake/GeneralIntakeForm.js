@@ -117,6 +117,8 @@ const GeneralIntakeForm = ({ onComplete }) => {
           emergency_contact: {
             contact: patientGeneralInfo.emergencyContact || "",
             relationship: patientGeneralInfo.emergencyRelationship || "",
+            phoneHome: patientGeneralInfo.emergencyPhoneHome || "",
+            phoneCell: patientGeneralInfo.emergencyPhoneCell || "",
             phoneType: patientGeneralInfo.emergencyPhoneWork || "",
           },
           how_did_you_hear: patientGeneralInfo.howDidHearAbout || "",
@@ -251,6 +253,8 @@ const GeneralIntakeForm = ({ onComplete }) => {
       whomMedicalCare: answers["whom_received_medical_care"] || "",
       emergencyContact: answers["emergency_contact"]?.contact || "",
       emergencyRelationship: answers["emergency_contact"]?.relationship || "",
+      emergencyPhoneHome: answers["emergency_contact"]?.phoneHome || "",
+      emergencyPhoneCell: answers["emergency_contact"]?.phoneCell || "",
       emergencyPhoneWork: answers["emergency_contact"]?.phoneType || "",
       howDidHearAbout: answers["how_did_you_hear"] || "",
     };

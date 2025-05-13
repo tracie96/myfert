@@ -142,7 +142,7 @@ export default function UserInfo() {
                   {userInfo?.user?.phoneNumber || "N/A"}
                 </p>
               </Col>
-              <Col span={12} md={6}>
+              {/* <Col span={12} md={6}>
                 <p>
                   <strong>RRM</strong> : {userInfo?.rrm || "N/A"}
                 </p>
@@ -169,10 +169,10 @@ export default function UserInfo() {
                 <p>
                   <strong>Coach</strong> : {userInfo?.coach || "N/A"}
                 </p>
-              </Col>
+              </Col> */}
             </Row>
             <Row gutter={16} style={{ marginTop: "16px" }}>
-              <Col span={12} md={6}>
+              {/* <Col span={12} md={6}>
                 <p>
                   <strong>Care Type</strong> : {userInfo?.careType || "N/A"}
                 </p>
@@ -181,7 +181,7 @@ export default function UserInfo() {
                 <p>
                   <strong>LMP</strong> : {userInfo?.lmp || "N/A"}
                 </p>
-              </Col>
+              </Col> */}
             </Row>
           </Card>
         </div>

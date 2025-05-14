@@ -86,6 +86,66 @@ export const getGeneralInformationPatient = createAsyncThunk(
   },
 );
 
+export const getNutritionPatient = createAsyncThunk(
+  "Patient/GetNutrition", // Unique action type prefix
+  async (_, { getState }) => { //  No id parameter needed, use _ to indicate unused parameter
+      console.log("Fetching access details...");
+
+      const user = getState()?.authentication?.userAuth;
+      const token = user?.obj?.token;
+
+      const config = {
+          headers: {
+              accept: "text/plain",
+              Authorization: `Bearer ${token}`,
+          },
+      };
+
+      try {
+          const response = await axios.get(
+              `${baseUrl}/Patient/GetNutrition`,
+              config,
+          );
+
+          console.log("Access details response:", response);
+          return response.data;
+      } catch (error) {
+          console.error("Error fetching access details:", error);
+          return handleApiError(error); // Use the error handling function
+      }
+  },
+);
+
+export const getSubstancePatient = createAsyncThunk(
+  "Patient/getSubstanceUse", // Unique action type prefix
+  async (_, { getState }) => { //  No id parameter needed, use _ to indicate unused parameter
+      console.log("Fetching access details...");
+
+      const user = getState()?.authentication?.userAuth;
+      const token = user?.obj?.token;
+
+      const config = {
+          headers: {
+              accept: "text/plain",
+              Authorization: `Bearer ${token}`,
+          },
+      };
+
+      try {
+          const response = await axios.get(
+              `${baseUrl}/Patient/getSubstanceUse`,
+              config,
+          );
+
+          console.log("Access details response:", response);
+          return response.data;
+      } catch (error) {
+          console.error("Error fetching access details:", error);
+          return handleApiError(error); // Use the error handling function
+      }
+  },
+);
+
 export const getAccessDetails = createAsyncThunk(
   "Patient/GetAccessDetails", // Unique action type prefix
   async (_, { getState }) => { //  No id parameter needed, use _ to indicate unused parameter
@@ -422,6 +482,9 @@ const initialState = {
   error: null,
   accessDetails: {},
   patientGeneralInfo:{},
+  patientNutritionInfo:{},
+  patientSubstanceInfo:{},
+
 };
 
 const intakeFormSlice = createSlice({
@@ -429,6 +492,34 @@ const intakeFormSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
+    // For getSubstance patient
+    builder
+    .addCase(getSubstancePatient.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    })
+    .addCase(getSubstancePatient.fulfilled, (state, action) => {
+      state.loading = false;
+      state.patientSubstanceInfo = action.payload; // Set the fetched data
+    })
+    .addCase(getSubstancePatient.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.error.message;
+    });
+     // For getNutrition
+     builder
+     .addCase(getNutritionPatient.pending, (state) => {
+       state.loading = true;
+       state.error = null;
+     })
+     .addCase(getNutritionPatient.fulfilled, (state, action) => {
+       state.loading = false;
+       state.patientNutritionInfo = action.payload; // Set the fetched data
+     })
+     .addCase(getNutritionPatient.rejected, (state, action) => {
+       state.loading = false;
+       state.error = action.error.message;
+     });
     // For getGeneralInformation
     builder
       .addCase(getGeneralInformationPatient.pending, (state) => {

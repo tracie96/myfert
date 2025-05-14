@@ -11,12 +11,13 @@ import {
   message,
 } from "antd";
 import { useNavigate } from "react-router-dom"; // useNavigate for react-router v6
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { completeCard } from "../../../../redux/assessmentSlice";
 import FormWrapper from "../FormWrapper";
 import "../assesment.css";
 import { useMediaQuery } from "react-responsive";
 import { backBtnTxt, exitBtnTxt, saveAndContinueBtn, submitBtn } from "../../../../../utils/constant";
+import { getNutritionPatient } from "../../../../redux/AssessmentController";
 
 const { Option } = Select;
 
@@ -314,18 +315,63 @@ const Nutrition = ({ onComplete }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const isMobile = useMediaQuery({ maxWidth: 767 });
+  const patientNutritionInfo = useSelector((state) => state.intake?.patientNutritionInfo);
+  
+  const mapNutritionInfoToAnswers = (info) => {
+    return {
+      special_nutritional_program: info.specialDietProgram || [],
+      special_diet_reason: info.specialDietReason || "",
+      sensitive_food: info.sensitiveToFood?.yesNo ? "Yes" : "No",
+      sensitive_food_other: info.sensitiveToFood?.describe || "",
+      sensitive_food_info: info.sensitiveToFood?.describe || "",
+      aversion_to_certain_food: info.aversionToFood?.yesNo ? "Yes" : "No",
+      adversely_react: info.adverseList || [],
+      crave_for_foods: info.anyFoodCraving?.yesNo ? "Yes" : "No",
+      eat_3_meals: info.have3MealADay?.yesNo ? "Yes" : "No",
+      meals_per_day: info.have3MealADay?.level?.toString() || "",
+      does_skipping_meal_affect_you: info.skippingAMeal ? "Yes" : "No",
+      actors_applyingto_current_lifestyle: info.eatingHabits || [],
+      diet_detail_breakfast: info.typicalBreakfast || "",
+      diet_detail_lunch: info.typicalLunch || "",
+      diet_detail_dinner: info.typicalDinner || "",
+      diet_detail_snacks: info.typicalSnacks || "",
+      diet_detail_fluids: info.typicalFluid || "",
+      diet_servings_fruits: info.noTypicalFruits || 0,
+      diet_serving_vegetables: info.noTypicalVegetables || 0,
+      diet_servings_legumes: info.noTypicalLegumes || 0,
+      diet_servings_meat: info.noTypicalRedMeat || 0,
+      diet_servings_fish: info.noTypicalFish || 0,
+      diet_servings_dairyalt: info.noTypicalDairy || 0,
+      diet_servings_nuts: info.noTypicalNuts || 0,
+      diet_servings_fatsandoil: info.noTypicalFats || 0,
+      diet_servings_soda: info.noTypicalCanSoda || 0,
+      diet_servings_sweets: info.noTypicalSweets || 0,
+      caffeinated_beverages: info.caffeinatedBeverages ? "Yes" : "No",
+      coffee_amount: info.coffeeCups || "",
+      tea_amount: info.teaCups || "",
+      soda_amount: info.sodaCups || "",
+      sensitive_food_caffeine: info.adverseReactionToCoffee ? "Yes" : "No",
+      sensitive_food_caffeine_feel: info.reactionToCaffeine || "",
+    };
+  };
+
+  
+  useEffect(() => {
+    dispatch(getNutritionPatient());
+  }, [dispatch]);
 
   useEffect(() => {
-    const savedIndex = parseInt(
-      localStorage.getItem("currentQuestionIndex3"),
-      10,
-    );
+    const savedIndex = parseInt(localStorage.getItem("currentQuestionIndex3"), 10);
     const savedAnswers = JSON.parse(localStorage.getItem("answers"));
+  
     if (!isNaN(savedIndex) && savedAnswers) {
       setCurrentQuestionIndex(savedIndex);
       setAnswers(savedAnswers);
+    } else if (patientNutritionInfo && Object.keys(patientNutritionInfo).length > 0) {
+      const prefilledAnswers = mapNutritionInfoToAnswers(patientNutritionInfo);
+      setAnswers(prefilledAnswers);
     }
-  }, []);
+  }, [patientNutritionInfo]);
 
   const handleExit = () => {
     navigate("/assessment");

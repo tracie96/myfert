@@ -10,12 +10,13 @@ import {
   message,
 } from "antd";
 import { useNavigate } from "react-router-dom"; // useNavigate for react-router v6
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { completeCard } from "../../../../redux/assessmentSlice";
 import FormWrapper from "../FormWrapper";
 import "../assesment.css";
 import { useMediaQuery } from "react-responsive";
 import { backBtnTxt, exitBtnTxt, saveAndContinueBtn, submitBtn } from "../../../../../utils/constant";
+import { getSubstancePatient } from "../../../../redux/AssessmentController";
 
 const questions = [
   {
@@ -163,18 +164,59 @@ const SubstanceUse = ({ onComplete }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const isMobile = useMediaQuery({ maxWidth: 767 });
+  const patientSubstanceInfo = useSelector((state) => state.intake?.patientSubstanceInfo);
 
+  const mapSubstanceInfoToAnswers = (info) => {
+    return {
+      smoke_currently: info.smokePresently ? "Yes" : "No",
+      packs_per_day: info.smokingCurrently?.packsDay || 0,
+      number_of_years: info.smokingCurrently?.years || 0,
+      smoke_type: info.smokingCurrently?.type || "",
+  
+      attempted_to_quit: info.attempedToQuit?.yesNo ? "Yes" : "No",
+      methods_to_stop_smoking: info.attempedToQuit?.describe || "",
+  
+      smoked_previously: info.smokedInPast ? "Yes" : "No",
+      packs_per_day_previous: info.smokedInPast?.packsDay || 0,
+      number_of_years_previous: info.smokedInPast?.years || 0,
+  
+      exposed_to_second_hand_smoke: info.exposedTo2ndSmoke ? "Yes" : "No",
+  
+      exposed_to_smoke: info.howManyAlcoholWeek || "",
+  
+      previous_alcohol_intake: info.previousAlcoholIntake?.yesNo ? "Yes" : "No",
+      previous_packs_per_day: info.previousAlcoholIntake?.describe || "",
+  
+      alcohol_problem: info.problemAlcohol ? "Yes" : "No",
+      packs_per_day_when: info.problemAlcoholWhen || "",
+      packs_per_day_expain: info.problemAlcoholExplain || "",
+  
+      considered_help_for_alcohol: info.getHelpForDrinking ? "Yes" : "No",
+  
+      using_recreational_drugs: info.currentlyRecreationalDrugs ? "Yes" : "No",
+      recreational_drugs_type: info.currentlyRecreationalDrugsType || "",
+  
+      inhaled_drugs: info.everUsedRecreationalDrugs ? "Yes" : "No",
+    };
+  };
+
+  
   useEffect(() => {
-    const savedIndex = parseInt(
-      localStorage.getItem("currentQuestionIndex4"),
-      10,
-    );
+    dispatch(getSubstancePatient());
+  }, [dispatch]);
+  
+  useEffect(() => {
+    const savedIndex = parseInt(localStorage.getItem("currentQuestionIndex4"), 10);
     const savedAnswers = JSON.parse(localStorage.getItem("answers"));
+  
     if (!isNaN(savedIndex) && savedAnswers) {
       setCurrentQuestionIndex(savedIndex);
       setAnswers(savedAnswers);
+    } else if (patientSubstanceInfo && Object.keys(patientSubstanceInfo).length > 0) {
+      const prefilled = mapSubstanceInfoToAnswers(patientSubstanceInfo);
+      setAnswers(prefilled);
     }
-  }, []);
+  }, [patientSubstanceInfo]);
   // ToDo: remove this commented code after testing
   // const validateQuestion = () => {
   //   const question = questions[currentQuestionIndex];

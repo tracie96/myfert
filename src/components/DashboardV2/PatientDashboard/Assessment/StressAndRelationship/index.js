@@ -13,8 +13,9 @@ import {
   Checkbox,
 } from "antd";
 import { useNavigate } from "react-router-dom"; // useNavigate for react-router v6
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { completeCard } from "../../../../redux/assessmentSlice";
+import { getStressPatient } from "../../../../redux/AssessmentController"; // Import the action
 import FormWrapper from "../FormWrapper";
 import "../assesment.css";
 import { useMediaQuery } from "react-responsive";
@@ -256,10 +257,15 @@ const StressAndRelationship = ({ onComplete }) => {
   const [answers, setAnswers] = useState({});
   const [isQuestionsLoaded, setIsQuestionsLoaded] = useState(false);
   const [questionLoadError, setQuestionLoadError] = useState(null);
+  const [isDataLoading, setIsDataLoading] = useState(true); // Add loading state for prefetch
+  
   const totalQuestions = questions?.length || 0;
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const isMobile = useMediaQuery({ maxWidth: 767 });
+
+  // Get stress data from Redux store
+  const { patientStressInfo, loading } = useSelector((state) => state.intake);
 
   const subQuestions_question = [
     { name: 'days light bleeding' },
@@ -267,6 +273,89 @@ const StressAndRelationship = ({ onComplete }) => {
     { name: 'days heavy bleeding' },
     { name: 'days very heavy bleeding' }
   ];
+
+  // Function to map API response to form format
+  const mapApiToFormData = (apiData) => {
+    if (!apiData) return {};
+
+    const formData = {
+      // Map boolean values back to "Yes"/"No"
+      do_you_feel_stress: apiData.excessStress ? "Yes" : "No",
+      can_you_handle_stress: apiData.easyToHandleStress ? "Yes" : "No",
+      
+      // Map stress ratings
+      health_stress_work: apiData.stressFromWork || 0,
+      health_stress_family: apiData.stressFromFamily || 0,
+      health_stress_social: apiData.stressFromSocial || 0,
+      health_stress_financies: apiData.stressFromFinances || 0,
+      health_stress_health: apiData.stressFromHealth || 0,
+      health_stress_other: apiData.stressFromOther || 0,
+      
+      // Map relaxation techniques
+      relaxation_techniques: apiData.relaxationTechniques ? "Yes" : "No",
+      how_often_reaxation: apiData.oftenRelaxationTechniques !== "N/A" ? apiData.oftenRelaxationTechniques : "",
+      
+      // Map technique types (convert string back to array)
+      special_nutritional_program: apiData.typeRelaxationTechniques && apiData.typeRelaxationTechniques !== "N/A" 
+        ? apiData.typeRelaxationTechniques.split(", ") 
+        : [],
+      
+      // Map counseling and therapy
+      have_you_sought_counselling: apiData.soughtCounselling ? "Yes" : "No",
+      current_therapy: apiData.currentlyInTherapy ? "Yes" : "No",
+      therapy_description: apiData.describeTherapy !== "N/A" ? apiData.describeTherapy : "",
+      
+      // Map abuse question
+      been_abused: apiData.abused ? "Yes" : "No",
+      
+      // Map hobbies (this field seems to be missing in the API mapping, using a default)
+      hobbies_and_leisure_activities: apiData.hobbiesLeisure !== "N/A" ? apiData.hobbiesLeisure : "",
+      
+      // Map relationship info
+      marital_status: Array.isArray(apiData.maritalStatus) ? apiData.maritalStatus : (apiData.maritalStatus !== "N/A" ? [apiData.maritalStatus] : []),
+      who_do_you_live_with: apiData.whoDoYouLiveWith !== "N/A" ? apiData.whoDoYouLiveWith : "",
+      current_occupation: apiData.currentOccupation !== "N/A" ? apiData.currentOccupation : "",
+      previous_occupation: apiData.previousOccupation !== "N/A" ? apiData.previousOccupation : "",
+      
+      // Map emotional support
+      resourcces_for_emotional_support: Array.isArray(apiData.emotionalSupport) ? apiData.emotionalSupport : [],
+      
+      // Map spiritual practice
+      spiritual_practice: apiData.religiousPractice ? "Yes" : "No",
+      spiritual_practice_desciption: apiData.typeReligiousPractice !== "N/A" ? apiData.typeReligiousPractice : "",
+    };
+
+    return formData;
+  };
+
+  // Prefetch existing data on component mount
+  useEffect(() => {
+    const fetchExistingData = async () => {
+      try {
+        setIsDataLoading(true);
+        
+        // Check if we already have the data in Redux store
+        if (patientStressInfo && Object.keys(patientStressInfo).length > 0) {
+          const formData = mapApiToFormData(patientStressInfo);
+          setAnswers(formData);
+        } else {
+          // Fetch data if not available
+          const resultAction = await dispatch(getStressPatient());
+          if (getStressPatient.fulfilled.match(resultAction)) {
+            const formData = mapApiToFormData(resultAction.payload);
+            setAnswers(formData);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching existing stress data:", error);
+        // Continue with empty form if fetch fails
+      } finally {
+        setIsDataLoading(false);
+      }
+    };
+
+    fetchExistingData();
+  }, [dispatch, patientStressInfo]);
 
   useEffect(() => {
     // Validate questions array is not empty
@@ -281,24 +370,26 @@ const StressAndRelationship = ({ onComplete }) => {
       setQuestionLoadError(errorMsg);
     }
 
-    // Load saved data
-    try {
-      const savedIndex = parseInt(
-        localStorage.getItem("currentQuestionIndex5"),
-        10,
-      );
-      const savedAnswers = JSON.parse(localStorage.getItem("answers"));
-      if (!isNaN(savedIndex) && savedAnswers) {
-        setCurrentQuestionIndex(savedIndex < totalQuestions ? savedIndex : 0);
-        setAnswers(savedAnswers);
+    // Load saved data from localStorage only if no prefetched data
+    if (!isDataLoading && Object.keys(answers).length === 0) {
+      try {
+        const savedIndex = parseInt(
+          localStorage.getItem("currentQuestionIndex5"),
+          10,
+        );
+        const savedAnswers = JSON.parse(localStorage.getItem("answers"));
+        if (!isNaN(savedIndex) && savedAnswers) {
+          setCurrentQuestionIndex(savedIndex < totalQuestions ? savedIndex : 0);
+          setAnswers(savedAnswers);
+        }
+      } catch (error) {
+        console.error('Error loading saved data:', error);
+        // Reset to defaults
+        localStorage.setItem("currentQuestionIndex5", "0");
+        setCurrentQuestionIndex(0);
       }
-    } catch (error) {
-      console.error('Error loading saved data:', error);
-      // Reset to defaults
-      localStorage.setItem("currentQuestionIndex5", "0");
-      setCurrentQuestionIndex(0);
     }
-  }, [totalQuestions]);
+  }, [totalQuestions, isDataLoading, answers]);
 
   // Add a safety check to prevent accessing an invalid question
   const getCurrentQuestion = () => {
@@ -466,16 +557,16 @@ const StressAndRelationship = ({ onComplete }) => {
         typeRelaxationTechniques: answers.special_nutritional_program?.join(", ") || "N/A",
         soughtCounselling: answers.have_you_sought_counselling === "Yes",
         currentlyInTherapy: answers.current_therapy === "Yes",
-        describeTherapy: answers.where_and_where_received_medical_care || "N/A",
+        describeTherapy: answers.therapy_description || "N/A", // Fixed mapping
         abused: answers.been_abused === "Yes",
-        hobbiesLeisure: "N/A", 
-        maritalStatus: answers.marital_status || "N/A",
+        hobbiesLeisure: answers.hobbies_and_leisure_activities || "N/A", // Fixed mapping
+        maritalStatus: Array.isArray(answers.marital_status) ? answers.marital_status.join(", ") : (answers.marital_status || "N/A"),
         whoDoYouLiveWith: answers.who_do_you_live_with || "N/A",
         currentOccupation: answers.current_occupation?.trim() || "N/A",
         previousOccupation: answers.previous_occupation?.trim() || "N/A",
         emotionalSupport: answers.resourcces_for_emotional_support || [],
         religiousPractice: answers.spiritual_practice === "Yes",
-        typeReligiousPractice:answers.spiritual_practice_desciption || "N/A",
+        typeReligiousPractice: answers.spiritual_practice_desciption || "N/A",
       };
   
       // Send data to API
@@ -498,7 +589,7 @@ const StressAndRelationship = ({ onComplete }) => {
           message.success("Form submitted successfully!");
           dispatch(completeCard("/questionnaire/5"));
           localStorage.setItem("currentQuestionIndex5", "0");
-          localStorage.setItem("answers", JSON.stringify(answers));
+          localStorage.setItem("answers", JSON.stringify({})); // Clear localStorage after successful submission
           navigate("/assessment");
         })
         .catch((error) => {
@@ -822,6 +913,21 @@ const StressAndRelationship = ({ onComplete }) => {
     currentQuestionIndex === totalQuestions - 1 ? "#01ACEE" : "#C2E6F8";
   const progressPercentage =
     ((currentQuestionIndex + 1) / totalQuestions) * 100;
+
+  // Show loading state while fetching data
+  if (isDataLoading || loading) {
+    return (
+      <Row gutter={16} style={{ padding: "0 5%" }}>
+        <Col xs={24} sm={24} md={24} lg={24} xl={24}>
+          <FormWrapper name="FEMALE INTAKE QUESTIONNAIRE" />
+          <div style={{ margin: "40px 0", textAlign: "center" }}>
+            <h3>Loading existing data...</h3>
+            <p>Please wait while we fetch your previously saved information.</p>
+          </div>
+        </Col>
+      </Row>
+    );
+  }
 
   return (
     <Row gutter={16} style={{ padding: "0 5%" }}>

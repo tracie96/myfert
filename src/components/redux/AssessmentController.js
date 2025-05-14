@@ -175,6 +175,270 @@ export const getAccessDetails = createAsyncThunk(
       }
   },
 );
+
+export const getHealthLifestylePatient = createAsyncThunk(
+  "Patient/GetHealthLifestyle",
+  async (_, { getState }) => {
+    console.log("Fetching health lifestyle details...");
+
+    const user = getState()?.authentication?.userAuth;
+    const token = user?.obj?.token;
+
+    const config = {
+      headers: {
+        accept: "text/plain",
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    try {
+      const response = await axios.get(
+        `${baseUrl}/Patient/GetHealthLifestyle`,
+        config,
+      );
+
+      console.log("Health lifestyle response:", response);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching health lifestyle:", error);
+      return handleApiError(error);
+    }
+  },
+);
+
+export const getStressPatient = createAsyncThunk(
+  "Patient/GetStress",
+  async (_, { getState }) => {
+    console.log("Fetching stress details...");
+
+    const user = getState()?.authentication?.userAuth;
+    const token = user?.obj?.token;
+
+    const config = {
+      headers: {
+        accept: "text/plain",
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    try {
+      const response = await axios.get(
+        `${baseUrl}/Patient/GetStress`,
+        config,
+      );
+
+      console.log("Stress response:", response);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching stress:", error);
+      return handleApiError(error);
+    }
+  },
+);
+
+export const getHealthMedicalPatient = createAsyncThunk(
+  "Patient/GetHealthMedicalHistory",
+  async (_, { getState }) => {
+    console.log("Fetching health medical history...");
+
+    const user = getState()?.authentication?.userAuth;
+    const token = user?.obj?.token;
+
+    const config = {
+      headers: {
+        accept: "text/plain",
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    try {
+      const response = await axios.get(
+        `${baseUrl}/Patient/GetHealthMedicalHistory`,
+        config,
+      );
+
+      console.log("Health medical history response:", response);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching health medical history:", error);
+      return handleApiError(error);
+    }
+  },
+);
+
+export const getPersonalFamilyPatient = createAsyncThunk(
+  "Patient/GetPersonalFamily",
+  async (_, { getState }) => {
+    console.log("Fetching personal family details...");
+
+    const user = getState()?.authentication?.userAuth;
+    const token = user?.obj?.token;
+
+    const config = {
+      headers: {
+        accept: "text/plain",
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    try {
+      const response = await axios.get(
+        `${baseUrl}/Patient/GetPersonalFamily`,
+        config,
+      );
+
+      console.log("Personal family response:", response);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching personal family:", error);
+      return handleApiError(error);
+    }
+  },
+);
+
+export const getIllnessConditionPatient = createAsyncThunk(
+  "Patient/GetIllnessConditions",
+  async (_, { getState }) => {
+    console.log("Fetching illness conditions...");
+
+    const user = getState()?.authentication?.userAuth;
+    const token = user?.obj?.token;
+
+    const config = {
+      headers: {
+        accept: "text/plain",
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    try {
+      const response = await axios.get(
+        `${baseUrl}/Patient/GetIllnessConditions`,
+        config,
+      );
+
+      console.log("Illness conditions response:", response);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching illness conditions:", error);
+      return handleApiError(error);
+    }
+  },
+);
+
+export const getReproductiveHealthPatient = createAsyncThunk(
+  "Patient/GetReproductiveHealth",
+  async (_, { getState }) => {
+    console.log("Fetching reproductive health...");
+
+    const user = getState()?.authentication?.userAuth;
+    const token = user?.obj?.token;
+
+    const config = {
+      headers: {
+        accept: "text/plain",
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    try {
+      const response = await axios.get(
+        `${baseUrl}/Patient/GetReproductiveHealth`,
+        config,
+      );
+
+      console.log("Reproductive health response:", response);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching reproductive health:", error);
+      return handleApiError(error);
+    }
+  },
+);
+
+export const getSymptomsPatient = createAsyncThunk(
+  "Patient/GetSymptoms",
+  async (_, { getState }) => {
+    console.log("Fetching symptoms...");
+
+    const user = getState()?.authentication?.userAuth;
+    const token = user?.obj?.token;
+
+    const config = {
+      headers: {
+        accept: "text/plain",
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    try {
+      const response = await axios.get(
+        `${baseUrl}/Patient/GetSymptoms`,
+        config,
+      );
+
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching symptoms:", error);
+      return handleApiError(error);
+    }
+  },
+);
+
+export const getReadinessPatient = createAsyncThunk(
+  "Patient/GetReadiness",
+  async (_, { getState }) => {
+    console.log("Fetching readiness...");
+
+    const user = getState()?.authentication?.userAuth;
+    const token = user?.obj?.token;
+
+    const config = {
+      headers: {
+        accept: "text/plain",
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    try {
+      const response = await axios.get(
+        `${baseUrl}/Patient/GetReadiness`,
+        config
+      );
+
+      const data = {
+        modifyDiet: 0,
+        takeDailySupplement: 0,
+        recordEverythingEat: 0,
+        modifyLifestyle: 0,
+        practiceRelaxation: 0,
+        engageRegularExercise: 0,
+        readinessConfident: {
+          level: 0,
+          name: "string",
+        },
+        readinessSupportive: 0,
+        readinessFrequency: 0,
+        comment: "string",
+        healthAchieve: "string",
+        healthLastTime: "string",
+        healthChangeTrigger: "string",
+        healthFeelBetter: "string",
+        healthFeelWorse: "string",
+        healthCondition: "string",
+        healthThinkHappening: "string",
+        healthHappenGetBetter: "string",
+      };
+
+      console.log("Readiness response:", response);
+      return response.data || data; 
+    } catch (error) {
+      console.error("Error fetching readiness:", error);
+      return handleApiError(error);
+    }
+  }
+);
+
 export const getCurrentHealthLifestyle = createAsyncThunk(
   "user/getCurrentHealthLifestyle",
   async (id, { getState }) => {
@@ -484,7 +748,14 @@ const initialState = {
   patientGeneralInfo:{},
   patientNutritionInfo:{},
   patientSubstanceInfo:{},
-
+  patientHealthLifestyle: {},
+  patientStressInfo: {},
+  patientHealthMedicalInfo: {},
+  patientPersonalFamilyInfo: {},
+  patientIllnessInfo: {},
+  patientSymptomsInfo: {},
+  patientReproductiveInfo: {},
+  patientReadinessInfo: {},
 };
 
 const intakeFormSlice = createSlice({
@@ -699,6 +970,127 @@ const intakeFormSlice = createSlice({
       .addCase(getAccessDetails.rejected, (state, action) => {
           state.loading = false;
           state.error = action.payload?.message || 'Failed to fetch access details.'; // Access the message from the error object
+      });
+
+    // New patient APIs extraReducers
+    // For getHealthLifestylePatient
+    builder
+      .addCase(getHealthLifestylePatient.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getHealthLifestylePatient.fulfilled, (state, action) => {
+        state.loading = false;
+        state.patientHealthLifestyle = action.payload;
+      })
+      .addCase(getHealthLifestylePatient.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      });
+
+    // For getStressPatient
+    builder
+      .addCase(getStressPatient.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getStressPatient.fulfilled, (state, action) => {
+        state.loading = false;
+        state.patientStressInfo = action.payload;
+      })
+      .addCase(getStressPatient.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      });
+
+    // For getHealthMedicalPatient
+    builder
+      .addCase(getHealthMedicalPatient.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getHealthMedicalPatient.fulfilled, (state, action) => {
+        state.loading = false;
+        state.patientHealthMedicalInfo = action.payload;
+      })
+      .addCase(getHealthMedicalPatient.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      });
+
+    // For getPersonalFamilyPatient
+    builder
+      .addCase(getPersonalFamilyPatient.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getPersonalFamilyPatient.fulfilled, (state, action) => {
+        state.loading = false;
+        state.patientPersonalFamilyInfo = action.payload;
+      })
+      .addCase(getPersonalFamilyPatient.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      });
+
+    // For getIllnessConditionPatient
+    builder
+      .addCase(getIllnessConditionPatient.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getIllnessConditionPatient.fulfilled, (state, action) => {
+        state.loading = false;
+        state.patientIllnessInfo = action.payload;
+      })
+      .addCase(getIllnessConditionPatient.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      });
+
+    // For getReproductiveHealthPatient
+    builder
+      .addCase(getReproductiveHealthPatient.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getReproductiveHealthPatient.fulfilled, (state, action) => {
+        state.loading = false;
+        state.patientReproductiveInfo = action.payload;
+      })
+      .addCase(getReproductiveHealthPatient.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      });
+
+    // For getSymptomsPatient
+    builder
+      .addCase(getSymptomsPatient.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getSymptomsPatient.fulfilled, (state, action) => {
+        state.loading = false;
+        state.patientSymptomsInfo = action.payload;
+      })
+      .addCase(getSymptomsPatient.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      });
+
+    // For getReadinessPatient
+    builder
+      .addCase(getReadinessPatient.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getReadinessPatient.fulfilled, (state, action) => {
+        state.loading = false;
+        state.patientReadinessInfo = action.payload;
+      })
+      .addCase(getReadinessPatient.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
       });
   },
 });

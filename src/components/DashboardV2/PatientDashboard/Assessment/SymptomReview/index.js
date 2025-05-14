@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Progress, Button, Radio, Col, Row, Input, message } from "antd";
 import { useNavigate } from "react-router-dom"; // useNavigate for react-router v6
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { completeCard } from "../../../../redux/assessmentSlice";
 import FormWrapper from "../FormWrapper";
 import "../assesment.css";
 import { DeleteOutlined } from "@ant-design/icons";
 import { useMediaQuery } from "react-responsive";
 import { backBtnTxt, exitBtnTxt, saveAndContinueBtn, submitBtn } from "../../../../../utils/constant";
+import { getSymptomsPatient } from "../../../../redux/AssessmentController";
 
 const questions = [
   {
@@ -652,18 +653,135 @@ const SymptomReview = ({ onComplete }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const isMobile = useMediaQuery({ maxWidth: 767 });
+  
+  const patientSymptomInfo = useSelector((state) => state.intake?.patientSymptomsInfo);
 
+console.log({patientSymptomInfo})
+  const mapSymptomInfoToAnswers = (info) => {
+    const mappedAnswers = {};
+    
+    const getLevelText = (level) => {
+      switch (level) {
+        case 1: return 'mild';
+        case 2: return 'moderate';
+        case 3: return 'severe';
+        default: return 'N/A';
+      }
+    };
+
+    const symptomCategories = [
+      'general', 'headEyesEars', 'musco', 'moodNerves', 'cardio', 
+      'urinary', 'digestion', 'digestionCont', 'eating', 'itchingSkin', 'respiratory', 
+      'nails', 'lymph', 'skin', 'skinProblems', 'skinProblemsContr', 
+      'femaleReproductive'
+    ];
+
+    symptomCategories.forEach(category => {
+      if (info[category] && Array.isArray(info[category])) {
+        info[category].forEach(symptom => {
+          if (symptom.name && symptom.level !== undefined) {
+            mappedAnswers[symptom.name] = getLevelText(symptom.level);
+          }
+        });
+      }
+    });
+
+    // Map current medications
+    if (info.currentMedication && Array.isArray(info.currentMedication)) {
+      mappedAnswers.current_medication = info.currentMedication.map(med => ({
+        medication: med.medication || "",
+        dosage: med.dosage || "",
+        date: med.startDate || "",
+        reason: med.reason || ""
+      }));
+    }
+
+    // Map nutritional supplements (note: API returns 'nutrionalSupplements')
+    if (info.nutrionalSupplements && Array.isArray(info.nutrionalSupplements)) {
+      mappedAnswers.nutritional_supplement = info.nutrionalSupplements.map(supplement => ({
+        medication: supplement.medication || "",
+        dosage: supplement.dosage || "",
+        date: supplement.startDate || "",
+        reason: supplement.reason || ""
+      }));
+    }
+
+    // Map supplements caused effects
+    if (info.supplementsCausedEffects) {
+      mappedAnswers.side_effects_problems = info.supplementsCausedEffects.yesNo ? "Yes" : "No";
+      mappedAnswers.side_effects_details = info.supplementsCausedEffects.describe || "";
+    }
+
+    // Map medication usage
+    mappedAnswers.regular_long_term_use = info.usedRegularlyNsaid ? "Yes" : "No";
+    mappedAnswers.regular_long_term_use_tylenol = info.usedRegularlyTyienol ? "Yes" : "No";
+    mappedAnswers.regular_long_term_use_acid_blocking_drugs = info.usedRegularlyAcidBlocking ? "Yes" : "No";
+
+    // Map antibiotic usage
+    if (info.antibioticsInfancy) {
+      mappedAnswers.antibiotics_usage = info.antibioticsInfancy.value1 === "Yes" ? "5 or more" : "Less than 5";
+      mappedAnswers.antibiotics_reason = info.antibioticsInfancy.value2 || "";
+    }
+
+    if (info.antibioticsTeens) {
+      mappedAnswers.antibiotics_usage_teen = info.antibioticsTeens.value1 === "Yes" ? "5 or more" : "Less than 5";
+      mappedAnswers.antibiotics_reason_teen = info.antibioticsTeens.value2 || "";
+    }
+
+    if (info.antibioticsAdult) {
+      mappedAnswers.antibiotics_usage_adulthood = info.antibioticsAdult.value1 === "Yes" ? "5 or more" : "Less than 5";
+      mappedAnswers.antibiotics_reason_adulthood = info.antibioticsAdult.value2 || "";
+    }
+
+    if (info.takenAntibioticsForLong) {
+      mappedAnswers.long_term_antibiotics = info.takenAntibioticsForLong.yesNo ? "Yes" : "No";
+      mappedAnswers.long_term_antibiotics_reason = info.takenAntibioticsForLong.describe || "";
+    }
+
+    // Map steroid usage
+    if (info.oralSteriodsInfancy) {
+      mappedAnswers.oral_steroids_usage_infancy = info.oralSteriodsInfancy.value1 === "Yes" ? "5 or more" : "Less than 5";
+      mappedAnswers.oral_steroids_reason_infancy = info.oralSteriodsInfancy.value2 || "";
+    }
+
+    if (info.oralSteriodsTeen) {
+      mappedAnswers.oral_steroids_usage_teen = info.oralSteriodsTeen.value1 === "Yes" ? "5 or more" : "Less than 5";
+      mappedAnswers.oral_steroids_reason_teen = info.oralSteriodsTeen.value2 || "";
+    }
+
+    if (info.oralSteriodsAdult) {
+      mappedAnswers.oral_steroids_usage_adulthood = info.oralSteriodsAdult.value1 === "Yes" ? "5 or more" : "Less than 5";
+      mappedAnswers.oral_steroids_reason_adulthood = info.oralSteriodsAdult.value2 || "";
+    }
+
+    return mappedAnswers;
+  };
+
+  useEffect(() => {
+    // Only fetch if we don't already have the data in state
+    if (!patientSymptomInfo || Object.keys(patientSymptomInfo).length === 0) {
+      dispatch(getSymptomsPatient());
+    }
+  }, [dispatch, patientSymptomInfo]);
+
+  console.log({patientSymptomInfo})
   useEffect(() => {
     const savedIndex = parseInt(
       localStorage.getItem("currentQuestionIndex9"),
       10,
     );
     const savedAnswers = JSON.parse(localStorage.getItem("answers"));
-    if (!isNaN(savedIndex) && savedAnswers) {
+    
+    // Prioritize localStorage data if it exists and has answers
+    if (!isNaN(savedIndex) && savedAnswers && Object.keys(savedAnswers).length > 0) {
       setCurrentQuestionIndex(savedIndex);
       setAnswers(savedAnswers);
+    } else if (patientSymptomInfo && Object.keys(patientSymptomInfo).length > 0) {
+      // Only use prefilled data if no localStorage data exists
+      const prefilledAnswers = mapSymptomInfoToAnswers(patientSymptomInfo);
+      setAnswers(prefilledAnswers);
     }
-  }, []);
+  }, [patientSymptomInfo]);
 
   const handleExit = () => {
     navigate("/assessment");
@@ -685,7 +803,6 @@ const SymptomReview = ({ onComplete }) => {
       return hasValidAnswer || hasOthersAnswer;
     }
   
-    // Skip validation for optional hospitalization questions
     if (question.type === "hospitalization") {
       return true;
     }
@@ -749,7 +866,7 @@ const SymptomReview = ({ onComplete }) => {
       lymph: [],
       skin: [],
       skinProblems: [],
-      skinProblemsCont: [],
+      skinProblemsContr: [],
       itchingSkin: [],
       femaleReproductive: [],
       currentMedication: [],
@@ -1131,7 +1248,7 @@ const SymptomReview = ({ onComplete }) => {
 
     skinProblemsContr.forEach((question) => {
       if (answers[question]) {
-        apiFormat.skinProblemsCont.push({
+        apiFormat.skinProblemsContr.push({
           level: getLevel(answers[question]),
           name: question,
         });
@@ -1245,9 +1362,8 @@ const SymptomReview = ({ onComplete }) => {
       lymph: apiFormat.lymph,
       skin: apiFormat.skin,
       skinProblems: apiFormat.skinProblems,
-      skinProblemsContr: apiFormat.skinProblemsCont,
+      skinProblemsContr: apiFormat.skinProblemsContr,
       femaleReproductive: apiFormat.femaleReproductive,
-      // femaleReproductiveCont: apiFormat.femaleReproductiveCont,
       currentMedication: answers.current_medication
         ? answers.current_medication.map((med) => ({
           medication: med.medication || "",
@@ -1380,14 +1496,6 @@ const SymptomReview = ({ onComplete }) => {
             className="input_questtionnaire"
           />
         )}
-        {/* {subQuestion.type === 'inputNumber' && (
-                <InputNumber
-                    name={subQuestion.name}
-                    value={answers[subQuestion.name] || 0}
-                    onChange={(value) => handleChange(value, subQuestion.name)}
-                    className='input_questtionnaire'
-                    />
-            )} */}
         {subQuestion.type === "radio" && (
           <Radio.Group
             name={subQuestion.name}

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Progress, Button, Radio, Col, Row, Input, message, Checkbox } from "antd";
 import { useNavigate } from "react-router-dom"; // useNavigate for react-router v6
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { completeCard } from "../../../../redux/assessmentSlice";
+import { getIllnessConditionPatient } from "../../../../redux/AssessmentController";
 import FormWrapper from "../FormWrapper";
 import "../assesment.css";
 import { DeleteOutlined } from "@ant-design/icons";
@@ -492,22 +493,270 @@ const questions = [
 const IllnessAndCondition = ({ onComplete }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
   const totalQuestions = questions.length;
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const isMobile = useMediaQuery({ maxWidth: 767 });
 
+  const { patientIllnessInfo, loading } = useSelector((state) => state.intake);
+console.log({patientIllnessInfo})
   useEffect(() => {
-    const savedIndex = parseInt(
-      localStorage.getItem("currentQuestionIndex8"),
-      10,
-    );
+    dispatch(getIllnessConditionPatient());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (patientIllnessInfo && Object.keys(patientIllnessInfo).length > 0 && !isDataLoaded) {
+      const mappedAnswers = mapApiResponseToFormState(patientIllnessInfo);
+      setAnswers(mappedAnswers);
+      setIsDataLoaded(true);
+      
+      const savedIndex = parseInt(localStorage.getItem("currentQuestionIndex8"), 10);
+      if (!isNaN(savedIndex)) {
+        setCurrentQuestionIndex(savedIndex);
+      }
+    } else if (!loading && Object.keys(patientIllnessInfo).length === 0) {
+      const savedIndex = parseInt(localStorage.getItem("currentQuestionIndex8"), 10);
     const savedAnswers = JSON.parse(localStorage.getItem("answers"));
     if (!isNaN(savedIndex) && savedAnswers) {
       setCurrentQuestionIndex(savedIndex);
       setAnswers(savedAnswers);
     }
-  }, []);
+      setIsDataLoaded(true);
+    }
+  }, [patientIllnessInfo, loading, isDataLoaded]);
+
+  const mapApiResponseToFormState = (apiData) => {
+    const formAnswers = {};
+
+    if (apiData.gastroIntestinal?.[0]) {
+      const gi = apiData.gastroIntestinal[0];
+      if (gi.describe?.includes("Irritable Bowel")) formAnswers.irritableBowel = "yes";
+      if (gi.describe?.includes("GERD")) formAnswers.gerd = "yes";
+      if (gi.describe?.includes("Crohns")) formAnswers.crohns = "yes";
+      if (gi.describe?.includes("Peptic Ulcer")) formAnswers.peptic_ulcer = "yes";
+      if (gi.describe?.includes("Celiac")) formAnswers.celiac = "yes";
+      if (gi.describe?.includes("Gallstones")) formAnswers.gallstones = "yes";
+    }
+
+    if (apiData.urinary?.[0]) {
+      const urinary = apiData.urinary[0];
+      if (urinary.describe?.includes("Kidney Stones")) formAnswers.kidney_stones = "yes";
+      if (urinary.describe?.includes("Gout")) formAnswers.gout = "yes";
+      if (urinary.describe?.includes("Interstitial Cystitis")) formAnswers.interstitial_cystitis = "yes";
+      if (urinary.describe?.includes("Frequent yeast")) formAnswers.frequent_yeast_infections = "yes";
+      if (urinary.describe?.includes("Frequent urinary")) formAnswers.frequent_urinary_tract_infections = "yes";
+      if (urinary.describe?.includes("Sexual dysfunction")) formAnswers.sexual_dysfunction = "yes";
+      if (urinary.describe?.includes("Sexual transmitted")) formAnswers.sexual_transmitted_disease = "yes";
+    }
+
+    if (apiData.endocrine?.[0]) {
+      const endocrine = apiData.endocrine[0];
+      if (endocrine.describe?.includes("Diabetes")) formAnswers.diabetes = "yes";
+      if (endocrine.describe?.includes("Hypothyroidism")) formAnswers.hypothyroidism = "yes";
+      if (endocrine.describe?.includes("Hyperthyroidism")) formAnswers.hyperthyroidism = "yes";
+      if (endocrine.describe?.includes("Polycystic")) formAnswers.polycystic = "yes";
+      if (endocrine.describe?.includes("Infertility")) formAnswers.infertility = "yes";
+      if (endocrine.describe?.includes("Metabolic")) formAnswers["metabolic_syndrome/insulin_resistance"] = "yes";
+      if (endocrine.describe?.includes("Eating Disorder")) formAnswers.eating_disorder = "yes";
+      if (endocrine.describe?.includes("Hyperglycemia")) formAnswers.hyperglycemia = "yes";
+    }
+
+    if (apiData.cardiovascular?.[0]) {
+      const cardio = apiData.cardiovascular[0];
+      if (cardio.describe?.includes("Angina")) formAnswers.angina = "yes";
+      if (cardio.describe?.includes("Heart Attack")) formAnswers.heart_attack = "yes";
+      if (cardio.describe?.includes("Heart failure")) formAnswers.heart_failure = "yes";
+      if (cardio.describe?.includes("Hypertension")) formAnswers.hypertension = "yes";
+      if (cardio.describe?.includes("Stroke")) formAnswers.stroke = "yes";
+      if (cardio.describe?.includes("High Blood Fats")) formAnswers.high_blood_fats = "yes";
+      if (cardio.describe?.includes("Rheumatic Fever")) formAnswers.rheumatic_fever = "yes";
+      if (cardio.describe?.includes("Arrythmia")) formAnswers.arrythmia = "yes";
+      if (cardio.describe?.includes("Murmur")) formAnswers.murmur = "yes";
+      if (cardio.describe?.includes("Mitral valve")) formAnswers.mitral_valve_prolapse = "yes";
+    }
+
+    if (apiData.neurologic?.[0]) {
+      const neuro = apiData.neurologic[0];
+      if (neuro.describe?.includes("Epilepsy")) formAnswers.epilepsy_seizures = "yes";
+      if (neuro.describe?.includes("ADD/ADHD")) formAnswers["ADD/ADHD"] = "yes";
+      if (neuro.describe?.includes("Headaches")) formAnswers.headaches = "yes";
+      if (neuro.describe?.includes("Migraines")) formAnswers.migraines = "yes";
+      if (neuro.describe?.includes("Depression")) formAnswers.depression = "yes";
+      if (neuro.describe?.includes("Anxiety")) formAnswers.anxiety = "yes";
+      if (neuro.describe?.includes("Autism")) formAnswers.Autism = "yes";
+      if (neuro.describe?.includes("Multiple sclerosis")) formAnswers.multiple_sclerosis = "yes";
+      if (neuro.describe?.includes("Parkinson")) formAnswers["Parkinson's disease"] = "yes";
+      if (neuro.describe?.includes("Dementia")) formAnswers.dementia = "yes";
+    }
+
+    if (apiData.diagnosticBoneDensity) {
+      formAnswers.boneDensity = apiData.diagnosticBoneDensity.date;
+      formAnswers.boneDensity_Comments = apiData.diagnosticBoneDensity.value;
+      if (!apiData.diagnosticBoneDensity.date) formAnswers.boneDensity_na = true;
+    }
+
+    if (apiData.diagnosticCTScan) {
+      formAnswers.ctscan = apiData.diagnosticCTScan.date;
+      formAnswers.ctscan_Comments = apiData.diagnosticCTScan.value;
+      if (!apiData.diagnosticCTScan.date) formAnswers.ctscan_na = true;
+    }
+
+    if (apiData.diagnosticColonoscopy) {
+      formAnswers.colonoscopy = apiData.diagnosticColonoscopy.date;
+      formAnswers.colonoscopy_Comments = apiData.diagnosticColonoscopy.value;
+      if (!apiData.diagnosticColonoscopy.date) formAnswers.colonoscopy_na = true;
+    }
+
+    if (apiData.diagnosticCardiacStress) {
+      formAnswers.cardiac_stress_test = apiData.diagnosticCardiacStress.date;
+      formAnswers.cardiac_stress_test_Comments = apiData.diagnosticCardiacStress.value;
+      if (!apiData.diagnosticCardiacStress.date) formAnswers.cardiac_stress_test_na = true;
+    }
+
+    if (apiData.diagnosticEKG) {
+      formAnswers.EKG = apiData.diagnosticEKG.date;
+      formAnswers.EKG_Comments = apiData.diagnosticEKG.value;
+      if (!apiData.diagnosticEKG.date) formAnswers.EKG_na = true;
+    }
+
+    if (apiData.diagnosticMRI) {
+      formAnswers.MRI = apiData.diagnosticMRI.date;
+      formAnswers.MRI_Comments = apiData.diagnosticMRI.value;
+      if (!apiData.diagnosticMRI.date) formAnswers.MRI_na = true;
+    }
+
+    if (apiData.diagnosticUpperEndoscopy) {
+      formAnswers.upper_endoscopy = apiData.diagnosticUpperEndoscopy.date;
+      formAnswers.upper_endoscopy_Comments = apiData.diagnosticUpperEndoscopy.value;
+      if (!apiData.diagnosticUpperEndoscopy.date) formAnswers.upper_endoscopy_na = true;
+    }
+
+    if (apiData.diagnosticUpperGI) {
+      formAnswers.upper_GI_series = apiData.diagnosticUpperGI.date;
+      formAnswers.upper_GI_series_Comments = apiData.diagnosticUpperGI.value;
+      if (!apiData.diagnosticUpperGI.date) formAnswers.upper_GI_series_na = true;
+    }
+
+    if (apiData.diagnosticChestXray) {
+      formAnswers.chest_X_ray = apiData.diagnosticChestXray.date;
+      formAnswers.chest_X_ray_Comments = apiData.diagnosticChestXray.value;
+      if (!apiData.diagnosticChestXray.date) formAnswers.chest_X_ray_na = true;
+    }
+
+    if (apiData.diagnosticOtherXray) {
+      formAnswers.other_X_rays = apiData.diagnosticOtherXray.date;
+      formAnswers.other_X_rays_Comments = apiData.diagnosticOtherXray.value;
+      if (!apiData.diagnosticOtherXray.date) formAnswers.other_X_rays_na = true;
+    }
+
+    if (apiData.diagnosticBarium) {
+      formAnswers.barium_enema = apiData.diagnosticBarium.date;
+      formAnswers.barium_enema_Comments = apiData.diagnosticBarium.value;
+      if (!apiData.diagnosticBarium.date) formAnswers.barium_enema_na = true;
+    }
+
+    if (apiData.diagnosticOther) {
+      formAnswers.other = apiData.diagnosticOther.date;
+      formAnswers.other_Comments = apiData.diagnosticOther.value;
+      if (!apiData.diagnosticOther.date) formAnswers.other_na = true;
+    }
+
+    if (apiData.injuriesBrokenBones) {
+      formAnswers.injuries = apiData.injuriesBrokenBones.date;
+      formAnswers.injuriess_Comments = apiData.injuriesBrokenBones.value;
+      if (!apiData.injuriesBrokenBones.date) formAnswers.injuries_na = true;
+    }
+
+    if (apiData.injuriesBack) {
+      formAnswers.back_injury = apiData.injuriesBack.date;
+      formAnswers.back_injury_Comments = apiData.injuriesBack.value;
+      if (!apiData.injuriesBack.date) formAnswers.back_injury_na = true;
+    }
+
+    if (apiData.injuriesNeck) {
+      formAnswers.neck_injury = apiData.injuriesNeck.date;
+      formAnswers.neck_injury_Comments = apiData.injuriesNeck.value;
+      if (!apiData.injuriesNeck.date) formAnswers.neck_injury_na = true;
+    }
+
+    if (apiData.injuriesHead) {
+      formAnswers.head_injury = apiData.injuriesHead.date;
+      formAnswers.head_injury_Comments = apiData.injuriesHead.value;
+      if (!apiData.injuriesHead.date) formAnswers.head_injury_na = true;
+    }
+
+    if (apiData.injuriesOther) {
+      formAnswers.Injuries = apiData.injuriesOther.date;
+      formAnswers.Injuries_Comments = apiData.injuriesOther.value;
+      if (!apiData.injuriesOther.date) formAnswers.Injuries_na = true;
+    }
+
+    if (apiData.surgeryAppen) {
+      formAnswers.appendectomy = apiData.surgeryAppen.date;
+      formAnswers.appendectomy_Comments = apiData.surgeryAppen.value;
+      if (!apiData.surgeryAppen.date) formAnswers.appendectomy_na = true;
+    }
+
+    if (apiData.surgeryDental) {
+      formAnswers.dental = apiData.surgeryDental.date;
+      formAnswers.dental_Comments = apiData.surgeryDental.value;
+      if (!apiData.surgeryDental.date) formAnswers.dental_na = true;
+    }
+
+    if (apiData.gallBladder) {
+      formAnswers.gallbladder = apiData.gallBladder.date;
+      formAnswers.gallbladder_Comments = apiData.gallBladder.value;
+      if (!apiData.gallBladder.date) formAnswers.gallbladder_na = true;
+    }
+
+    if (apiData.hernia) {
+      formAnswers.hernia = apiData.hernia.date;
+      formAnswers.hernia_Comments = apiData.hernia.value;
+      if (!apiData.hernia.date) formAnswers.hernia_na = true;
+    }
+
+    if (apiData.hysterectomy) {
+      formAnswers.hysterectomy = apiData.hysterectomy.date;
+      formAnswers.hysterectomy_Comments = apiData.hysterectomy.value;
+      if (!apiData.hysterectomy.date) formAnswers.hysterectomy_na = true;
+    }
+
+    if (apiData.tonsillectomy) {
+      formAnswers.tonsillectomy = apiData.tonsillectomy.date;
+      formAnswers.tonsillectomy_Comments = apiData.tonsillectomy.value;
+      if (!apiData.tonsillectomy.date) formAnswers.tonsillectomy_na = true;
+    }
+
+    if (apiData.jointReplacement) {
+      formAnswers.joint_replacement = apiData.jointReplacement.date;
+      formAnswers.joint_replacement_Comments = apiData.jointReplacement.value;
+      if (!apiData.jointReplacement.date) formAnswers.joint_replacement_na = true;
+    }
+
+    if (apiData.heartSurgery) {
+      formAnswers.heart_surgery = apiData.heartSurgery.date;
+      formAnswers.heart_surgery_Comments = apiData.heartSurgery.value;
+      if (!apiData.heartSurgery.date) formAnswers.heart_surgery_na = true;
+    }
+
+    if (apiData.otherSurgeries) {
+      formAnswers.other_surgeries = apiData.otherSurgeries.date;
+      formAnswers.other_surgeries_Comments = apiData.otherSurgeries.value;
+      if (!apiData.otherSurgeries.date) formAnswers.other_surgeries_na = true;
+    }
+
+    if (apiData.addNew && Array.isArray(apiData.addNew)) {
+      formAnswers.hospitalizations = apiData.addNew.map(item => ({
+        date: item.date || "",
+        reason: item.value || ""
+      }));
+    } else {
+      formAnswers.hospitalizations = [];
+    }
+
+    return formAnswers;
+  };
 
   const handleExit = () => {
     navigate("/assessment");

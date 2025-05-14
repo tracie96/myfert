@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Progress, Button, Col, Row, Input, message } from "antd";
 import { useNavigate } from "react-router-dom"; 
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { completeCard } from "../../../../redux/assessmentSlice";
 import FormWrapper from "../FormWrapper";
 import "../assesment.css";
 import { useMediaQuery } from "react-responsive";
 import { backBtnTxt, exitBtnTxt, saveAndContinueBtn, submitBtn } from "../../../../../utils/constant";
+import { getReadinessPatient } from "../../../../redux/AssessmentController";
 
 const questions = [
   {
@@ -127,6 +128,35 @@ const Readiness = ({ onComplete }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const isMobile = useMediaQuery({ maxWidth: 767 });
+  const patientReadinessInfo = useSelector((state) => state.intake?.patientReadinessInfo);
+
+  const mapReadinessInfoToAnswers = (info) => {
+    return {
+      modify_diet: info.modifyDiet || 0,
+      supplements: info.takeDailySupplement || 0,
+      keep_record_meal: info.recordEverythingEat || 0,
+      modify_lifestyle: info.modifyLifestyle || 0,
+      practice_relaxation: info.practiceRelaxation || 0,
+      engage_in_regular_exercise: info.engageRegularExercise || 0,
+      confidence_follow_through: info.readinessConfident?.level || 0,
+      confidence_follow_through_details: info.readinessConfident?.name || "",
+      health_stress_7: info.readinessSupportive || 0,
+      ongoing_support: info.readinessFrequency || 0,
+      add_commnets: info.comment || "",
+      achieve_your_goals: info.healthAchieve || "",
+      felt_well_last_time: info.healthLastTime || "",
+      health_issue: info.healthChangeTrigger || "",
+      feel_better: info.healthFeelBetter || "",
+      feel_worse: info.healthFeelWorse || "",
+      current_state: info.healthCondition || "",
+      healthThinkHappening: info.healthThinkHappening || "",
+      healthHappenGetBetter: info.healthHappenGetBetter || ""
+    };
+  };
+
+  useEffect(() => {
+    dispatch(getReadinessPatient());
+  }, [dispatch]);
 
   useEffect(() => {
     const savedIndex = parseInt(
@@ -134,11 +164,15 @@ const Readiness = ({ onComplete }) => {
       10,
     );
     const savedAnswers = JSON.parse(localStorage.getItem("answers"));
+    
     if (!isNaN(savedIndex) && savedAnswers) {
       setCurrentQuestionIndex(savedIndex);
       setAnswers(savedAnswers);
+    } else if (patientReadinessInfo && Object.keys(patientReadinessInfo).length > 0) {
+      const prefilledAnswers = mapReadinessInfoToAnswers(patientReadinessInfo);
+      setAnswers(prefilledAnswers);
     }
-  }, []);
+  }, [patientReadinessInfo]);
 
   const handleExit = () => {
     navigate("/assessment");
@@ -197,8 +231,8 @@ const Readiness = ({ onComplete }) => {
       healthFeelBetter: answers.feel_better || "",
       healthFeelWorse: answers.feel_worse || "",
       healthCondition: answers.current_state || "",
-      healthThinkHappening: answers.happening_and_why || "",
-      healthHappenGetBetter: answers.get_better || ""
+      healthThinkHappening: answers.healthThinkHappening || "",
+      healthHappenGetBetter: answers.healthHappenGetBetter || ""
     };
   };
 

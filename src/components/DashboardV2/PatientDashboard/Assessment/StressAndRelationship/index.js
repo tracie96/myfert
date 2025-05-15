@@ -265,7 +265,7 @@ const StressAndRelationship = ({ onComplete }) => {
   const isMobile = useMediaQuery({ maxWidth: 767 });
 
   // Get stress data from Redux store
-  const { patientStressInfo, loading } = useSelector((state) => state.intake);
+  const { patientStressInfo } = useSelector((state) => state.intake);
 
   const subQuestions_question = [
     { name: 'days light bleeding' },
@@ -915,19 +915,19 @@ const StressAndRelationship = ({ onComplete }) => {
     ((currentQuestionIndex + 1) / totalQuestions) * 100;
 
   // Show loading state while fetching data
-  if (isDataLoading || loading) {
-    return (
-      <Row gutter={16} style={{ padding: "0 5%" }}>
-        <Col xs={24} sm={24} md={24} lg={24} xl={24}>
-          <FormWrapper name="FEMALE INTAKE QUESTIONNAIRE" />
-          <div style={{ margin: "40px 0", textAlign: "center" }}>
-            <h3>Loading existing data...</h3>
-            <p>Please wait while we fetch your previously saved information.</p>
-          </div>
-        </Col>
-      </Row>
-    );
-  }
+  // if (isDataLoading || loading) {
+  //   return (
+  //     <Row gutter={16} style={{ padding: "0 5%" }}>
+  //       <Col xs={24} sm={24} md={24} lg={24} xl={24}>
+  //         <FormWrapper name="FEMALE INTAKE QUESTIONNAIRE" />
+  //         <div style={{ margin: "40px 0", textAlign: "center" }}>
+  //           <h3>Loading existing data...</h3>
+  //           <p>Please wait while we fetch your previously saved information.</p>
+  //         </div>
+  //       </Col>
+  //     </Row>
+  //   );
+  // }
 
   return (
     <Row gutter={16} style={{ padding: "0 5%" }}>

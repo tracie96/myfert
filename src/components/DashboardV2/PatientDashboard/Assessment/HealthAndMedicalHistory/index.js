@@ -14,8 +14,9 @@ import {
   DatePicker,
 } from "antd";
 import { useNavigate } from "react-router-dom"; // useNavigate for react-router v6
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { completeCard } from "../../../../redux/assessmentSlice";
+import { getHealthMedicalPatient } from "../../../../redux/AssessmentController";
 import FormWrapper from "../FormWrapper";
 import "../assesment.css";
 import moment from "moment";
@@ -123,7 +124,7 @@ const questions = [
     question: "You were born:",
     type: "radio",
     name: "mode_of_own_birth",
-    options: ["Term", "Premature", "Don’t know"],
+    options: ["Term", "Premature", "Don't know"],
   },
   {
     question: "Were there any pregnancy or birth complications?",
@@ -348,22 +349,116 @@ const questions = [
 const HealthAndMedicalHistory = ({ onComplete }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
   const totalQuestions = questions.length;
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const isMobile = useMediaQuery({ maxWidth: 767 });
 
+  const { patientHealthMedicalInfo } = useSelector(
+    (state) => state.intake
+  );
+  console.log("patientHealthMedicalInfo", patientHealthMedicalInfo);
+
+  const transformApiDataToAnswers = (data) => {
+    if (!data || !data.obj) return {};
+
+    const apiData = data.obj;
+    const transformedAnswers = {};
+
+    try {
+      transformedAnswers.overll_wellbeing = apiData?.howWellThingsGoingOverall || 1;
+      transformedAnswers.school_wellbeing = apiData?.howWellThingsGoingSchool || 1;
+      transformedAnswers.job_wellbeing = apiData?.howWellThingsGoingJob || 1;
+      transformedAnswers.social_life_wellbeing = apiData?.howWellThingsGoingSocialLife || 1;
+      transformedAnswers.close_friends_wellbeing = apiData.howWellThingsGoingCloseFriends || 1;
+      transformedAnswers.sex_wellbeing = apiData.howWellThingsGoingSex || 1;
+      transformedAnswers.attitude_wellbeing = apiData.howWellThingsGoingAttitude || 1;
+      transformedAnswers.relationship_wellbeing = apiData.howWellThingsGoingPartner || 1;
+      transformedAnswers.children_wellbeing = apiData.howWellThingsGoingKids || 1;
+      transformedAnswers.parents_wellbeing = apiData.howWellThingsGoingParents || 1;
+            transformedAnswers.spouse_wellbeing = apiData.howWellThingsGoingSpouse || 1;
+
+      transformedAnswers.mode_of_own_birth = apiData.howWereYouBorn || "";
+      
+      if (apiData.wereYouBornWithComplication) {
+        transformedAnswers.birth_complications = apiData.wereYouBornWithComplication.yesNo ? "Yes" : "No";
+        transformedAnswers.birth_complications_details = apiData.wereYouBornWithComplication.describe || "";
+      }
+
+      transformedAnswers.breast_fed_duration = apiData.breastFedHowLong || "";
+      transformedAnswers.bottle_fed_type = apiData.breastFedFormula || "";
+      transformedAnswers.dont_know = apiData.breastFoodDontKnow || false;
+
+      transformedAnswers.age_of_solid_food_intro = apiData.ageIntroductionSolidFood || "";
+      transformedAnswers.age_of_wheat_food_intro = apiData.ageIntroductionWheat || "";
+      transformedAnswers.age_of_diary_food_intro = apiData.ageIntroductionDiary || "";
+
+      transformedAnswers.allergic_food = apiData.foodsAvoided ? "Yes" : "No";
+      transformedAnswers.food_avoided = apiData.foodsAvoidTypeSymptoms || "";
+
+      transformedAnswers.eat_sugar_as_a_child = apiData.alotSugar ? "Yes" : "No";
+
+      if (apiData.dentalHistory && apiData.dentalHistory.length > 0) {
+        transformedAnswers.fillings_removed = apiData.dentalHistory[0].level || 0;
+      }
+
+      transformedAnswers.mercury_filings = apiData.mercuryFillingRemoved ? "Yes" : "No";
+      transformedAnswers.mercury_fillings_removed = apiData.mercuryFillingRemovedWhen || "";
+
+      transformedAnswers.do_you_brush_regularly = apiData.brushRegularly ? "Yes" : "No";
+      transformedAnswers.do_you_floss_regularly = apiData.flossRegularly ? "Yes" : "No";
+
+      transformedAnswers.smoke_irritants = apiData.environmentEffect || [];
+      transformedAnswers.work_env_smoke_irritants = apiData.environmentExposed || [];
+
+      transformedAnswers.harmful_chemicals = apiData.exposedHarmfulChemical ? "Yes" : "No";
+      if (apiData.whenExposedHarmfulChemical) {
+        transformedAnswers.harmful_chemical_exposure = apiData.whenExposedHarmfulChemical.chemicalName || "";
+        transformedAnswers.harmful_chemical_exposure_length = apiData.whenExposedHarmfulChemical.lengthExposure || "";
+        transformedAnswers.harmful_chemical_exposure_date = apiData.whenExposedHarmfulChemical.dateExposure || "";
+      }
+
+      transformedAnswers.pets_or_animal = apiData.petsFarmAnimal ? "Yes" : "No";
+      transformedAnswers.where_they_live = apiData.petsAnimalLiveWhere || "";
+
+    } catch (error) {
+      console.error("Error transforming API data:", error);
+    }
+
+    return transformedAnswers;
+  };
+
   useEffect(() => {
-    const savedIndex = parseInt(
-      localStorage.getItem("currentQuestionIndex6"),
-      10,
-    );
+    dispatch(getHealthMedicalPatient());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (
+      patientHealthMedicalInfo &&
+      patientHealthMedicalInfo.obj &&
+      Object.keys(patientHealthMedicalInfo.obj).length > 0
+    ) {
+      const transformedAnswers = transformApiDataToAnswers(patientHealthMedicalInfo);
+      console.log("Prefilling from API:", transformedAnswers);
+      setAnswers(transformedAnswers);
+      setIsDataLoaded(true);
+      setCurrentQuestionIndex(0);
+      // Clear localStorage to avoid confusion
+      localStorage.removeItem("answers");
+      localStorage.removeItem("currentQuestionIndex6");
+      return;
+    }
+    // Only use localStorage if API is empty
+    const savedIndex = parseInt(localStorage.getItem("currentQuestionIndex6"), 10);
     const savedAnswers = JSON.parse(localStorage.getItem("answers"));
     if (!isNaN(savedIndex) && savedAnswers) {
       setCurrentQuestionIndex(savedIndex);
       setAnswers(savedAnswers);
+      setIsDataLoaded(true);
+      console.log("Prefilling from localStorage:", savedAnswers);
     }
-  }, []);
+  }, [patientHealthMedicalInfo]);
 
   const handleExit = () => {
     navigate("/assessment");
@@ -383,21 +478,20 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
         });
   
       case "checkbox_with_input":
-        return question.options.every((option) => { // Changed .some to .every
+        return question.options.every((option) => {
           const checkboxChecked = answers[option.name];
           const inputValid = option.inputName
             ? (answers[option.inputName] !== undefined && answers[option.inputName] !== "")
             : true; 
   
-          return !checkboxChecked || inputValid; // Key Change:  !checkboxChecked || inputValid
+          return !checkboxChecked || inputValid;
         });
   
         case "checkbox": {
             if (!answers[question.name] || answers[question.name].length === 0) {
-              return false; // No checkbox selected
+              return false;
             }
   
-            // Check if "Other" is selected and the "Other" input is filled
             if (answers[question.name].includes("Other")) {
               const otherInputName = `${question.name}_other`;
               if (!answers[otherInputName] || answers[otherInputName] === "") {
@@ -411,10 +505,9 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
   
       case "radio": {
         if (answers[question.name] === undefined) {
-          return false; // Radio button must be selected
+          return false;
         }
   
-        // Check if "Yes" is selected and if the corresponding input needs to be filled
         if (answers[question.name] === "Yes" && (
           question.name === "do_you_use_sleeping_aids" ||
           question.name === "problems_limiting_exercise" ||
@@ -432,24 +525,23 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
   
       case "long_radio": {
         if (answers[question.name] === undefined) {
-          return false; // Radio button must be selected
+          return false;
         }
   
         if (answers[question.name] === "Yes") {
-          // Check if all sub-questions have been answered
-          if (!question.subQuestions) return true; // no subquestions, then valid
+          if (!question.subQuestions) return true;
   
           for (const subQuestion of question.subQuestions) {
             if (answers[subQuestion.name] === undefined || answers[subQuestion.name] === "") {
               console.log(
                 `Validation Failed: Sub-question ${subQuestion.name} is not answered.`
               );
-              return false; // A sub-question is not answered
+              return false;
             }
           }
         }
   
-        return true; // Either "No" is selected, or "Yes" is selected and all sub-questions are answered
+        return true;
       }
   
       case "long_textarea":
@@ -559,7 +651,6 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
         }
       );
 
-      // Check for response status
       if (!response.ok) {
         throw new Error("Failed to submit data");
       }
@@ -567,14 +658,12 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
       const result = await response.json();
       console.log("Successfully submitted:", result);
 
-      // Proceed with navigation and localStorage updates
       dispatch(completeCard("/questionnaire/6"));
       localStorage.setItem("currentQuestionIndex6", 0);
       localStorage.setItem("answers", JSON.stringify(answers));
       navigate("/assessment");
     } catch (error) {
       console.error("Error submitting data:", error);
-      // Handle any errors, maybe show a message to the user
     }
   };
 
@@ -868,7 +957,7 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
                       setAnswers((prev) => ({
                         ...prev,
                         [`${question.name}_na`]: isChecked,
-                        [question.name]: isChecked ? 0 : prev[question.name], // Reset slider/input if checked
+                        [question.name]: isChecked ? 0 : prev[question.name],
                       }));
                     }}
                   >
@@ -891,7 +980,7 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
               value={answers[question.name] || ""}
               onChange={(e) => handleChange(e.target.value, question.name)}
               rows={4}
-              style={{ marginTop: "10px" }} // Ensure there's some spacing between the button and textarea
+              style={{ marginTop: "10px" }}
             />
           </div>
         );
@@ -1116,6 +1205,8 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
   const progressPercentage =
     ((currentQuestionIndex + 1) / totalQuestions) * 100;
 
+  console.log("Current answers state:", answers);
+
   return (
     <Row gutter={16} style={{ padding: "0 5%" }}>
       <Col xs={24} sm={24} md={24} lg={24} xl={24}>
@@ -1125,7 +1216,7 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
           strokeColor={progressColor}
         />
         <h3 style={{ margin: "20px 0", color: "#F2AA93" }}>
-          {questions[currentQuestionIndex]?.title ? questions[currentQuestionIndex]?.title : 'Parent’s Birth/Childhood History'}
+          {questions[currentQuestionIndex]?.title ? questions[currentQuestionIndex]?.title : "Parent's Birth/Childhood History"}
         </h3>
 
         <h3 style={{ margin: "20px 0", color: "#000", fontWeight: "600", fontSize: "15px" }}>

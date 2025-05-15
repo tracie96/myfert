@@ -352,6 +352,11 @@ const Nutrition = ({ onComplete }) => {
       soda_amount: info.sodaCups || "",
       sensitive_food_caffeine: info.adverseReactionToCoffee ? "Yes" : "No",
       sensitive_food_caffeine_feel: info.reactionToCaffeine || "",
+      special_diet_reason:info.specialDietReason || "",
+      breakfast_time:info.breakfastTime || "",
+      lunch_time:info.lunchTime || "",
+      snack_time:info.snacksTime || "",
+      dinner_time:info.dinnerTime || "",
     };
   };
 
@@ -542,6 +547,11 @@ const Nutrition = ({ onComplete }) => {
       explainAdverseReactionToCoffee:
         answers.sensitive_food_caffeine_feel || "",
       reactionToCaffeine: answers.sensitive_food_caffeine_feel || "",
+      specialDietReason:answers.special_diet_reason || "",
+      breakfastTime:answers.breakfast_time || "",
+      lunchTime:answers.lunch_time || "",
+      snacksTime:answers.snack_time || "",
+      dinnerTime:answers.dinner_time || "",
     };
   };
 

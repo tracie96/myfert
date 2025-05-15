@@ -22,6 +22,7 @@ import "../assesment.css";
 import moment from "moment";
 import { useMediaQuery } from "react-responsive";
 import { backBtnTxt, exitBtnTxt, saveAndContinueBtn, submitBtn } from "../../../../../utils/constant";
+import { getHealthLifestylePatient } from "../../../../redux/AssessmentController";
 
 const { Option } = Select;
 
@@ -354,6 +355,63 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const isMobile = useMediaQuery({ maxWidth: 767 });
+  const patientHealthLifestyle = useSelector((state) => state.intake?.patientHealthLifestyle);
+
+  useEffect(() => {
+    if (patientHealthLifestyle) {
+      const lifestyle = patientHealthLifestyle;
+  
+      const prefillAnswers = {
+        overll_wellbeing: lifestyle.howWellThingsGoingOverall || 1,
+        school_wellbeing: lifestyle.howWellThingsGoingSchool || 1,
+        job_wellbeing: lifestyle.howWellThingsGoingJob || 1,
+        social_life_wellbeing: lifestyle.howWellThingsGoingSocialLife || 1,
+        close_friends_wellbeing: lifestyle.howWellThingsGoingCloseFriends || 1,
+        sex_wellbeing: lifestyle.howWellThingsGoingSex || 1,
+        attitude_wellbeing: lifestyle.howWellThingsGoingAttitude || 1,
+        relationship_wellbeing: lifestyle.howWellThingsGoingPartner || 1,
+        children_wellbeing: lifestyle.howWellThingsGoingKids || 1,
+        parents_wellbeing: lifestyle.howWellThingsGoingParents || 1,
+        spouse_wellbeing: lifestyle.howWellThingsGoingSpouse || 1,
+        mode_of_own_birth: lifestyle.howWereYouBorn,
+        birth_complications: lifestyle.wereYouBornWithComplication?.yesNo ? "Yes" : "No",
+        birth_complications_details: lifestyle.wereYouBornWithComplication?.describe || "",
+        breast_fed_duration: lifestyle.breastFedHowLong || "",
+        bottle_fed_type: lifestyle.breastFedFormula || "",
+        dont_know: lifestyle.breastFoodDontKnow || false,
+        age_of_solid_food_intro: lifestyle.ageIntroductionSolidFood || "",
+        age_of_wheat_food_intro: lifestyle.ageIntroductionWheat || "",
+        age_of_diary_food_intro: lifestyle.ageIntroductionDiary || "",
+        allergic_food: lifestyle.foodsAvoided ? "Yes" : "No",
+        food_avoided: lifestyle.foodsAvoidTypeSymptoms || "",
+        eat_sugar_as_a_child: lifestyle.alotSugar ? "Yes" : "No",
+        mercury_filings: lifestyle.mercuryFillingRemoved ? "Yes" : "No",
+        mercury_fillings_removed: lifestyle.mercuryFillingRemovedWhen || "",
+        fillings_removed: lifestyle.fillingsAsKid || "",
+  
+        do_you_brush_regularly: lifestyle.brushRegularly ? "Yes" : "No",
+        do_you_floss_regularly: lifestyle.flossRegularly ? "Yes" : "No",
+  
+        smoke_irritants: lifestyle.environmentEffect || [],
+        work_env_smoke_irritants: lifestyle.environmentExposed || [],
+  
+        harmful_chemicals: lifestyle.exposedHarmfulChemical ? "Yes" : "No",
+        harmful_chemical_exposure: lifestyle.whenExposedHarmfulChemical?.chemicalName || "",
+        harmful_chemical_exposure_length: lifestyle.whenExposedHarmfulChemical?.lengthExposure || "",
+        harmful_chemical_exposure_date: lifestyle.whenExposedHarmfulChemical?.dateExposure || "",
+  
+        pets_or_animal: lifestyle.petsFarmAnimal ? "Yes" : "No",
+        where_they_live: lifestyle.petsAnimalLiveWhere || "",
+      };
+  
+      setAnswers(prefillAnswers);
+    }
+  }, [patientHealthLifestyle]);
+
+  
+  useEffect(() => {
+    dispatch(getHealthLifestylePatient());
+  }, [dispatch]);
 
   const { patientHealthMedicalInfo } = useSelector(
     (state) => state.intake

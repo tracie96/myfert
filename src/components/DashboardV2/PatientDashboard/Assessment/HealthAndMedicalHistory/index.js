@@ -350,7 +350,6 @@ const questions = [
 const HealthAndMedicalHistory = ({ onComplete }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
-  const [isDataLoaded, setIsDataLoaded] = useState(false);
   const totalQuestions = questions.length;
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -500,7 +499,6 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
       const transformedAnswers = transformApiDataToAnswers(patientHealthMedicalInfo);
       console.log("Prefilling from API:", transformedAnswers);
       setAnswers(transformedAnswers);
-      setIsDataLoaded(true);
       setCurrentQuestionIndex(0);
       // Clear localStorage to avoid confusion
       localStorage.removeItem("answers");
@@ -513,7 +511,6 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
     if (!isNaN(savedIndex) && savedAnswers) {
       setCurrentQuestionIndex(savedIndex);
       setAnswers(savedAnswers);
-      setIsDataLoaded(true);
       console.log("Prefilling from localStorage:", savedAnswers);
     }
   }, [patientHealthMedicalInfo]);

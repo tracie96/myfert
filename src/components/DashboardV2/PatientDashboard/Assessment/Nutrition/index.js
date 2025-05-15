@@ -352,7 +352,7 @@ const Nutrition = ({ onComplete }) => {
       soda_amount: info.sodaCups || "",
       sensitive_food_caffeine: info.adverseReactionToCoffee ? "Yes" : "No",
       sensitive_food_caffeine_feel: info.reactionToCaffeine || "",
-      special_diet_reason:info.specialDietReason || "",
+      // special_diet_reason:info.specialDietReason || "",
       breakfast_time:info.breakfastTime || "",
       lunch_time:info.lunchTime || "",
       snack_time:info.snacksTime || "",

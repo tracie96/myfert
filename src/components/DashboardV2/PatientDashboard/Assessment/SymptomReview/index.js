@@ -673,7 +673,7 @@ console.log({patientSymptomInfo})
       'general', 'headEyesEars', 'musco', 'moodNerves', 'cardio', 
       'urinary', 'digestion', 'digestionCont', 'eating', 'itchingSkin', 'respiratory', 
       'nails', 'lymph', 'skin', 'skinProblems', 'skinProblemsContr', 
-      'femaleReproductive'
+      'femaleReproductive', 'menstrual', 'premenstrual'
     ];
 
     symptomCategories.forEach(category => {
@@ -869,6 +869,8 @@ console.log({patientSymptomInfo})
       skinProblemsContr: [],
       itchingSkin: [],
       femaleReproductive: [],
+      menstrual: [],
+      premenstrual: [],
       currentMedication: [],
       nutritionalSupplements: [],
       femaleReproductiveCont:[]
@@ -1346,6 +1348,47 @@ console.log({patientSymptomInfo})
       }
     });
 
+    const premenstrualQuestions = [
+      "bloating",
+      "breast_tenderness",
+      "carbohydrate_craving",
+      "chocolate_craving",
+      "constipation",
+      "decreased_sleep",
+      "diarrhea",
+      "fatigue",
+      "increased_sleep",
+      "irritability",
+    ];
+
+    const menstrualQuestions = [
+      "cramps",
+      "heavy_periods",
+      "irregular_periods",
+      "no_periods",
+      "scanty_periods",
+      "spotting_between",
+    ];
+
+    premenstrualQuestions.forEach((question) => {
+      if (answers[question]) {
+        apiFormat.premenstrual = apiFormat.premenstrual || [];
+        apiFormat.premenstrual.push({
+          level: getLevel(answers[question]),
+          name: question,
+        });
+      }
+    });
+
+    menstrualQuestions.forEach((question) => {
+      if (answers[question]) {
+        apiFormat.menstrual = apiFormat.menstrual || [];
+        apiFormat.menstrual.push({
+          level: getLevel(answers[question]),
+          name: question,
+        });
+      }
+    });
 
     const transformedData = {
       general: apiFormat.general,
@@ -1355,6 +1398,7 @@ console.log({patientSymptomInfo})
       cardio: apiFormat.cardio,
       urinary: apiFormat.urinary,
       digestion: apiFormat.digestion,
+      digestionCont: apiFormat.digestionCont,
       eating: apiFormat.eating,
       itchingSkin: apiFormat.itchingSkin,
       respiratory: apiFormat.respiratory,
@@ -1364,6 +1408,8 @@ console.log({patientSymptomInfo})
       skinProblems: apiFormat.skinProblems,
       skinProblemsContr: apiFormat.skinProblemsContr,
       femaleReproductive: apiFormat.femaleReproductive,
+      menstrual: apiFormat.menstrual,
+      premenstrual: apiFormat.premenstrual,
       currentMedication: answers.current_medication
         ? answers.current_medication.map((med) => ({
           medication: med.medication || "",

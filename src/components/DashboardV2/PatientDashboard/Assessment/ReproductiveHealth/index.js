@@ -14,7 +14,7 @@ import {
   Space,
 } from "antd";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { completeCard } from "../../../../redux/assessmentSlice";
 import FormWrapper from "../FormWrapper";
 import "../assesment.css";
@@ -25,6 +25,7 @@ import Title from "antd/es/typography/Title";
 import Paragraph from "antd/es/typography/Paragraph";
 import { backBtnTxt, exitBtnTxt, reproductiveGeneralHeading, reproductiveGeneralInfo, saveAndContinueBtn, submitBtn } from "../../../../../utils/constant";
 import InfoModal from "./InfoModal";
+import { getReproductiveHealthPatient } from "../../../../redux/AssessmentController";
 
 const { Option } = Select;
 
@@ -609,6 +610,63 @@ const ReproductiveHealth = ({ onComplete }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const isMobile = useMediaQuery({ maxWidth: 767 });
+  const patientReproductiveInfo = useSelector((state) => state.intake?.patientReproductiveInfo);
+  console.log("patientReproductiveInfo-->", patientReproductiveInfo);
+
+  useEffect(() => {
+    if (patientReproductiveInfo) {
+      const mappedAnswers = {
+        relaxation_techniques: patientReproductiveInfo.birthControl ? "Yes" : "No",
+        how_often_hormonal_bc: patientReproductiveInfo.hormonalBirthControl || "",
+        how_often_non_hormonal_bc: patientReproductiveInfo.nonHormonalBirthControl || "",
+        isPregnant: patientReproductiveInfo.currentlyPregnant ? "Yes" : "No",
+        is_trying_to_conceive: patientReproductiveInfo.tryingToConceive ? "Yes" : "No",
+        is_difficulty_to_conceive: patientReproductiveInfo.difficultyTryingToConceive ? "Yes" : "No",
+        is_family_health_concern: patientReproductiveInfo.familyMemberWithReproductiveConcerns || "No",
+        is_trying_to_conceive_time: patientReproductiveInfo.howLongTryingToConceive || "",
+        methods_trying_to_conceive: patientReproductiveInfo.methodToConceive || [],
+        is_charting_cycles: patientReproductiveInfo.chartingToConceive || [],
+        current_therapy: patientReproductiveInfo.currentTherapy || "",
+        charting_method: patientReproductiveInfo.methodFertilityAwareness || "",
+        intercourse_during_fertile_sub: patientReproductiveInfo.intercourse_during_fertile || "",
+        is_frequent_intercourse_cycle: patientReproductiveInfo.intercouseEachCycle || "",
+        is_menstrual_pain: patientReproductiveInfo.menstrualPainDuringPeriod || [],
+        is_lower_back_pain: patientReproductiveInfo.experiencePelvicPain ? "Yes" : "No",
+        duration_per_cycle: patientReproductiveInfo.menstralBleedingPelvicPain?.duration || "",
+        duration_per_cycle_severity_pelvic_pain: patientReproductiveInfo.menstralBleedingPelvicPain?.colour || "",
+        is_pms_symptom: patientReproductiveInfo.doYouPmsSymptoms ? "Yes" : "No",
+        pms_sympton: patientReproductiveInfo.pmsSymptoms || [],
+        pms_sympton_severity: patientReproductiveInfo.pms?.colour || "",
+        longest_cycle_radio: patientReproductiveInfo.longestCycleLenght || "",
+        average_cycle_radio: patientReproductiveInfo.averageCycleLenght || "",
+        shortest_cycle_radio: patientReproductiveInfo.shortestCycleLenght || "",
+        mid_cycle_spotting: patientReproductiveInfo.midCycleSpotting ? "Yes" : "No",
+        cycle_spotting_sub_frq: patientReproductiveInfo.menstralCycleFrequency || "",
+        cycle_spotting_sub_number: patientReproductiveInfo.menstralCycleDuration || "",
+        cycle_spotting_sub: patientReproductiveInfo.menstralCycleColour || "",
+        cervical_mucus: patientReproductiveInfo.cycleDischargeCreamy?.duration || "",
+        cervical_mucus_sub: patientReproductiveInfo.cycleDischargeCreamy?.colour || "",
+        Watery_mucus_sub: patientReproductiveInfo.cycleDischargeWatery?.duration || "",
+        Watery_mucus_colour: patientReproductiveInfo.cycleDischargeWatery?.colour || "",
+        egg_white_mucus_sub: patientReproductiveInfo.cycleDischargeEggWhite?.duration || "",
+        egg_white_mucus_colour: patientReproductiveInfo.cycleDischargeEggWhite?.colour || "",
+        pre_spotting_sub: patientReproductiveInfo.cycleDischargePrePeriod?.duration || "",
+        pre_spotting_colour: patientReproductiveInfo.cycleDischargePrePeriod?.colour || "",
+        after_period_spot_sub: patientReproductiveInfo.cycleDischargeAfterPeriodSpotting?.duration || "",
+        after_period_spot_colour: patientReproductiveInfo.cycleDischargeAfterPeriodSpotting?.colour || "",
+        // Add more mappings as needed...
+      };
+  
+      setAnswers((prev) => ({
+        ...prev,
+        ...mappedAnswers,
+      }));
+    }
+  }, [patientReproductiveInfo]);
+  
+  useEffect(() => {
+    dispatch(getReproductiveHealthPatient());
+  }, [dispatch]);
 
   useEffect(() => {
     const savedIndex = parseInt(

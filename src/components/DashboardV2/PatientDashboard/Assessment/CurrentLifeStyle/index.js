@@ -12,13 +12,14 @@ import {
   Table,
 } from "antd";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { completeCard } from "../../../../redux/assessmentSlice";
 import FormWrapper from "../FormWrapper";
 import "./styles.css";
 import { useMediaQuery } from "react-responsive";
 import { DeleteTwoTone, EditTwoTone } from "@ant-design/icons";
 import { backBtnTxt, exitBtnTxt, saveAndContinueBtn, submitBtn } from "../../../../../utils/constant";
+import { getHealthLifestylePatient } from "../../../../redux/AssessmentController";
 
 const { Option } = Select;
 
@@ -298,31 +299,99 @@ const CurrentLifeStyle = ({ onComplete }) => {
   const [editingKey, setEditingKey] = useState("");
   const [tempConcern, setTempConcern] = useState({});
   const [tempAllergy, setTempAllergy] = useState({});
-
+  const patientHealthLifeStyleInfo = useSelector((state) => state.intake?.patientHealthLifestyle);
+console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
   const totalQuestions = questions.length;
 
   const isMobile = useMediaQuery({ maxWidth: 767 });
 
+  const mapHealthLifestyleInfoToState = (info) => {
+    const answersFromApi = {
+      sleep_hours: info.sleepHours?.toString() || "",
+      problems_falling_asleep: info.problemSleeping ? "Yes" : "No",
+      problems_staying_asleep: info.stayingAsleep ? "Yes" : "No",
+      problems_with_insomnia: info.insomnia ? "Yes" : "No",
+      do_you_snore: info.doYouSnore ? "Yes" : "No",
+      do_you_feel_rested: info.restedUponAwake ? "Yes" : "No",
+      do_you_use_sleeping_aids: info.sleepingAids?.yesNo ? "Yes" : "No",
+      do_you_use_sleeping_aids_other: info.sleepingAids?.describe || "",
+  
+      // Exercise: cardio
+      cardio_aerobic_describe: info.cardio?.type || "",
+      cardio_aerobic_number: info.cardio?.timesWeek?.toString() || "",
+      cardio_aerobic_time_duration: info.cardio?.duration?.toString() || "",
+  
+      strength_resistance_describe: info.strenght?.type || "",
+      strength_resistance_number: info.strenght?.timesWeek?.toString() || "",
+      strength_resistance_time_duration: info.strenght?.duration?.toString() || "",
+  
+      flexibility_stretching_describe: info.flexibility?.type || "",
+      flexibility_stretching_number: info.flexibility?.timesWeek?.toString() || "",
+      flexibility_stretching_time_duration: info.flexibility?.duration?.toString() || "",
+  
+      sport_participated_describe: info.balance?.type || "",
+      sport_participated_number: info.balance?.timesWeek?.toString() || "",
+      sport_participated_time_duration: info.balance?.duration?.toString() || "",
+  
+      sport_participated_in_describe: info.other?.type || "",
+      sport_participated_in_number: info.other?.timesWeek?.toString() || "",
+      sport_participated_in_time_duration: info.other?.duration?.toString() || "",
+  
+      motivated_to_exercise: info.motivatedToExercise || "",
+  
+      problems_limiting_exercise: info.problemsThatLimitExercise?.yesNo ? "Yes" : "No",
+      problems_limiting_exercise_other: info.problemsThatLimitExercise?.describe || "",
+  
+      sore_after_exercise: info.soreAfterExercise?.yesNo ? "Yes" : "No",
+      sore_after_exercise_other: info.soreAfterExercise?.describe || "",
+    };
+  
+    return {
+      answers: answersFromApi,
+      concerns: info.ongoingHealth?.map((item, index) => ({
+        key: index.toString(),
+        problem: item.problem || "",
+        severity: item.severity || "",
+        priorTreatment: item.priorTreatment || "",
+        success: item.success || "",
+      })) || [],
+      allergies: info.allergies?.map((item, index) => ({
+        key: index.toString(),
+        supplement_name: item.supplement_name || "",
+        reaction: item.reaction || "",
+      })) || [],
+    };
+  };
+
+  
   useEffect(() => {
-    const savedIndex = parseInt(
-      localStorage.getItem("currentQuestionIndex2"),
-      10,
-    );
+    dispatch(getHealthLifestylePatient());
+  }, [dispatch]);
+
+  useEffect(() => {
+    const savedIndex = parseInt(localStorage.getItem("currentQuestionIndex2"), 10);
     const savedAnswers = JSON.parse(localStorage.getItem("answers"));
     const savedConcern = JSON.parse(localStorage.getItem("currentConcern"));
     const savedAllergies = JSON.parse(localStorage.getItem("currentAllergies"));
-
+  
     if (!isNaN(savedIndex) && savedAnswers) {
       setCurrentQuestionIndex(savedIndex);
       setAnswers(savedAnswers);
+    } else if (patientHealthLifeStyleInfo && Object.keys(patientHealthLifeStyleInfo).length > 0) {
+      const mapped = mapHealthLifestyleInfoToState(patientHealthLifeStyleInfo);
+      setAnswers(mapped.answers);
+      setCurrentConcern(mapped.concerns);
+      setCurrentAllergies(mapped.allergies);
     }
+  
     if (savedConcern) {
       setCurrentConcern(savedConcern);
     }
     if (savedAllergies) {
       setCurrentAllergies(savedAllergies);
     }
-  }, []);
+  }, [patientHealthLifeStyleInfo]);
+  
 
   const validateQuestion = () => {
     const question = questions[currentQuestionIndex];

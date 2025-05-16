@@ -225,31 +225,31 @@ const questions = [
       },
     ],
   },
-  {
-    question: "Based on your current occupation:",
-    type: "occupation_schedule",
-    name: "occupation_schedule",
-    subQuestions: [
-      {
-        question: "Weekly schedule",
-        type: "inputNumber",
-        name: "occupation_weekly_hours",
-        suffix: "hours"
-      },
-      {
-        question: "Type",
-        type: "radio",
-        name: "occupation_type",
-        options: [
-          "Daytime",
-          "Evening",
-          "Nighttime",
-          "Rotating Shift",
-          "On-call"
-        ]
-      }
-    ]
-  },
+  // {
+  //   question: "Based on your current occupation:",
+  //   type: "occupation_schedule",
+  //   name: "occupation_schedule",
+  //   subQuestions: [
+  //     {
+  //       question: "Weekly schedule",
+  //       type: "inputNumber",
+  //       name: "occupation_weekly_hours",
+  //       suffix: "hours"
+  //     },
+  //     {
+  //       question: "Type",
+  //       type: "radio",
+  //       name: "occupation_type",
+  //       options: [
+  //         "Daytime",
+  //         "Evening",
+  //         "Nighttime",
+  //         "Rotating Shift",
+  //         "On-call"
+  //       ]
+  //     }
+  //   ]
+  // },
 ];
 
 const StressAndRelationship = ({ onComplete }) => {
@@ -328,34 +328,26 @@ const StressAndRelationship = ({ onComplete }) => {
     return formData;
   };
 
-  // Prefetch existing data on component mount
+  // Fetch stress data on component mount
   useEffect(() => {
-    const fetchExistingData = async () => {
+    const fetchStressData = async () => {
       try {
-        setIsDataLoading(true);
-        
-        // Check if we already have the data in Redux store
-        if (patientStressInfo && Object.keys(patientStressInfo).length > 0) {
-          const formData = mapApiToFormData(patientStressInfo);
-          setAnswers(formData);
-        } else {
-          // Fetch data if not available
-          const resultAction = await dispatch(getStressPatient());
-          if (getStressPatient.fulfilled.match(resultAction)) {
-            const formData = mapApiToFormData(resultAction.payload);
-            setAnswers(formData);
-          }
-        }
+        await dispatch(getStressPatient());
       } catch (error) {
-        console.error("Error fetching existing stress data:", error);
-        // Continue with empty form if fetch fails
-      } finally {
-        setIsDataLoading(false);
+        console.error("Error fetching stress data:", error);
       }
     };
+    fetchStressData();
+  }, [dispatch]);
 
-    fetchExistingData();
-  }, [dispatch, patientStressInfo]);
+  // Map API data to form format when patientStressInfo changes
+  useEffect(() => {
+    if (patientStressInfo && Object.keys(patientStressInfo).length > 0) {
+      const formData = mapApiToFormData(patientStressInfo);
+      setAnswers(formData);
+    }
+    setIsDataLoading(false);
+  }, [patientStressInfo]);
 
   useEffect(() => {
     // Validate questions array is not empty
@@ -902,7 +894,52 @@ const StressAndRelationship = ({ onComplete }) => {
               renderSubQuestions(question.subQuestions)}
           </div>
         );
-
+      case "occupation_schedule":
+        return (
+          <div>
+            {question.subQuestions.map((subQ, idx) => {
+              if (subQ.type === "inputNumber") {
+                return (
+                  <div key={subQ.name} style={{ marginBottom: 16 }}>
+                    <label>
+                      <span style={{ color: "red" }}>* </span>
+                      {subQ.question}
+                    </label>
+                    <InputNumber
+                      min={0}
+                      value={answers[subQ.name] || undefined}
+                      onChange={(value) => handleChange(value, subQ.name)}
+                      style={{ marginLeft: 8, marginRight: 8 }}
+                    />
+                    {subQ.suffix}
+                  </div>
+                );
+              }
+              if (subQ.type === "radio") {
+                return (
+                  <div key={subQ.name} style={{ marginBottom: 16 }}>
+                    <label>
+                      <span style={{ color: "red" }}>* </span>
+                      {subQ.question}
+                    </label>
+                    <Radio.Group
+                      value={answers[subQ.name]}
+                      onChange={(e) => handleChange(e.target.value, subQ.name)}
+                      style={{ display: "block", marginTop: 8 }}
+                    >
+                      {subQ.options.map((option, i) => (
+                        <Radio key={i} value={option} style={{ display: "block" }}>
+                          {option}
+                        </Radio>
+                      ))}
+                    </Radio.Group>
+                  </div>
+                );
+              }
+              return null;
+            })}
+          </div>
+        );
       default:
         console.warn('Unknown question type:', question.type);
         return null;

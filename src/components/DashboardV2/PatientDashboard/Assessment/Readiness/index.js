@@ -112,12 +112,12 @@ const questions = [
   {
     title: "What do you think is happening and why?",
     type: "long_textarea",
-    name: "happening_and_why"
+    name: "healthThinkHappening"
   },
   {
     title: "What do you feel needs to happen for you to get better?",
     type: "long_textarea",
-    name: "get_better"
+    name: "healthHappenGetBetter"
   },
 ];
 

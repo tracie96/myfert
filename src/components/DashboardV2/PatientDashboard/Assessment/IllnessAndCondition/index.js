@@ -636,6 +636,7 @@ const IllnessAndCondition = ({ onComplete }) => {
       handleDateRadioField(apiData.diagnosticCardiacStress, 'cardiac_stress_test');
       handleDateRadioField(apiData.diagnosticEKG, 'EKG');
       handleDateRadioField(apiData.diagnosticMRI, 'MRI');
+      handleDateRadioField(apiData.diagnosticLastPap, 'lastPapTest');
       handleDateRadioField(apiData.diagnosticUpperEndoscopy, 'upper_endoscopy');
       handleDateRadioField(apiData.diagnosticUpperGI, 'upper_GI_series');
       handleDateRadioField(apiData.diagnosticChestXray, 'chest_X_ray');

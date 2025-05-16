@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { Row, Col, Button, Spin, Steps, Avatar, Divider, Modal } from "antd";
 // import PeriodCycleTracker from "../../../screens/PatientDashboard/Cycle/cycle";
 import { useDispatch } from "react-redux";
-import { getMiraInfo } from "../../redux/AuthController";
+import { getMiraInfo, getUserProfile } from "../../redux/AuthController";
 import { getAccessDetails } from "../../redux/AssessmentController";
 import { LoadingOutlined } from "@ant-design/icons";
 import "../dashboard.css";
@@ -128,19 +128,33 @@ export default function PatDash() {
     return Object.values(accessDetails).every(value => value === true);
   };
 
-  const checkLearningProgress = useCallback(() => {
-    // Check if videos have been watched from userAuth object
-    const hasWatchedVideos = userAuth?.obj?.videoWatched === true;
-    
-    setChecklistItems(prev => ({
-      ...prev,
-      learnVideos: hasWatchedVideos
-    }));
-  }, [userAuth?.obj?.videoWatched]);
-
   useEffect(() => {
-    checkLearningProgress();
-  }, [checkLearningProgress]);
+    const fetchUserProfile = async () => {
+      try {
+        const response = await dispatch(getUserProfile());
+        console.log('User Profile Response:', response);
+        console.log('Current userAuth:', userAuth);
+        
+        // Check both sources for video watching status
+        const hasWatchedVideos = response.payload?.videoWatched === true || 
+                               userAuth?.obj?.videoWatched === true ||
+                               userAuth?.obj?.videoWatched === "true";
+        
+        console.log('Has watched videos:', hasWatchedVideos);
+        
+        setChecklistItems(prev => ({
+          ...prev,
+          learnVideos: hasWatchedVideos
+        }));
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+      }
+    };
+
+    if (userAuth?.obj?.token) {
+      fetchUserProfile();
+    }
+  }, [dispatch, userAuth]);
 
   const filteredAppointments = appointmentList.filter(
     (app) => app.roleId === 0

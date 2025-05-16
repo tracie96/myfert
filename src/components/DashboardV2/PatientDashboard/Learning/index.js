@@ -4,6 +4,7 @@ import "./learn.css";
 import { useMediaQuery } from "react-responsive";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useSelector } from "react-redux";
 
 import { Button, Typography, List } from "antd";
 const { Title, Text } = Typography;
@@ -13,6 +14,7 @@ const { Panel } = Collapse;
 const LearnInfo = () => {
   const [isFaqOpen, setIsFaqOpen] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState(null);
+  const { userAuth } = useSelector((state) => state.authentication);
   const [videos, setVideos] = useState([
     {
       id: 'understanding',
@@ -57,14 +59,20 @@ const LearnInfo = () => {
   useEffect(() => {
     const markVideosAsWatched = async () => {
       try {
-        await axios.get('https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/MarkVideoAsWatch');
+        await axios.get('https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/MarkVideoAsWatch', {
+          headers: {
+            'Authorization': `Bearer ${userAuth?.obj?.token}`
+          }
+        });
       } catch (error) {
         console.error('Error marking videos as watched:', error);
       }
     };
 
-    markVideosAsWatched();
-  }, []);
+    if (userAuth?.obj?.token) {
+      markVideosAsWatched();
+    }
+  }, [userAuth?.obj?.token]);
 
   // Track video completion
   const handleVideoSelect = (video) => {

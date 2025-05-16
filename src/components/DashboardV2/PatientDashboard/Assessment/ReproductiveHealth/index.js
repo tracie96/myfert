@@ -627,7 +627,7 @@ const ReproductiveHealth = ({ onComplete }) => {
         is_charting_cycles: patientReproductiveInfo.chartingToConceive || [],
         current_therapy: patientReproductiveInfo.currentTherapy ? "Yes" : "No",
         charting_method: patientReproductiveInfo.methodFertilityAwareness || "",
-        intercourse_during_fertile_sub: patientReproductiveInfo.intercourse_during_fertile || "",
+        // intercourse_during_fertile_sub: patientReproductiveInfo.intercourse_during_fertile || "",
         is_frequent_intercourse_cycle: patientReproductiveInfo.intercouseEachCycle || "",
         is_menstrual_pain: patientReproductiveInfo.menstrualPainDuringPeriod || [],
         is_lower_back_pain: patientReproductiveInfo.experiencePelvicPain ? "Yes" : "No",

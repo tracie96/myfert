@@ -257,6 +257,7 @@ const GeneralIntakeForm = ({ onComplete }) => {
       emergencyPhoneCell: answers["emergency_contact"]?.phoneCell || "",
       emergencyPhoneWork: answers["emergency_contact"]?.phoneType || "",
       howDidHearAbout: answers["how_did_you_hear"] || "",
+      age:answers["age"] || "",
     };
   
     const encryptedData = 

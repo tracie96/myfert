@@ -656,7 +656,6 @@ const SymptomReview = ({ onComplete }) => {
   
   const patientSymptomInfo = useSelector((state) => state.intake?.patientSymptomsInfo);
 
-console.log({patientSymptomInfo})
 
   const mapSymptomInfoToAnswers = (info) => {
     const mappedAnswers = {};
@@ -765,7 +764,6 @@ console.log({patientSymptomInfo})
     }
   }, [dispatch, patientSymptomInfo]);
 
-  console.log({patientSymptomInfo})
   useEffect(() => {
     const savedIndex = parseInt(
       localStorage.getItem("currentQuestionIndex9"),

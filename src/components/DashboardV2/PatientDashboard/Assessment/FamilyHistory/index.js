@@ -371,17 +371,76 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const patientPersonalFamilyInfo = useSelector((state) => state.intake?.patientPersonalFamilyInfo);
 
-  useEffect(() => {
-    const savedIndex = parseInt(
-      localStorage.getItem("currentQuestionIndex7"),
-      10,
-    );
-    const savedAnswers = JSON.parse(localStorage.getItem("answers"));
-    if (!isNaN(savedIndex) && savedAnswers) {
-      setCurrentQuestionIndex(savedIndex);
-      setAnswers(savedAnswers);
+  const mapPersonalFamilyInfoToAnswers = (info) => {
+    const mapped = {};
+  
+    // Map obstetricHistory
+    if (info.obstetricHistory && Array.isArray(info.obstetricHistory)) {
+      info.obstetricHistory.forEach((item) => {
+        const key = item.name?.toLowerCase().replace(/\s+/g, "_");
+        mapped[key] = true;
+        mapped[`${key}_select`] = item.level || 0;
+      });
     }
-  }, []);
+  
+    // General fields
+    mapped.pregnancy_problems = info.problemsAfterPregnancy ? "Yes" : "No";
+    mapped.pregnancy_problems_sub = info.problemsAfterPregnancyExplain || "";
+  
+    mapped.age_of_period = info.ageStartMenstrual || "";
+    mapped.date_of_last_period = info.startDateLastMenstrual || "";
+    mapped.length_of_cycle = info.lenghtOfCycle || "";
+    mapped.times_between_of_cycle = info.timeBtwCycles || "";
+  
+    mapped.cramping = info.cramping ? "Yes" : "No";
+    mapped.pain = info.painInPeriod ? "Yes" : "No";
+  
+    mapped.premenstrual_problems = info.everHadPreMenstrualProblems?.yesNo ? "Yes" : "No";
+    mapped.premenstrual_problems_describe = info.everHadPreMenstrualProblems?.describe || "";
+  
+    mapped.other_premenstrual_problems = info.otherMenstrualProblems?.yesNo ? "Yes" : "No";
+    mapped.other_hormonal_problems_history = info.otherMenstrualProblems?.describe || "";
+  
+    mapped.hormonal_birthcontrol = info.hormonalBirthControlType?.name ? "Yes" : "No";
+    mapped.hormonal_birthcontrol_often = info.hormonalBirthControlType?.name || "";
+    mapped.hormonal_birthcontrol_long = info.hormonalBirthControlType?.level?.toString() || "";
+  
+    mapped.other_hormonal_problems = info.problemsWithHormonalBirthControl?.yesNo ? "Yes" : "No";
+    mapped.any_hormonal_problems_bc = info.problemsWithHormonalBirthControl?.describe || "";
+  
+    mapped.use_of_contraception = info.useContraception?.yesNo ? "Yes" : "No";
+    mapped.use_of_contraception_sub = info.useContraception?.describe || "";
+  
+    mapped.is_menopause = info.inMenopause?.yesNo ? "Yes" : "No";
+    mapped.age_at_last_period = info.inMenopause?.level || "";
+  
+    mapped.surgical_menopause = info.surgicalMenopause?.yesNo ? "Yes" : "No";
+    mapped.surgical_menopause_detail = info.surgicalMenopause?.describe || "";
+  
+    mapped.symptomatic_problems_menopause_history = info.symptomicProblems || [];
+  
+    mapped.hormone_replacement_therapy = info.hormonalReplacement?.yesNo ? "Yes" : "No";
+    mapped.hormone_replacement_therapy_sub = info.hormonalReplacement?.describe || "";
+  
+    mapped.symptomatic_problems_menopause_other = info.gynSymptoms || [];
+  
+    mapped.other_test_procedures = info.otherTest || "";
+  
+    return mapped;
+  };
+  
+  useEffect(() => {
+    dispatch(getPersonalFamilyPatient());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (patientPersonalFamilyInfo && Object.keys(patientPersonalFamilyInfo).length > 0) {
+      const mappedAnswers = mapPersonalFamilyInfoToAnswers(patientPersonalFamilyInfo);
+      setAnswers(mappedAnswers);
+      localStorage.setItem("answers", JSON.stringify(mappedAnswers)); // optional: persist locally
+    }
+  }, [patientPersonalFamilyInfo]);
+  
 
   useEffect(() => {
     if (!patientPersonalFamilyInfo || Object.keys(patientPersonalFamilyInfo).length === 0) {
@@ -465,12 +524,7 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
     }
   }, [patientPersonalFamilyInfo]);
 
-  // Add a debug log for answers state
-  useEffect(() => {
-    console.log('Current answers state:', answers);
-  }, [answers]);
 
-  console.log(patientPersonalFamilyInfo,'patientPersonalFamilyInfo')
 
   const validateQuestion = () => {
     const question = questions[currentQuestionIndex];

@@ -3,6 +3,7 @@ import { Col, Collapse, Row } from "antd";
 import "./learn.css";
 import { useMediaQuery } from "react-responsive";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 import { Button, Typography, List } from "antd";
 const { Title, Text } = Typography;
@@ -51,6 +52,19 @@ const LearnInfo = () => {
   ]);
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const navigate = useNavigate();
+
+  // Add useEffect to mark videos as watched when component mounts
+  useEffect(() => {
+    const markVideosAsWatched = async () => {
+      try {
+        await axios.get('https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/MarkVideoAsWatch');
+      } catch (error) {
+        console.error('Error marking videos as watched:', error);
+      }
+    };
+
+    markVideosAsWatched();
+  }, []);
 
   // Track video completion
   const handleVideoSelect = (video) => {

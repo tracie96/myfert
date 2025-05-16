@@ -118,11 +118,13 @@ export const GetSideBar = () => {
           <span>LABS</span>
         </NavLink>
       </Menu.Item>
+
       <Menu.Item key="6" icon={<FaServicestack style={{ color: "#00ADEF" }} />}>
         <NavLink to="/patient/services" style={{ textDecoration: "none" }}>
           <span className="no-underline">SERVICES</span>
         </NavLink>
       </Menu.Item>
+      
       {/* <Menu.Item key="6" icon={<FaNotesMedical style={{ color: "#00ADEF" }} />}>
         <NavLink to="/patient/appointment" style={{ textDecoration: "none" }}>
           <span className="no-underline">NOTES</span>

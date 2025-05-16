@@ -498,317 +498,252 @@ const IllnessAndCondition = ({ onComplete }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const isMobile = useMediaQuery({ maxWidth: 767 });
-
+  console.log(isDataLoaded, 'isDataLoaded')
   const { patientIllnessInfo, loading } = useSelector((state) => state.intake);
-console.log({patientIllnessInfo})
+
   useEffect(() => {
     dispatch(getIllnessConditionPatient());
   }, [dispatch]);
 
   useEffect(() => {
-    if (patientIllnessInfo && Object.keys(patientIllnessInfo).length > 0 && !isDataLoaded) {
+    const mapApiResponseToFormState = (apiData) => {
+      console.log('Starting mapApiResponseToFormState with apiData:', apiData);
+      const formAnswers = {};
+
+      if (apiData.respiratory && apiData.respiratory.length > 0) {
+        console.log('Found respiratory data:', apiData.respiratory);
+        for (const item of apiData.respiratory) {
+          if (item.describe === "irritableBowel") formAnswers.irritableBowel = "yes";
+          if (item.describe === "gerd") formAnswers.gerd = "yes";
+          if (item.describe === "crohns") formAnswers.crohns = "yes";
+          if (item.describe === "peptic_ulcer") formAnswers.peptic_ulcer = "yes";
+          if (item.describe === "celiac") formAnswers.celiac = "yes";
+          if (item.describe === "gallstones") formAnswers.gallstones = "yes";
+        }
+      }
+
+      if (apiData.urinary && apiData.urinary.length > 0) {
+        for (const item of apiData.urinary) {
+          if (item.describe === "kidney_stones") formAnswers.kidney_stones = "yes";
+          if (item.describe === "gout") formAnswers.gout = "yes";
+          if (item.describe === "interstitial_cystitis") formAnswers.interstitial_cystitis = "yes";
+          if (item.describe === "frequent_yeast_infections") formAnswers.frequent_yeast_infections = "yes";
+          if (item.describe === "frequent_urinary_tract_infections") formAnswers.frequent_urinary_tract_infections = "yes";
+          if (item.describe === "sexual_dysfunction") formAnswers.sexual_dysfunction = "yes";
+          if (item.describe === "sexual_transmitted_disease") formAnswers.sexual_transmitted_disease = "yes";
+        }
+      }
+
+      if (apiData.endocrine && apiData.endocrine.length > 0) {
+        for (const item of apiData.endocrine) {
+          if (item.describe === "diabetes") formAnswers.diabetes = "yes";
+          if (item.describe === "hypothyroidism") formAnswers.hypothyroidism = "yes";
+          if (item.describe === "hyperthyroidism") formAnswers.hyperthyroidism = "yes";
+          if (item.describe === "polycystic") formAnswers.polycystic = "yes";
+          if (item.describe === "infertility") formAnswers.infertility = "yes";
+          if (item.describe === "metabolic_syndrome/insulin_resistance") formAnswers["metabolic_syndrome/insulin_resistance"] = "yes";
+          if (item.describe === "eating_disorder") formAnswers.eating_disorder = "yes";
+          if (item.describe === "hyperglycemia") formAnswers.hyperglycemia = "yes";
+        }
+      }
+
+      if (apiData.cardiovascular && apiData.cardiovascular.length > 0) {
+        for (const item of apiData.cardiovascular) {
+          if (item.describe === "angina") formAnswers.angina = "yes";
+          if (item.describe === "heart_attack") formAnswers.heart_attack = "yes";
+          if (item.describe === "heart_failure") formAnswers.heart_failure = "yes";
+          if (item.describe === "hypertension") formAnswers.hypertension = "yes";
+          if (item.describe === "stroke") formAnswers.stroke = "yes";
+          if (item.describe === "high_blood_fats") formAnswers.high_blood_fats = "yes";
+          if (item.describe === "rheumatic_fever") formAnswers.rheumatic_fever = "yes";
+          if (item.describe === "arrythmia") formAnswers.arrythmia = "yes";
+          if (item.describe === "murmur") formAnswers.murmur = "yes";
+          if (item.describe === "mitral_valve_prolapse") formAnswers.mitral_valve_prolapse = "yes";
+        }
+      }
+
+      if (apiData.neurologic && apiData.neurologic.length > 0) {
+        for (const item of apiData.neurologic) {
+          if (item.describe === "epilepsy_seizures") formAnswers.epilepsy_seizures = "yes";
+          if (item.describe === "ADD/ADHD") formAnswers["ADD/ADHD"] = "yes";
+          if (item.describe === "headaches") formAnswers.headaches = "yes";
+          if (item.describe === "migraines") formAnswers.migraines = "yes";
+          if (item.describe === "depression") formAnswers.depression = "yes";
+          if (item.describe === "anxiety") formAnswers.anxiety = "yes";
+          if (item.describe === "Autism") formAnswers.Autism = "yes";
+          if (item.describe === "multiple_sclerosis") formAnswers.multiple_sclerosis = "yes";
+          if (item.describe === "Parkinson's disease") formAnswers["Parkinson's disease"] = "yes";
+          if (item.describe === "dementia") formAnswers.dementia = "yes";
+        }
+      }
+
+      if (apiData.inflammatory && apiData.inflammatory.length > 0) {
+        for (const item of apiData.inflammatory) {
+          if (item.describe === "rheumatoid_arthritis") formAnswers.rheumatoid_arthritis = "yes";
+          if (item.describe === "chronic_fatigue_syndrome") formAnswers.chronic_fatigue_syndrome = "yes";
+          if (item.describe === "food_allergies") formAnswers.food_allergies = "yes";
+          if (item.describe === "environmental_allergies") formAnswers.environmental_allergies = "yes";
+          if (item.describe === "multiple_chemical_sensitivities") formAnswers.multiple_chemical_sensitivities = "yes";
+          if (item.describe === "autoimmune_disease") formAnswers.autoimmune_disease = "yes";
+          if (item.describe === "immune_deficiency") formAnswers.immune_deficiency = "yes";
+          if (item.describe === "mononucleosis") formAnswers.mononucleosis = "yes";
+        }
+      }
+
+      if (apiData.musculoskeletal && apiData.musculoskeletal.length > 0) {
+        for (const item of apiData.musculoskeletal) {
+          if (item.describe === "fibromyalgia") formAnswers.fibromyalgia = "yes";
+          if (item.describe === "osteoarthritis") formAnswers.osteoarthritis = "yes";
+          if (item.describe === "chronic_pain") formAnswers.chronic_pain = "yes";
+        }
+      }
+
+      if (apiData.skin && apiData.skin.length > 0) {
+        for (const item of apiData.skin) {
+          if (item.describe === "eczema") formAnswers.eczema = "yes";
+          if (item.describe === "psoriasis") formAnswers.psoriasis = "yes";
+          if (item.describe === "acne") formAnswers.acne = "yes";
+          if (item.describe === "skin_cancer") formAnswers.skin_cancer = "yes";
+        }
+      }
+
+      if (apiData.cancer && apiData.cancer.length > 0) {
+        for (const item of apiData.cancer) {
+          if (item.describe === "lung") formAnswers.lung = "yes";
+          if (item.describe === "breast") formAnswers.breast = "yes";
+          if (item.describe === "colon") formAnswers.colon = "yes";
+          if (item.describe === "ovarian") formAnswers.ovarian = "yes";
+          if (item.describe === "skin") formAnswers.skin = "yes";
+        }
+      }
+
+      // Helper function to handle date_radio type fields
+      const handleDateRadioField = (apiField, formField) => {
+        if (apiField) {
+          formAnswers[formField] = apiField.date;
+          formAnswers[`${formField}_Comments`] = apiField.value;
+          // If there's a date but no comments, set _na to true
+          if (apiField.date && !apiField.value) {
+            formAnswers[`${formField}_na`] = true;
+          }
+        }
+      };
+
+      // Map date_radio fields using the helper function
+      handleDateRadioField(apiData.diagnosticBoneDensity, 'boneDensity');
+      handleDateRadioField(apiData.diagnosticCTScan, 'ctscan');
+      handleDateRadioField(apiData.diagnosticColonoscopy, 'colonoscopy');
+      handleDateRadioField(apiData.diagnosticCardiacStress, 'cardiac_stress_test');
+      handleDateRadioField(apiData.diagnosticEKG, 'EKG');
+      handleDateRadioField(apiData.diagnosticMRI, 'MRI');
+      handleDateRadioField(apiData.diagnosticUpperEndoscopy, 'upper_endoscopy');
+      handleDateRadioField(apiData.diagnosticUpperGI, 'upper_GI_series');
+      handleDateRadioField(apiData.diagnosticChestXray, 'chest_X_ray');
+      handleDateRadioField(apiData.diagnosticOtherXray, 'other_X_rays');
+      handleDateRadioField(apiData.diagnosticBarium, 'barium_enema');
+      handleDateRadioField(apiData.diagnosticOther, 'other');
+      handleDateRadioField(apiData.injuriesBrokenBones, 'injuries');
+      handleDateRadioField(apiData.injuriesBack, 'back_injury');
+      handleDateRadioField(apiData.injuriesNeck, 'neck_injury');
+      handleDateRadioField(apiData.injuriesHead, 'head_injury');
+      handleDateRadioField(apiData.injuriesOther, 'Injuries');
+      handleDateRadioField(apiData.surgeryAppen, 'appendectomy');
+      handleDateRadioField(apiData.surgeryDental, 'dental');
+      handleDateRadioField(apiData.gallBladder, 'gallbladder');
+      handleDateRadioField(apiData.hernia, 'hernia');
+      handleDateRadioField(apiData.hysterectomy, 'hysterectomy');
+      handleDateRadioField(apiData.tonsillectomy, 'tonsillectomy');
+      handleDateRadioField(apiData.jointReplacement, 'joint_replacement');
+      handleDateRadioField(apiData.heartSurgery, 'heart_surgery');
+      handleDateRadioField(apiData.otherSurgeries, 'other_surgeries');
+
+      if (apiData.addNew && Array.isArray(apiData.addNew)) {
+        formAnswers.hospitalizations = apiData.addNew.map(item => ({
+          date: item.date || "",
+          reason: item.value || ""
+        }));
+      } else {
+        formAnswers.hospitalizations = [];
+      }
+
+      console.log('Final mapped formAnswers:', formAnswers);
+      return formAnswers;
+    };
+
+    // Handle initial data load and updates
+    if (patientIllnessInfo && Object.keys(patientIllnessInfo).length > 0) {
+      console.log('Loading patient illness info:', patientIllnessInfo);
       const mappedAnswers = mapApiResponseToFormState(patientIllnessInfo);
       setAnswers(mappedAnswers);
       setIsDataLoaded(true);
-      
+
       const savedIndex = parseInt(localStorage.getItem("currentQuestionIndex8"), 10);
       if (!isNaN(savedIndex)) {
         setCurrentQuestionIndex(savedIndex);
       }
-    } else if (!loading && Object.keys(patientIllnessInfo).length === 0) {
+    } else if (!loading) {
+      // Only try to load from localStorage if we're not loading from API
       const savedIndex = parseInt(localStorage.getItem("currentQuestionIndex8"), 10);
-    const savedAnswers = JSON.parse(localStorage.getItem("answers"));
-    if (!isNaN(savedIndex) && savedAnswers) {
-      setCurrentQuestionIndex(savedIndex);
-      setAnswers(savedAnswers);
-    }
+      const savedAnswers = JSON.parse(localStorage.getItem("answers"));
+      if (!isNaN(savedIndex) && savedAnswers) {
+        setCurrentQuestionIndex(savedIndex);
+        setAnswers(savedAnswers);
+      }
       setIsDataLoaded(true);
     }
-  }, [patientIllnessInfo, loading, isDataLoaded]);
-
-  const mapApiResponseToFormState = (apiData) => {
-    const formAnswers = {};
-
-    if (apiData.gastroIntestinal?.[0]) {
-      const gi = apiData.gastroIntestinal[0];
-      if (gi.describe?.includes("Irritable Bowel")) formAnswers.irritableBowel = "yes";
-      if (gi.describe?.includes("GERD")) formAnswers.gerd = "yes";
-      if (gi.describe?.includes("Crohns")) formAnswers.crohns = "yes";
-      if (gi.describe?.includes("Peptic Ulcer")) formAnswers.peptic_ulcer = "yes";
-      if (gi.describe?.includes("Celiac")) formAnswers.celiac = "yes";
-      if (gi.describe?.includes("Gallstones")) formAnswers.gallstones = "yes";
-    }
-
-    if (apiData.urinary?.[0]) {
-      const urinary = apiData.urinary[0];
-      if (urinary.describe?.includes("Kidney Stones")) formAnswers.kidney_stones = "yes";
-      if (urinary.describe?.includes("Gout")) formAnswers.gout = "yes";
-      if (urinary.describe?.includes("Interstitial Cystitis")) formAnswers.interstitial_cystitis = "yes";
-      if (urinary.describe?.includes("Frequent yeast")) formAnswers.frequent_yeast_infections = "yes";
-      if (urinary.describe?.includes("Frequent urinary")) formAnswers.frequent_urinary_tract_infections = "yes";
-      if (urinary.describe?.includes("Sexual dysfunction")) formAnswers.sexual_dysfunction = "yes";
-      if (urinary.describe?.includes("Sexual transmitted")) formAnswers.sexual_transmitted_disease = "yes";
-    }
-
-    if (apiData.endocrine?.[0]) {
-      const endocrine = apiData.endocrine[0];
-      if (endocrine.describe?.includes("Diabetes")) formAnswers.diabetes = "yes";
-      if (endocrine.describe?.includes("Hypothyroidism")) formAnswers.hypothyroidism = "yes";
-      if (endocrine.describe?.includes("Hyperthyroidism")) formAnswers.hyperthyroidism = "yes";
-      if (endocrine.describe?.includes("Polycystic")) formAnswers.polycystic = "yes";
-      if (endocrine.describe?.includes("Infertility")) formAnswers.infertility = "yes";
-      if (endocrine.describe?.includes("Metabolic")) formAnswers["metabolic_syndrome/insulin_resistance"] = "yes";
-      if (endocrine.describe?.includes("Eating Disorder")) formAnswers.eating_disorder = "yes";
-      if (endocrine.describe?.includes("Hyperglycemia")) formAnswers.hyperglycemia = "yes";
-    }
-
-    if (apiData.cardiovascular?.[0]) {
-      const cardio = apiData.cardiovascular[0];
-      if (cardio.describe?.includes("Angina")) formAnswers.angina = "yes";
-      if (cardio.describe?.includes("Heart Attack")) formAnswers.heart_attack = "yes";
-      if (cardio.describe?.includes("Heart failure")) formAnswers.heart_failure = "yes";
-      if (cardio.describe?.includes("Hypertension")) formAnswers.hypertension = "yes";
-      if (cardio.describe?.includes("Stroke")) formAnswers.stroke = "yes";
-      if (cardio.describe?.includes("High Blood Fats")) formAnswers.high_blood_fats = "yes";
-      if (cardio.describe?.includes("Rheumatic Fever")) formAnswers.rheumatic_fever = "yes";
-      if (cardio.describe?.includes("Arrythmia")) formAnswers.arrythmia = "yes";
-      if (cardio.describe?.includes("Murmur")) formAnswers.murmur = "yes";
-      if (cardio.describe?.includes("Mitral valve")) formAnswers.mitral_valve_prolapse = "yes";
-    }
-
-    if (apiData.neurologic?.[0]) {
-      const neuro = apiData.neurologic[0];
-      if (neuro.describe?.includes("Epilepsy")) formAnswers.epilepsy_seizures = "yes";
-      if (neuro.describe?.includes("ADD/ADHD")) formAnswers["ADD/ADHD"] = "yes";
-      if (neuro.describe?.includes("Headaches")) formAnswers.headaches = "yes";
-      if (neuro.describe?.includes("Migraines")) formAnswers.migraines = "yes";
-      if (neuro.describe?.includes("Depression")) formAnswers.depression = "yes";
-      if (neuro.describe?.includes("Anxiety")) formAnswers.anxiety = "yes";
-      if (neuro.describe?.includes("Autism")) formAnswers.Autism = "yes";
-      if (neuro.describe?.includes("Multiple sclerosis")) formAnswers.multiple_sclerosis = "yes";
-      if (neuro.describe?.includes("Parkinson")) formAnswers["Parkinson's disease"] = "yes";
-      if (neuro.describe?.includes("Dementia")) formAnswers.dementia = "yes";
-    }
-
-    if (apiData.diagnosticBoneDensity) {
-      formAnswers.boneDensity = apiData.diagnosticBoneDensity.date;
-      formAnswers.boneDensity_Comments = apiData.diagnosticBoneDensity.value;
-      if (!apiData.diagnosticBoneDensity.date) formAnswers.boneDensity_na = true;
-    }
-
-    if (apiData.diagnosticCTScan) {
-      formAnswers.ctscan = apiData.diagnosticCTScan.date;
-      formAnswers.ctscan_Comments = apiData.diagnosticCTScan.value;
-      if (!apiData.diagnosticCTScan.date) formAnswers.ctscan_na = true;
-    }
-
-    if (apiData.diagnosticColonoscopy) {
-      formAnswers.colonoscopy = apiData.diagnosticColonoscopy.date;
-      formAnswers.colonoscopy_Comments = apiData.diagnosticColonoscopy.value;
-      if (!apiData.diagnosticColonoscopy.date) formAnswers.colonoscopy_na = true;
-    }
-
-    if (apiData.diagnosticCardiacStress) {
-      formAnswers.cardiac_stress_test = apiData.diagnosticCardiacStress.date;
-      formAnswers.cardiac_stress_test_Comments = apiData.diagnosticCardiacStress.value;
-      if (!apiData.diagnosticCardiacStress.date) formAnswers.cardiac_stress_test_na = true;
-    }
-
-    if (apiData.diagnosticEKG) {
-      formAnswers.EKG = apiData.diagnosticEKG.date;
-      formAnswers.EKG_Comments = apiData.diagnosticEKG.value;
-      if (!apiData.diagnosticEKG.date) formAnswers.EKG_na = true;
-    }
-
-    if (apiData.diagnosticMRI) {
-      formAnswers.MRI = apiData.diagnosticMRI.date;
-      formAnswers.MRI_Comments = apiData.diagnosticMRI.value;
-      if (!apiData.diagnosticMRI.date) formAnswers.MRI_na = true;
-    }
-
-    if (apiData.diagnosticUpperEndoscopy) {
-      formAnswers.upper_endoscopy = apiData.diagnosticUpperEndoscopy.date;
-      formAnswers.upper_endoscopy_Comments = apiData.diagnosticUpperEndoscopy.value;
-      if (!apiData.diagnosticUpperEndoscopy.date) formAnswers.upper_endoscopy_na = true;
-    }
-
-    if (apiData.diagnosticUpperGI) {
-      formAnswers.upper_GI_series = apiData.diagnosticUpperGI.date;
-      formAnswers.upper_GI_series_Comments = apiData.diagnosticUpperGI.value;
-      if (!apiData.diagnosticUpperGI.date) formAnswers.upper_GI_series_na = true;
-    }
-
-    if (apiData.diagnosticChestXray) {
-      formAnswers.chest_X_ray = apiData.diagnosticChestXray.date;
-      formAnswers.chest_X_ray_Comments = apiData.diagnosticChestXray.value;
-      if (!apiData.diagnosticChestXray.date) formAnswers.chest_X_ray_na = true;
-    }
-
-    if (apiData.diagnosticOtherXray) {
-      formAnswers.other_X_rays = apiData.diagnosticOtherXray.date;
-      formAnswers.other_X_rays_Comments = apiData.diagnosticOtherXray.value;
-      if (!apiData.diagnosticOtherXray.date) formAnswers.other_X_rays_na = true;
-    }
-
-    if (apiData.diagnosticBarium) {
-      formAnswers.barium_enema = apiData.diagnosticBarium.date;
-      formAnswers.barium_enema_Comments = apiData.diagnosticBarium.value;
-      if (!apiData.diagnosticBarium.date) formAnswers.barium_enema_na = true;
-    }
-
-    if (apiData.diagnosticOther) {
-      formAnswers.other = apiData.diagnosticOther.date;
-      formAnswers.other_Comments = apiData.diagnosticOther.value;
-      if (!apiData.diagnosticOther.date) formAnswers.other_na = true;
-    }
-
-    if (apiData.injuriesBrokenBones) {
-      formAnswers.injuries = apiData.injuriesBrokenBones.date;
-      formAnswers.injuriess_Comments = apiData.injuriesBrokenBones.value;
-      if (!apiData.injuriesBrokenBones.date) formAnswers.injuries_na = true;
-    }
-
-    if (apiData.injuriesBack) {
-      formAnswers.back_injury = apiData.injuriesBack.date;
-      formAnswers.back_injury_Comments = apiData.injuriesBack.value;
-      if (!apiData.injuriesBack.date) formAnswers.back_injury_na = true;
-    }
-
-    if (apiData.injuriesNeck) {
-      formAnswers.neck_injury = apiData.injuriesNeck.date;
-      formAnswers.neck_injury_Comments = apiData.injuriesNeck.value;
-      if (!apiData.injuriesNeck.date) formAnswers.neck_injury_na = true;
-    }
-
-    if (apiData.injuriesHead) {
-      formAnswers.head_injury = apiData.injuriesHead.date;
-      formAnswers.head_injury_Comments = apiData.injuriesHead.value;
-      if (!apiData.injuriesHead.date) formAnswers.head_injury_na = true;
-    }
-
-    if (apiData.injuriesOther) {
-      formAnswers.Injuries = apiData.injuriesOther.date;
-      formAnswers.Injuries_Comments = apiData.injuriesOther.value;
-      if (!apiData.injuriesOther.date) formAnswers.Injuries_na = true;
-    }
-
-    if (apiData.surgeryAppen) {
-      formAnswers.appendectomy = apiData.surgeryAppen.date;
-      formAnswers.appendectomy_Comments = apiData.surgeryAppen.value;
-      if (!apiData.surgeryAppen.date) formAnswers.appendectomy_na = true;
-    }
-
-    if (apiData.surgeryDental) {
-      formAnswers.dental = apiData.surgeryDental.date;
-      formAnswers.dental_Comments = apiData.surgeryDental.value;
-      if (!apiData.surgeryDental.date) formAnswers.dental_na = true;
-    }
-
-    if (apiData.gallBladder) {
-      formAnswers.gallbladder = apiData.gallBladder.date;
-      formAnswers.gallbladder_Comments = apiData.gallBladder.value;
-      if (!apiData.gallBladder.date) formAnswers.gallbladder_na = true;
-    }
-
-    if (apiData.hernia) {
-      formAnswers.hernia = apiData.hernia.date;
-      formAnswers.hernia_Comments = apiData.hernia.value;
-      if (!apiData.hernia.date) formAnswers.hernia_na = true;
-    }
-
-    if (apiData.hysterectomy) {
-      formAnswers.hysterectomy = apiData.hysterectomy.date;
-      formAnswers.hysterectomy_Comments = apiData.hysterectomy.value;
-      if (!apiData.hysterectomy.date) formAnswers.hysterectomy_na = true;
-    }
-
-    if (apiData.tonsillectomy) {
-      formAnswers.tonsillectomy = apiData.tonsillectomy.date;
-      formAnswers.tonsillectomy_Comments = apiData.tonsillectomy.value;
-      if (!apiData.tonsillectomy.date) formAnswers.tonsillectomy_na = true;
-    }
-
-    if (apiData.jointReplacement) {
-      formAnswers.joint_replacement = apiData.jointReplacement.date;
-      formAnswers.joint_replacement_Comments = apiData.jointReplacement.value;
-      if (!apiData.jointReplacement.date) formAnswers.joint_replacement_na = true;
-    }
-
-    if (apiData.heartSurgery) {
-      formAnswers.heart_surgery = apiData.heartSurgery.date;
-      formAnswers.heart_surgery_Comments = apiData.heartSurgery.value;
-      if (!apiData.heartSurgery.date) formAnswers.heart_surgery_na = true;
-    }
-
-    if (apiData.otherSurgeries) {
-      formAnswers.other_surgeries = apiData.otherSurgeries.date;
-      formAnswers.other_surgeries_Comments = apiData.otherSurgeries.value;
-      if (!apiData.otherSurgeries.date) formAnswers.other_surgeries_na = true;
-    }
-
-    if (apiData.addNew && Array.isArray(apiData.addNew)) {
-      formAnswers.hospitalizations = apiData.addNew.map(item => ({
-        date: item.date || "",
-        reason: item.value || ""
-      }));
-    } else {
-      formAnswers.hospitalizations = [];
-    }
-
-    return formAnswers;
-  };
+  }, [patientIllnessInfo, loading]);
 
   const handleExit = () => {
     navigate("/assessment");
   };
   const validateQuestion = () => {
     const question = questions[currentQuestionIndex];
-  
+
     switch (question.type) {
       case "multi_yes_no":
         const hasValidAnswer = question.subQuestions.some(
           (subQuestion) =>
-              answers[subQuestion.name] === "yes" || answers[subQuestion.name] === "no" || answers[subQuestion.name] === "n/a"
+            answers[subQuestion.name] === "yes" || answers[subQuestion.name] === "no" || answers[subQuestion.name] === "n/a"
         );
-  
+
         const hasOthersAnswer =
           answers[`${question.name}_others`] !== undefined &&
           answers[`${question.name}_others`] !== "";
-  
+
         return hasValidAnswer || hasOthersAnswer;
-  
-        case "date_radio": {
-          const naCheckboxName = `${question.name}_na`;
-          const isNAChecked = answers[naCheckboxName] === true;
-  
-          if (isNAChecked) {
-            return true; 
-          }
-  
-          const dateValue = answers[question.dateName];
-          if (!dateValue || dateValue === "") {
-            console.log("Validation Failed: Date is empty.");
+
+      case "date_radio": {
+        const naCheckboxName = `${question.name}_na`;
+        const isNAChecked = answers[naCheckboxName] === true;
+
+        if (isNAChecked) {
+          return true;
+        }
+
+        const dateValue = answers[question.dateName];
+        if (!dateValue || dateValue === "") {
+          console.log("Validation Failed: Date is empty.");
+          return false;
+        }
+
+        if (question.radioOptions && question.radioOptions.length > 0) {
+          const commentName = `${question.radioName}_${question.radioOptions[0].value}`;
+          const commentValue = answers[commentName];
+          if (!commentValue || commentValue === "") {
+            console.log("Validation Failed: Comment is empty.");
             return false;
           }
-  
-          if (question.radioOptions && question.radioOptions.length > 0) {
-            const commentName = `${question.radioName}_${question.radioOptions[0].value}`;
-            const commentValue = answers[commentName];
-            if (!commentValue || commentValue === "") {
-              console.log("Validation Failed: Comment is empty.");
-              return false;
-            }
-          }
-  
-          return true; 
         }
-  
+
+        return true;
+      }
+
       default:
         return answers[question.name] !== undefined && answers[question.name] !== "";
     }
   };
-  
-  
+
+
   const handleSave = () => {
     if (!validateQuestion()) {
       message.error("Please answer the current question before saving.");
@@ -838,180 +773,152 @@ console.log({patientIllnessInfo})
       message.error("Please answer the current question before Submitting.");
       return;
     }
+
+    // Helper function to organize questions by their sub-categories
+    const getCategoryQuestions = (categoryName) => {
+      // Find all questions with this category/sub value and extract their subQuestions
+      const subQuestions = [];
+
+      for (const question of questions) {
+        if (question.type === "multi_yes_no" && question.sub === categoryName) {
+          subQuestions.push(...question.subQuestions);
+        }
+      }
+
+      // Create API data for this category
+      return subQuestions.map(subQuestion => ({
+        yesNo: answers[subQuestion.name] === "yes",
+        describe: answers[subQuestion.name] === "yes" ? subQuestion.name : ""
+      })).filter(item => item.yesNo); // Only include items that are yes
+    };
+
     // Prepare the data to match the API structure
     const apiData = {
-      gastroIntestinal: [
-        {
-          yesNo: answers.irritableBowel === "yes" || answers.crohns === "yes" || answers.peptic_ulcer === "yes",
-          describe: `${answers.irritableBowel === "yes" ? "Irritable Bowel, " : ""}${answers.crohns === "yes" ? "Crohns, " : ""}${answers.peptic_ulcer === "yes" ? "Peptic Ulcer" : ""}`,
-        },
-      ],
-      respiratory: [
-        {
-          yesNo: answers.lung === "yes",
-          describe: answers.lung === "yes" ? "Lung" : "",
-        },
-      ],
-      urinary: [
-        {
-          yesNo: answers.kidney_stones === "yes" || answers.interstitial_cystitis === "yes",
-          describe: `${answers.kidney_stones === "yes" ? "Kidney Stones, " : ""}${answers.interstitial_cystitis === "yes" ? "Interstitial Cystitis" : ""}`,
-        },
-      ],
-      endocrine: [
-        {
-          yesNo: answers.hyperglycemia === "yes" || answers.eating_disorder === "yes" || answers["metabolic_syndrome/insulin_resistance"] === "yes" ,
-          describe: `${answers.hyperglycemia === "yes" ? "Hyperglycemia, " : ""}${answers.eating_disorder === "yes" ? "Eating Disorder, " : ""}${answers["metabolic_syndrome/insulin_resistance"] === "yes" ? "Metabolic Syndrome/Insulin Resistance" : ""}`,
-        },
-      ],
-      inflammatory: [
-        {
-          yesNo: answers.gout === "yes",
-          describe: answers.gout === "yes" ? "Gout" : "",
-        },
-      ],
-      musculoskeletal: [
-        {
-          yesNo: answers.fibromyalgia === "yes",
-          describe: answers.fibromyalgia === "yes" ? "Fibromyalgia" : "",
-        },
-      ],
-      skin: [
-        {
-          yesNo: answers.acne === "yes" || answers.psoriasis === "yes" || answers.eczema === "yes",
-          describe: `${answers.acne === "yes" ? "Acne, " : ""}${answers.psoriasis === "yes" ? "Psoriasis, " : ""}${answers.eczema === "yes" ? "Eczema" : ""}`,
-        },
-      ],
-      cardiovascular: [
-        {
-          yesNo: answers.hypertension === "yes" || answers.stroke === "yes" || answers.high_blood_fats === "yes" || answers.rheumatic_fever === "yes" || answers.murmur === "yes",
-          describe: `${answers.hypertension === "yes" ? "Hypertension, " : ""}${answers.stroke === "yes" ? "Stroke, " : ""}${answers.high_blood_fats === "yes" ? "High Blood Fats, " : ""}${answers.rheumatic_fever === "yes" ? "Rheumatic Fever, " : ""}${answers.murmur === "yes" ? "Murmur" : ""}`,
-        },
-      ],
-      neurologic: [
-        {
-          yesNo: answers.epilepsy_seizures === "yes" || answers["ADD/ADHD"] === "yes" || answers.headaches === "yes" || answers.migraines === "yes" || answers.depression === "yes",
-          describe: `${answers.epilepsy_seizures === "yes" ? "Epilepsy/Seizures, " : ""}${answers["ADD/ADHD"] === "yes" ? "ADD/ADHD, " : ""}${answers.headaches === "yes" ? "Headaches, " : ""}${answers.migraines === "yes" ? "Migraines, " : ""}${answers.depression === "yes" ? "Depression" : ""}`,
-        },
-      ],
-      cancer: [
-        {
-          yesNo: answers.breast === "yes" || answers.colon === "yes",
-          describe: `${answers.breast === "yes" ? "Breast, " : ""}${answers.colon === "yes" ? "Colon" : ""}`,
-        },
-      ],
+      // Based on the questions array, the gastrointestinal items are mislabeled as "Respiratory"
+      respiratory: getCategoryQuestions("Respiratory"),
+      urinary: getCategoryQuestions("Urinary/Genital"),
+      endocrine: getCategoryQuestions("Endocrine/Metabolic"),
+      inflammatory: getCategoryQuestions("Inflammatory/Immune"),
+      musculoskeletal: getCategoryQuestions("Musculoskeletal"),
+      skin: getCategoryQuestions("Skin"),
+      cardiovascular: getCategoryQuestions("Cardiovascular"),
+      neurologic: getCategoryQuestions("Neurologic/Emotional"),
+      cancer: getCategoryQuestions("Cancer"),
+
+      // Rest of the structure remains unchanged
       diagnosticBoneDensity: {
-        date: answers.boneDensity || "",
-        value: answers.boneDensity_Comments || "",
+        date: answers.boneDensity_na ? "" : answers.boneDensity || "",
+        value: answers.boneDensity_na ? "" : answers.boneDensity_Comments || "",
       },
       diagnosticCTScan: {
-        date: answers.ctscan || "",
-        value: answers.ctscan_Comments || "",
+        date: answers.ctscan_na ? "" : answers.ctscan || "",
+        value: answers.ctscan_na ? "" : answers.ctscan_Comments || "",
       },
       diagnosticColonoscopy: {
-        date: answers.colonoscopy || "",
-        value: answers.colonoscopy_Comments || "",
+        date: answers.colonoscopy_na ? "" : answers.colonoscopy || "",
+        value: answers.colonoscopy_na ? "" : answers.colonoscopy_Comments || "",
       },
       diagnosticCardiacStress: {
-        date: answers.cardiac_stress_test || "",
-        value: answers.cardiac_stress_test_Comments || "",
+        date: answers.cardiac_stress_test_na ? "" : answers.cardiac_stress_test || "",
+        value: answers.cardiac_stress_test_na ? "" : answers.cardiac_stress_test_Comments || "",
       },
       diagnosticEKG: {
-        date: answers.EKG_na ? "" : answers.EKG || "", // Handle boolean
-        value: answers.EKG_na ? "" : answers.EKG_Comments || "", // Handle boolean
+        date: answers.EKG_na ? "" : answers.EKG || "",
+        value: answers.EKG_na ? "" : answers.EKG_Comments || "",
       },
       diagnosticMRI: {
-        date: answers.MRI || "",
-        value: answers.MRI_Comments || "",
+        date: answers.MRI_na ? "" : answers.MRI || "",
+        value: answers.MRI_na ? "" : answers.MRI_Comments || "",
       },
       diagnosticUpperEndoscopy: {
-        date: answers.upper_endoscopy || "",
-        value: answers.upper_endoscopy_Comments || "",
+        date: answers.upper_endoscopy_na ? "" : answers.upper_endoscopy || "",
+        value: answers.upper_endoscopy_na ? "" : answers.upper_endoscopy_Comments || "",
       },
       diagnosticUpperGI: {
-        date: answers.upper_GI_series || "",
-        value: answers.upper_GI_series_Comments || "",
+        date: answers.upper_GI_series_na ? "" : answers.upper_GI_series || "",
+        value: answers.upper_GI_series_na ? "" : answers.upper_GI_series_Comments || "",
       },
       diagnosticChestXray: {
-        date: answers.chest_X_ray || "",
-        value: answers.chest_X_ray_Comments || "",
+        date: answers.chest_X_ray_na ? "" : answers.chest_X_ray || "",
+        value: answers.chest_X_ray_na ? "" : answers.chest_X_ray_Comments || "",
       },
       diagnosticOtherXray: {
-        date: answers.other_X_rays || "",
-        value: answers.other_X_rays_Comments || "",
+        date: answers.other_X_rays_na ? "" : answers.other_X_rays || "",
+        value: answers.other_X_rays_na ? "" : answers.other_X_rays_Comments || "",
       },
       diagnosticBarium: {
-        date: answers.barium_enema || "",
-        value: answers.barium_enema_Comments || "",
+        date: answers.barium_enema_na ? "" : answers.barium_enema || "",
+        value: answers.barium_enema_na ? "" : answers.barium_enema_Comments || "",
       },
       diagnosticOther: {
-        date: answers.other || "",
-        value: answers.other_Comments || "",
-        otherName: answers.other_Comments || "",
+        date: answers.other_na ? "" : answers.other || "",
+        value: answers.other_na ? "" : answers.other_Comments || "",
+        otherName: answers.other_na ? "" : answers.other_Comments || "",
       },
       injuriesBrokenBones: {
-        date: answers.injuries || "",
+        date: answers.injuries_na ? "" : answers.injuries || "",
         value: answers.injuriess_Comments || "",
       },
       injuriesBack: {
-        date: answers.back_injury || "",
+        date: answers.back_injury_na ? "" : answers.back_injury || "",
         value: answers.back_injury_Comments || "",
       },
       injuriesNeck: {
-        date: answers.neck_injury || "",
+        date: answers.neck_injury_na ? "" : answers.neck_injury || "",
         value: answers.neck_injury_Comments || "",
       },
       injuriesHead: {
-        date: answers.head_injury || "",
+        date: answers.head_injury_na ? "" : answers.head_injury || "",
         value: answers.head_injury_Comments || "",
       },
       injuriesOther: {
-        date: answers.Injuries || "",
+        date: answers.Injuries_na ? "" : answers.Injuries || "",
         value: answers.Injuries_Comments || "",
-        otherName: answers.Injuries_Comments || "",
+        otherName: answers.Injuries_na ? "" : answers.Injuries_Comments || "",
       },
       surgeryAppen: {
-        date: answers.appendectomy_na ? "" : answers.appendectomy || "", // Handle boolean
-        value: answers.appendectomy_na ? "" : answers.appendectomy_Comments || "", // Handle boolean
+        date: answers.appendectomy_na ? "" : answers.appendectomy || "",
+        value: answers.appendectomy_Comments || "",
       },
       surgeryDental: {
-        date: answers.dental || "",
+        date: answers.dental_na ? "" : answers.dental || "",
         value: answers.dental_Comments || "",
       },
       gallBladder: {
-        date: answers.gallbladder || "",
+        date: answers.gallbladder_na ? "" : answers.gallbladder || "",
         value: answers.gallbladder_Comments || "",
       },
       hernia: {
-        date: answers.hernia || "",
+        date: answers.hernia_na ? "" : answers.hernia || "",
         value: answers.hernia_Comments || "",
       },
       hysterectomy: {
-        date: answers.hysterectomy || "",
+        date: answers.hysterectomy_na ? "" : answers.hysterectomy || "",
         value: answers.hysterectomy_Comments || "",
       },
       tonsillectomy: {
-        date: answers.tonsillectomy || "",
+        date: answers.tonsillectomy_na ? "" : answers.tonsillectomy || "",
         value: answers.tonsillectomy_Comments || "",
       },
       jointReplacement: {
-        date: answers.joint_replacement || "",
+        date: answers.joint_replacement_na ? "" : answers.joint_replacement || "",
         value: answers.joint_replacement_Comments || "",
       },
       heartSurgery: {
-        date: answers.heart_surgery || "",
+        date: answers.heart_surgery_na ? "" : answers.heart_surgery || "",
         value: answers.heart_surgery_Comments || "",
       },
       otherSurgeries: {
-        date: answers.other_surgeries || "",
+        date: answers.other_surgeries_na ? "" : answers.other_surgeries || "",
         value: answers.other_surgeries_Comments || "",
-        otherName: answers.other_surgeries_Comments || "",
+        otherName: answers.other_surgeries_na ? "" : answers.other_surgeries_Comments || "",
       },
       addNew: answers.hospitalizations.map((item) => ({
         date: item.date || "",
         value: item.reason || "",
       })),
     };
+
     const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
     const token = userInfo.obj.token || "";
     fetch("https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/AddIllnessConditions", {
@@ -1091,9 +998,9 @@ console.log({patientIllnessInfo})
               {question.question}
             </Button>
             <p
-              style={{ 
-                color: "#00ADEF", 
-                fontSize: isMobile ? "13px" : "15px", 
+              style={{
+                color: "#00ADEF",
+                fontSize: isMobile ? "13px" : "15px",
                 fontWeight: "bold",
                 marginBottom: "10px"
               }}
@@ -1110,7 +1017,7 @@ console.log({patientIllnessInfo})
               </Checkbox>
             </div>
             <div style={{ marginBottom: "10px" }}>
-              <label style={{ color:"#000", fontSize: isMobile ? "13px" : "14px" }}>Date:</label>
+              <label style={{ color: "#000", fontSize: isMobile ? "13px" : "14px" }}>Date:</label>
               <br />
               <Input
                 type="date"
@@ -1127,7 +1034,7 @@ console.log({patientIllnessInfo})
             <div style={{ marginBottom: "10px" }}>
               {question.radioOptions.map((option, index) => (
                 <div key={index} style={{ marginBottom: "5px" }}>
-                  <label style={{ color:"#000", fontSize: isMobile ? "13px" : "14px" }}>{option.label}:</label>
+                  <label style={{ color: "#000", fontSize: isMobile ? "13px" : "14px" }}>{option.label}:</label>
                   <br />
                   <Input
                     type="text"
@@ -1250,21 +1157,21 @@ console.log({patientIllnessInfo})
 
             {question.subQuestions.map((subQuestion) => (
               <div key={subQuestion.name} style={{ marginTop: 20 }}>
-                <div style={{ 
-                  display: "flex", 
+                <div style={{
+                  display: "flex",
                   alignItems: "center",
                   flexDirection: isMobile ? "column" : "row",
                   gap: isMobile ? "10px" : "0"
                 }}>
-                  <div style={{ 
-                    flex: 1, 
-                    fontSize: isMobile ? "13px" : "15px", 
+                  <div style={{
+                    flex: 1,
+                    fontSize: isMobile ? "13px" : "15px",
                     color: "#000",
                     width: isMobile ? "100%" : "auto"
                   }}>
                     {subQuestion.text}
                   </div>
-                  <div style={{ 
+                  <div style={{
                     display: "flex",
                     width: isMobile ? "100%" : "auto",
                     justifyContent: isMobile ? "space-between" : "flex-start"
@@ -1294,7 +1201,7 @@ console.log({patientIllnessInfo})
             ))}
             <Input
               placeholder="Others"
-              style={{ 
+              style={{
                 marginTop: 20,
                 width: "100%"
               }}
@@ -1328,8 +1235,8 @@ console.log({patientIllnessInfo})
           percent={Math.round(progressPercentage)}
           strokeColor={progressColor}
         />
-        <h3 style={{ 
-          margin: "20px 0", 
+        <h3 style={{
+          margin: "20px 0",
           color: "#F2AA93",
           fontSize: isMobile ? "16px" : "18px"
         }}>
@@ -1337,11 +1244,11 @@ console.log({patientIllnessInfo})
           {questions[currentQuestionIndex].title}
         </h3>
 
-        <h3 style={{ 
-          margin: "20px 0", 
-          color: "#000", 
-          fontWeight:"600", 
-          fontSize: isMobile ? "13px" : "15px" 
+        <h3 style={{
+          margin: "20px 0",
+          color: "#000",
+          fontWeight: "600",
+          fontSize: isMobile ? "13px" : "15px"
         }}>
           {questions[currentQuestionIndex].question}
         </h3>

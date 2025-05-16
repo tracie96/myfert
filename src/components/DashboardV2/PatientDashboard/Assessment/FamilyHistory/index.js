@@ -13,12 +13,13 @@ import {
   Switch,
 } from "antd";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { completeCard } from "../../../../redux/assessmentSlice";
 import FormWrapper from "../FormWrapper";
 import "../assesment.css";
 import { useMediaQuery } from "react-responsive";
 import { backBtnTxt, exitBtnTxt, saveAndContinueBtn, submitBtn } from "../../../../../utils/constant";
+import { getPersonalFamilyPatient } from "../../../../redux/AssessmentController";
 
 const { Option } = Select;
 
@@ -43,8 +44,8 @@ const questions = [
       },
       {
         label: "Abortions",
-        name: "Root_canals",
-        selectName: "Root_canals_select",
+        name: "abortions",
+        selectName: "abortions_select",
         selectOptions: Array.from({ length: 30 }, (_, i) => 0 + i),
       },
       {
@@ -61,8 +62,8 @@ const questions = [
       },
       {
         label: "Caeseran",
-        name: "caeseran",
-        selectName: "caeseran_select",
+        name: "caeserean",
+        selectName: "caeserean_select",
         selectOptions: Array.from({ length: 30 }, (_, i) => 0 + i),
       },
       {
@@ -201,11 +202,6 @@ const questions = [
         question: "If Yes: How Often",
         type: "text",
         name: "hormonal_birthcontrol_often",
-      },
-      {
-        question: "How long?",
-        type: "text",
-        name: "hormonal_birthcontrol_long",
       },
     ],
   },
@@ -373,6 +369,7 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
   const navigate = useNavigate();
   const [unit, setUnit] = useState("Metric");
   const isMobile = useMediaQuery({ maxWidth: 767 });
+  const patientPersonalFamilyInfo = useSelector((state) => state.intake?.patientPersonalFamilyInfo);
 
   useEffect(() => {
     const savedIndex = parseInt(
@@ -385,6 +382,95 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
       setAnswers(savedAnswers);
     }
   }, []);
+
+  useEffect(() => {
+    if (!patientPersonalFamilyInfo || Object.keys(patientPersonalFamilyInfo).length === 0) {
+      dispatch(getPersonalFamilyPatient());
+    }
+  }, [dispatch, patientPersonalFamilyInfo]);
+
+  useEffect(() => {
+    console.log('patientPersonalFamilyInfo received:', patientPersonalFamilyInfo);
+    
+    if (patientPersonalFamilyInfo && Object.keys(patientPersonalFamilyInfo).length > 0) {
+      // First map the obstetric history
+      const obstetricHistoryMap = {};
+      patientPersonalFamilyInfo.obstetricHistory?.forEach(item => {
+        const key = item.name.toLowerCase().replace(/\s+/g, '_');
+        // Set the checkbox state
+        obstetricHistoryMap[key] = item.level !== null && item.level !== undefined;
+        // Set the select value with the correct selectName format
+        obstetricHistoryMap[`${key}_select`] = item.level;
+      });
+
+      const mappedAnswers = {
+        ...obstetricHistoryMap,
+        // Map pregnancy problems
+        pregnancy_problems: patientPersonalFamilyInfo.problemsAfterPregnancy ? "Yes" : "No",
+        pregnancy_problems_sub: patientPersonalFamilyInfo.problemsAfterPregnancyExplain || "",
+
+        // Map menstrual history
+        age_of_period: patientPersonalFamilyInfo.ageStartMenstrual || "",
+        date_of_last_period: patientPersonalFamilyInfo.startDateLastMenstrual || "",
+        length_of_cycle: patientPersonalFamilyInfo.lenghtOfCycle || "",
+        times_between_of_cycle: patientPersonalFamilyInfo.timeBtwCycles || "",
+        cramping: patientPersonalFamilyInfo.cramping ? "Yes" : "No",
+        pain: patientPersonalFamilyInfo.painInPeriod ? "Yes" : "No",
+
+        // Map premenstrual problems
+        premenstrual_problems: patientPersonalFamilyInfo.everHadPreMenstrualProblems?.yesNo ? "Yes" : "No",
+        premenstrual_problems_describe: patientPersonalFamilyInfo.everHadPreMenstrualProblems?.describe || "",
+
+        // Map other menstrual problems
+        other_premenstrual_problems: patientPersonalFamilyInfo.otherMenstrualProblems?.yesNo ? "Yes" : "No",
+        other_hormonal_problems_history: patientPersonalFamilyInfo.otherMenstrualProblems?.describe || "",
+
+        // Map hormonal birth control
+        hormonal_birthcontrol: patientPersonalFamilyInfo.hormonalBirthControlType?.name ? "Yes" : "No",
+        hormonal_birthcontrol_often: patientPersonalFamilyInfo.hormonalBirthControlType?.name || "",
+        hormonal_birthcontrol_long: "", // Not provided in API
+
+        // Map hormonal birth control problems
+        other_hormonal_problems: patientPersonalFamilyInfo.problemsWithHormonalBirthControl?.yesNo ? "Yes" : "No",
+        any_hormonal_problems_bc: patientPersonalFamilyInfo.problemsWithHormonalBirthControl?.describe || "",
+
+        // Map contraception
+        use_of_contraception: patientPersonalFamilyInfo.useContraception?.yesNo ? "Yes" : "No",
+        use_of_contraception_sub: patientPersonalFamilyInfo.useContraception?.describe || "",
+
+        // Map menopause
+        is_menopause: patientPersonalFamilyInfo.inMenopause?.yesNo ? "Yes" : "No",
+        age_at_last_period: patientPersonalFamilyInfo.inMenopause?.level || "",
+
+        // Map surgical menopause
+        surgical_menopause: patientPersonalFamilyInfo.surgicalMenopause?.yesNo ? "Yes" : "No",
+        surgical_menopause_detail: patientPersonalFamilyInfo.surgicalMenopause?.describe || "",
+
+        // Map symptomatic problems
+        symptomatic_problems_menopause_history: patientPersonalFamilyInfo.symptomicProblems || [],
+
+        // Map hormone replacement
+        hormone_replacement_therapy: patientPersonalFamilyInfo.hormonalReplacement?.yesNo ? "Yes" : "No",
+        hormone_replacement_therapy_sub: patientPersonalFamilyInfo.hormonalReplacement?.describe || "",
+
+        // Map gynecological symptoms
+        symptomatic_problems_menopause_other: patientPersonalFamilyInfo.gynSymptoms || [],
+
+        // Map other tests
+        other_test_procedures: patientPersonalFamilyInfo.otherTest || "",
+      };
+
+      console.log('Mapped answers:', mappedAnswers);
+      setAnswers(mappedAnswers);
+    }
+  }, [patientPersonalFamilyInfo]);
+
+  // Add a debug log for answers state
+  useEffect(() => {
+    console.log('Current answers state:', answers);
+  }, [answers]);
+
+  console.log(patientPersonalFamilyInfo,'patientPersonalFamilyInfo')
 
   const validateQuestion = () => {
     const question = questions[currentQuestionIndex];
@@ -490,7 +576,7 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
       return;
     }
     const obstetricCategories = [
-      "Pregnancy",
+      "Pregnancies",
       "Miscarriages",
       "Abortions",
       "Living children",
@@ -503,8 +589,8 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
     const apiPayload = {
       obstetricHistory: obstetricCategories.map((category) => ({
         name: category,
-        level: Number.isInteger(answers[category.toLowerCase().replace(/\s+/g, "_")])
-          ? answers[category.toLowerCase().replace(/\s+/g, "_")]
+        level: Number.isInteger(answers[`${category.toLowerCase().replace(/\s+/g, "_")}_select`])
+          ? answers[`${category.toLowerCase().replace(/\s+/g, "_")}_select`]
           : null,
       })),
 

@@ -10,7 +10,6 @@ import {
   FaPills, 
   FaChartPie, 
   FaFileAlt, 
-  FaInfoCircle, 
   FaFlask, 
   FaInbox, 
   FaLink, 
@@ -152,9 +151,7 @@ export const GetSideBar = () => {
         </NavLink>
       </Menu.Item>
 
-      <Menu.Item key="7" icon={<FaInfoCircle style={{ color: "#00ADEF" }} />}>
-        {/* Add any additional content for the InfoCircle icon */}
-      </Menu.Item>
+
 
     </Menu>
   );

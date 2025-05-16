@@ -626,13 +626,15 @@ const ReproductiveHealth = ({ onComplete }) => {
         is_trying_to_conceive_time: patientReproductiveInfo.howLongTryingToConceive || "",
         methods_trying_to_conceive: patientReproductiveInfo.methodToConceive || [],
         is_charting_cycles: patientReproductiveInfo.chartingToConceive || [],
-        current_therapy: patientReproductiveInfo.currentTherapy || "",
+        current_therapy: patientReproductiveInfo.currentTherapy ? "Yes" : "No",
         charting_method: patientReproductiveInfo.methodFertilityAwareness || "",
         intercourse_during_fertile_sub: patientReproductiveInfo.intercourse_during_fertile || "",
         is_frequent_intercourse_cycle: patientReproductiveInfo.intercouseEachCycle || "",
         is_menstrual_pain: patientReproductiveInfo.menstrualPainDuringPeriod || [],
         is_lower_back_pain: patientReproductiveInfo.experiencePelvicPain ? "Yes" : "No",
-        duration_per_cycle: patientReproductiveInfo.menstralBleedingPelvicPain?.duration || "",
+        duration_per_cycle_pp_not_menstrual: patientReproductiveInfo.duringCirclePelvicPain?.duration || "",
+        duration_per_mild_cycle_severity_pp_not_menstrual: patientReproductiveInfo.duringCirclePelvicPain?.colour || "",
+        duration_per_cycle_pelvic_pain: patientReproductiveInfo.menstralBleedingPelvicPain?.duration || "",
         duration_per_cycle_severity_pelvic_pain: patientReproductiveInfo.menstralBleedingPelvicPain?.colour || "",
         is_pms_symptom: patientReproductiveInfo.doYouPmsSymptoms ? "Yes" : "No",
         pms_sympton: patientReproductiveInfo.pmsSymptoms || [],
@@ -922,6 +924,7 @@ const ReproductiveHealth = ({ onComplete }) => {
     }
     try {
       const requestData = {
+        
         birthControl: answers.relaxation_techniques === "Yes",
         hormonalBirthControl: answers.how_often_hormonal_bc || "N/A",
         nonHormonalBirthControl: answers.how_often_non_hormonal_bc || "N/A",
@@ -941,8 +944,8 @@ const ReproductiveHealth = ({ onComplete }) => {
         menstrualPainDuringPeriod: answers.is_menstrual_pain || ["None"],
         experiencePelvicPain: answers.is_lower_back_pain === "Yes",
         menstralBleedingPelvicPain: {
-          duration: `${answers.duration_per_cycle}` || "N/A",
-          colour: answers.duration_per_cycle_severity, 
+          duration: `${answers.duration_per_cycle_pelvic_pain}` || "N/A",
+          colour: answers.duration_per_cycle_severity_pelvic_pain, 
         },
         doYouPmsSymptoms: answers.is_pms_symptom === "Yes",
         pmsSymptoms: answers.pms_sympton || ["None"],
@@ -964,8 +967,8 @@ const ReproductiveHealth = ({ onComplete }) => {
         intercouseDays: answers.intercouseDays || "Unknown",
         is_charting_cycles: answers.is_charting_cycles || 'N/A',
         duringCirclePelvicPain: {
-          duration: answers.duration_per_mild_cycle_radio || "N/A",
-          colour: "N/A",
+          duration: `${answers.duration_per_cycle_pp_not_menstrual}` || "N/A",
+          colour: `${answers.duration_per_mild_cycle_severity_pp_not_menstrual}` || "N/A",
         },
         midCycleSpotting: answers.mid_cycle_spotting === "Yes",
         menstralCycleFrequency: answers.menstralCycleFrequency || "Unknown", // Example default

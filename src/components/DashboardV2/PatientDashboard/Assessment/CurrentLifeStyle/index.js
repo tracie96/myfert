@@ -374,23 +374,36 @@ console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
     const savedConcern = JSON.parse(localStorage.getItem("currentConcern"));
     const savedAllergies = JSON.parse(localStorage.getItem("currentAllergies"));
   
-    if (!isNaN(savedIndex) && savedAnswers) {
+    const hasApiData = patientHealthLifeStyleInfo && Object.keys(patientHealthLifeStyleInfo).length > 0;
+    const mapped = hasApiData ? mapHealthLifestyleInfoToState(patientHealthLifeStyleInfo) : null;
+  
+    if (!isNaN(savedIndex)) {
       setCurrentQuestionIndex(savedIndex);
-      setAnswers(savedAnswers);
-    } else if (patientHealthLifeStyleInfo && Object.keys(patientHealthLifeStyleInfo).length > 0) {
-      const mapped = mapHealthLifestyleInfoToState(patientHealthLifeStyleInfo);
-      setAnswers(mapped.answers);
-      setCurrentConcern(mapped.concerns);
-      setCurrentAllergies(mapped.allergies);
     }
   
-    if (savedConcern) {
-      setCurrentConcern(savedConcern);
+    if (savedAnswers && Object.keys(savedAnswers).length > 0) {
+      setAnswers(savedAnswers);
+    } else if (mapped) {
+      setAnswers(mapped.answers);
+      localStorage.setItem("answers", JSON.stringify(mapped.answers));
     }
-    if (savedAllergies) {
+  
+    // ⚠️ THIS is where the fix happens
+    if (savedConcern && savedConcern.length > 0) {
+      setCurrentConcern(savedConcern);
+    } else if (mapped) {
+      setCurrentConcern(mapped.concerns);
+      localStorage.setItem("currentConcern", JSON.stringify(mapped.concerns));
+    }
+  
+    if (savedAllergies && savedAllergies.length > 0) {
       setCurrentAllergies(savedAllergies);
+    } else if (mapped) {
+      setCurrentAllergies(mapped.allergies);
+      localStorage.setItem("currentAllergies", JSON.stringify(mapped.allergies));
     }
   }, [patientHealthLifeStyleInfo]);
+  
   
 
   const validateQuestion = () => {

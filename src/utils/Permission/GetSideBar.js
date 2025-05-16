@@ -17,10 +17,12 @@ import {
   FaListOl, 
   FaBars, 
   FaServicestack,
+  FaBook,
 } from "react-icons/fa";
 
 export const GetSideBar = () => {
   const { userAuth } = useSelector((state) => state.authentication);
+  const accessDetails = useSelector((state) => state.intake.accessDetails);
   const [visible, setVisible] = useState(false);
   const { Sider } = Layout;
   const isMobile = useMediaQuery({ maxWidth: 767 });
@@ -85,6 +87,12 @@ export const GetSideBar = () => {
         return "1";
     }
   };
+
+  const getAccessDetailsStatus = () => {
+    if (!accessDetails) return false;
+    return Object.values(accessDetails).every(value => value === true);
+  };
+
   const menuItems = (
     <Menu
       theme="light"
@@ -119,11 +127,13 @@ export const GetSideBar = () => {
         </NavLink>
       </Menu.Item>
 
-      <Menu.Item key="6" icon={<FaServicestack style={{ color: "#00ADEF" }} />}>
-        <NavLink to="/patient/services" style={{ textDecoration: "none" }}>
-          <span className="no-underline">SERVICES</span>
-        </NavLink>
-      </Menu.Item>
+      {getAccessDetailsStatus() && userAuth?.obj?.videoWatched && (
+        <Menu.Item key="6" icon={<FaServicestack style={{ color: "#00ADEF" }} />}>
+          <NavLink to="/patient/services" style={{ textDecoration: "none" }}>
+            <span className="no-underline">SERVICES</span>
+          </NavLink>
+        </Menu.Item>
+      )}
       
       {/* <Menu.Item key="6" icon={<FaNotesMedical style={{ color: "#00ADEF" }} />}>
         <NavLink to="/patient/appointment" style={{ textDecoration: "none" }}>
@@ -136,10 +146,14 @@ export const GetSideBar = () => {
           <span className="no-underline">DOCUMENTS</span>
         </NavLink>
       </Menu.Item> */}
-      <Menu.Item key="8" icon={<FaInfoCircle style={{ color: "#00ADEF" }} />}>
+      <Menu.Item key="8" icon={<FaBook style={{ color: "#00ADEF" }} />}>
         <NavLink to="/learn" style={{ textDecoration: "none" }}>
           <span className="no-underline">LEARN</span>
         </NavLink>
+      </Menu.Item>
+
+      <Menu.Item key="7" icon={<FaInfoCircle style={{ color: "#00ADEF" }} />}>
+        {/* Add any additional content for the InfoCircle icon */}
       </Menu.Item>
 
     </Menu>

@@ -22,7 +22,6 @@ import "../assesment.css";
 import moment from "moment";
 import { useMediaQuery } from "react-responsive";
 import { backBtnTxt, exitBtnTxt, saveAndContinueBtn, submitBtn } from "../../../../../utils/constant";
-import { getHealthLifestylePatient } from "../../../../redux/AssessmentController";
 
 const { Option } = Select;
 
@@ -196,49 +195,49 @@ const questions = [
     name: "eat_sugar_as_a_child",
     options: ["Yes", "No"],
   },
-  {
-    question:
-      "Check if you have any of the following, and provide number if applicable:",
-    type: "checkbox_with_select",
-    options: [
-      {
-        label: "Silver mercury fillings",
-        name: "Silver_mercury_fillings",
-        selectName: "Silver_mercury_fillings_select",
-        selectOptions: Array.from({ length: 30 }, (_, i) => 1 + i),
-      },
-      {
-        label: "Gold fillings",
-        name: "Gold_fillings",
-        selectName: "Gold_fillings_select",
-        selectOptions: Array.from({ length: 30 }, (_, i) => 1 + i),
-      },
-      {
-        label: "Root canals",
-        name: "Root_canals",
-        selectName: "Root_canals_select",
-        selectOptions: Array.from({ length: 30 }, (_, i) => 1 + i),
-      },
-      {
-        label: "Implants",
-        name: "Implants",
-        selectName: "Implants_select",
-        selectOptions: Array.from({ length: 30 }, (_, i) => 1 + i),
-      },
-      {
-        label: "Caps/Crowns",
-        name: "Caps/Crowns",
-        selectName: "Caps/Crowns_select",
-        selectOptions: Array.from({ length: 30 }, (_, i) => 1 + i),
-      },
-      {
-        label: "Tooth pain",
-        name: "Tooth_pain",
-        selectName: "Tooth_pain_select",
-        selectOptions: Array.from({ length: 30 }, (_, i) => 1 + i),
-      },
-    ],
-  },
+  // {
+  //   question:
+  //     "Check if you have any of the following, and provide number if applicable:",
+  //   type: "checkbox_with_select",
+  //   options: [
+  //     {
+  //       label: "Silver mercury fillings",
+  //       name: "Silver_mercury_fillings",
+  //       selectName: "Silver_mercury_fillings_select",
+  //       selectOptions: Array.from({ length: 30 }, (_, i) => 1 + i),
+  //     },
+  //     {
+  //       label: "Gold fillings",
+  //       name: "Gold_fillings",
+  //       selectName: "Gold_fillings_select",
+  //       selectOptions: Array.from({ length: 30 }, (_, i) => 1 + i),
+  //     },
+  //     {
+  //       label: "Root canals",
+  //       name: "Root_canals",
+  //       selectName: "Root_canals_select",
+  //       selectOptions: Array.from({ length: 30 }, (_, i) => 1 + i),
+  //     },
+  //     {
+  //       label: "Implants",
+  //       name: "Implants",
+  //       selectName: "Implants_select",
+  //       selectOptions: Array.from({ length: 30 }, (_, i) => 1 + i),
+  //     },
+  //     {
+  //       label: "Caps/Crowns",
+  //       name: "Caps/Crowns",
+  //       selectName: "Caps/Crowns_select",
+  //       selectOptions: Array.from({ length: 30 }, (_, i) => 1 + i),
+  //     },
+  //     {
+  //       label: "Tooth pain",
+  //       name: "Tooth_pain",
+  //       selectName: "Tooth_pain_select",
+  //       selectOptions: Array.from({ length: 30 }, (_, i) => 1 + i),
+  //     },
+  //   ],
+  // },
   {
     question: "Have you had any mercury fillings removed?",
     type: "long_radio",
@@ -354,12 +353,18 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const isMobile = useMediaQuery({ maxWidth: 767 });
-  const patientHealthLifestyle = useSelector((state) => state.intake?.patientHealthLifestyle);
+  const patientHealthMedicalInfo = useSelector((state) => state.intake?.patientHealthMedicalInfo);
+  
+  useEffect(() => {
+    dispatch(getHealthMedicalPatient());
+  }, [dispatch]);
+
+  console.log(patientHealthMedicalInfo,'patientHealthMedicalInfo')
 
   useEffect(() => {
-    if (patientHealthLifestyle) {
-      const lifestyle = patientHealthLifestyle;
-  
+    if (patientHealthMedicalInfo) {
+      const lifestyle = patientHealthMedicalInfo;
+
       const prefillAnswers = {
         overll_wellbeing: lifestyle.howWellThingsGoingOverall || 1,
         school_wellbeing: lifestyle.howWellThingsGoingSchool || 1,
@@ -405,17 +410,10 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
   
       setAnswers(prefillAnswers);
     }
-  }, [patientHealthLifestyle]);
+  }, [patientHealthMedicalInfo]);
 
-  
-  useEffect(() => {
-    dispatch(getHealthLifestylePatient());
-  }, [dispatch]);
 
-  const { patientHealthMedicalInfo } = useSelector(
-    (state) => state.intake
-  );
-  console.log("patientHealthMedicalInfo", patientHealthMedicalInfo);
+
 
   const transformApiDataToAnswers = (data) => {
     if (!data || !data.obj) return {};
@@ -424,60 +422,106 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
     const transformedAnswers = {};
 
     try {
-      transformedAnswers.overll_wellbeing = apiData?.howWellThingsGoingOverall || 1;
-      transformedAnswers.school_wellbeing = apiData?.howWellThingsGoingSchool || 1;
-      transformedAnswers.job_wellbeing = apiData?.howWellThingsGoingJob || 1;
-      transformedAnswers.social_life_wellbeing = apiData?.howWellThingsGoingSocialLife || 1;
-      transformedAnswers.close_friends_wellbeing = apiData.howWellThingsGoingCloseFriends || 1;
-      transformedAnswers.sex_wellbeing = apiData.howWellThingsGoingSex || 1;
-      transformedAnswers.attitude_wellbeing = apiData.howWellThingsGoingAttitude || 1;
-      transformedAnswers.relationship_wellbeing = apiData.howWellThingsGoingPartner || 1;
-      transformedAnswers.children_wellbeing = apiData.howWellThingsGoingKids || 1;
-      transformedAnswers.parents_wellbeing = apiData.howWellThingsGoingParents || 1;
-            transformedAnswers.spouse_wellbeing = apiData.howWellThingsGoingSpouse || 1;
+      // Map wellbeing scores
+      transformedAnswers.overll_wellbeing = 
+        apiData?.howWellThingsGoingOverall !== undefined && apiData?.howWellThingsGoingOverall !== null
+          ? apiData.howWellThingsGoingOverall
+          : 1;
+      transformedAnswers.school_wellbeing = 
+        apiData?.howWellThingsGoingSchool !== undefined && apiData?.howWellThingsGoingSchool !== null
+          ? apiData.howWellThingsGoingSchool
+          : 1;
+      transformedAnswers.job_wellbeing = 
+        apiData?.howWellThingsGoingJob !== undefined && apiData?.howWellThingsGoingJob !== null
+          ? apiData.howWellThingsGoingJob
+          : 1;
+      transformedAnswers.social_life_wellbeing = 
+        apiData?.howWellThingsGoingSocialLife !== undefined && apiData?.howWellThingsGoingSocialLife !== null
+          ? apiData.howWellThingsGoingSocialLife
+          : 1;
+      transformedAnswers.close_friends_wellbeing = 
+        apiData?.howWellThingsGoingCloseFriends !== undefined && apiData?.howWellThingsGoingCloseFriends !== null
+          ? apiData.howWellThingsGoingCloseFriends
+          : 1;
+      transformedAnswers.sex_wellbeing = 
+        apiData?.howWellThingsGoingSex !== undefined && apiData?.howWellThingsGoingSex !== null
+          ? apiData.howWellThingsGoingSex
+          : 1;
+      transformedAnswers.attitude_wellbeing = 
+        apiData?.howWellThingsGoingAttitude !== undefined && apiData?.howWellThingsGoingAttitude !== null
+          ? apiData.howWellThingsGoingAttitude
+          : 1;
+      transformedAnswers.relationship_wellbeing = 
+        apiData?.howWellThingsGoingPartner !== undefined && apiData?.howWellThingsGoingPartner !== null
+          ? apiData.howWellThingsGoingPartner
+          : 1;
+      transformedAnswers.children_wellbeing = 
+        apiData?.howWellThingsGoingKids !== undefined && apiData?.howWellThingsGoingKids !== null
+          ? apiData.howWellThingsGoingKids
+          : 1;
+      transformedAnswers.parents_wellbeing = 
+        apiData?.howWellThingsGoingParents !== undefined && apiData?.howWellThingsGoingParents !== null
+          ? apiData.howWellThingsGoingParents
+          : 1;
+      transformedAnswers.spouse_wellbeing = 
+        apiData?.howWellThingsGoingSpouse !== undefined && apiData?.howWellThingsGoingSpouse !== null
+          ? apiData.howWellThingsGoingSpouse
+          : 1;
 
-      transformedAnswers.mode_of_own_birth = apiData.howWereYouBorn || "";
+      // Map birth information
+      transformedAnswers.mode_of_own_birth = apiData?.howWereYouBorn || "";
       
+      // Map birth complications
       if (apiData.wereYouBornWithComplication) {
         transformedAnswers.birth_complications = apiData.wereYouBornWithComplication.yesNo ? "Yes" : "No";
         transformedAnswers.birth_complications_details = apiData.wereYouBornWithComplication.describe || "";
       }
 
-      transformedAnswers.breast_fed_duration = apiData.breastFedHowLong || "";
-      transformedAnswers.bottle_fed_type = apiData.breastFedFormula || "";
-      transformedAnswers.dont_know = apiData.breastFoodDontKnow || false;
+      // Map feeding information
+      transformedAnswers.breast_fed_duration = apiData?.breastFedHowLong || "";
+      transformedAnswers.bottle_fed_type = apiData?.breastFedFormula || "";
+      transformedAnswers.dont_know = apiData?.breastFoodDontKnow || false;
 
-      transformedAnswers.age_of_solid_food_intro = apiData.ageIntroductionSolidFood || "";
-      transformedAnswers.age_of_wheat_food_intro = apiData.ageIntroductionWheat || "";
-      transformedAnswers.age_of_diary_food_intro = apiData.ageIntroductionDiary || "";
+      // Map food introduction ages
+      transformedAnswers.age_of_solid_food_intro = apiData?.ageIntroductionSolidFood || "";
+      transformedAnswers.age_of_wheat_food_intro = apiData?.ageIntroductionWheat || "";
+      transformedAnswers.age_of_diary_food_intro = apiData?.ageIntroductionDiary || "";
 
-      transformedAnswers.allergic_food = apiData.foodsAvoided ? "Yes" : "No";
-      transformedAnswers.food_avoided = apiData.foodsAvoidTypeSymptoms || "";
+      // Map food avoidance
+      transformedAnswers.allergic_food = apiData?.foodsAvoided ? "Yes" : "No";
+      transformedAnswers.food_avoided = apiData?.foodsAvoidTypeSymptoms || "";
 
-      transformedAnswers.eat_sugar_as_a_child = apiData.alotSugar ? "Yes" : "No";
+      // Map sugar consumption
+      transformedAnswers.eat_sugar_as_a_child = apiData?.alotSugar ? "Yes" : "No";
 
+      // Map dental history
       if (apiData.dentalHistory && apiData.dentalHistory.length > 0) {
         transformedAnswers.fillings_removed = apiData.dentalHistory[0].level || 0;
       }
 
-      transformedAnswers.mercury_filings = apiData.mercuryFillingRemoved ? "Yes" : "No";
-      transformedAnswers.mercury_fillings_removed = apiData.mercuryFillingRemovedWhen || "";
+      // Map mercury fillings
+      transformedAnswers.mercury_filings = apiData?.mercuryFillingRemoved ? "Yes" : "No";
+      transformedAnswers.mercury_fillings_removed = apiData?.mercuryFillingRemovedWhen || "";
 
-      transformedAnswers.do_you_brush_regularly = apiData.brushRegularly ? "Yes" : "No";
-      transformedAnswers.do_you_floss_regularly = apiData.flossRegularly ? "Yes" : "No";
+      // Map dental hygiene
+      transformedAnswers.do_you_brush_regularly = apiData?.brushRegularly ? "Yes" : "No";
+      transformedAnswers.do_you_floss_regularly = apiData?.flossRegularly ? "Yes" : "No";
 
-      transformedAnswers.smoke_irritants = apiData.environmentEffect || [];
-      transformedAnswers.work_env_smoke_irritants = apiData.environmentExposed || [];
+      // Map environment effects
+      transformedAnswers.smoke_irritants = apiData?.environmentEffect || [];
+      transformedAnswers.work_env_smoke_irritants = apiData?.environmentExposed || [];
 
-      transformedAnswers.harmful_chemicals = apiData.exposedHarmfulChemical ? "Yes" : "No";
+      // Map harmful chemical exposure
+      transformedAnswers.harmful_chemicals = apiData?.exposedHarmfulChemical ? "Yes" : "No";
       if (apiData.whenExposedHarmfulChemical) {
         transformedAnswers.harmful_chemical_exposure = apiData.whenExposedHarmfulChemical.chemicalName || "";
-        transformedAnswers.harmful_chemical_exposure_length = apiData.whenExposedHarmfulChemical.lengthExposure || "";
+        transformedAnswers.harmful_chemical_exposure_length = apiData.whenExposedHarmfulChemical.lenghtExposure || "";
         transformedAnswers.harmful_chemical_exposure_date = apiData.whenExposedHarmfulChemical.dateExposure || "";
       }
 
-      transformedAnswers.pets_or_animal = apiData.petsFarmAnimal ? "Yes" : "No";
-      transformedAnswers.where_they_live = apiData.petsAnimalLiveWhere || "";
+      // Map pets information
+      transformedAnswers.pets_or_animal = apiData?.petsFarmAnimal ? "Yes" : "No";
+      transformedAnswers.where_they_live = apiData?.petsAnimalLiveWhere || "";
 
     } catch (error) {
       console.error("Error transforming API data:", error);

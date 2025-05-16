@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Row, Col, Button, Spin, Steps, Avatar, Divider, Modal } from "antd";
 // import PeriodCycleTracker from "../../../screens/PatientDashboard/Cycle/cycle";
 import { useDispatch } from "react-redux";
@@ -128,19 +128,19 @@ export default function PatDash() {
     return Object.values(accessDetails).every(value => value === true);
   };
 
-  const checkLearningProgress = () => {
-    // Check if any quiz has been opened
-    const hasOpenedQuiz = localStorage.getItem('hasOpenedQuiz') === 'true';
+  const checkLearningProgress = useCallback(() => {
+    // Check if videos have been watched from userAuth object
+    const hasWatchedVideos = userAuth?.obj?.videoWatched === true;
     
     setChecklistItems(prev => ({
       ...prev,
-      learnVideos: hasOpenedQuiz
+      learnVideos: hasWatchedVideos
     }));
-  };
+  }, [userAuth?.obj?.videoWatched]);
 
   useEffect(() => {
     checkLearningProgress();
-  }, []);
+  }, [checkLearningProgress]);
 
   const filteredAppointments = appointmentList.filter(
     (app) => app.roleId === 0
@@ -323,6 +323,7 @@ export default function PatDash() {
             gap: "8px",
             justifyContent: "space-between",
           }}>
+            
             <div style={{
               display: "flex",
               alignItems: "center",

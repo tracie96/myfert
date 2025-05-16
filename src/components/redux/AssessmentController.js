@@ -197,7 +197,6 @@ export const getHealthLifestylePatient = createAsyncThunk(
         config,
       );
 
-      console.log("Health lifestyle response:", response);
       return response.data;
     } catch (error) {
       console.error("Error fetching health lifestyle:", error);

@@ -826,6 +826,10 @@ const IllnessAndCondition = ({ onComplete }) => {
         date: answers.EKG_na ? "" : answers.EKG || "",
         value: answers.EKG_na ? "" : answers.EKG_Comments || "",
       },
+      diagnosticLastPap: {
+        date: answers.lastPapTest_na ? "" : answers.lastPapTest || "",
+        value: answers.lastPapTest_na ? "" : answers.lastPapTest_Comments || "",
+      },
       diagnosticMRI: {
         date: answers.MRI_na ? "" : answers.MRI || "",
         value: answers.MRI_na ? "" : answers.MRI_Comments || "",

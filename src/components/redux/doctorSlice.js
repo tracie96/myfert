@@ -590,6 +590,58 @@ export const deleteAppointment = createAsyncThunk(
   }
 );
 
+export const fetchPatientNotes = createAsyncThunk(
+  'doctor/fetchPatientNotes',
+  async (patientId, { rejectWithValue,getState }) => {
+    const user = getState()?.authentication?.userAuth;
+
+    try {
+      const response = await fetch(
+        `https://myfertilitydevapi-prod.azurewebsites.net/api/Doctor/GetPatientNotes/${patientId}`,
+        {
+          method: 'GET',
+          headers: {
+            'accept': 'text/plain',
+            Authorization: `Bearer ${user?.obj?.token}`,
+
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error('Failed to fetch patient notes');
+      }
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      return rejectWithValue(err.message);
+    }
+  }
+);
+
+export const addPatientNotes = createAsyncThunk(
+  "doctor/addPatientNotes",
+  async ({ patientNote, personalNote, appointmentType, patientRef }, { rejectWithValue, getState, dispatch }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+
+    try {
+      const response = await axios.post(
+        `${baseUrl}Doctor/AddPatientNotes`,
+        { patientNote, personalNote, appointmentType, patientRef },
+        config
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(handleApiError(error?.response?.data, dispatch, user));
+    }
+  }
+);
+
 const doctorSlices = createSlice({
   name: "doctor",
   initialState: {
@@ -603,8 +655,10 @@ const doctorSlices = createSlice({
     bloodWork: [],
     medStatus: null,
     medError: null,
-    medications: []
-
+    medications: [],
+    patientNotes: [],
+    loadingNotes: false,
+    notesError: null
   },
   extraReducers: (builder) => {
     builder.addCase(patientList.pending, (state, action) => {
@@ -844,6 +898,20 @@ const doctorSlices = createSlice({
       .addCase(deleteAppointment.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      });
+
+    builder
+      .addCase(fetchPatientNotes.pending, (state) => {
+        state.loadingNotes = true;
+        state.notesError = null;
+      })
+      .addCase(fetchPatientNotes.fulfilled, (state, action) => {
+        state.loadingNotes = false;
+        state.patientNotes = action.payload;
+      })
+      .addCase(fetchPatientNotes.rejected, (state, action) => {
+        state.loadingNotes = false;
+        state.notesError = action.payload;
       });
   },
 });

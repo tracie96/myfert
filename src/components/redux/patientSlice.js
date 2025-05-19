@@ -328,6 +328,29 @@ export const getUpcomingAppointments = createAsyncThunk(
 );
 //#endregion
 
+export const getPatientNotes = createAsyncThunk(
+  "patient/getPatientNotes",
+  async (_, { rejectWithValue, getState, dispatch }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        "accept": "text/plain",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+    try {
+      const response = await axios.get(
+        `${baseUrl}Patient/GetPatientNotes`,
+        config
+      );
+      return response.data;
+    } catch (error) {
+      handleApiError(error?.response?.data, dispatch, user);
+      return rejectWithValue(error?.response?.data || "An error occurred");
+    }
+  }
+);
+
 const patientSlices = createSlice({
   name: "patient",
   initialState: {
@@ -337,8 +360,8 @@ const patientSlices = createSlice({
     patientAppStatusCode: null,
     patientServerErr: null,
     bloodWork: [],
-    medication: []
-
+    medication: [],
+    notes: []
   },
   extraReducers: (builder) => {
     builder.addCase(
@@ -524,6 +547,18 @@ const patientSlices = createSlice({
         state.error = action.payload;
       });
 
+    builder
+      .addCase(getPatientNotes.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(getPatientNotes.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.notes = action.payload;
+      })
+      .addCase(getPatientNotes.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload;
+      });
 
   },
 });

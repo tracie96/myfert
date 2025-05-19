@@ -92,6 +92,8 @@ import TermsOfService from "../../pages/TermsOfService";
 import CollectionNotice from "../../pages/CollectionNotice";
 import PrivacyPolicy from "../../pages/PrivacyPolicy";
 import ConfidentialityAgreement from "../../pages/ConfidentialityAgreement";
+import Note from "../DashboardV2/DoctorDashboard/Note";
+import PatientNote from "../DashboardV2/PatientDashboard/Note";
 
 //#endregion
 
@@ -232,10 +234,14 @@ const getRouter = createBrowserRouter(
         <Route path="patient/calendar" element={<PatientAppointment />} />
         <Route path="patient/services" element={<Services />} />
         <Route path="patient/appointment" element={<PatientAppointmentList />} />
+        <Route path="patient/notes" element={<PatientNote />} />
+
 
         <Route path="doctor/appointments" element={<AppointmentList />} />
         <Route path="doctor/labs" element={<LabsAndRequisitions />} />
         <Route path="doctor/meds" element={<MedicationTable />} />
+        
+        <Route path="doctor/notes" element={<Note />} />
 
         
         <Route path="patient/labs" element={<LabScreen />} />

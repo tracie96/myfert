@@ -1,0 +1,374 @@
+/* Notes container styles */
+:root {
+  --primary-blue: #00ADEF;
+  --dark-blue: #111F4A;
+  --light-border: #C2E6F8;
+  --orange-name: #F2AA93;
+  --purple-name: #B46DB8;
+  --green-name: rgba(0, 128, 0, 0.5);
+  --text-light: rgba(0, 0, 0, 0.5);
+  --border-light: rgba(0, 0, 0, 0.2);
+}
+
+
+.notes-container {
+  padding: 20px;
+}
+
+.notes-card {
+  border: 1px solid var(--light-border);
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+}
+
+/* Notes header styles */
+.add-note-button {
+  font-size: 13px;
+  font-weight: bold;
+  letter-spacing: 0.65px;
+  margin-bottom: 20px;
+  cursor: pointer;
+}
+
+
+/* Notes tabs styles */
+.tabs-container {
+  display: flex;
+  margin-bottom: 20px;
+  padding-bottom: 25px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.tab {
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0 16px;
+}
+
+.tab:first-child {
+  padding-left: 0;
+}
+
+.tab-active {
+  color: var(--primary-blue);
+}
+
+.tab-inactive {
+  color: var(--dark-blue);
+}
+
+/* Note item styles */
+.note-item {
+  display: flex;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.profile-section {
+  width: 145px;
+}
+
+.profile-image {
+  width: 32px;
+  height: 32px;
+  margin-bottom: 10px;
+}
+
+.name-role-container {
+  margin-left: 42px;
+  margin-top: -32px;
+}
+
+.name-text {
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.date-text {
+  font-size: 11px;
+  color: var(--text-light);
+  margin-top: 10px;
+}
+
+.appointment-section {
+  width: 180px;
+  font-size: 10px;
+  padding-top: 6px;
+}
+
+.progress-notes-section {
+  width: 377px;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.personal-notes-section {
+  width: 297px;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.menu-section {
+  margin-left: auto;
+}
+
+/* View more button styles */
+.view-more {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 20px;
+  color: var(--primary-blue);
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .appointment-section {
+    width: 120px;
+  }
+  
+  .progress-notes-section,
+  .personal-notes-section {
+    width: auto;
+    flex: 1;
+  }
+  
+  .tabs-container .tab {
+    flex: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .note-item {
+    flex-direction: column;
+  }
+  
+  .profile-section,
+  .appointment-section,
+  .progress-notes-section,
+  .personal-notes-section {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  
+  .menu-section {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+  }
+  
+  .notes-card {
+    padding: 10px;
+  }
+}
+
+.notes-header-row {
+  display: flex;
+  align-items: center;
+  padding: 0 0 16px 0;
+  border-bottom: 2px solid #e5eaf2;
+  font-weight: bold;
+  color: #335cad;
+  background: transparent;
+  font-size: 16px;
+}
+
+.notes-header-col {
+  padding: 0 8px;
+  font-size: 15px;
+}
+
+.notes-header-col--profile {
+  width: 160px;
+  min-width: 140px;
+}
+
+.notes-header-col--appt {
+  width: 220px;
+  min-width: 180px;
+}
+
+.notes-header-col--progress {
+  flex: 2;
+  min-width: 220px;
+}
+
+.notes-header-col--personal {
+  flex: 1.5;
+  min-width: 180px;
+}
+
+.notes-header-col--menu {
+  width: 40px;
+}
+
+.note-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 24px 0;
+  border-bottom: 1px solid #e5eaf2;
+  gap: 0;
+  background: transparent;
+}
+
+.profile-section {
+  width: 160px;
+  min-width: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.appointment-section {
+  width: 220px;
+  min-width: 180px;
+  font-size: 13px;
+  color: #666;
+  margin-top: 2px;
+}
+
+.progress-notes-section {
+  flex: 2;
+  min-width: 220px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #444;
+}
+
+.personal-notes-section {
+  flex: 1.5;
+  min-width: 180px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #444;
+}
+
+.menu-section {
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+@media (max-width: 1024px) {
+  .notes-header-row, .note-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .notes-header-col,
+  .profile-section,
+  .appointment-section,
+  .progress-notes-section,
+  .personal-notes-section,
+  .menu-section {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+.notes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  margin-bottom: 32px;
+}
+
+.note-item:not(:first-child) {
+  margin-top: 48px;
+}
+
+.note-row {
+  display: flex;
+  align-items: flex-start;
+  border-bottom: 1px solid #e5eaf2;
+  padding: 24px 0;
+}
+
+.note-header {
+  border-bottom: 2px solid #e5eaf2;
+  background: transparent;
+  font-size: 16px;
+  color: #111F4A;
+  padding: 0 0 16px 0;
+}
+
+.note-col {
+  padding: 0 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.profile-col {
+  width: 160px;
+  min-width: 140px;
+  align-items: flex-start;
+}
+
+.appt-col {
+  width: 220px;
+  min-width: 180px;
+}
+
+.progress-col {
+  flex: 2;
+  min-width: 220px;
+}
+
+.personal-col {
+  flex: 1.5;
+  min-width: 180px;
+}
+
+.menu-col {
+  width: 40px;
+  align-items: flex-end;
+}
+
+.profile-image {
+  width: 32px;
+  height: 32px;
+  margin-bottom: 10px;
+}
+
+.name-text {
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.date-text {
+  font-size: 11px;
+  color: #888;
+  margin-top: 8px;
+}
+
+.notes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 32px;
+}
+
+@media (max-width: 1024px) {
+  .note-row, .note-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .note-col,
+  .profile-col,
+  .appt-col,
+  .progress-col,
+  .personal-col,
+  .menu-col {
+    width: 100%;
+    min-width: 0;
+  }
+} 
+.ant-btn-primary {
+  background: #01acee;
+  border: 1px solid #01acee;}

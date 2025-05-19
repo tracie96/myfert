@@ -18,7 +18,7 @@ import {
   FaServicestack,
   FaBook,
 } from "react-icons/fa";
-
+import { FaNotesMedical } from "react-icons/fa";
 export const GetSideBar = () => {
   const { userAuth } = useSelector((state) => state.authentication);
   const accessDetails = useSelector((state) => state.intake.accessDetails);
@@ -50,6 +50,8 @@ export const GetSideBar = () => {
         return "9";
       case "/patient/services":
         return "6";
+      case "/patient/notes":
+        return "10"
      
       default:
         return "1";
@@ -68,6 +70,8 @@ export const GetSideBar = () => {
         return "4";
       case "/doctor/meds":
         return "5";
+      case "/doctor/notes":
+        return "6";
       default:
         return "1";
     }
@@ -116,13 +120,19 @@ export const GetSideBar = () => {
       </Menu.Item>
 
       <Menu.Item key="5" icon={<FaPills style={{ color: "#00ADEF" }} />}>
-      <NavLink to="/patient/meds" style={{ textDecoration: "none" }}>
-        <span>MEDS</span>
+        <NavLink to="/patient/meds" style={{ textDecoration: "none" }}>
+          <span>MEDS</span>
         </NavLink>
       </Menu.Item>
       <Menu.Item key="9" icon={<FaFlask style={{ color: "#00ADEF" }} />}>
         <NavLink to="/patient/labs" style={{ textDecoration: "none" }}>
           <span>LABS</span>
+        </NavLink>
+      </Menu.Item>
+
+      <Menu.Item key="10" icon={<FaNotesMedical style={{ color: "#00ADEF" }} />}>
+        <NavLink to="/patient/notes" style={{ textDecoration: "none" }}>
+          <span>NOTES</span>
         </NavLink>
       </Menu.Item>
 
@@ -133,26 +143,12 @@ export const GetSideBar = () => {
           </NavLink>
         </Menu.Item>
       )}
-      
-      {/* <Menu.Item key="6" icon={<FaNotesMedical style={{ color: "#00ADEF" }} />}>
-        <NavLink to="/patient/appointment" style={{ textDecoration: "none" }}>
-          <span className="no-underline">NOTES</span>
-        </NavLink>
-        </Menu.Item> */}
 
-        {/* <Menu.Item key="7" icon={<FaNotesMedical style={{ color: "#00ADEF" }} />}>
-        <NavLink to="/patient/appointment" style={{ textDecoration: "none" }}>
-          <span className="no-underline">DOCUMENTS</span>
-        </NavLink>
-      </Menu.Item> */}
       <Menu.Item key="8" icon={<FaBook style={{ color: "#00ADEF" }} />}>
         <NavLink to="/learn" style={{ textDecoration: "none" }}>
           <span className="no-underline">LEARN</span>
         </NavLink>
       </Menu.Item>
-
-
-
     </Menu>
   );
   const doctorMenuItems = (
@@ -167,16 +163,6 @@ export const GetSideBar = () => {
           <span>PATIENT LIST</span>
         </NavLink>
       </Menu.Item>
-      {/* <Menu.Item key="2" icon={<FaCalendarAlt style={{ color: "#00ADEF" }} />}>
-        <NavLink to="/doctor/appointment" style={{ textDecoration: "none" }}>
-          <span className="no-underline">CALENDAR</span>
-        </NavLink>
-      </Menu.Item>
-      <Menu.Item key="3" icon={<FaListOl style={{ color: "#00ADEF" }} />}>
-        <NavLink to="/doctor/appointments" style={{ textDecoration: "none" }}>
-          <span>APPOINTMENTS</span>
-        </NavLink>
-      </Menu.Item> */}
       <Menu.Item key="4" icon={<FaFlask style={{ color: "#00ADEF" }} />}>
         <NavLink to="/doctor/labs" style={{ textDecoration: "none" }}>
           <span>LABS</span>
@@ -185,6 +171,11 @@ export const GetSideBar = () => {
       <Menu.Item key="5" icon={<FaPills style={{ color: "#00ADEF" }} />}>
         <NavLink to="/doctor/meds" style={{ textDecoration: "none" }}>
           <span>MEDS</span>
+        </NavLink>
+      </Menu.Item>
+      <Menu.Item key="6" icon={<FaNotesMedical style={{ color: "#00ADEF" }} />}>
+        <NavLink to="/doctor/notes" style={{ textDecoration: "none" }}>
+          <span>NOTES</span>
         </NavLink>
       </Menu.Item>
     </Menu>

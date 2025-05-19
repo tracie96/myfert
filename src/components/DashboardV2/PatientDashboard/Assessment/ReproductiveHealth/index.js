@@ -729,13 +729,16 @@ const ReproductiveHealth = ({ onComplete }) => {
             return true;
           }
 
-          // Validate number_with_radio_sub questions if not "Unsure"
-          if (subQuestion.type === "number_with_radio_sub") {
-            if (!subUnsure && (typeof subAnswer !== "number" || isNaN(subAnswer))) {
-              subQuestionsValid = false;
-              break; // No need to continue if one subquestion is invalid
+            // Validate number_with_radio_sub questions if not "Unsure"
+            if (subQuestion.type === "number_with_radio_sub") {
+              if (!subUnsure) {
+                const parsed = Number(subAnswer);
+                if (isNaN(parsed) || parsed === 0) {
+                  subQuestionsValid = false;
+                  break; // No need to continue if one subquestion is invalid
+                }
+              }
             }
-          }
             
             // Validate radio questions
             if (subQuestion.type === "radio") {

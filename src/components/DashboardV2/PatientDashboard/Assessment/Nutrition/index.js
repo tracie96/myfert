@@ -328,7 +328,7 @@ const Nutrition = ({ onComplete }) => {
       adversely_react: info.adverseList || [],
       crave_for_foods: info.anyFoodCraving?.yesNo ? "Yes" : "No",
       eat_3_meals: info.have3MealADay?.yesNo ? "Yes" : "No",
-      meals_per_day: info.have3MealADay?.level?.toString() || "",
+      meals_per_day: info.howManyEatOutPerWeek || "",
       does_skipping_meal_affect_you: info.skippingAMeal ? "Yes" : "No",
       actors_applyingto_current_lifestyle: info.eatingHabits || [],
       diet_detail_breakfast: info.typicalBreakfast || "",

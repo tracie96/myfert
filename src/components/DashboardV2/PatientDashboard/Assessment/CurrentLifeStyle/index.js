@@ -101,7 +101,7 @@ const questions = [
     question: "For your current exercise program, do you do ",
     type: "long_radio",
     postname: "Cardio/Aerobic ?",
-    name: "cardio/aerobic",
+    name: "cardio_aerobic",
     sub: "Lifestyle Review - Exercise",
     options: ["Yes", "No"],
     subQuestions: [
@@ -307,6 +307,8 @@ console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
 
   const mapHealthLifestyleInfoToState = (info) => {
     const answersFromApi = {
+      do_you_have_current_health_concern: info.doYouOngoingHealth ? "Yes" : "No",
+      do_you_have_any_allergies: info.doYouAllergies ? "Yes" : "No",
       sleep_hours: info.sleepHours?.toString() || "",
       problems_falling_asleep: info.problemSleeping ? "Yes" : "No",
       problems_staying_asleep: info.stayingAsleep ? "Yes" : "No",
@@ -317,25 +319,35 @@ console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
       do_you_use_sleeping_aids_other: info.sleepingAids?.describe || "",
   
       // Exercise: cardio
+      cardio_aerobic: info.cardio?.doYou ? "Yes" : "No",
       cardio_aerobic_describe: info.cardio?.type || "",
       cardio_aerobic_number: info.cardio?.timesWeek?.toString() || "",
       cardio_aerobic_time_duration: info.cardio?.duration?.toString() || "",
-  
+
+      sport_participated_in_strength: info.strenght?.doYou ? "Yes" : "No",
       strength_resistance_describe: info.strenght?.type || "",
       strength_resistance_number: info.strenght?.timesWeek?.toString() || "",
       strength_resistance_time_duration: info.strenght?.duration?.toString() || "",
-  
+
+      sport_participated_in_flexibility: info.flexibility?.doYou ? "Yes" : "No",
       flexibility_stretching_describe: info.flexibility?.type || "",
       flexibility_stretching_number: info.flexibility?.timesWeek?.toString() || "",
       flexibility_stretching_time_duration: info.flexibility?.duration?.toString() || "",
   
+      sport_participated_in_balance: info.balance?.doYou ? "Yes" : "No",
       sport_participated_describe: info.balance?.type || "",
       sport_participated_number: info.balance?.timesWeek?.toString() || "",
       sport_participated_time_duration: info.balance?.duration?.toString() || "",
   
+      sport_participated_in_others: info.other?.doYou ? "Yes" : "No",
       sport_participated_in_describe: info.other?.type || "",
       sport_participated_in_number: info.other?.timesWeek?.toString() || "",
       sport_participated_in_time_duration: info.other?.duration?.toString() || "",
+
+      sport_participated_in_leisure: info.sport?.doYou ? "Yes" : "No",
+      sports_leisure_describe: info.sport?.type || "",
+      sports_leisure_number: info.sport?.timesWeek?.toString() || "",
+      sports_leisure_time_duration: info.sport?.duration?.toString() || "",
   
       motivated_to_exercise: info.motivatedToExercise || "",
   
@@ -357,7 +369,7 @@ console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
       })) || [],
       allergies: info.allergies?.map((item, index) => ({
         key: index.toString(),
-        supplement_name: item.supplement_name || "",
+        food: item.food || "",
         reaction: item.reaction || "",
       })) || [],
     };
@@ -754,20 +766,18 @@ console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
   const allergyColumns = [
     {
       title: "Name of Medication/Supplement/Food",
-      dataIndex: "supplement_name",
+      dataIndex: "food", // ✅ updated from "supplement_name"
       editable: true,
       render: (text, record) =>
         editingAllergies === record.key ? (
           <Input
-            value={tempAllergy.supplement_name || text}
-            onChange={(e) =>
-              handleChangeAllergy("supplement_name", e.target.value)
-            }
+            value={tempAllergy.food || text} // ✅ updated
+            onChange={(e) => handleChangeAllergy("food", e.target.value)}
             placeholder="Enter name"
             required
             style={{
               width: "100%",
-              borderColor: tempAllergy.supplement_name ? undefined : "red",
+              borderColor: tempAllergy.food ? undefined : "red", // ✅ updated
             }}
           />
         ) : (
@@ -861,7 +871,7 @@ console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
   };
 
   const cancelAllergy = () => {
-    if (tempAllergy.supplement_name === "" && tempAllergy.reaction === "") {
+    if (tempAllergy.food === "" && tempAllergy.reaction === "") {
       setCurrentAllergies((prev) =>
         prev.filter((allergy) => allergy.key !== editingAllergies),
       );
@@ -882,7 +892,7 @@ console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
     const index = newData.findIndex((item) => key === item.key);
 
     // Validation: Ensure required fields are filled
-    if (!tempAllergy.supplement_name || !tempAllergy.reaction) {
+    if (!tempAllergy.food || !tempAllergy.reaction) {
       message.error("All fields are required.");
       return;
     }
@@ -941,44 +951,57 @@ console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
     const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
     const token = userInfo.obj.token || "";
     const transformedData = {
+      restedUponAwake: answers["do_you_feel_rested"] === "Yes",
+      doYouAllergies: answers["do_you_have_any_allergies"] === "Yes",
+      doYouOngoingHealth: answers["do_you_have_current_health_concern"] === "Yes",
       ongoingHealth: currentConcern ? currentConcern : [],
-      allergies: currentAllergies ? currentAllergies : [],
+      allergies: currentAllergies
+      ? currentAllergies.map(({ key, food, reaction }) => ({
+          food, // ✅ updated key
+          reaction,
+        }))
+      : [],
       sleepHours: parseInt(answers["sleep_hours"], 10) || 0,
       problemSleeping: answers["problems_falling_asleep"] === "Yes",
       stayingAsleep: answers["problems_staying_asleep"] === "Yes",
       insomnia: answers["problems_with_insomnia"] === "Yes",
       doYouSnore: answers["do_you_snore"] === "Yes",
-      restedUponAwake: answers["rested_upon_awakening"] === "Yes",
       sleepingAids: {
-        yesNo: answers["sleeping_aids_yesNo"] === "Yes",
-        describe: answers["sleeping_aids_describe"] || "",
+        yesNo: answers["do_you_use_sleeping_aids"] === "Yes",
+        describe: answers["do_you_use_sleeping_aids_other"] || "",
       },
       cardio: {
+        doYou: answers["cardio_aerobic"] === "Yes",
         type: answers["cardio_aerobic_describe"] || "",
         timesWeek: parseInt(answers["cardio_aerobic_number"], 10) || 0,
         duration: parseInt(answers["cardio_aerobic_time_duration"], 10) || 0,
       },
       strenght: {
+        doYou: answers["sport_participated_in_strength"] === "Yes",
         type: answers["strength_resistance_describe"] || "",
         timesWeek: parseInt(answers["strength_resistance_number"], 10) || 0,
         duration: parseInt(answers["strength_resistance_time_duration"], 10) || 0,
       },
       flexibility: {
+        doYou: answers["sport_participated_in_flexibility"] === "Yes",
         type: answers["flexibility_stretching_describe"] || "",
         timesWeek: parseInt(answers["flexibility_stretching_number"], 10) || 0,
         duration: parseInt(answers["flexibility_stretching_time_duration"], 10) || 0,
       },
       balance: {
+        doYou: answers["sport_participated_in_balance"] === "Yes",
         type: answers["sport_participated_describe"] || "",
         timesWeek: parseInt(answers["sport_participated_number"], 10) || 0,
         duration: parseInt(answers["sport_participated_time_duration"], 10) || 0,
       },
       sport: {
-        type: answers["sport_type"] || "",
-        timesWeek: parseInt(answers["sport_times_week"], 10) || 0,
-        duration: parseInt(answers["sport_duration"], 10) || 0,
+        doYou: answers["sport_participated_in_leisure"] === "Yes",
+        type: answers["sports_leisure_describe"] || "",
+        timesWeek: parseInt(answers["sports_leisure_number"], 10) || 0,
+        duration: parseInt(answers["sports_leisure_time_duration"], 10) || 0,
       },
       other: {
+        doYou: answers["sport_participated_in_others"] === "Yes",
         type: answers["sport_participated_in_describe"] || "",
         timesWeek: parseInt(answers["sport_participated_in_number"], 10) || 0,
         duration: parseInt(answers["sport_participated_in_time_duration"], 10) || 0,
@@ -986,12 +1009,12 @@ console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
       },
       motivatedToExercise: answers["motivated_to_exercise"] || "",
       problemsThatLimitExercise: {
-        yesNo: answers["problems_limit_exercise_yesNo"] === "Yes",
-        describe: answers["problems_limit_exercise_describe"] || "",
+        yesNo: answers["problems_limiting_exercise"] === "Yes",
+        describe: answers["problems_limiting_exercise_other"] || "",
       },
       soreAfterExercise: {
-        yesNo: answers["sore_after_exercise_yesNo"] === "Yes",
-        describe: answers["sore_after_exercise_describe"] || "",
+        yesNo: answers["sore_after_exercise"] === "Yes",
+        describe: answers["sore_after_exercise_other"] || "",
       },
     };
 

@@ -401,7 +401,7 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
   
         harmful_chemicals: lifestyle.exposedHarmfulChemical ? "Yes" : "No",
         harmful_chemical_exposure: lifestyle.whenExposedHarmfulChemical?.chemicalName || "",
-        harmful_chemical_exposure_length: lifestyle.whenExposedHarmfulChemical?.lengthExposure || "",
+        harmful_chemical_exposure_length: lifestyle.whenExposedHarmfulChemical?.lenghtExposure || "",
         harmful_chemical_exposure_date: lifestyle.whenExposedHarmfulChemical?.dateExposure || "",
   
         pets_or_animal: lifestyle.petsFarmAnimal ? "Yes" : "No",
@@ -728,7 +728,7 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
         exposedHarmfulChemical: answers.harmful_chemicals === "Yes",
         whenExposedHarmfulChemical: {
           chemicalName: answers.harmful_chemical_exposure || "Not answered",
-          lengthExposure: answers.harmful_chemical_exposure_length || 0,
+          lenghtExposure: answers.harmful_chemical_exposure_length || 0,
           dateExposure: answers.harmful_chemical_exposure_date || "Not answered",
         },
         petsFarmAnimal: answers.pets_or_animal === "Yes",

@@ -16,9 +16,7 @@ const NoteItem = ({
   appointmentType,
   progressNotes,
   personalNotes,
-  nameColor,
   hasMenu = false,
-  menuIcon = "https://cdn.builder.io/api/v1/image/assets/TEMP/f9ab6930c2845a62780ec7d43446b11054cb8a18",
   noteId
 }) => {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);

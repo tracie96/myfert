@@ -38,6 +38,7 @@ const Note = () => {
       dispatch(fetchPatientNotes(patient.userRef));
     }
   }, [patient.userRef, dispatch]);
+  console.log({notes})
 
   useEffect(() => {
     if (patientNotes) {
@@ -59,7 +60,8 @@ const Note = () => {
             `Plan: ${note.patientPlan}`
           ],
           personalNotes: note.personalNote || '',
-          nameColor: "text-[#F2AA93]"
+          nameColor: "text-[#F2AA93]",
+          noteId: note.noteId
         };
       });
       setNotes(formattedNotes);

@@ -26,7 +26,6 @@ const PatientNote = () => {
 
   useEffect(() => {
     if (patientNotes) {
-      // Transform the API response to match our UI format
       const formattedNotes = patientNotes.map(note => {
         // Parse the date string
         const [datePart] = note.createdOn.split(' ');

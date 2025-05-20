@@ -724,7 +724,6 @@ const ReproductiveHealth = ({ onComplete }) => {
             "after_period_spot_sub"
           ];
 
-          // Check if subQuestion name is one of the valid names
           if (validCervicalMucusNames.includes(subQuestion.name)) {
             return true;
           }

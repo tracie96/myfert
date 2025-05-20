@@ -91,7 +91,7 @@ const questions = [
       {
         question: "If Yes: How Often",
         type: "text",
-        name: "how_often_reaxation",
+        name: "how_often_relaxation",
       },
     ],
   },
@@ -293,7 +293,7 @@ const StressAndRelationship = ({ onComplete }) => {
       
       // Map relaxation techniques
       relaxation_techniques: apiData.relaxationTechniques ? "Yes" : "No",
-      how_often_reaxation: apiData.oftenRelaxationTechniques !== "N/A" ? apiData.oftenRelaxationTechniques : "",
+      how_often_relaxation: apiData.oftenRelaxationTechniques !== "N/A" ? apiData.oftenRelaxationTechniques : "",
       
       // Map technique types (convert string back to array)
       special_nutritional_program: apiData.typeRelaxationTechniques && apiData.typeRelaxationTechniques !== "N/A" 
@@ -545,7 +545,7 @@ const StressAndRelationship = ({ onComplete }) => {
         stressFromHealth: answers.health_stress_health || 0,
         stressFromOther: answers.health_stress_other || 0,
         relaxationTechniques: answers.relaxation_techniques === "Yes",
-        oftenRelaxationTechniques: answers.how_often_reaxation || "N/A",
+        oftenRelaxationTechniques: answers.how_often_relaxation || "N/A",
         typeRelaxationTechniques: answers.special_nutritional_program?.join(", ") || "N/A",
         soughtCounselling: answers.have_you_sought_counselling === "Yes",
         currentlyInTherapy: answers.current_therapy === "Yes",
@@ -637,6 +637,14 @@ const StressAndRelationship = ({ onComplete }) => {
             />
             <span>{subQuestion.suffix || ""}</span>
           </div>
+        )}
+        {subQuestion.type === "text" && (
+          <Input
+            className="input_questtionnaire"
+            name={subQuestion.name}
+            value={answers[subQuestion.name] || ""}
+            onChange={(e) => handleChange(e.target.value, subQuestion.name)}
+          />
         )}
         {subQuestion.type === "radio" && (
           <Radio.Group

@@ -1270,7 +1270,7 @@ function SwitchContent({
                       // Render objects (e.g., diagnosticBoneDensity)
                       displayValue = (
                         <div class="inside-table-content">
-                          Date: {value.date}, Value: {value.value}, Other Name: {value.otherName}
+                          Date: {value?.date}, Value: {value?.value}, Other Name: {value?.otherName}
                         </div>
                       );
                     } else {
@@ -1298,7 +1298,7 @@ function SwitchContent({
                           label={key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())}
                           key={`${key}-additional`}
                         >
-                          Date: {value.date}, Value: {value.value}, Other Name: {value.otherName}
+                          Date: {value?.date}, Value: {value?.value}, Other Name: {value?.otherName}
                         </Descriptions.Item>
                       );
                     }

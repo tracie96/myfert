@@ -105,18 +105,19 @@ const questions = [
       { name: "auditory_hallucinations", text: "Auditory hallucinations" },
       { name: "blackouts", text: "Blackouts" },
       { name: "depression", text: "Depression" },
-      {
-        name: "difficulty_concentrating",
-        text: "Difficulty:",
-        subOptions: [
-          { name: "concentrating", text: "Concentrating" },
-          { name: "with_balance", text: "With balance" },
-          { name: "with_thinking", text: "With thinking" },
-          { name: "with_judgment", text: "With judgment" },
-          { name: "with_speech", text: "With speech" },
-          { name: "with_memory", text: "With memory" },
-        ],
-      },
+      { name: "difficulty", text: "Difficulty" },
+      // {
+      //   name: "difficulty_concentrating",
+      //   text: "Difficulty:",
+      //   subOptions: [
+      //     { name: "concentrating", text: "Concentrating" },
+      //     { name: "with_balance", text: "With balance" },
+      //     { name: "with_thinking", text: "With thinking" },
+      //     { name: "with_judgment", text: "With judgment" },
+      //     { name: "with_speech", text: "With speech" },
+      //     { name: "with_memory", text: "With memory" },
+      //   ],
+      // },
       { name: "dizziness", text: "Dizziness (spinning)" },
       { name: "fainting", text: "Fainting" },
       { name: "fearfulness", text: "Fearfulness" },
@@ -319,7 +320,7 @@ const questions = [
       { name: "tender_neck", text: "Tender/neck" },
       {
         name: "other_enlarged_tender_lymph_nodes",
-        text: "Other enlarged/tender lymph nodes",
+        text: "Other enlarged/tender lymph nodes"
       },
     ],
   },
@@ -913,7 +914,7 @@ const SymptomReview = ({ onComplete }) => {
     const lymphQuestions = [
       "enlarged_neck",
       "tender_neck",
-      "other_enlarged_tender_ly"]
+      "other_enlarged_tender_lymph_nodes"]
 
     const muscoQuestions = [
       "back_muscle_spasm",
@@ -941,17 +942,18 @@ const SymptomReview = ({ onComplete }) => {
       "auditory_hallucinations",
       "blackouts",
       "depression",
-      {
-        name: 'difficulty_concentrating',
-        subOptions: [
-          { name: 'concentrating' },
-          { name: 'with_balance' },
-          { name: 'with_thinking' },
-          { name: 'with_judgment' },
-          { name: 'with_speech' },
-          { name: 'with_memory' }
-        ]
-      },
+      "difficulty",
+      // {
+      //   name: 'difficulty_concentrating',
+      //   subOptions: [
+      //     { name: 'concentrating' },
+      //     { name: 'with_balance' },
+      //     { name: 'with_thinking' },
+      //     { name: 'with_judgment' },
+      //     { name: 'with_speech' },
+      //     { name: 'with_memory' }
+      //   ]
+      // },
       "dizziness",
       "fainting",
       "fearfulness",
@@ -1427,8 +1429,8 @@ const SymptomReview = ({ onComplete }) => {
         : [{ medication: "", dosage: "", startDate: "", reason: "" }],
 
       supplementsCausedEffects: {
-        yesNo: answers.supplement_effects ? true : false,
-        describe: answers.supplement_effects_description || "",
+        yesNo: answers.side_effects_problems ? true : false,
+        describe: answers.side_effects_details || "",
       },
       usedRegularlyNsaid: answers.regular_long_term_use === "Yes",
       usedRegularlyTyienol: answers.regular_long_term_use_tylenol === "Yes",
@@ -1448,7 +1450,7 @@ const SymptomReview = ({ onComplete }) => {
       },
       takenAntibioticsForLong: {
         yesNo: answers.long_term_antibiotics ? true : false,
-        describe: answers.long_term_antibiotics_description || "",
+        describe: answers.long_term_antibiotics_reason || "",
       },
       oralSteriodsInfancy: {
         value1: answers.steroids_infant ? "Yes" : "No",
@@ -1483,7 +1485,6 @@ const SymptomReview = ({ onComplete }) => {
       )
         .then((response) => response.json())
         .then((data) => {
-          console.log("Transformed Data:", transformedData);
           message.success("Form submitted successfully!");
           dispatch(completeCard("/questionnaire/9"));
           localStorage.setItem("currentQuestionIndex9", 0);

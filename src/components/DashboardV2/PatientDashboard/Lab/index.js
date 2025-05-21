@@ -178,22 +178,25 @@ const LabScreen = () => {
                         <List
                             dataSource={labRequisitions}
                             renderItem={(file) => (
-                                <List.Item style={{ borderBottom: '1px solid #f0f0f0', padding: '12px 16px' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 15, width: '100%' }}>
+                                <List.Item style={{ borderBottom: '1px solid #f0f0f0', padding: '12px 0' }}>
+                                    <div
+                                        style={{
+                                            display: 'grid',
+                                            gridTemplateColumns: '40px 1.5fr 1fr 1.5fr',
+                                            alignItems: 'center',
+                                            width: '100%',
+                                            gap: 15,
+                                        }}
+                                    >
                                         <div style={{ width: '3px', height: '40px', backgroundColor: 'red' }}></div>
-
-                                        <div style={{ flex: 1 }}>
+                                        <div>
                                             <Text style={{ fontWeight: 500 }}>{file.filename}</Text>
-                                            <br />
                                         </div>
-
-                                        <div style={{ flex: 1 }}>
+                                        <div>
                                             <Text style={{ fontWeight: 500 }}>
                                                 {file.createdOn ? moment(file.createdOn).format('MMMM DD, YYYY') : 'No date available'}
                                             </Text>
-                                            <br />
                                         </div>
-
                                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                             <FilePdfOutlined style={{ color: 'red', fontSize: 24 }} />
                                             <Link onClick={() => handleDownload(file.fileRef)} style={{ color: "#1890ff", cursor: "pointer" }}>

@@ -24,9 +24,9 @@ const AddNoteForm = ({ onClose, onSubmit, isLoading }) => {
         rules={[{ required: true, message: 'Please select appointment type' }]}
       >
         <Select placeholder="Select appointment type">
-          <Option value={0}>Follow-Up</Option>
-          <Option value={1}>Initial Assessment - Initial Consult</Option>
-          <Option value={2}>Initial Assessment - Second Consult</Option>
+          <Option value={1}>Follow-Up</Option>
+          <Option value={2}>Initial Assessment - Initial Consult</Option>
+          <Option value={3}>Initial Assessment - Second Consult</Option>
         </Select>
       </Form.Item>
 

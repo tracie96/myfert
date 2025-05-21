@@ -884,8 +884,8 @@ export default function PatDash() {
                           alignItems: 'center',
                           gap: 8,
                           marginTop: 16,
-                          opacity: (checklistItems.learnVideos) ? 1 : 0.5,
-                          pointerEvents: ( checklistItems.learnVideos) ? 'auto' : 'none'
+                          opacity: (userAuth?.obj?.videoWatched && getAccessDetailsStatus()) ? 1 : 0.5,
+                          pointerEvents: ( userAuth?.obj?.videoWatched && getAccessDetailsStatus()) ? 'auto' : 'none'
                         }}
                         onClick={() => window.open('/patient/services')}
                       >

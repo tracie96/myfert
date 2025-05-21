@@ -75,7 +75,7 @@ const Note = () => {
   const handleViewMore = () => {
     setVisibleNotes(prev => prev + 3);
   };
-
+console.log({notes})
   const addNote = async (newNote) => {
     try {
       const result = await dispatch(addPatientNotes({

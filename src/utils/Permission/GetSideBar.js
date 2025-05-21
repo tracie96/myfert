@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import fertilityImage from "../../assets/images/auth/fertilityImage.svg";
 import { useSelector } from "react-redux";
-import { Menu, Button, Drawer, Layout } from "antd";
+import { Menu, Button, Drawer, Layout, Modal } from "antd";
 import { useMediaQuery } from "react-responsive";
 // Import React Icons
 import { 
@@ -17,12 +17,14 @@ import {
   FaBars, 
   FaServicestack,
   FaBook,
+  FaSignOutAlt,
 } from "react-icons/fa";
 import { FaNotesMedical } from "react-icons/fa";
 export const GetSideBar = () => {
   const { userAuth } = useSelector((state) => state.authentication);
   const accessDetails = useSelector((state) => state.intake.accessDetails);
   const [visible, setVisible] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const { Sider } = Layout;
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const location = useLocation();
@@ -32,6 +34,16 @@ export const GetSideBar = () => {
 
   const onClose = () => {
     setVisible(false);
+  };
+
+  const handleLogout = () => {
+    // Add your logout logic here
+    localStorage.clear();
+    window.location.href = "/";
+  };
+
+  const handleCloseLogoutModal = () => {
+    setShowLogoutModal(false);
   };
 
   const getSelectedKey = () => {
@@ -178,6 +190,13 @@ export const GetSideBar = () => {
           <span>NOTES</span>
         </NavLink>
       </Menu.Item>
+      <Menu.Item 
+        key="7" 
+        icon={<FaSignOutAlt style={{ color: "#00ADEF" }} />}
+        onClick={() => setShowLogoutModal(true)}
+      >
+        <span>LOGOUT</span>
+      </Menu.Item>
     </Menu>
   );
 
@@ -315,7 +334,7 @@ export const GetSideBar = () => {
                 onClose={onClose}
                 visible={visible}
                 bodyStyle={{ padding: 0 }}
-                width={250} // Set the width of the Drawer here
+                width={250}
               >
                 <NavLink
                   className="sidebar-brand d-flex align-items-center justify-content-center"
@@ -362,6 +381,73 @@ export const GetSideBar = () => {
               {doctorMenuItems}
             </Sider>
           )}
+          <Modal
+            open={showLogoutModal}
+            onCancel={handleCloseLogoutModal}
+            footer={null}
+            centered
+          >
+            <div style={{
+              padding: '12px 32px 16px 32px',
+              color: '#222',
+              fontSize: '1.1rem',
+              lineHeight: 1.6,
+              textAlign: 'center',
+            }}>
+              Select <span style={{ color: '#335cad', fontWeight: 600, background: '#e6eaf2', padding: '2px 8px', borderRadius: 6 }}>
+                "Logout"
+              </span> if you are ready to end your current session.
+            </div>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              gap: 16,
+              padding: '20px 32px 28px 32px',
+              background: '#f8fafc',
+              borderBottomLeftRadius: 16,
+              borderBottomRightRadius: 16,
+              borderTop: '1px solid #e6eaf2',
+            }}>
+              <button
+                style={{
+                  minWidth: 110,
+                  padding: '10px 0',
+                  borderRadius: 8,
+                  fontWeight: 600,
+                  fontSize: '1rem',
+                  border: 'none',
+                  background: '#e6eaf2',
+                  color: '#335cad',
+                  transition: 'background 0.2s',
+                  cursor: 'pointer',
+                }}
+                onMouseOver={e => (e.currentTarget.style.background = '#d0d8e8')}
+                onMouseOut={e => (e.currentTarget.style.background = '#e6eaf2')}
+                onClick={handleCloseLogoutModal}
+              >
+                Cancel
+              </button>
+              <button
+                style={{
+                  minWidth: 110,
+                  padding: '10px 0',
+                  borderRadius: 8,
+                  fontWeight: 600,
+                  fontSize: '1rem',
+                  border: 'none',
+                  background: '#335cad',
+                  color: '#fff',
+                  transition: 'background 0.2s',
+                  cursor: 'pointer',
+                }}
+                onMouseOver={e => (e.currentTarget.style.background = '#274080')}
+                onMouseOut={e => (e.currentTarget.style.background = '#335cad')}
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+            </div>
+          </Modal>
         </div>
       </>
     );

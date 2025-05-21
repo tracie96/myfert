@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { List, Card, Avatar, Typography, Button, Divider, Row, Col, Modal, Form, Input, Dropdown, Menu } from "antd";
-import { MoreOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { List, Card, Avatar, Typography, Divider, Row, Col, Modal, Form, Input } from "antd";
 
 const { Text } = Typography;
 const { TextArea } = Input;
@@ -36,51 +35,33 @@ const NotesList = ({ notes, onViewMore }) => {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [form] = Form.useForm();
-  const handleEdit = (note) => {
-    const values = {};
-    note.progressNotes.forEach(noteText => {
-      const [type, content] = noteText.split(': ');
-      switch(type) {
-        case 'Subjective':
-          values.subjective = content;
-          break;
-        case 'Objective':
-          values.objective = content;
-          break;
-        case 'Assessment':
-          values.assessment = content;
-          break;
-        case 'Plan':
-          values.patientPlan = content;
-          break;
-        default:
-          break;
-      }
-    });
-    values.personalNote = note.personalNotes;
-    form.setFieldsValue(values);
-    setIsEditModalVisible(true);
-  };
-
-  const handleDelete = (note) => {
-    console.log('Deleting note:', note);
-    setIsDeleteModalVisible(true);
-  };
+  // const handleEdit = (note) => {
+  //   const values = {};
+  //   note.progressNotes.forEach(noteText => {
+  //     const [type, content] = noteText.split(': ');
+  //     switch(type) {
+  //       case 'Subjective':
+  //         values.subjective = content;
+  //         break;
+  //       case 'Objective':
+  //         values.objective = content;
+  //         break;
+  //       case 'Assessment':
+  //         values.assessment = content;
+  //         break;
+  //       case 'Plan':
+  //         values.patientPlan = content;
+  //         break;
+  //       default:
+  //         break;
+  //     }
+  //   });
+  //   values.personalNote = note.personalNotes;
+  //   form.setFieldsValue(values);
+  //   setIsEditModalVisible(true);
+  // };
 
 
-
-
-
-  const menu = (note) => (
-    <Menu>
-      <Menu.Item key="edit" icon={<EditOutlined />} onClick={() => handleEdit(note)}>
-        Edit Note
-      </Menu.Item>
-      <Menu.Item key="delete" icon={<DeleteOutlined />} onClick={() => handleDelete(note)}>
-        Delete Note
-      </Menu.Item>
-    </Menu>
-  );
 
   return (
     <Card bordered={false}>
@@ -168,18 +149,18 @@ const NotesList = ({ notes, onViewMore }) => {
               <Col span={4}>
                 <Text>{item.personalNotes || 'No personal notes'}</Text>
               </Col>
-              <Col span={1}>
+              {/* <Col span={1}>
                 <Dropdown overlay={menu(item)} trigger={['click']}>
                   <MoreOutlined style={{ fontSize: '20px', cursor: 'pointer' }} />
                 </Dropdown>
-              </Col>
+              </Col> */}
             </Row>
           </List.Item>
         )}
       />
-      <div style={{ textAlign: "right", marginTop: 16 }}>
+      {/* <div style={{ textAlign: "right", marginTop: 16 }}>
         <Button type="link" onClick={onViewMore}>View More</Button>
-      </div>
+      </div> */}
 
       <Modal
         title="Edit Note"

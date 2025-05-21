@@ -109,9 +109,7 @@ function Navbar() {
         </div> : ''}
         {/* Topbar Navbar */}
         <ul className="navbar-nav ml-auto">
-          {/* Nav Item - Alerts */}
           <li className="nav-item dropdown no-arrow mx-1">
-            {/* Dropdown - Alerts */}
             <div
               className="dropdown dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
               aria-labelledby="alertsDropdown"

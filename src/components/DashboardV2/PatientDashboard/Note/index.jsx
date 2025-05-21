@@ -3,26 +3,19 @@ import NotesList from './NotesList';
 import ViewMoreButton from './ViewMoreButton';
 import '../../DoctorDashboard/Note/note.css';
 import { useDispatch, useSelector } from 'react-redux';
-import { Modal, Button } from 'antd';
-import { useNavigate } from 'react-router-dom';
 import { getPatientNotes } from '../../../redux/patientSlice';
 
 const PatientNote = () => {
   const [notes, setNotes] = useState([]);
   const [visibleNotes, setVisibleNotes] = useState(3);
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const patient = JSON.parse(localStorage.getItem("patient")) || { userRef: "" };
   const { notes: patientNotes, status, error } = useSelector((state) => state.patient);
 
   useEffect(() => {
-    if (!patient.userRef) {
-      setIsModalVisible(true);
-    } else {
+   
       dispatch(getPatientNotes());
-    }
-  }, [patient.userRef, dispatch]);
+    
+  }, [dispatch]);
 
   useEffect(() => {
     if (patientNotes) {
@@ -52,9 +45,6 @@ const PatientNote = () => {
     }
   }, [patientNotes]);
 
-  const handleModalClose = () => {
-    navigate("/doctor");
-  };
 
   const handleViewMore = () => {
     setVisibleNotes(prev => prev + 3);
@@ -83,7 +73,6 @@ const PatientNote = () => {
 
   return (
     <div className="notes-container">
-      {patient.userRef ? (
         <>
           <div className="notes-card">
             <NotesList notes={notes.slice(0, visibleNotes)} />
@@ -94,21 +83,7 @@ const PatientNote = () => {
             )}
           </div>
         </>
-      ) : (
-        <Modal
-          title="No Patient Selected"
-          open={isModalVisible}
-          footer={[
-            <Button key="ok" type="primary" onClick={handleModalClose}>
-              Select Patient
-            </Button>
-          ]}
-          closable={false}
-          maskClosable={false}
-        >
-          <p>Please select a patient to view their notes.</p>
-        </Modal>
-      )}
+      
     </div>
   );
 };

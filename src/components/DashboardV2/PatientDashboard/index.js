@@ -344,7 +344,7 @@ export default function PatDash() {
             }}>
               <input
                 type="checkbox"
-                checked={checklistItems.learnVideos}
+                checked={checklistItems.learnVideos || userAuth?.obj?.videoWatched}
                 style={{
                   width: "20px",
                   height: "20px",

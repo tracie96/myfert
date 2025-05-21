@@ -26,11 +26,11 @@ const PatientNote = () => {
         const date = new Date(year, month - 1, day); // month is 0-based in JS Date
 
         return {
-          profileImage: "https://cdn.builder.io/api/v1/image/assets/TEMP/03d8574713eae32df92c6306c07473dcda5418d6", // Default image
+          profileImage: note.doctorPicture || "https://cdn.builder.io/api/v1/image/assets/TEMP/03d8574713eae32df92c6306c07473dcda5418d6",
           name: note.providerName || "Current User",
           role: note.providerRole || "Clinician",
           date: date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
-          appointmentType: getAppointmentTypeString(note.appointType),
+          appointmentType:note.appointType,
           progressNotes: [
             `Subjective: ${note.subjective || ''}`,
             `Objective: ${note.objective || ''}`,
@@ -50,18 +50,7 @@ const PatientNote = () => {
     setVisibleNotes(prev => prev + 3);
   };
 
-  const getAppointmentTypeString = (type) => {
-    switch (type) {
-      case 0:
-        return 'Follow-Up';
-      case 1:
-        return 'Initial Assessment - Initial Consult';
-      case 2:
-        return 'Initial Assessment - Second Consult';
-      default:
-        return 'Follow-Up';
-    }
-  };
+
 
   if (status === 'loading') {
     return <div>Loading notes...</div>;

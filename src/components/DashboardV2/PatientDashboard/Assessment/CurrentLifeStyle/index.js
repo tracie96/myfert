@@ -425,22 +425,27 @@ console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
       case "checkbox_with_select":
         break;
         case "radio": {
-          if (answers[question.name] === undefined) {
-            return false; 
+          const value = answers[question.name];
+        
+          // General validation: answer must exist and be a valid option
+          if (value === undefined || value === "") {
+            return false;
           }
-    
-          if (answers[question.name] === "Yes" && (
-            question.name === "do_you_use_sleeping_aids" ||
-            question.name === "problems_limiting_exercise" ||
-            question.name === "sore_after_exercise"
-          )) {
+        
+          // For specific fields, if value is 'Yes', check additional input field
+          if (
+            value === "Yes" &&
+            (
+              question.name === "do_you_use_sleeping_aids" ||
+              question.name === "problems_limiting_exercise" ||
+              question.name === "sore_after_exercise"
+            )
+          ) {
             const inputFieldName = `${question.name}_other`;
-            if (!answers[inputFieldName] || answers[inputFieldName] === "") {
-              console.log(`Validation Failed: ${question.name} is Yes, but input field is empty.`);
+            if (!answers[inputFieldName] || answers[inputFieldName].trim() === "") {
               return false;
             }
           }
-    
           return true;
         }
 
@@ -473,14 +478,42 @@ console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
         return (
           answers[question.name] !== undefined && answers[question.name] !== ""
         );
+        case "select": {
+          const value = answers[question.name];
+          if (value === undefined || value === "") {
+            return false;
+          }
+          return true;
+        }
+        
+        case "ranking": {
+          // Only validate if the user answered "Yes" to the preceding health concern question
+          if (answers["do_you_have_current_health_concern"] === "Yes") {
+            if (!currentConcern || currentConcern.length === 0) {
+              return false;
+            }
+        
+            // Optional: Ensure each concern has all fields filled before proceeding
+            for (const concern of currentConcern) {
+              if (
+                !concern.problem ||
+                !concern.severity ||
+                !concern.priorTreatment ||
+                !concern.success
+              ) {
+                message.error("Please complete all fields for each health concern.");
+                return false;
+              }
+            }
+          }
+        
+          return true;
+        }
 
       default:
         return true;
     }
   };
-
-
-
 
   const label = (
     <span>

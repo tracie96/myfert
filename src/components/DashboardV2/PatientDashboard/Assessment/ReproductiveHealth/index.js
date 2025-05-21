@@ -716,20 +716,19 @@ const ReproductiveHealth = ({ onComplete }) => {
                 allSubQuestionsUnsure = false;
             }
             
-          const validCervicalMucusNames = [
-            "cervical_mucus",
-            "pre_spotting_sub",
-            "Watery_mucus_sub",
-            "egg_white_mucus_sub",
-            "after_period_spot_sub"
-          ];
+          // const validCervicalMucusNames = [
+          //   "cervical_mucus",
+          //   "pre_spotting_sub",
+          //   "Watery_mucus_sub",
+          //   "egg_white_mucus_sub",
+          //   "after_period_spot_sub"
+          // ];
+          // if (validCervicalMucusNames.includes(subQuestion.name)) {
+          //   return true;
+          // }
 
-          if (validCervicalMucusNames.includes(subQuestion.name)) {
-            return true;
-          }
-
-            // Validate number_with_radio_sub questions if not "Unsure"
-            if (subQuestion.type === "number_with_radio_sub") {
+            // Validate number_with_radio_sub questions if not "Unsure" 
+            if (subQuestion.type === "number_with_radio_sub" && subQuestion.name !== "longest_cycle_radio" && subQuestion.name !== "shortest_cycle_radio" && subQuestion.name !== "average_cycle_radio") {
               if (!subUnsure) {
                 const parsed = Number(subAnswer);
                 if (isNaN(parsed) || parsed === 0) {

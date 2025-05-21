@@ -664,7 +664,7 @@ pre code {
 .learnButton {
   background-color: #C2E6F8;
   border-color: none;
-  color: #00ADEF;
+  /* color: #00ADEF; */
   width: 80px;
   height: 32px;
   font-size: 14px;

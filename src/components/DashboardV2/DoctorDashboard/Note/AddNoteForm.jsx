@@ -24,30 +24,64 @@ const AddNoteForm = ({ onClose, onSubmit, isLoading }) => {
         rules={[{ required: true, message: 'Please select appointment type' }]}
       >
         <Select placeholder="Select appointment type">
-          <Option value="Follow-Up">Follow-Up</Option>
-          <Option value="Initial Assessment - Initial Consult">Initial Assessment - Initial Consult</Option>
-          <Option value="Initial Assessment - Second Consult">Initial Assessment - Second Consult</Option>
+          <Option value={0}>Follow-Up</Option>
+          <Option value={1}>Initial Assessment - Initial Consult</Option>
+          <Option value={2}>Initial Assessment - Second Consult</Option>
         </Select>
       </Form.Item>
 
       <Form.Item
-        name="progressNotes"
-        label="Progress Notes"
-        rules={[{ required: true, message: 'Please enter progress notes' }]}
+        name="subjective"
+        label="Subjective"
+        rules={[{ required: true, message: 'Please enter subjective notes' }]}
       >
         <TextArea 
           rows={4} 
-          placeholder="Enter progress notes (S: Subjective, O: Objective, A: Assessment, P: Plan)"
+          placeholder="Enter patient's reported symptoms and concerns"
         />
       </Form.Item>
 
       <Form.Item
-        name="personalNotes"
-        label="Personal Notes"
+        name="objective"
+        label="Objective"
+        rules={[{ required: true, message: 'Please enter objective findings' }]}
       >
         <TextArea 
           rows={4} 
-          placeholder="Enter personal notes (optional)"
+          placeholder="Enter measurable observations and test results"
+        />
+      </Form.Item>
+
+      <Form.Item
+        name="assessment"
+        label="Assessment"
+        rules={[{ required: true, message: 'Please enter assessment' }]}
+      >
+        <TextArea 
+          rows={4} 
+          placeholder="Enter your professional assessment and diagnosis"
+        />
+      </Form.Item>
+
+      <Form.Item
+        name="patientPlan"
+        label="Plan"
+        rules={[{ required: true, message: 'Please enter treatment plan' }]}
+      >
+        <TextArea 
+          rows={4} 
+          placeholder="Enter treatment plan and next steps"
+        />
+      </Form.Item>
+
+      <Form.Item
+        name="personalNote"
+        label="Personal Notes"
+        rules={[{ required: true, message: 'Please enter personal notes' }]}
+      >
+        <TextArea 
+          rows={4} 
+          placeholder="Enter personal notes"
         />
       </Form.Item>
 

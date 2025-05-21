@@ -620,7 +620,7 @@ export const fetchPatientNotes = createAsyncThunk(
 
 export const addPatientNotes = createAsyncThunk(
   "doctor/addPatientNotes",
-  async ({ patientNote, personalNote, appointmentType, patientRef }, { rejectWithValue, getState, dispatch }) => {
+  async ({ personalNote, subjective, objective, assessment, patientPlan, appointmentType, patientRef }, { rejectWithValue, getState, dispatch }) => {
     const user = getState()?.authentication?.userAuth;
     const config = {
       headers: {
@@ -632,7 +632,57 @@ export const addPatientNotes = createAsyncThunk(
     try {
       const response = await axios.post(
         `${baseUrl}Doctor/AddPatientNotes`,
-        { patientNote, personalNote, appointmentType, patientRef },
+        { personalNote, subjective, objective, assessment, patientPlan, appointmentType, patientRef },
+        config
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(handleApiError(error?.response?.data, dispatch, user));
+    }
+  }
+);
+
+export const editPatientNote = createAsyncThunk(
+  "doctor/editPatientNote",
+  async ({ personalNote, subjective, objective, assessment, patientPlan, noteId }, { rejectWithValue, getState, dispatch }) => {
+    const user = getState()?.authentication?.userAuth;
+    console.log(personalNote,subjective,objective,patientPlan ,assessment,'lll')
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+
+    try {
+      const response = await axios.post(
+        `${baseUrl}Doctor/EditPatientNote`,
+        { personalNote, subjective, objective, assessment, patientPlan, noteId },
+        config
+      );
+      return response.data;
+    } catch (error) {
+      console.log({error})
+      return rejectWithValue(handleApiError(error?.response?.data, dispatch, user));
+    }
+  }
+);
+
+export const deletePatientNote = createAsyncThunk(
+  "doctor/deletePatientNote",
+  async (noteId, { rejectWithValue, getState, dispatch }) => {
+    const user = getState()?.authentication?.userAuth;
+    console.log({noteId})
+    const config = {
+      headers: {
+        Accept: "text/plain",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+
+    try {
+      const response = await axios.get(
+        `${baseUrl}Doctor/DeletePatientNote/${noteId}`,
         config
       );
       return response.data;
@@ -658,7 +708,11 @@ const doctorSlices = createSlice({
     medications: [],
     patientNotes: [],
     loadingNotes: false,
-    notesError: null
+    notesError: null,
+    editingNote: false,
+    editNoteError: null,
+    deletingNote: false,
+    deleteNoteError: null
   },
   extraReducers: (builder) => {
     builder.addCase(patientList.pending, (state, action) => {
@@ -912,6 +966,42 @@ const doctorSlices = createSlice({
       .addCase(fetchPatientNotes.rejected, (state, action) => {
         state.loadingNotes = false;
         state.notesError = action.payload;
+      });
+
+    builder
+      .addCase(editPatientNote.pending, (state) => {
+        state.editingNote = true;
+        state.editNoteError = null;
+      })
+      .addCase(editPatientNote.fulfilled, (state, action) => {
+        state.editingNote = false;
+        // Update the note in the patientNotes array
+        const updatedNoteIndex = state.patientNotes.findIndex(note => note.noteId === action.payload.noteId);
+        if (updatedNoteIndex !== -1) {
+          state.patientNotes[updatedNoteIndex] = {
+            ...state.patientNotes[updatedNoteIndex],
+            ...action.payload
+          };
+        }
+      })
+      .addCase(editPatientNote.rejected, (state, action) => {
+        state.editingNote = false;
+        state.editNoteError = action.payload;
+      });
+
+    builder
+      .addCase(deletePatientNote.pending, (state) => {
+        state.deletingNote = true;
+        state.deleteNoteError = null;
+      })
+      .addCase(deletePatientNote.fulfilled, (state, action) => {
+        state.deletingNote = false;
+        // Remove the deleted note from the patientNotes array
+        state.patientNotes = state.patientNotes.filter(note => note.noteId !== action.meta.arg);
+      })
+      .addCase(deletePatientNote.rejected, (state, action) => {
+        state.deletingNote = false;
+        state.deleteNoteError = action.payload;
       });
   },
 });

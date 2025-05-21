@@ -1,0 +1,174 @@
+/* Import Inter font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+.notes-container {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 1033px;
+}
+
+/****************************
+ * Consultation Note Row Layout
+ ****************************/
+.consultation-note-row {
+  display: grid;
+  grid-template-columns: 220px 180px 1fr auto;
+  align-items: flex-start;
+  gap: 1.5rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(0,0,0,0.12);
+  background: none;
+  box-shadow: none;
+}
+
+@media (max-width: 900px) {
+  .consultation-note-row {
+    grid-template-columns: 1fr 1fr 2fr;
+    gap: 1rem;
+  }
+}
+@media (max-width: 640px) {
+  .consultation-note-row {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+  }
+}
+
+/****************************
+ * Profile Column
+ ****************************/
+.note-profile-col {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+.profile-image {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+.provider-name-text {
+  color: #a21caf;
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.1;
+}
+.provider-role {
+  color: #71717a;
+  font-size: 0.95em;
+  font-weight: 500;
+  margin-bottom: 0.1em;
+}
+.note-date {
+  color: #a1a1aa;
+  font-size: 0.85em;
+  margin-top: 0.2em;
+}
+
+/****************************
+ * Appointment Type Column
+ ****************************/
+.note-appt-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 120px;
+}
+.consultation-type {
+  font-size: 0.95em;
+  color: #27272a;
+  background: none;
+  font-weight: 500;
+}
+
+/****************************
+ * SOAP Notes Column
+ ****************************/
+.note-soap-col {
+  width: 100%;
+}
+.soap-notes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.soap-note {
+  display: block;
+  width: 100%;
+  padding: 0.6rem 1.1rem;
+  font-weight: 500;
+  line-height: 1.4;
+  border-radius: 0.7rem;
+  border-left: 4px solid transparent;
+  margin-bottom: 0;
+  font-size: 1em;
+  box-sizing: border-box;
+}
+.soap-note-pink {
+  background-color: #fdf2f8;
+  border-left-color: #a21caf;
+}
+.soap-note-slate {
+  background-color: #f1f5f9;
+  border-left-color: #64748b;
+}
+.soap-note-green {
+  background-color: #f0fdf4;
+  border-left-color: #22c55e;
+}
+.soap-note-orange {
+  background-color: #fff7ed;
+  border-left-color: #f59e42;
+}
+
+/****************************
+ * Additional Comments
+ ****************************/
+.additional-comments {
+  color: #52525b;
+  margin-top: 0.5rem;
+  font-size: 0.97em;
+}
+
+/****************************
+ * More Options
+ ****************************/
+.note-menu-col {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  min-width: 30px;
+}
+.more-options {
+  height: 1.2rem;
+  width: 1.2rem;
+  cursor: pointer;
+  margin-top: 0.2rem;
+}
+
+@media (max-width: 640px) {
+  .note-profile-col {
+    flex-direction: row;
+    align-items: center;
+  }
+  .profile-info {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .note-appt-col, .note-soap-col {
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+} 

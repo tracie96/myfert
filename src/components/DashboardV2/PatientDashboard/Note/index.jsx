@@ -26,7 +26,6 @@ const PatientNote = () => {
 
   useEffect(() => {
     if (patientNotes) {
-      // Transform the API response to match our UI format
       const formattedNotes = patientNotes.map(note => {
         // Parse the date string
         const [datePart] = note.createdOn.split(' ');
@@ -39,7 +38,12 @@ const PatientNote = () => {
           role: note.providerRole || "Clinician",
           date: date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
           appointmentType: getAppointmentTypeString(note.appointType),
-          progressNotes: note.note ? note.note.split('\n').filter(note => note.trim()) : [],
+          progressNotes: [
+            `Subjective: ${note.subjective || ''}`,
+            `Objective: ${note.objective || ''}`,
+            `Assessment: ${note.assessment || ''}`,
+            `Plan: ${note.patientPlan || ''}`
+          ],
           personalNotes: note.personalNote || '',
           nameColor: "text-[#F2AA93]" 
         };

@@ -77,13 +77,20 @@
 }
 
 .name-role-container {
-  margin-left: 42px;
-  margin-top: -32px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
 }
 
 .name-text {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: bold;
+}
+
+.role-text {
+  font-size: 13px;
+  color: #666;
 }
 
 .date-text {
@@ -285,8 +292,16 @@
 .note-row {
   display: flex;
   align-items: flex-start;
-  border-bottom: 1px solid #e5eaf2;
   padding: 24px 0;
+  border-bottom: 1px solid #e5eaf2;
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
+  margin: 0;
+}
+
+.note-row:last-child {
+  border-bottom: none;
 }
 
 .note-header {
@@ -305,9 +320,45 @@
 }
 
 .profile-col {
-  width: 160px;
-  min-width: 140px;
+  min-width: 160px;
+  display: flex;
+  flex-direction: column;
   align-items: flex-start;
+  padding-right: 16px;
+}
+
+.profile-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.profile-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 0;
+}
+
+.name-text {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 0;
+}
+
+.role-text {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+  margin-left: 8px;
+}
+
+.date-text {
+  font-size: 12px;
+  color: #a0a0a0;
+  margin-top: 2px;
+  margin-left: 50px;
 }
 
 .appt-col {
@@ -330,28 +381,11 @@
   align-items: flex-end;
 }
 
-.profile-image {
-  width: 32px;
-  height: 32px;
-  margin-bottom: 10px;
-}
-
-.name-text {
-  font-size: 13px;
-  font-weight: bold;
-}
-
-.date-text {
-  font-size: 11px;
-  color: #888;
-  margin-top: 8px;
-}
-
 .notes-list {
   display: flex;
   flex-direction: column;
   gap: 0;
-  margin-bottom: 32px;
+  margin-bottom: 0;
 }
 
 @media (max-width: 1024px) {
@@ -368,7 +402,47 @@
     width: 100%;
     min-width: 0;
   }
-} 
+}
+
+@media (max-width: 900px) {
+  .note-row, .note-header {
+    flex-direction: column;
+    padding: 18px 0;
+  }
+  .profile-col {
+    padding-right: 0;
+    margin-bottom: 8px;
+  }
+  .date-text {
+    margin-left: 0;
+  }
+}
+
 .ant-btn-primary {
   background: #01acee;
   border: 1px solid #01acee;}
+
+.empty-state-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  padding: 40px;
+}
+
+.empty-state-text {
+  color: #666;
+  font-size: 14px;
+  text-align: center;
+  max-width: 300px;
+  line-height: 1.5;
+}
+
+.loading-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  color: #666;
+  font-size: 14px;
+}

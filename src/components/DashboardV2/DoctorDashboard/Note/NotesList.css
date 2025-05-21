@@ -1,0 +1,104 @@
+.notes-list {
+  width: 100%;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.note-row {
+  display: flex;
+  padding: 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.note-row:last-child {
+  border-bottom: none;
+}
+
+.note-header {
+  background-color: #fafafa;
+  font-weight: 500;
+}
+
+.note-col {
+  padding: 0 8px;
+}
+
+.profile-col {
+  flex: 0 0 200px;
+}
+
+.appt-col {
+  flex: 0 0 150px;
+}
+
+.progress-col {
+  flex: 1;
+}
+
+.personal-col {
+  flex: 0 0 200px;
+}
+
+.menu-col {
+  flex: 0 0 50px;
+  text-align: right;
+}
+
+.note-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.note-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.note-profile-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.note-date {
+  font-size: 12px;
+  color: #8c8c8c;
+  margin-top: 4px;
+}
+
+.progress-notes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.progress-note-item {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border-left: 4px solid;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.progress-note-label {
+  font-weight: 600;
+  min-width: 100px;
+}
+
+.progress-note-content {
+  flex: 1;
+}
+
+.personal-note {
+  color: #595959;
+  font-style: italic;
+}
+
+.note-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+} 

@@ -722,14 +722,15 @@ const ReproductiveHealth = ({ onComplete }) => {
           //   "egg_white_mucus_sub",
           //   "after_period_spot_sub"
           // ];
-          
-          // // Check if subQuestion name is one of the valid names
+
           // if (validCervicalMucusNames.includes(subQuestion.name)) {
           //   return true;
           // }
 
-            // Validate number_with_radio_sub questions if not "Unsure"
-            if (subQuestion.type === "number_with_radio_sub" || subQuestion.type === "number_with_radio") {
+
+            // Validate number_with_radio_sub questions if not "Unsure" 
+            if (subQuestion.type === "number_with_radio_sub" && subQuestion.name !== "longest_cycle_radio" && subQuestion.name !== "shortest_cycle_radio" && subQuestion.name !== "average_cycle_radio") {
+
               if (!subUnsure) {
                 const parsed = Number(subAnswer);
                 if (isNaN(parsed) || parsed === 0) {

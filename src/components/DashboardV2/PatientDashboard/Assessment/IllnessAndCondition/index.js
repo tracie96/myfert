@@ -300,17 +300,6 @@ const questions = [
     radioName: "other",
     radioOptions: [{ label: "comments", value: "Comments" }],
   },
-
-  {
-    type: "date_radio",
-    name: "injuries",
-    question: "Injuries",
-    sub: "Broken bone(s)",
-    dateName: "injuries",
-    title: "Medical History: Illnesses/Conditions",
-    radioName: "injuriess",
-    radioOptions: [{ label: "comments", value: "Comments" }],
-  },
   {
     type: "date_radio",
     name: "back_injury",
@@ -339,7 +328,7 @@ const questions = [
     sub: "Broken bone(s)",
     dateName: "injuries",
     title: "Medical History: Illnesses/Conditions",
-    radioName: "Injuries",
+    radioName: "injuries",
     radioOptions: [{ label: "comments", value: "Comments" }],
   },
   {
@@ -364,12 +353,12 @@ const questions = [
   },
   {
     type: "date_radio",
-    name: "head_injury",
+    name: "head_injury_others",
     question: "Injuries",
     sub: "Others",
-    dateName: "head_injury",
+    dateName: "head_injury_others",
     title: "Medical History: Illnesses/Conditions",
-    radioName: "head_injury",
+    radioName: "head_injury_others",
     radioOptions: [
       { label: "others", value: "Others" },
 
@@ -510,110 +499,63 @@ const IllnessAndCondition = ({ onComplete }) => {
       console.log('Starting mapApiResponseToFormState with apiData:', apiData);
       const formAnswers = {};
 
+      if (apiData.gastroIntestinal && apiData.gastroIntestinal.length > 0) {
+        for (const item of apiData.gastroIntestinal) {
+          formAnswers[item.typeName] = item.yesNoNA;
+        }
+      }
+      
       if (apiData.respiratory && apiData.respiratory.length > 0) {
-        console.log('Found respiratory data:', apiData.respiratory);
         for (const item of apiData.respiratory) {
-          if (item.describe === "irritableBowel") formAnswers.irritableBowel = "yes";
-          if (item.describe === "gerd") formAnswers.gerd = "yes";
-          if (item.describe === "crohns") formAnswers.crohns = "yes";
-          if (item.describe === "peptic_ulcer") formAnswers.peptic_ulcer = "yes";
-          if (item.describe === "celiac") formAnswers.celiac = "yes";
-          if (item.describe === "gallstones") formAnswers.gallstones = "yes";
+          formAnswers[item.typeName] = item.yesNoNA;
         }
       }
 
       if (apiData.urinary && apiData.urinary.length > 0) {
         for (const item of apiData.urinary) {
-          if (item.describe === "kidney_stones") formAnswers.kidney_stones = "yes";
-          if (item.describe === "gout") formAnswers.gout = "yes";
-          if (item.describe === "interstitial_cystitis") formAnswers.interstitial_cystitis = "yes";
-          if (item.describe === "frequent_yeast_infections") formAnswers.frequent_yeast_infections = "yes";
-          if (item.describe === "frequent_urinary_tract_infections") formAnswers.frequent_urinary_tract_infections = "yes";
-          if (item.describe === "sexual_dysfunction") formAnswers.sexual_dysfunction = "yes";
-          if (item.describe === "sexual_transmitted_disease") formAnswers.sexual_transmitted_disease = "yes";
+          formAnswers[item.typeName] = item.yesNoNA;
         }
       }
 
       if (apiData.endocrine && apiData.endocrine.length > 0) {
         for (const item of apiData.endocrine) {
-          if (item.describe === "diabetes") formAnswers.diabetes = "yes";
-          if (item.describe === "hypothyroidism") formAnswers.hypothyroidism = "yes";
-          if (item.describe === "hyperthyroidism") formAnswers.hyperthyroidism = "yes";
-          if (item.describe === "polycystic") formAnswers.polycystic = "yes";
-          if (item.describe === "infertility") formAnswers.infertility = "yes";
-          if (item.describe === "metabolic_syndrome/insulin_resistance") formAnswers["metabolic_syndrome/insulin_resistance"] = "yes";
-          if (item.describe === "eating_disorder") formAnswers.eating_disorder = "yes";
-          if (item.describe === "hyperglycemia") formAnswers.hyperglycemia = "yes";
-        }
-      }
-
-      if (apiData.cardiovascular && apiData.cardiovascular.length > 0) {
-        for (const item of apiData.cardiovascular) {
-          if (item.describe === "angina") formAnswers.angina = "yes";
-          if (item.describe === "heart_attack") formAnswers.heart_attack = "yes";
-          if (item.describe === "heart_failure") formAnswers.heart_failure = "yes";
-          if (item.describe === "hypertension") formAnswers.hypertension = "yes";
-          if (item.describe === "stroke") formAnswers.stroke = "yes";
-          if (item.describe === "high_blood_fats") formAnswers.high_blood_fats = "yes";
-          if (item.describe === "rheumatic_fever") formAnswers.rheumatic_fever = "yes";
-          if (item.describe === "arrythmia") formAnswers.arrythmia = "yes";
-          if (item.describe === "murmur") formAnswers.murmur = "yes";
-          if (item.describe === "mitral_valve_prolapse") formAnswers.mitral_valve_prolapse = "yes";
-        }
-      }
-
-      if (apiData.neurologic && apiData.neurologic.length > 0) {
-        for (const item of apiData.neurologic) {
-          if (item.describe === "epilepsy_seizures") formAnswers.epilepsy_seizures = "yes";
-          if (item.describe === "ADD/ADHD") formAnswers["ADD/ADHD"] = "yes";
-          if (item.describe === "headaches") formAnswers.headaches = "yes";
-          if (item.describe === "migraines") formAnswers.migraines = "yes";
-          if (item.describe === "depression") formAnswers.depression = "yes";
-          if (item.describe === "anxiety") formAnswers.anxiety = "yes";
-          if (item.describe === "Autism") formAnswers.Autism = "yes";
-          if (item.describe === "multiple_sclerosis") formAnswers.multiple_sclerosis = "yes";
-          if (item.describe === "Parkinson's disease") formAnswers["Parkinson's disease"] = "yes";
-          if (item.describe === "dementia") formAnswers.dementia = "yes";
+          formAnswers[item.typeName] = item.yesNoNA;
         }
       }
 
       if (apiData.inflammatory && apiData.inflammatory.length > 0) {
         for (const item of apiData.inflammatory) {
-          if (item.describe === "rheumatoid_arthritis") formAnswers.rheumatoid_arthritis = "yes";
-          if (item.describe === "chronic_fatigue_syndrome") formAnswers.chronic_fatigue_syndrome = "yes";
-          if (item.describe === "food_allergies") formAnswers.food_allergies = "yes";
-          if (item.describe === "environmental_allergies") formAnswers.environmental_allergies = "yes";
-          if (item.describe === "multiple_chemical_sensitivities") formAnswers.multiple_chemical_sensitivities = "yes";
-          if (item.describe === "autoimmune_disease") formAnswers.autoimmune_disease = "yes";
-          if (item.describe === "immune_deficiency") formAnswers.immune_deficiency = "yes";
-          if (item.describe === "mononucleosis") formAnswers.mononucleosis = "yes";
+          formAnswers[item.typeName] = item.yesNoNA;
         }
       }
 
       if (apiData.musculoskeletal && apiData.musculoskeletal.length > 0) {
         for (const item of apiData.musculoskeletal) {
-          if (item.describe === "fibromyalgia") formAnswers.fibromyalgia = "yes";
-          if (item.describe === "osteoarthritis") formAnswers.osteoarthritis = "yes";
-          if (item.describe === "chronic_pain") formAnswers.chronic_pain = "yes";
+          formAnswers[item.typeName] = item.yesNoNA;
         }
       }
 
       if (apiData.skin && apiData.skin.length > 0) {
         for (const item of apiData.skin) {
-          if (item.describe === "eczema") formAnswers.eczema = "yes";
-          if (item.describe === "psoriasis") formAnswers.psoriasis = "yes";
-          if (item.describe === "acne") formAnswers.acne = "yes";
-          if (item.describe === "skin_cancer") formAnswers.skin_cancer = "yes";
+          formAnswers[item.typeName] = item.yesNoNA;
         }
       }
 
+      if (apiData.cardiovascular && apiData.cardiovascular.length > 0) {
+        for (const item of apiData.cardiovascular) {
+          formAnswers[item.typeName] = item.yesNoNA;
+        }
+      }
+      
+      if (apiData.neurologic && apiData.neurologic.length > 0) {
+        for (const item of apiData.neurologic) {
+          formAnswers[item.typeName] = item.yesNoNA;
+        }
+      }
+      
       if (apiData.cancer && apiData.cancer.length > 0) {
         for (const item of apiData.cancer) {
-          if (item.describe === "lung") formAnswers.lung = "yes";
-          if (item.describe === "breast") formAnswers.breast = "yes";
-          if (item.describe === "colon") formAnswers.colon = "yes";
-          if (item.describe === "ovarian") formAnswers.ovarian = "yes";
-          if (item.describe === "skin") formAnswers.skin = "yes";
+          formAnswers[item.typeName] = item.yesNoNA;
         }
       }
 
@@ -647,7 +589,10 @@ const IllnessAndCondition = ({ onComplete }) => {
       handleDateRadioField(apiData.injuriesBack, 'back_injury');
       handleDateRadioField(apiData.injuriesNeck, 'neck_injury');
       handleDateRadioField(apiData.injuriesHead, 'head_injury');
-      handleDateRadioField(apiData.injuriesOther, 'Injuries');
+      handleDateRadioField(apiData.injuriesOther, 'head_injury_others');
+      if (apiData.injuriesOther?.otherName) {
+        formAnswers["head_injury_others_Others"] = apiData.injuriesOther.otherName;
+      }
       handleDateRadioField(apiData.surgeryAppen, 'appendectomy');
       handleDateRadioField(apiData.surgeryDental, 'dental');
       handleDateRadioField(apiData.gallBladder, 'gallbladder');
@@ -788,9 +733,9 @@ const IllnessAndCondition = ({ onComplete }) => {
 
       // Create API data for this category
       return subQuestions.map(subQuestion => ({
-        yesNo: answers[subQuestion.name] === "yes",
-        describe: answers[subQuestion.name] === "yes" ? subQuestion.name : ""
-      })).filter(item => item.yesNo); // Only include items that are yes
+        typeName: subQuestion.name,
+        yesNoNA: answers[subQuestion.name] || "n/a"
+      })); // Only include items that are yes
     };
 
     // Prepare the data to match the API structure
@@ -862,7 +807,7 @@ const IllnessAndCondition = ({ onComplete }) => {
       },
       injuriesBrokenBones: {
         date: answers.injuries_na ? "" : answers.injuries || "",
-        value: answers.injuriess_Comments || "",
+        value: answers.injuries_Comments || "",
       },
       injuriesBack: {
         date: answers.back_injury_na ? "" : answers.back_injury || "",
@@ -877,9 +822,9 @@ const IllnessAndCondition = ({ onComplete }) => {
         value: answers.head_injury_Comments || "",
       },
       injuriesOther: {
-        date: answers.Injuries_na ? "" : answers.Injuries || "",
-        value: answers.Injuries_Comments || "",
-        otherName: answers.Injuries_na ? "" : answers.Injuries_Comments || "",
+        date: answers.head_injury_others_na ? "" : answers.head_injury_others || "",
+        value: answers.head_injury_others_Comments || "",
+        otherName: answers.head_injury_others_Others || "", 
       },
       surgeryAppen: {
         date: answers.appendectomy_na ? "" : answers.appendectomy || "",

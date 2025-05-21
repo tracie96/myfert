@@ -4,8 +4,8 @@ import { Modal } from "react-bootstrap";
 const CustomModal = ({
   show,
   onHide,
-  size = "lg", // default size is large
-  classes = "", // default header color is primary
+  size = "lg", // 
+  classes = "",
   title,
   body,
   footer,

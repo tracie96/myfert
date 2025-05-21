@@ -319,6 +319,7 @@ const Nutrition = ({ onComplete }) => {
   
   const mapNutritionInfoToAnswers = (info) => {
     return {
+      does_skipping_meal_affect_you_other: info.reasonSkipMeal || "",
       special_nutritional_program: info.specialDietProgram || [],
       special_diet_reason: info.specialDietReason || "",
       sensitive_food: info.sensitiveToFood?.yesNo ? "Yes" : "No",
@@ -328,6 +329,7 @@ const Nutrition = ({ onComplete }) => {
       adversely_react: info.adverseList || [],
       crave_for_foods: info.anyFoodCraving?.yesNo ? "Yes" : "No",
       eat_3_meals: info.have3MealADay?.yesNo ? "Yes" : "No",
+      eat_3_meals_detail:info.have3MealADay?.yesNo === false? info.have3MealADay.level : "",
       meals_per_day: info.howManyEatOutPerWeek || "",
       does_skipping_meal_affect_you: info.skippingAMeal ? "Yes" : "No",
       actors_applyingto_current_lifestyle: info.eatingHabits || [],
@@ -360,7 +362,6 @@ const Nutrition = ({ onComplete }) => {
     };
   };
 
-  
   useEffect(() => {
     dispatch(getNutritionPatient());
   }, [dispatch]);
@@ -400,6 +401,15 @@ const Nutrition = ({ onComplete }) => {
     const question = questions[currentQuestionIndex];
   
     switch (question.type) {
+      case "long_select": {
+        const value = answers[question.name];
+        console.log("value--", value);
+        if (value === undefined || value === null || value === "" || value === 0) {
+          console.log(`Validation Failed: No value selected for ${question.name}`);
+          return false;
+        }
+        return true;
+      }
       case "checkbox_with_select":
         for (const option of question.options) {
           const checkboxChecked = answers[option.name] || false;
@@ -428,19 +438,29 @@ const Nutrition = ({ onComplete }) => {
         }
         return answers[question.name] !== undefined;
   
-      case "radio": {
-        if (answers[question.name] === undefined) {
-          console.log(`Validation Failed: No selection made for ${question.name}`);
-          return false;
-        }
-        if (["sensitive_food", "sensitive_food_caffeine"].includes(question.name) && answers[question.name] === "Yes") {
-          if (!answers[`${question.name}_other`] || answers[`${question.name}_other`] === "") {
-            console.log(`Validation Failed: ${question.name} is Yes, but input field is empty.`);
+        case "radio": {
+          const value = answers[question.name];
+        
+          if (value === undefined || value === null || value === "") {
+            console.log(`Validation Failed: No selection made for ${question.name}`);
             return false;
           }
+        
+          // Optional logic for specific radios needing extra input
+          if (
+            value === "Yes" &&
+            ["sensitive_food", "sensitive_food_caffeine"].includes(question.name)
+          ) {
+            const detailField = `${question.name}_other`;
+            if (!answers[detailField] || answers[detailField].trim() === "") {
+              console.log(`Validation Failed: ${detailField} required.`);
+              return false;
+            }
+          }
+        
+          return true;
         }
-        return true;
-      }
+        
   
       case "checkbox": {
         if (!answers[question.name] || answers[question.name].length === 0) {
@@ -455,7 +475,7 @@ const Nutrition = ({ onComplete }) => {
         }
         return true;
       }
-  
+      
       case "long_textarea":
         return answers[question.name] !== undefined && answers[question.name] !== "";
   
@@ -519,9 +539,12 @@ const Nutrition = ({ onComplete }) => {
       have3MealADay: {
         yesNo: answers.eat_3_meals === "Yes",
         level:
-          parseInt(answers?.meals_per_day?.replace(/[^0-9]/g, ""), 10) || 0,
+          answers.eat_3_meals === "No"
+            ? parseInt(answers["eat_3_meals_detail"] || "0", 10)
+            : 3, // default to 3 if answered Yes
       },
       skippingAMeal: answers.does_skipping_meal_affect_you === "Yes",
+      reasonSkipMeal:answers.does_skipping_meal_affect_you === "Yes" ? answers.does_skipping_meal_affect_you_other : "",
       howManyEatOutPerWeek: answers.meals_per_day || "",
       eatingHabits: answers.actors_applyingto_current_lifestyle || [],
       typicalBreakfast: answers.diet_detail_breakfast || "",

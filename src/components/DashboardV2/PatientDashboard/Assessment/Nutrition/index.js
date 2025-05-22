@@ -318,27 +318,33 @@ const Nutrition = ({ onComplete }) => {
   const patientNutritionInfo = useSelector((state) => state.intake?.patientNutritionInfo);
   
   const mapNutritionInfoToAnswers = (info) => {
+    const normalizeYesNo = (value) => {
+      if (value === true) return "Yes";
+      if (value === false) return "No";
+      return null;
+    };
+  
     return {
       does_skipping_meal_affect_you_other: info.reasonSkipMeal || "",
       special_nutritional_program: info.specialDietProgram || [],
       special_diet_reason: info.specialDietReason || "",
-      sensitive_food: info.sensitiveToFood?.yesNo ? "Yes" : "No",
+      sensitive_food: normalizeYesNo(info.sensitiveToFood?.yesNo),
       sensitive_food_other: info.sensitiveToFood?.describe || "",
       sensitive_food_info: info.sensitiveToFood?.describe || "",
-      aversion_to_certain_food: info.aversionToFood?.yesNo ? "Yes" : "No",
+      aversion_to_certain_food: normalizeYesNo(info.aversionToFood?.yesNo),
       adversely_react: info.adverseList || [],
-      crave_for_foods: info.anyFoodCraving?.yesNo ? "Yes" : "No",
-      eat_3_meals: info.have3MealADay?.yesNo ? "Yes" : "No",
-      eat_3_meals_detail:info.have3MealADay?.yesNo === false? info.have3MealADay.level : "",
+      crave_for_foods: normalizeYesNo(info.anyFoodCraving?.yesNo),
+      eat_3_meals: normalizeYesNo(info.have3MealADay?.yesNo),
+      eat_3_meals_detail: info.have3MealADay?.yesNo === "NO" ? info.have3MealADay.level : "",
       meals_per_day: info.howManyEatOutPerWeek || "",
-      does_skipping_meal_affect_you: info.skippingAMeal ? "Yes" : "No",
+      does_skipping_meal_affect_you: normalizeYesNo(info.skippingAMeal),
       actors_applyingto_current_lifestyle: info.eatingHabits || [],
       diet_detail_breakfast: info.typicalBreakfast || "",
       diet_detail_lunch: info.typicalLunch || "",
       diet_detail_dinner: info.typicalDinner || "",
       diet_detail_snacks: info.typicalSnacks || "",
       diet_detail_fluids: info.typicalFluid || "",
-      diet_servings_fruits: info.noTypicalFruits || 0,
+      diet_servings_fruits: info.noTypicalFruits !== undefined ? String(info.noTypicalFruits) : "",
       diet_serving_vegetables: info.noTypicalVegetables || 0,
       diet_servings_legumes: info.noTypicalLegumes || 0,
       diet_servings_meat: info.noTypicalRedMeat || 0,
@@ -348,19 +354,19 @@ const Nutrition = ({ onComplete }) => {
       diet_servings_fatsandoil: info.noTypicalFats || 0,
       diet_servings_soda: info.noTypicalCanSoda || 0,
       diet_servings_sweets: info.noTypicalSweets || 0,
-      caffeinated_beverages: info.caffeinatedBeverages ? "Yes" : "No",
+      caffeinated_beverages: normalizeYesNo(info.caffeinatedBeverages),
       coffee_amount: info.coffeeCups || "",
       tea_amount: info.teaCups || "",
       soda_amount: info.sodaCups || "",
-      sensitive_food_caffeine: info.adverseReactionToCoffee ? "Yes" : "No",
+      sensitive_food_caffeine: normalizeYesNo(info.adverseReactionToCoffee),
       sensitive_food_caffeine_feel: info.reactionToCaffeine || "",
-      // special_diet_reason:info.specialDietReason || "",
-      breakfast_time:info.breakfastTime || "",
-      lunch_time:info.lunchTime || "",
-      snack_time:info.snacksTime || "",
-      dinner_time:info.dinnerTime || "",
+      breakfast_time: info.breakfastTime || "",
+      lunch_time: info.lunchTime || "",
+      snack_time: info.snacksTime || "",
+      dinner_time: info.dinnerTime || "",
     };
   };
+  
 
   useEffect(() => {
     dispatch(getNutritionPatient());
@@ -812,25 +818,26 @@ const Nutrition = ({ onComplete }) => {
             />
           </div>
         );
-      case "long_select":
-        return (
-          <div style={{ flexDirection: "column" }}>
-            <br />
-            <Select
-              className="select_questtionnaire"
-              name={question.name}
-              value={answers[question.name] || ""}
-              onChange={(value) => handleChange(value, question.name)}
-              style={{ width: "292px", marginTop: "10px" }}
-            >
-              {question.selectOptions.map((option, index) => (
-                <Option key={index} value={option}>
-                  {option}
-                </Option>
-              ))}
-            </Select>
-          </div>
-        );
+        case "long_select":
+          return (
+            <div style={{ flexDirection: "column" }}>
+              <br />
+              <Select
+                className="select_questtionnaire"
+                name={question.name}
+                value={answers[question.name] !== undefined && answers[question.name] !== null ? answers[question.name] : ""}
+                onChange={(value) => handleChange(value, question.name)}
+                style={{ width: "292px", marginTop: "10px" }}
+              >
+                {question.selectOptions.map((option, index) => (
+                  <Option key={index} value={option}>
+                    {option}
+                  </Option>
+                ))}
+              </Select>
+            </div>
+          );
+        
       case "long_radio":
         return (
           <div style={{ flexDirection: "column" }}>

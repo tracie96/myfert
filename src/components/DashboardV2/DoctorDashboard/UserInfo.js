@@ -1572,10 +1572,18 @@ function SwitchContent({
                   {reproductiveInfo?.duringCirclePelvicPain?.colour || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Do You Pms Symptoms">
-                {Array.isArray(reproductiveInfo?.pmsSymptoms)
-                  ? reproductiveInfo.pmsSymptoms.join(', ')
-                  : "N/A"}
-              </Descriptions.Item>
+                  {Array.isArray(reproductiveInfo?.pmsSymptoms) && reproductiveInfo.pmsSymptoms.length > 0 ? (
+                    <div className="inside-table-content">
+                      {reproductiveInfo.pmsSymptoms.map((symptom, index) => (
+                        <Tag color="blue" key={index} className="m-1">
+                          {symptom}
+                        </Tag>
+                      ))}
+                    </div>
+                  ) : (
+                    "N/A"
+                  )}
+                </Descriptions.Item>
                 <Descriptions.Item label="pms Duration">
                   {reproductiveInfo?.pms?.duration || "N/A"}
                 </Descriptions.Item>

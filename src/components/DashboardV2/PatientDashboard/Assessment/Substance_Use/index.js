@@ -167,36 +167,41 @@ const SubstanceUse = ({ onComplete }) => {
   const patientSubstanceInfo = useSelector((state) => state.intake?.patientSubstanceInfo);
 
   const mapSubstanceInfoToAnswers = (info) => {
+    const normalizeYesNo = (value) => {
+      if (value === true) return "Yes";
+      if (value === false) return "No";
+      return null;
+    };
     return {
-      smoke_currently: info.smokePresently ? "Yes" : "No",
+      smoke_currently: normalizeYesNo(info.smokePresently?.yesNo),
       packs_per_day: info.smokingCurrently?.packsDay || 0,
       number_of_years: info.smokingCurrently?.years || 0,
       smoke_type: info.smokingCurrently?.type || "",
   
-      attempted_to_quit: info.attempedToQuit?.yesNo ? "Yes" : "No",
+      attempted_to_quit: normalizeYesNo(info.attempedToQuit?.yesNo),
       methods_to_stop_smoking: info.attempedToQuit?.describe || "",
   
-      smoked_previously: info.smokedInPast ? "Yes" : "No",
+      smoked_previously: normalizeYesNo(info.smokedInPast?.yesNo),
       packs_per_day_previous: info.smokedInPast?.packsDay || 0,
       number_of_years_previous: info.smokedInPast?.years || 0,
   
-      exposed_to_second_hand_smoke: info.exposedTo2ndSmoke ? "Yes" : "No",
+      exposed_to_second_hand_smoke: normalizeYesNo(info.exposedTo2ndSmoke?.yesNo),
   
       exposed_to_smoke: info.howManyAlcoholWeek || "",
   
       previous_alcohol_intake: info.previousAlcoholIntake?.yesNo ? "Yes" : "No",
       previous_packs_per_day: info.previousAlcoholIntake?.describe || "",
   
-      alcohol_problem: info.problemAlcohol ? "Yes" : "No",
+      alcohol_problem: normalizeYesNo(info.problemAlcohol?.yesNo),
       packs_per_day_when: info.problemAlcoholWhen || "",
       packs_per_day_expain: info.problemAlcoholExplain || "",
   
-      considered_help_for_alcohol: info.getHelpForDrinking ? "Yes" : "No",
+      considered_help_for_alcohol: normalizeYesNo(info.getHelpForDrinking?.yesNo),
   
-      using_recreational_drugs: info.currentlyRecreationalDrugs ? "Yes" : "No",
+      using_recreational_drugs: normalizeYesNo(info.currentlyRecreationalDrugs?.yesNo),
       recreational_drugs_type: info.currentlyRecreationalDrugsType || "",
   
-      inhaled_drugs: info.everUsedRecreationalDrugs ? "Yes" : "No",
+      inhaled_drugs: normalizeYesNo(info.everUsedRecreationalDrugs?.yesNo),
     };
   };
 

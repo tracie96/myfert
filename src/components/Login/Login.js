@@ -195,7 +195,7 @@ function Login() {
               </Text>
               {/* <Text onClick={handleResendOtp} style={{ cursor: 'pointer', color: '#01ADF0' }}>Resend OTP?</Text> */}
               <Text className="sign-up-link">
-                Don't have an account? <NavLink to="/patientSignup">Sign Up</NavLink>
+                Don't have an account? <NavLink to="/clinicianRegister">Sign Up</NavLink>
               </Text>
             </div>
           </Form>

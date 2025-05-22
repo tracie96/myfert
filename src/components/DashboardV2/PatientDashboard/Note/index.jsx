@@ -32,9 +32,9 @@ const PatientNote = () => {
           date: date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
           appointmentType:note.appointType,
           progressNotes: [
-            `Subjective: ${note.subjective || ''}`,
-            `Objective: ${note.objective || ''}`,
-            `Assessment: ${note.assessment || ''}`,
+            // `Subjective: ${note.subjective || ''}`,
+            // `Objective: ${note.objective || ''}`,
+            // `Assessment: ${note.assessment || ''}`,
             `Plan: ${note.patientPlan || ''}`
           ],
           personalNotes: note.personalNote || '',

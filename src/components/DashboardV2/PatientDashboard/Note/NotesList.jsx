@@ -69,7 +69,6 @@ const NotesList = ({ notes, onViewMore }) => {
         <Col span={5}><b>Profile</b></Col>
         <Col span={5}><b>Appt Type</b></Col>
         <Col span={9}><b>Progress Notes</b></Col>
-        <Col span={4}><b>Personal Notes</b></Col>
         <Col span={1}></Col>
       </Row>
       <Divider style={{ margin: "8px 0" }} />
@@ -126,14 +125,7 @@ const NotesList = ({ notes, onViewMore }) => {
                         display: 'flex',
                         alignItems: 'center'
                       }}>
-                        <Text style={{ 
-                          fontSize: '13px',
-                          fontWeight: 600,
-                          color: colors.text,
-                          marginRight: '8px'
-                        }}>
-                          {type}:
-                        </Text>
+                       
                         <Text style={{ 
                           fontSize: '14px',
                           color: '#262626',
@@ -146,9 +138,9 @@ const NotesList = ({ notes, onViewMore }) => {
                   })}
                 </ul>
               </Col>
-              <Col span={4}>
+              {/* <Col span={4}>
                 <Text>{item.personalNotes || 'No personal notes'}</Text>
-              </Col>
+              </Col> */}
               {/* <Col span={1}>
                 <Dropdown overlay={menu(item)} trigger={['click']}>
                   <MoreOutlined style={{ fontSize: '20px', cursor: 'pointer' }} />

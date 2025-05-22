@@ -431,7 +431,7 @@ function SwitchContent({
               <Descriptions column={1} bordered>
 
                 <Descriptions.Item label="Emergency Phone (Work)">
-                  {generalInfo.emergencyPhoneWork || "N/A"}
+                  {generalInfo.emergencyPhoneHome || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="How Did You Hear About Us?">
                   {generalInfo.howDidHearAbout || "N/A"}
@@ -536,13 +536,13 @@ function SwitchContent({
                 </Descriptions.Item>
                 <Descriptions.Item label="Strength">
                   <div style={{ marginBottom: "4px" }}>
-                    <strong>Type:</strong> <Tag color="green">{currentHealth?.strength?.type || "Strength"}</Tag>
+                    <strong>Type:</strong> <Tag color="green">{currentHealth?.strenght?.type || "Strength"}</Tag>
                   </div>
                   <div style={{ marginBottom: "4px" }}>
-                    <strong>Frequency:</strong> {currentHealth?.strength?.timesWeek || 0} times per week
+                    <strong>Frequency:</strong> {currentHealth?.strenght?.timesWeek || 0} times per week
                   </div>
                   <div>
-                    <strong>Duration:</strong> {currentHealth?.strength?.duration || 0} minutes
+                    <strong>Duration:</strong> {currentHealth?.strenght?.duration || 0} minutes
                   </div>
                 </Descriptions.Item>
 
@@ -753,7 +753,7 @@ function SwitchContent({
                     {nutrition.noTypicalFats || "N/A"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Caffeinated Beverages">
-                    {nutrition.caffeinatedBeverages || "N/A"}
+                    {nutrition.caffeinatedBeverages ? "Yes" : "No"}
                   </Descriptions.Item>
                 </Descriptions>
               )}

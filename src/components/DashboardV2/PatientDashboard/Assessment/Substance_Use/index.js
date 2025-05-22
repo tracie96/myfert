@@ -173,7 +173,7 @@ const SubstanceUse = ({ onComplete }) => {
       return null;
     };
     return {
-      smoke_currently: normalizeYesNo(info.smokePresently?.yesNo),
+      smoke_currently: normalizeYesNo(info.smokePresently),
       packs_per_day: info.smokingCurrently?.packsDay || 0,
       number_of_years: info.smokingCurrently?.years || 0,
       smoke_type: info.smokingCurrently?.type || "",
@@ -181,27 +181,27 @@ const SubstanceUse = ({ onComplete }) => {
       attempted_to_quit: normalizeYesNo(info.attempedToQuit?.yesNo),
       methods_to_stop_smoking: info.attempedToQuit?.describe || "",
   
-      smoked_previously: normalizeYesNo(info.smokedInPast?.yesNo),
+      smoked_previously: normalizeYesNo(info.smokedInPast?.type),
       packs_per_day_previous: info.smokedInPast?.packsDay || 0,
       number_of_years_previous: info.smokedInPast?.years || 0,
   
-      exposed_to_second_hand_smoke: normalizeYesNo(info.exposedTo2ndSmoke?.yesNo),
+      exposed_to_second_hand_smoke: normalizeYesNo(info.exposedTo2ndSmoke),
   
       exposed_to_smoke: info.howManyAlcoholWeek || "",
   
       previous_alcohol_intake: info.previousAlcoholIntake?.yesNo ? "Yes" : "No",
       previous_packs_per_day: info.previousAlcoholIntake?.describe || "",
   
-      alcohol_problem: normalizeYesNo(info.problemAlcohol?.yesNo),
+      alcohol_problem: normalizeYesNo(info.problemAlcohol),
       packs_per_day_when: info.problemAlcoholWhen || "",
       packs_per_day_expain: info.problemAlcoholExplain || "",
   
-      considered_help_for_alcohol: normalizeYesNo(info.getHelpForDrinking?.yesNo),
+      considered_help_for_alcohol: normalizeYesNo(info.getHelpForDrinking),
   
-      using_recreational_drugs: normalizeYesNo(info.currentlyRecreationalDrugs?.yesNo),
+      using_recreational_drugs: normalizeYesNo(info.currentlyRecreationalDrugs),
       recreational_drugs_type: info.currentlyRecreationalDrugsType || "",
   
-      inhaled_drugs: normalizeYesNo(info.everUsedRecreationalDrugs?.yesNo),
+      inhaled_drugs: normalizeYesNo(info.everUsedRecreationalDrugs),
     };
   };
 
@@ -211,6 +211,7 @@ const SubstanceUse = ({ onComplete }) => {
   }, [dispatch]);
   
   useEffect(() => {
+    console.log("Effect triggered. patientSubstanceInfo =", patientSubstanceInfo);
     const savedIndex = parseInt(localStorage.getItem("currentQuestionIndex4"), 10);
     const savedAnswers = JSON.parse(localStorage.getItem("answers"));
   
@@ -218,6 +219,7 @@ const SubstanceUse = ({ onComplete }) => {
       setCurrentQuestionIndex(savedIndex);
       setAnswers(savedAnswers);
     } else if (patientSubstanceInfo && Object.keys(patientSubstanceInfo).length > 0) {
+     // console.log("patientSubstanceInfo",patientSubstanceInfo);
       const prefilled = mapSubstanceInfoToAnswers(patientSubstanceInfo);
       setAnswers(prefilled);
     }
@@ -363,7 +365,7 @@ const SubstanceUse = ({ onComplete }) => {
           ? {
               packsDay: answers.packs_per_day_previous || 0,
               years: answers.number_of_years_previous || 0,
-              type: "not applicable" || 0,
+              type: answers.smoked_previously || "",
             }
           : {},
       exposedTo2ndSmoke: answers.exposed_to_second_hand_smoke === "Yes",

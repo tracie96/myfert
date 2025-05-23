@@ -312,16 +312,6 @@ export default function UserInfo() {
                     <h4 style={{ color: '#111F4A', fontSize: '13px', marginBottom: '12px' }}>Intake Form</h4>
                     <h4 style={{ color: '#FF0000', fontSize: '13px', marginBottom: '12px' }}>Yes</h4>
                   </div>
-                  <div style={{ display: "flex", alignItems: "center",  justifyContent: 'space-between', borderBottom: '1px solid rgb(0,0,0, .2)', marginTop: '14px' }}>
-                    <h4 style={{ color: '#111F4A', fontSize: '13px', marginBottom: '12px' }}>PCOS</h4>
-                    <h4 style={{ color: '#111F4A', fontSize: '13px', marginBottom: '12px' }}>Intake Form</h4>
-                    <h4 style={{ color: '#FF0000', fontSize: '13px', marginBottom: '12px' }}>Yes</h4>
-                  </div>
-                  <div style={{ display: "flex", alignItems: "center",  justifyContent: 'space-between', borderBottom: '1px solid rgb(0,0,0, .2)', marginTop: '14px' }}>
-                    <h4 style={{ color: '#111F4A', fontSize: '13px', marginBottom: '12px' }}>PCOS</h4>
-                    <h4 style={{ color: '#111F4A', fontSize: '13px', marginBottom: '12px' }}>Intake Form</h4>
-                    <h4 style={{ color: '#FF0000', fontSize: '13px', marginBottom: '12px' }}>Yes</h4>
-                  </div>
                 </div> */}
               {/* </div> */}
 
@@ -1236,79 +1226,146 @@ function SwitchContent({
 
       case 7:
         return loading ? (
-          <p>{stress}</p>
+          <p>Loading...</p>
         ) : (
           <div className="p-6 rounded-md shadow-md">
             <Row gutter={16}>
               <Col xs={24} md={12}>
                 <Descriptions column={1} bordered>
-                  {Object.entries(illness).map(([key, value]) => {
-                    let displayValue = 'N/A';
-      
-                    // Handle different data types correctly
-                    if (value === null || value === undefined) {
-                      displayValue = 'N/A';
-                    } else if (typeof value === 'boolean') {
-                      displayValue = value ? 'Yes' : 'No'; // Display boolean as "Yes" or "No"
-                    } else if (typeof value === 'string' || typeof value === 'number') {
-                      displayValue = value; // Directly render strings and numbers
-                    } else if (Array.isArray(value)) {
-                      // Render arrays (e.g., gastroIntestinal, respiratory, etc.)
-                      displayValue = value.map((item, index) => (
-                        <div class="inside-table-content" key={index}>
-                          <span>{item.yesNo ? 'Yes' : 'No'}</span>: 
-                          {item.describe && typeof item.describe === 'string' ? (
-                            item.describe.split(',').map((desc, idx) => (
-                              <Tag key={idx} color="blue">{desc.trim()}</Tag> // Use Ant Design Tag
-                            ))
-                          ) : (
-                            <Tag color="red">N/A</Tag> // Handle case where describe is not a string
-                          )}
-                        </div>
-                      ));
-                    } else if (typeof value === 'object') {
-                      // Render objects (e.g., diagnosticBoneDensity)
-                      displayValue = (
-                        <div class="inside-table-content">
-                          Date: {value?.date}, Value: {value?.value}, Other Name: {value?.otherName}
-                        </div>
-                      );
-                    } else {
-                      displayValue = 'Unknown Data Type';
+                  {Object.entries(illness || {}).map(([category, data]) => {
+                    // Only handle diagnostic, surgery, and injury categories
+                    if (!category.startsWith('diagnostic') && !category.startsWith('surgery') && !category.startsWith('injuries')) {
+                      return null;
                     }
-      
-                    return (
-                      <Descriptions.Item
-                        label={key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())}
-                        key={key}
-                      >
-                        <span className="font-medium">{displayValue}</span>
-                      </Descriptions.Item>
-                    );
-                  })}
-                </Descriptions>
-              </Col>
-      
-              <Col xs={24} md={12}>
-                <Descriptions column={1} bordered>
-                  {Object.entries(illness).map(([key, value]) => {
-                    if (typeof value === 'object' && !Array.isArray(value)) {
+
+                    if (typeof data === 'object' && data !== null) {
+                      const value = data.value || '';
+                      const date = data.date || '';
+                      const otherName = data.otherName;
+                      
                       return (
                         <Descriptions.Item
-                          label={key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())}
-                          key={`${key}-additional`}
+                          label={category.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                          key={category}
                         >
-                          Date: {value?.date}, Value: {value?.value}, Other Name: {value?.otherName}
+                          {(!date && !value && !otherName) ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <Tag color="default">Answer not provided</Tag>
+                            </div>
+                          ) : (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              {otherName ? (
+                                <Tag color="blue">Name: {otherName}</Tag>
+                              ) : null}
+                              <Tag color={date ? "purple" : "default"}>
+                                Date: {date || 'Answer not provided'}
+                              </Tag>
+                              <Tag color={value ? "cyan" : "default"}>
+                                Value: {value || 'Answer not provided'}
+                              </Tag>
+                            </div>
+                          )}
                         </Descriptions.Item>
                       );
                     }
-                    return null;
+                    return (
+                      <Descriptions.Item
+                        label={category.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                        key={category}
+                      >
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          <Tag color="default">Answer not provided</Tag>
+                        </div>
+                      </Descriptions.Item>
+                    );
                   })}
+
+                  {/* Handle addNew array separately */}
+                  {illness?.addNew && illness.addNew.length > 0 && (
+                    <Descriptions.Item label="Additional Records">
+                      {illness.addNew.map((record, index) => (
+                        <div key={index} style={{ marginBottom: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          <Tag color={record.date ? "blue" : "default"}>
+                            Date: {record.date || 'Answer not provided'}
+                          </Tag>
+                          <Tag color={record.value ? "green" : "default"}>
+                            Value: {record.value || 'Answer not provided'}
+                          </Tag>
+                        </div>
+                      ))}
+                    </Descriptions.Item>
+                  )}
+                </Descriptions>
+              </Col>
+
+              <Col xs={24} md={12}>
+                <Descriptions column={1} bordered>
+                  {Object.entries(illness || {}).map(([category, data]) => {
+                    // Only handle diagnostic, surgery, and injury categories
+                    if (!category.startsWith('diagnostic') && !category.startsWith('surgery') && !category.startsWith('injuries')) {
+                      return null;
+                    }
+
+                    if (typeof data === 'object' && data !== null) {
+                      const value = data.value || '';
+                      const date = data.date || '';
+                      const otherName = data.otherName;
+                      
+                      return (
+                        <Descriptions.Item
+                          label={category.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                          key={category}
+                        >
+                          {(!date && !value && !otherName) ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <Tag color="default">Answer not provided</Tag>
+                            </div>
+                          ) : (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              {otherName ? (
+                                <Tag color="blue">Name: {otherName}</Tag>
+                              ) : null}
+                              <Tag color={date ? "purple" : "default"}>
+                                Date: {date || 'Answer not provided'}
+                              </Tag>
+                              <Tag color={value ? "cyan" : "default"}>
+                                Value: {value || 'Answer not provided'}
+                              </Tag>
+                            </div>
+                          )}
+                        </Descriptions.Item>
+                      );
+                    }
+                    return (
+                      <Descriptions.Item
+                        label={category.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                        key={category}
+                      >
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          <Tag color="default">Answer not provided</Tag>
+                        </div>
+                      </Descriptions.Item>
+                    );
+                  })}
+
+                  {/* Handle addNew array separately */}
+                  {illness?.addNew && illness.addNew.length > 0 && (
+                    <Descriptions.Item label="Additional Records">
+                      {illness.addNew.map((record, index) => (
+                        <div key={index} style={{ marginBottom: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          <Tag color={record.date ? "blue" : "default"}>
+                            Date: {record.date || 'Answer not provided'}
+                          </Tag>
+                          <Tag color={record.value ? "green" : "default"}>
+                            Value: {record.value || 'Answer not provided'}
+                          </Tag>
+                        </div>
+                      ))}
+                    </Descriptions.Item>
+                  )}
                 </Descriptions>
               </Col>
             </Row>
-      
-        
           </div>
         );
       

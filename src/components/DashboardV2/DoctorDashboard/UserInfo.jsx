@@ -1232,69 +1232,52 @@ function SwitchContent({
             <Row gutter={16}>
               <Col xs={24} md={12}>
                 <Descriptions column={1} bordered>
-                  {Object.entries(illness || {}).map(([category, data]) => {
-                    // Only handle diagnostic, surgery, and injury categories
-                    if (!category.startsWith('diagnostic') && !category.startsWith('surgery') && !category.startsWith('injuries')) {
+                  {Object.entries(illness || {}).map(([category, conditions]) => {
+                    // Skip diagnostic/surgery/injury categories
+                    if (category.startsWith('diagnostic') || category.startsWith('surgery') || category.startsWith('injuries')) {
                       return null;
                     }
 
-                    if (typeof data === 'object' && data !== null) {
-                      const value = data.value || '';
-                      const date = data.date || '';
-                      const otherName = data.otherName;
-                      
+                    // Handle arrays of conditions (like gastroIntestinal, respiratory, etc.)
+                    if (Array.isArray(conditions)) {
                       return (
-                        <Descriptions.Item
-                          label={category.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                        <Descriptions.Item 
+                          label={category.charAt(0).toUpperCase() + category.slice(1)} 
                           key={category}
                         >
-                          {(!date && !value && !otherName) ? (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                              <Tag color="default">Answer not provided</Tag>
+                          {conditions && conditions.length > 0 ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                              {conditions.filter(condition => condition && typeof condition === 'object').map((condition, index) => {
+                                if (!condition || !condition.typeName || !condition.yesNoNA) {
+                                  return (
+                                    <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                      <Tag color="default">
+                                        {condition?.typeName?.replace(/_/g, ' ').split('/').join('/') || 'Unknown'}: Answer not provided
+                                      </Tag>
+                                    </div>
+                                  );
+                                }
+                                return (
+                                  <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <Tag color={condition.yesNoNA === 'n/a' ? 'default' : condition.yesNoNA === 'yes' ? 'green' : 'red'}>
+                                      {condition.typeName.replace(/_/g, ' ').split('/').join('/')}:
+                                      {' '}
+                                      {condition.yesNoNA === 'n/a' ? 'Answer not provided' : condition.yesNoNA.toUpperCase()}
+                                    </Tag>
+                                  </div>
+                                );
+                              })}
                             </div>
                           ) : (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                              {otherName ? (
-                                <Tag color="blue">Name: {otherName}</Tag>
-                              ) : null}
-                              <Tag color={date ? "purple" : "default"}>
-                                Date: {date || 'Answer not provided'}
-                              </Tag>
-                              <Tag color={value ? "cyan" : "default"}>
-                                Value: {value || 'Answer not provided'}
-                              </Tag>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <Tag color="default">Answer not provided</Tag>
                             </div>
                           )}
                         </Descriptions.Item>
                       );
                     }
-                    return (
-                      <Descriptions.Item
-                        label={category.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-                        key={category}
-                      >
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                          <Tag color="default">Answer not provided</Tag>
-                        </div>
-                      </Descriptions.Item>
-                    );
+                    return null;
                   })}
-
-                  {/* Handle addNew array separately */}
-                  {illness?.addNew && illness.addNew.length > 0 && (
-                    <Descriptions.Item label="Additional Records">
-                      {illness.addNew.map((record, index) => (
-                        <div key={index} style={{ marginBottom: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                          <Tag color={record.date ? "blue" : "default"}>
-                            Date: {record.date || 'Answer not provided'}
-                          </Tag>
-                          <Tag color={record.value ? "green" : "default"}>
-                            Value: {record.value || 'Answer not provided'}
-                          </Tag>
-                        </div>
-                      ))}
-                    </Descriptions.Item>
-                  )}
                 </Descriptions>
               </Col>
 
@@ -1317,20 +1300,22 @@ function SwitchContent({
                           key={category}
                         >
                           {(!date && !value && !otherName) ? (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                              <Tag color="default">Answer not provided</Tag>
-                            </div>
+                            <Tag color="default">Answer not provided</Tag>
                           ) : (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                               {otherName ? (
                                 <Tag color="blue">Name: {otherName}</Tag>
                               ) : null}
-                              <Tag color={date ? "purple" : "default"}>
-                                Date: {date || 'Answer not provided'}
-                              </Tag>
-                              <Tag color={value ? "cyan" : "default"}>
-                                Value: {value || 'Answer not provided'}
-                              </Tag>
+                              {date ? (
+                                <Tag color="purple">Date: {date}</Tag>
+                              ) : (
+                                <Tag color="default">Date: Answer not provided</Tag>
+                              )}
+                              {value ? (
+                                <Tag color="cyan">Value: {value}</Tag>
+                              ) : (
+                                <Tag color="default">Value: Answer not provided</Tag>
+                              )}
                             </div>
                           )}
                         </Descriptions.Item>
@@ -1341,9 +1326,7 @@ function SwitchContent({
                         label={category.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
                         key={category}
                       >
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                          <Tag color="default">Answer not provided</Tag>
-                        </div>
+                       <Tag color="cyan">Answer not provided</Tag>
                       </Descriptions.Item>
                     );
                   })}
@@ -1352,13 +1335,17 @@ function SwitchContent({
                   {illness?.addNew && illness.addNew.length > 0 && (
                     <Descriptions.Item label="Additional Records">
                       {illness.addNew.map((record, index) => (
-                        <div key={index} style={{ marginBottom: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                          <Tag color={record.date ? "blue" : "default"}>
-                            Date: {record.date || 'Answer not provided'}
-                          </Tag>
-                          <Tag color={record.value ? "green" : "default"}>
-                            Value: {record.value || 'Answer not provided'}
-                          </Tag>
+                        <div key={index} style={{ marginBottom: '8px' }}>
+                          {record.date ? (
+                            <Tag color="blue">Date: {record.date}</Tag>
+                          ) : (
+                            <Tag color="cyan">Date: Answer not provided</Tag>
+                          )}
+                          {record.value ? (
+                            <Tag color="green">Value: {record.value}</Tag>
+                          ) : (
+                            <Tag color="cyan">Value: Answer not provided</Tag>
+                          )}
                         </div>
                       ))}
                     </Descriptions.Item>

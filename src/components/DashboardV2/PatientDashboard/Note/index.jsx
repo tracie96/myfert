@@ -5,12 +5,17 @@ import '../../DoctorDashboard/Note/note.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { getPatientNotes } from '../../../redux/patientSlice';
 import { Card } from 'antd';
+import { useMediaQuery } from 'react-responsive';
 
 const PatientNote = () => {
   const [notes, setNotes] = useState([]);
   const [visibleNotes, setVisibleNotes] = useState(3);
   const dispatch = useDispatch();
   const { notes: patientNotes, status, error } = useSelector((state) => state.patient);
+
+  // Add responsive breakpoints
+  const isMobile = useMediaQuery({ maxWidth: 767 });
+  const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 1023 });
 
   useEffect(() => {
     dispatch(getPatientNotes());
@@ -66,11 +71,26 @@ const PatientNote = () => {
   }
 
   return (
-    <div className="notes-container" style={{ padding: '16px' }}>
-      <div className="notes-card">
-        <NotesList notes={notes.slice(0, visibleNotes)} />
+    <div className="notes-container" style={{ 
+      padding: isMobile ? '8px' : '16px',
+      maxWidth: '100%',
+      overflowX: 'hidden'
+    }}>
+      <div className="notes-card" style={{
+        margin: isMobile ? '0' : '0 auto',
+        width: '100%'
+      }}>
+        <NotesList 
+          notes={notes.slice(0, visibleNotes)} 
+          isMobile={isMobile}
+          isTablet={isTablet}
+        />
         {visibleNotes < notes.length && (
-          <div onClick={handleViewMore} style={{ textAlign: 'center', marginTop: '16px' }}>
+          <div onClick={handleViewMore} style={{ 
+            textAlign: 'center', 
+            marginTop: isMobile ? '12px' : '16px',
+            padding: isMobile ? '8px' : '16px'
+          }}>
             <ViewMoreButton />
           </div>
         )}

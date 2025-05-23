@@ -254,9 +254,10 @@ const NotesList = ({ notes, onViewMore }) => {
                 <Text style={{ wordBreak: 'break-word' }}>{item.personalNotes || 'No personal notes'}</Text>
               </Col>
               <Col xs={24} sm={columns.actions} style={{ textAlign: isMobile ? 'left' : 'right' }}>
-                <Dropdown overlay={menu(item)} trigger={['click']}>
+            {isMobile && <Button type="primary" onClick={() => handleEdit(item)}>Edit</Button> }
+                {!isMobile && <Dropdown overlay={menu(item)} trigger={['click']}>
                   <MoreOutlined style={{ fontSize: '20px', cursor: 'pointer' }} />
-                </Dropdown>
+                </Dropdown> }
               </Col>
             </Row>
           </List.Item>

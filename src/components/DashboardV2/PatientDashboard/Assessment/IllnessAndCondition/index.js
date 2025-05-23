@@ -504,7 +504,7 @@ const IllnessAndCondition = ({ onComplete }) => {
           formAnswers[item.typeName] = item.yesNoNA;
         }
       }
-      
+
       if (apiData.respiratory && apiData.respiratory.length > 0) {
         for (const item of apiData.respiratory) {
           formAnswers[item.typeName] = item.yesNoNA;
@@ -546,13 +546,13 @@ const IllnessAndCondition = ({ onComplete }) => {
           formAnswers[item.typeName] = item.yesNoNA;
         }
       }
-      
+
       if (apiData.neurologic && apiData.neurologic.length > 0) {
         for (const item of apiData.neurologic) {
           formAnswers[item.typeName] = item.yesNoNA;
         }
       }
-      
+
       if (apiData.cancer && apiData.cancer.length > 0) {
         for (const item of apiData.cancer) {
           formAnswers[item.typeName] = item.yesNoNA;
@@ -653,8 +653,8 @@ const IllnessAndCondition = ({ onComplete }) => {
         );
 
         const hasOthersAnswer =
-          answers[`${question.name}_others`] !== undefined &&
-          answers[`${question.name}_others`] !== "";
+          answers[`${question.name}_${question.sub.replace(/\//g, '_')}_others`] !== undefined &&
+          answers[`${question.name}_${question.sub.replace(/\//g, '_')}_others`] !== "";
 
         return hasValidAnswer || hasOthersAnswer;
 
@@ -824,7 +824,7 @@ const IllnessAndCondition = ({ onComplete }) => {
       injuriesOther: {
         date: answers.head_injury_others_na ? "" : answers.head_injury_others || "",
         value: answers.head_injury_others_Comments || "",
-        otherName: answers.head_injury_others_Others || "", 
+        otherName: answers.head_injury_others_Others || "",
       },
       surgeryAppen: {
         date: answers.appendectomy_na ? "" : answers.appendectomy || "",
@@ -933,7 +933,7 @@ const IllnessAndCondition = ({ onComplete }) => {
 
         return (
           <div key={question.name} style={{ marginBottom: "20px" }}>
-            <Button
+            {/* <Button
               type="primary"
               style={{
                 marginTop: "10px",
@@ -946,17 +946,33 @@ const IllnessAndCondition = ({ onComplete }) => {
               }}
             >
               {question.question}
-            </Button>
-            <p
-              style={{
-                color: "#00ADEF",
-                fontSize: isMobile ? "13px" : "15px",
-                fontWeight: "bold",
-                marginBottom: "10px"
-              }}
-            >
-              {question.sub}
-            </p>
+            </Button> */}
+            <div style={{
+              marginTop: "10px",
+              marginBottom: "10px",
+              background: "#335CAD",
+              padding: isMobile ? "5px" : "10px",
+              fontSize: isMobile ? "13px" : "15px",
+              fontWeight: "bold",
+              width: isMobile ? "100%" : "200px",
+              borderRadius: "8px",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center"
+            }}>
+              <p
+                style={{
+                  color: "#fff",
+                  fontSize: isMobile ? "13px" : "15px",
+                  fontWeight: "bold",
+                  margin: 0,
+                  textAlign: "center"
+                }}
+              >
+                {question.sub}
+              </p>
+            </div>
+
             <div style={{ marginBottom: "10px" }}>
               <Checkbox
                 checked={isNA}
@@ -1155,9 +1171,9 @@ const IllnessAndCondition = ({ onComplete }) => {
                 marginTop: 20,
                 width: "100%"
               }}
-              value={answers[`${question.name}_others`] || ""}
+              value={answers[`${question.name}_${question.sub.replace(/\//g, '_')}_others`] || ""}
               onChange={(e) =>
-                handleChange(e.target.value.trim(), `${question.name}_others`)
+                handleChange(e.target.value.trim(), `${question.name}_${question.sub.replace(/\//g, '_')}_others`)
               }
             />
           </div>

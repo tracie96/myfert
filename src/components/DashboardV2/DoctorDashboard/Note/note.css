@@ -12,14 +12,18 @@
 
 
 .notes-container {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
   padding: 20px;
 }
 
 .notes-card {
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
   border: 1px solid var(--light-border);
-  background-color: white;
   padding: 20px;
-  border-radius: 5px;
 }
 
 /* Notes header styles */
@@ -288,9 +292,30 @@
 .note-item:not(:first-child) {
   margin-top: 48px;
 }
-.ant-select-dropdown{
-  width: 20% !important;
-  max-width: 20% !important;
+
+/* Remove the restrictive width on ant-select-dropdown */
+.ant-select-dropdown {
+  width: auto !important;
+  max-width: none !important;
+  min-width: 200px !important;
+}
+
+/* Ensure the select input field is properly sized */
+.ant-select {
+  width: 100% !important;
+}
+
+/* Style the select options for better visibility */
+.ant-select-item {
+  padding: 8px 12px !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Ensure dropdown is above other elements */
+.ant-select-dropdown {
+  z-index: 1050;
 }
 
 .note-row {
@@ -449,4 +474,51 @@
   min-height: 300px;
   color: #666;
   font-size: 14px;
+}
+
+@media screen and (max-width: 767px) {
+  .notes-container {
+    padding: 8px !important;
+  }
+
+  .notes-card {
+    margin: 0;
+  }
+
+  .header-row {
+    display: none;
+  }
+}
+
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .notes-container {
+    padding: 12px !important;
+  }
+}
+
+/* Ensure text wrapping for long content */
+.ant-typography {
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Improve spacing for mobile view */
+@media screen and (max-width: 767px) {
+  .ant-list-item {
+    padding: 16px 0 !important;
+  }
+
+  .ant-row {
+    margin-left: -8px !important;
+    margin-right: -8px !important;
+  }
+
+  .ant-col {
+    padding: 8px !important;
+  }
+}
+
+/* Improve dropdown positioning */
+.ant-dropdown {
+  position: fixed;
 }

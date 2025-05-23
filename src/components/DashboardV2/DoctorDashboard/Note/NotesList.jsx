@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { List, Card, Avatar, Typography, Button, Divider, Row, Col, Modal, Form, Input, Dropdown, Menu } from "antd";
+import { List, Card, Avatar, Typography, Button, Divider, Row, Col, Modal, Form, Input, Dropdown, Menu, Space } from "antd";
 import { MoreOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useDispatch } from 'react-redux';
 import { editPatientNote, fetchPatientNotes, deletePatientNote } from "../../../redux/doctorSlice";
+import { useMediaQuery } from 'react-responsive';
 
 const { Text } = Typography;
 const { TextArea } = Input;
@@ -40,6 +41,9 @@ const NotesList = ({ notes, onViewMore }) => {
   const [selectedNote, setSelectedNote] = useState(null);
   const [form] = Form.useForm();
   const dispatch = useDispatch();
+  
+  const isMobile = useMediaQuery({ maxWidth: 767 });
+  const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 1023 });
 
   const handleEdit = (note) => {
     setSelectedNote(note);
@@ -129,14 +133,43 @@ const NotesList = ({ notes, onViewMore }) => {
     </Menu>
   );
 
+  const getResponsiveColumns = () => {
+    if (isMobile) {
+      return {
+        profile: 24,
+        apptType: 24,
+        progressNotes: 24,
+        personalNotes: 24,
+        actions: 24
+      };
+    } else if (isTablet) {
+      return {
+        profile: 8,
+        apptType: 8,
+        progressNotes: 16,
+        personalNotes: 16,
+        actions: 2
+      };
+    }
+    return {
+      profile: 5,
+      apptType: 5,
+      progressNotes: 9,
+      personalNotes: 4,
+      actions: 1
+    };
+  };
+
+  const columns = getResponsiveColumns();
+
   return (
     <Card bordered={false}>
-      <Row gutter={16} style={{ marginBottom: 16 }}>
-        <Col span={5}><b>Profile</b></Col>
-        <Col span={5}><b>Appt Type</b></Col>
-        <Col span={9}><b>Progress Notes</b></Col>
-        <Col span={4}><b>Personal Notes</b></Col>
-        <Col span={1}></Col>
+      <Row gutter={[16, 16]} style={{ marginBottom: 16 }} className="header-row">
+        <Col xs={24} sm={columns.profile}><b>Profile</b></Col>
+        <Col xs={24} sm={columns.apptType}><b>Appt Type</b></Col>
+        <Col xs={24} sm={columns.progressNotes}><b>Progress Notes</b></Col>
+        <Col xs={24} sm={columns.personalNotes}><b>Personal Notes</b></Col>
+        <Col xs={24} sm={columns.actions}></Col>
       </Row>
       <Divider style={{ margin: "8px 0" }} />
       <List
@@ -147,9 +180,9 @@ const NotesList = ({ notes, onViewMore }) => {
             key={item.name + item.date}
             style={{ padding: "24px 0", borderBottom: "1px solid #f0f0f0" }}
           >
-            <Row gutter={16} align="middle">
-              <Col span={5}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <Row gutter={[16, 16]} align="top">
+              <Col xs={24} sm={columns.profile}>
+                <Space align="start">
                   <Avatar 
                     src={item.profileImage} 
                     size={48} 
@@ -158,20 +191,22 @@ const NotesList = ({ notes, onViewMore }) => {
                     <Text strong style={{ color: "#335cad" }}>{item.name}</Text>
                     <br />
                     <Text type="secondary">{item.role}</Text>
+                    <br />
+                    <Text type="secondary" style={{ fontSize: 12 }}>
+                      {(item.date)}
+                    </Text>
                   </div>
-                </div>
-                <Text type="secondary" style={{ fontSize: 12, marginTop: '8px', marginLeft: '60px' }}>
-                  {(item.date)}
-                </Text>
+                </Space>
               </Col>
-              <Col span={5}>
+              <Col xs={24} sm={columns.apptType}>
                 <Text>{item.appointmentType || 'No Appointment Type'}</Text>
               </Col>
-              <Col span={9}>
+              <Col xs={24} sm={columns.progressNotes}>
                 <ul style={{ 
                   margin: 0, 
                   paddingLeft: 0,
-                  listStyleType: 'none'
+                  listStyleType: 'none',
+                  width: '100%'
                 }}>
                   {getProgressNotes(item).map((note, idx) => {
                     const [type, content] = note.split(': ');
@@ -189,20 +224,24 @@ const NotesList = ({ notes, onViewMore }) => {
                         borderRadius: '6px',
                         borderLeft: `4px solid ${colors.border}`,
                         display: 'flex',
-                        alignItems: 'center'
+                        flexDirection: isMobile ? 'column' : 'row',
+                        alignItems: isMobile ? 'flex-start' : 'center',
+                        width: '100%'
                       }}>
                         <Text style={{ 
                           fontSize: '13px',
                           fontWeight: 600,
                           color: colors.text,
-                          marginRight: '8px'
+                          marginRight: '8px',
+                          marginBottom: isMobile ? '4px' : 0
                         }}>
                           {type}:
                         </Text>
                         <Text style={{ 
                           fontSize: '14px',
                           color: '#262626',
-                          lineHeight: '1.5'
+                          lineHeight: '1.5',
+                          wordBreak: 'break-word'
                         }}>
                           {content}
                         </Text>
@@ -211,10 +250,10 @@ const NotesList = ({ notes, onViewMore }) => {
                   })}
                 </ul>
               </Col>
-              <Col span={4}>
-                <Text>{item.personalNotes || 'No personal notes'}</Text>
+              <Col xs={24} sm={columns.personalNotes}>
+                <Text style={{ wordBreak: 'break-word' }}>{item.personalNotes || 'No personal notes'}</Text>
               </Col>
-              <Col span={1}>
+              <Col xs={24} sm={columns.actions} style={{ textAlign: isMobile ? 'left' : 'right' }}>
                 <Dropdown overlay={menu(item)} trigger={['click']}>
                   <MoreOutlined style={{ fontSize: '20px', cursor: 'pointer' }} />
                 </Dropdown>

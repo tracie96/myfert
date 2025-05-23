@@ -1245,8 +1245,10 @@ function SwitchContent({
                           label={category.charAt(0).toUpperCase() + category.slice(1)} 
                           key={category}
                         >
+                 
                           {conditions && conditions.length > 0 ? (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                              
                               {conditions.filter(condition => condition && typeof condition === 'object').map((condition, index) => {
                                 if (!condition || !condition.typeName || !condition.yesNoNA) {
                                   return (
@@ -1268,11 +1270,8 @@ function SwitchContent({
                                 );
                               })}
                             </div>
-                          ) : (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <Tag color="default">Answer not provided</Tag>
-                            </div>
-                          )}
+                          ) :''
+                          }
                         </Descriptions.Item>
                       );
                     }
@@ -1288,7 +1287,7 @@ function SwitchContent({
                     if (!category.startsWith('diagnostic') && !category.startsWith('surgery') && !category.startsWith('injuries')) {
                       return null;
                     }
-
+                 
                     if (typeof data === 'object' && data !== null) {
                       const value = data.value || '';
                       const date = data.date || '';
@@ -1332,22 +1331,25 @@ function SwitchContent({
                   })}
 
                   {/* Handle addNew array separately */}
-                  {illness?.addNew && illness.addNew.length > 0 && (
+                  {illness?.addNew && illness.addNew.length > 0 && illness.addNew.some(record => record.date || record.value) && (
                     <Descriptions.Item label="Additional Records">
-                      {illness.addNew.map((record, index) => (
-                        <div key={index} style={{ marginBottom: '8px' }}>
-                          {record.date ? (
-                            <Tag color="blue">Date: {record.date}</Tag>
-                          ) : (
-                            <Tag color="cyan">Date: Answer not provided</Tag>
-                          )}
-                          {record.value ? (
-                            <Tag color="green">Value: {record.value}</Tag>
-                          ) : (
-                            <Tag color="cyan">Value: Answer not provided</Tag>
-                          )}
-                        </div>
-                      ))}
+                      {illness.addNew.map((record, index) => {
+                        if (!record.date && !record.value) return null;
+                        return (
+                          <div key={index} style={{ marginBottom: '8px' }}>
+                            {record.date ? (
+                              <Tag color="blue">Date: {record.date}</Tag>
+                            ) : (
+                              <Tag color="cyan">Date: Answer not provided</Tag>
+                            )}
+                            {record.value ? (
+                              <Tag color="green">Value: {record.value}</Tag>
+                            ) : (
+                              <Tag color="cyan">Value: Answer not provided</Tag>
+                            )}
+                          </div>
+                        );
+                      })}
                     </Descriptions.Item>
                   )}
                 </Descriptions>

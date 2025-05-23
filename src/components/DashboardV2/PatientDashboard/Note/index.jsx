@@ -31,6 +31,7 @@ const PatientNote = () => {
           role: note.providerRole || "Clinician",
           date: date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
           appointmentType:note.appointType,
+          patientPlan:note.patientPlan,
           progressNotes: [
             // `Subjective: ${note.subjective || ''}`,
             // `Objective: ${note.objective || ''}`,

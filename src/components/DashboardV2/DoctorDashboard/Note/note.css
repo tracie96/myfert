@@ -288,6 +288,10 @@
 .note-item:not(:first-child) {
   margin-top: 48px;
 }
+.ant-select-dropdown{
+  width: 20% !important;
+  max-width: 20% !important;
+}
 
 .note-row {
   display: flex;

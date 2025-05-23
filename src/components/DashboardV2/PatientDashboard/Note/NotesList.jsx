@@ -4,32 +4,7 @@ import { List, Card, Avatar, Typography, Divider, Row, Col, Modal, Form, Input }
 const { Text } = Typography;
 const { TextArea } = Input;
 
-const getProgressNotes = (note) => {
-  return note.progressNotes || ['No progress notes available'];
-};
 
-const noteTypeColors = {
-  'Subjective': {
-    border: '#4A90E2',
-    bg: '#F0F7FF',
-    text: '#2C5282'
-  },
-  'Objective': {
-    border: '#48BB78', 
-    bg: '#F0FFF4',
-    text: '#2F855A'
-  },
-  'Assessment': {
-    border: '#ED8936', 
-    bg: '#FFFAF0',
-    text: '#C05621'
-  },
-  'Plan': {
-    border: '#9F7AEA', 
-    bg: '#FAF5FF',
-    text: '#6B46C1'
-  }
-};
 
 const NotesList = ({ notes, onViewMore }) => {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
@@ -68,7 +43,7 @@ const NotesList = ({ notes, onViewMore }) => {
       <Row gutter={16} style={{ marginBottom: 16 }}>
         <Col span={5}><b>Profile</b></Col>
         <Col span={5}><b>Appt Type</b></Col>
-        <Col span={9}><b>Progress Notes</b></Col>
+        <Col span={9}><b>Plan</b></Col>
         <Col span={1}></Col>
       </Row>
       <Divider style={{ margin: "8px 0" }} />
@@ -101,42 +76,8 @@ const NotesList = ({ notes, onViewMore }) => {
               <Col span={5}>
                 <Text>{item.appointmentType || 'No Appointment Type'}</Text>
               </Col>
-              <Col span={9}>
-                <ul style={{ 
-                  margin: 0, 
-                  paddingLeft: 0,
-                  listStyleType: 'none'
-                }}>
-                  {getProgressNotes(item).map((note, idx) => {
-                    const [type, content] = note.split(': ');
-                    const colors = noteTypeColors[type] || {
-                      border: '#335cad',
-                      bg: '#f8f9fa',
-                      text: '#335cad'
-                    };
-                    
-                    return (
-                      <li key={idx} style={{ 
-                        marginBottom: '12px',
-                        padding: '8px 12px',
-                        backgroundColor: colors.bg,
-                        borderRadius: '6px',
-                        borderLeft: `4px solid ${colors.border}`,
-                        display: 'flex',
-                        alignItems: 'center'
-                      }}>
-                       
-                        <Text style={{ 
-                          fontSize: '14px',
-                          color: '#262626',
-                          lineHeight: '1.5'
-                        }}>
-                          {content}
-                        </Text>
-                      </li>
-                    );
-                  })}
-                </ul>
+              <Col span={5}>
+                <Text>{item.patientPlan || 'No Appointment Type'}</Text>
               </Col>
               {/* <Col span={4}>
                 <Text>{item.personalNotes || 'No personal notes'}</Text>

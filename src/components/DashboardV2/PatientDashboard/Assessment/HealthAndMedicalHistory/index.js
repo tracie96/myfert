@@ -364,7 +364,11 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
   useEffect(() => {
     if (patientHealthMedicalInfo) {
       const lifestyle = patientHealthMedicalInfo;
-
+      const normalizeYesNo = (value) => {
+        if (value === true) return "Yes";
+        if (value === false) return "No";
+        return null;
+      };
       const prefillAnswers = {
         overll_wellbeing: lifestyle.howWellThingsGoingOverall || 1,
         school_wellbeing: lifestyle.howWellThingsGoingSchool || 1,
@@ -378,7 +382,7 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
         parents_wellbeing: lifestyle.howWellThingsGoingParents || 1,
         spouse_wellbeing: lifestyle.howWellThingsGoingSpouse || 1,
         mode_of_own_birth: lifestyle.howWereYouBorn,
-        birth_complications: lifestyle.wereYouBornWithComplication?.yesNo ? "Yes" : "No",
+        birth_complications: normalizeYesNo(lifestyle.wereYouBornWithComplication?.yesNo),
         birth_complications_details: lifestyle.wereYouBornWithComplication?.describe || "",
         breast_fed_duration: lifestyle.breastFedHowLong || "",
         bottle_fed_type: lifestyle.breastFedFormula || "",
@@ -386,25 +390,25 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
         age_of_solid_food_intro: lifestyle.ageIntroductionSolidFood || "",
         age_of_wheat_food_intro: lifestyle.ageIntroductionWheat || "",
         age_of_diary_food_intro: lifestyle.ageIntroductionDiary || "",
-        allergic_food: lifestyle.foodsAvoided ? "Yes" : "No",
+        allergic_food: normalizeYesNo(lifestyle.foodsAvoided),
         food_avoided: lifestyle.foodsAvoidTypeSymptoms || "",
-        eat_sugar_as_a_child: lifestyle.alotSugar ? "Yes" : "No",
-        mercury_filings: lifestyle.mercuryFillingRemoved ? "Yes" : "No",
+        eat_sugar_as_a_child: normalizeYesNo(lifestyle.alotSugar),
+        mercury_filings: normalizeYesNo(lifestyle.mercuryFillingRemoved),
         mercury_fillings_removed: lifestyle.mercuryFillingRemovedWhen || "",
         fillings_removed: lifestyle.fillingsAsKid || "",
   
-        do_you_brush_regularly: lifestyle.brushRegularly ? "Yes" : "No",
-        do_you_floss_regularly: lifestyle.flossRegularly ? "Yes" : "No",
+        do_you_brush_regularly: normalizeYesNo(lifestyle.brushRegularly),
+        do_you_floss_regularly: normalizeYesNo(lifestyle.flossRegularly),
   
         smoke_irritants: lifestyle.environmentEffect || [],
         work_env_smoke_irritants: lifestyle.environmentExposed || [],
   
-        harmful_chemicals: lifestyle.exposedHarmfulChemical ? "Yes" : "No",
+        harmful_chemicals: normalizeYesNo(lifestyle.exposedHarmfulChemical),
         harmful_chemical_exposure: lifestyle.whenExposedHarmfulChemical?.chemicalName || "",
         harmful_chemical_exposure_length: lifestyle.whenExposedHarmfulChemical?.lenghtExposure || "",
         harmful_chemical_exposure_date: lifestyle.whenExposedHarmfulChemical?.dateExposure || "",
   
-        pets_or_animal: lifestyle.petsFarmAnimal ? "Yes" : "No",
+        pets_or_animal: normalizeYesNo(lifestyle.petsFarmAnimal),
         where_they_live: lifestyle.petsAnimalLiveWhere || "",
       };
   
@@ -566,6 +570,14 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
     const question = questions[currentQuestionIndex];
   
     switch (question.type) { 
+      case "rating_scale": {
+        const value = answers[question.name];
+        if (value === undefined || value === null || value === 0) {
+          return false;
+        }
+        return true;
+      }
+
       case "checkbox_with_select":
         return question.options.every((option) => {
           const checkboxChecked = answers[option.name];
@@ -603,7 +615,8 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
           }
   
       case "radio": {
-        if (answers[question.name] === undefined) {
+        if (answers[question.name] === undefined || answers[question.name] === null || answers[question.name] === "") {
+          console.log(`Validation failed: '${question.name}' radio question not answered.`);
           return false;
         }
   

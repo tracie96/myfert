@@ -119,7 +119,7 @@ const questions = [
       {
         type: "select",
         label: "Time/Duration (Minutes)",
-        options: Array.from({ length: 60 }, (_, i) => 1 + i),
+        options: Array.from({ length: 20 }, (_, i) => (i + 1) * 10),
         name: "cardio_aerobic_time_duration",
       },
     ],
@@ -147,7 +147,7 @@ const questions = [
       {
         type: "select",
         label: "Time/Duration (Minutes)",
-        options: Array.from({ length: 60 }, (_, i) => 1 + i),
+        options: Array.from({ length: 20 }, (_, i) => (i + 1) * 10),
         name: "strength_resistance_time_duration",
       },
     ],
@@ -175,7 +175,7 @@ const questions = [
       {
         type: "select",
         label: "Time/Duration (Minutes)",
-        options: Array.from({ length: 60 }, (_, i) => 1 + i),
+        options: Array.from({ length: 20 }, (_, i) => (i + 1) * 10),
         name: "flexibility_stretching_time_duration",
       },
     ],
@@ -203,7 +203,7 @@ const questions = [
       {
         type: "select",
         label: "Time/Duration (Minutes)",
-        options: Array.from({ length: 60 }, (_, i) => 1 + i),
+        options: Array.from({ length: 20 }, (_, i) => (i + 1) * 10),
         name: "sport_participated_time_duration",
       },
     ],
@@ -231,7 +231,7 @@ const questions = [
       {
         type: "select",
         label: "Time/Duration (Minutes)",
-        options: Array.from({ length: 48 }, (_, i) => 1 + i),
+        options: Array.from({ length: 20 }, (_, i) => (i + 1) * 10),
         name: "sports_leisure_time_duration",
       },
     ],
@@ -259,7 +259,7 @@ const questions = [
       {
         type: "select",
         label: "Time/Duration (Minutes)",
-        options: Array.from({ length: 60 }, (_, i) => i < 59 ? i + 1 : '60+'),
+        options: Array.from({ length: 20 }, (_, i) => (i + 1) * 10),
         name: "sport_participated_in_time_duration",
       },
     ],
@@ -306,55 +306,61 @@ console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
   const isMobile = useMediaQuery({ maxWidth: 767 });
 
   const mapHealthLifestyleInfoToState = (info) => {
+    const normalizeYesNo = (value) => {
+      if (value === true) return "Yes";
+      if (value === false) return "No";
+      return null;
+    };
+
     const answersFromApi = {
-      do_you_have_current_health_concern: info.doYouOngoingHealth ? "Yes" : "No",
-      do_you_have_any_allergies: info.doYouAllergies ? "Yes" : "No",
+      do_you_have_current_health_concern: normalizeYesNo(info.doYouOngoingHealth),
+      do_you_have_any_allergies: normalizeYesNo(info.doYouAllergies),
       sleep_hours: info.sleepHours?.toString() || "",
-      problems_falling_asleep: info.problemSleeping ? "Yes" : "No",
-      problems_staying_asleep: info.stayingAsleep ? "Yes" : "No",
-      problems_with_insomnia: info.insomnia ? "Yes" : "No",
-      do_you_snore: info.doYouSnore ? "Yes" : "No",
-      do_you_feel_rested: info.restedUponAwake ? "Yes" : "No",
-      do_you_use_sleeping_aids: info.sleepingAids?.yesNo ? "Yes" : "No",
+      problems_falling_asleep: normalizeYesNo(info.problemSleeping),
+      problems_staying_asleep: normalizeYesNo(info.stayingAsleep),
+      problems_with_insomnia: normalizeYesNo(info.insomnia),
+      do_you_snore: normalizeYesNo(info.doYouSnore),
+      do_you_feel_rested: normalizeYesNo(info.restedUponAwake),
+      do_you_use_sleeping_aids: normalizeYesNo(info.sleepingAids?.yesNo),
       do_you_use_sleeping_aids_other: info.sleepingAids?.describe || "",
   
       // Exercise: cardio
-      cardio_aerobic: info.cardio?.doYou ? "Yes" : "No",
+      cardio_aerobic: normalizeYesNo(info.cardio?.doYou),
       cardio_aerobic_describe: info.cardio?.type || "",
       cardio_aerobic_number: info.cardio?.timesWeek?.toString() || "",
       cardio_aerobic_time_duration: info.cardio?.duration?.toString() || "",
 
-      sport_participated_in_strength: info.strenght?.doYou ? "Yes" : "No",
+      sport_participated_in_strength: normalizeYesNo(info.strenght?.doYou),
       strength_resistance_describe: info.strenght?.type || "",
       strength_resistance_number: info.strenght?.timesWeek?.toString() || "",
       strength_resistance_time_duration: info.strenght?.duration?.toString() || "",
 
-      sport_participated_in_flexibility: info.flexibility?.doYou ? "Yes" : "No",
+      sport_participated_in_flexibility: normalizeYesNo(info.flexibility?.doYou),
       flexibility_stretching_describe: info.flexibility?.type || "",
       flexibility_stretching_number: info.flexibility?.timesWeek?.toString() || "",
       flexibility_stretching_time_duration: info.flexibility?.duration?.toString() || "",
   
-      sport_participated_in_balance: info.balance?.doYou ? "Yes" : "No",
+      sport_participated_in_balance: normalizeYesNo(info.balance?.doYou),
       sport_participated_describe: info.balance?.type || "",
       sport_participated_number: info.balance?.timesWeek?.toString() || "",
       sport_participated_time_duration: info.balance?.duration?.toString() || "",
   
-      sport_participated_in_others: info.other?.doYou ? "Yes" : "No",
+      sport_participated_in_others: normalizeYesNo(info.other?.doYou),
       sport_participated_in_describe: info.other?.type || "",
       sport_participated_in_number: info.other?.timesWeek?.toString() || "",
       sport_participated_in_time_duration: info.other?.duration?.toString() || "",
 
-      sport_participated_in_leisure: info.sport?.doYou ? "Yes" : "No",
+      sport_participated_in_leisure: normalizeYesNo(info.sport?.doYou),
       sports_leisure_describe: info.sport?.type || "",
       sports_leisure_number: info.sport?.timesWeek?.toString() || "",
       sports_leisure_time_duration: info.sport?.duration?.toString() || "",
   
       motivated_to_exercise: info.motivatedToExercise || "",
   
-      problems_limiting_exercise: info.problemsThatLimitExercise?.yesNo ? "Yes" : "No",
+      problems_limiting_exercise: normalizeYesNo(info.problemsThatLimitExercise?.yesNo),
       problems_limiting_exercise_other: info.problemsThatLimitExercise?.describe || "",
   
-      sore_after_exercise: info.soreAfterExercise?.yesNo ? "Yes" : "No",
+      sore_after_exercise: normalizeYesNo(info.soreAfterExercise?.yesNo),
       sore_after_exercise_other: info.soreAfterExercise?.describe || "",
     };
   
@@ -427,27 +433,28 @@ console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
         case "radio": {
           const value = answers[question.name];
         
-          // General validation: answer must exist and be a valid option
-          if (value === undefined || value === "") {
+          // Step 1: Require a radio selection always
+          if (!value || !question.options.includes(value)) {
             return false;
           }
         
-          // For specific fields, if value is 'Yes', check additional input field
-          if (
-            value === "Yes" &&
-            (
-              question.name === "do_you_use_sleeping_aids" ||
-              question.name === "problems_limiting_exercise" ||
-              question.name === "sore_after_exercise"
-            )
-          ) {
+          // Step 2: For specific radios that need extra input when value is "Yes"
+          const needsOther = [
+            "do_you_use_sleeping_aids",
+            "problems_limiting_exercise",
+            "sore_after_exercise",
+          ];
+        
+          if (value === "Yes" && needsOther.includes(question.name)) {
             const inputFieldName = `${question.name}_other`;
             if (!answers[inputFieldName] || answers[inputFieldName].trim() === "") {
               return false;
             }
           }
+        
           return true;
         }
+        
 
       case "long_radio": {
         if (answers[question.name] === undefined) {

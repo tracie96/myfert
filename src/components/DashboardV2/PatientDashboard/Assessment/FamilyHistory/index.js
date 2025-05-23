@@ -462,10 +462,15 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
         obstetricHistoryMap[`${key}_select`] = item.level;
       });
 
+      const normalizeYesNo = (value) => {
+        if (value === true) return "Yes";
+        if (value === false) return "No";
+        return null;
+      };
       const mappedAnswers = {
         ...obstetricHistoryMap,
         // Map pregnancy problems
-        pregnancy_problems: patientPersonalFamilyInfo.problemsAfterPregnancy ? "Yes" : "No",
+        pregnancy_problems: normalizeYesNo(patientPersonalFamilyInfo.problemsAfterPregnancy),
         pregnancy_problems_sub: patientPersonalFamilyInfo.problemsAfterPregnancyExplain || "",
 
         // Map menstrual history
@@ -473,43 +478,43 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
         date_of_last_period: patientPersonalFamilyInfo.startDateLastMenstrual || "",
         length_of_cycle: patientPersonalFamilyInfo.lenghtOfCycle || "",
         times_between_of_cycle: patientPersonalFamilyInfo.timeBtwCycles || "",
-        cramping: patientPersonalFamilyInfo.cramping ? "Yes" : "No",
-        pain: patientPersonalFamilyInfo.painInPeriod ? "Yes" : "No",
+        cramping: normalizeYesNo(patientPersonalFamilyInfo.cramping),
+        pain: normalizeYesNo(patientPersonalFamilyInfo.painInPeriod),
 
         // Map premenstrual problems
-        premenstrual_problems: patientPersonalFamilyInfo.everHadPreMenstrualProblems?.yesNo ? "Yes" : "No",
+        premenstrual_problems: normalizeYesNo(patientPersonalFamilyInfo.everHadPreMenstrualProblems?.yesNo),
         premenstrual_problems_describe: patientPersonalFamilyInfo.everHadPreMenstrualProblems?.describe || "",
 
         // Map other menstrual problems
-        other_premenstrual_problems: patientPersonalFamilyInfo.otherMenstrualProblems?.yesNo ? "Yes" : "No",
+        other_premenstrual_problems: normalizeYesNo(patientPersonalFamilyInfo.otherMenstrualProblems?.yesNo),
         other_hormonal_problems_history: patientPersonalFamilyInfo.otherMenstrualProblems?.describe || "",
 
         // Map hormonal birth control
-        hormonal_birthcontrol: patientPersonalFamilyInfo.hormonalBirthControlType?.name ? "Yes" : "No",
+        hormonal_birthcontrol: normalizeYesNo(patientPersonalFamilyInfo.hormonalBirthControlType?.name),
         hormonal_birthcontrol_often: patientPersonalFamilyInfo.hormonalBirthControlType?.name || "",
         hormonal_birthcontrol_long: "", // Not provided in API
 
         // Map hormonal birth control problems
-        other_hormonal_problems: patientPersonalFamilyInfo.problemsWithHormonalBirthControl?.yesNo ? "Yes" : "No",
+        other_hormonal_problems: normalizeYesNo(patientPersonalFamilyInfo.problemsWithHormonalBirthControl?.yesNo),
         any_hormonal_problems_bc: patientPersonalFamilyInfo.problemsWithHormonalBirthControl?.describe || "",
 
         // Map contraception
-        use_of_contraception: patientPersonalFamilyInfo.useContraception?.yesNo ? "Yes" : "No",
+        use_of_contraception: normalizeYesNo(patientPersonalFamilyInfo.useContraception?.yesNo),
         use_of_contraception_sub: patientPersonalFamilyInfo.useContraception?.describe || "",
 
         // Map menopause
-        is_menopause: patientPersonalFamilyInfo.inMenopause?.yesNo ? "Yes" : "No",
+        is_menopause: normalizeYesNo(patientPersonalFamilyInfo.inMenopause?.yesNo),
         age_at_last_period: patientPersonalFamilyInfo.inMenopause?.level || "",
 
         // Map surgical menopause
-        surgical_menopause: patientPersonalFamilyInfo.surgicalMenopause?.yesNo ? "Yes" : "No",
+        surgical_menopause: normalizeYesNo(patientPersonalFamilyInfo.surgicalMenopause?.yesNo),
         surgical_menopause_detail: patientPersonalFamilyInfo.surgicalMenopause?.describe || "",
 
         // Map symptomatic problems
         symptomatic_problems_menopause_history: patientPersonalFamilyInfo.symptomicProblems || [],
 
         // Map hormone replacement
-        hormone_replacement_therapy: patientPersonalFamilyInfo.hormonalReplacement?.yesNo ? "Yes" : "No",
+        hormone_replacement_therapy: normalizeYesNo(patientPersonalFamilyInfo.hormonalReplacement?.yesNo),
         hormone_replacement_therapy_sub: patientPersonalFamilyInfo.hormonalReplacement?.describe || "",
 
         // Map gynecological symptoms
@@ -533,6 +538,13 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
     }
   
     switch (question.type) {
+      case "radio": {
+        if (answers[question.name] === undefined || answers[question.name] === null || answers[question.name] === "") {
+          console.log(`Validation failed: '${question.name}' radio question not answered.`);
+          return false;
+        }
+        return true;
+      }
       case "checkbox_with_select":
         for (const option of question.options) {
           const checkboxChecked = answers[option.name] || false;

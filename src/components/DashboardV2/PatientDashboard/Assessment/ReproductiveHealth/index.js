@@ -614,30 +614,35 @@ const ReproductiveHealth = ({ onComplete }) => {
 
   useEffect(() => {
     if (patientReproductiveInfo) {
+      const normalizeYesNo = (value) => {
+        if (value === true) return "Yes";
+        if (value === false) return "No";
+        return null;
+      };
       const mappedAnswers = {
-        relaxation_techniques: patientReproductiveInfo.birthControl ? "Yes" : "No",
+        relaxation_techniques: normalizeYesNo(patientReproductiveInfo.birthControl),
         how_often_hormonal_bc: patientReproductiveInfo.hormonalBirthControl || "",
         how_often_non_hormonal_bc: patientReproductiveInfo.nonHormonalBirthControl || "",
-        isPregnant: patientReproductiveInfo.currentlyPregnant ? "Yes" : "No",
-        is_trying_to_conceive: patientReproductiveInfo.tryingToConceive ? "Yes" : "No",
-        is_difficulty_to_conceive: patientReproductiveInfo.difficultyTryingToConceive ? "Yes" : "No",
-        is_family_health_concern: patientReproductiveInfo.familyMemberWithReproductiveConcerns || "No",
+        isPregnant: normalizeYesNo(patientReproductiveInfo.currentlyPregnant),
+        is_trying_to_conceive: normalizeYesNo(patientReproductiveInfo.tryingToConceive),
+        is_difficulty_to_conceive: normalizeYesNo(patientReproductiveInfo.difficultyTryingToConceive),
+        is_family_health_concern: normalizeYesNo(patientReproductiveInfo.familyMemberWithReproductiveConcerns),
         is_trying_to_conceive_time: patientReproductiveInfo.howLongTryingToConceive || "",
         methods_trying_to_conceive: patientReproductiveInfo.methodToConceive || [],
         is_charting_cycles: patientReproductiveInfo.chartingToConceive || [],
-        current_therapy: patientReproductiveInfo.currentTherapy ? "Yes" : "No",
+        current_therapy: normalizeYesNo(patientReproductiveInfo.currentTherapy),
         charting_method: patientReproductiveInfo.methodFertilityAwareness || "",
         // intercourse_during_fertile_sub: patientReproductiveInfo.intercourse_during_fertile || "",
         is_frequent_intercourse_cycle: patientReproductiveInfo.intercouseEachCycle || "",
         is_menstrual_pain: patientReproductiveInfo.menstrualPainDuringPeriod || [],
-        is_lower_back_pain: patientReproductiveInfo.experiencePelvicPain ? "Yes" : "No",
+        is_lower_back_pain: normalizeYesNo(patientReproductiveInfo.experiencePelvicPain),
         duration_per_cycle_pp_not_menstrual: patientReproductiveInfo.duringCirclePelvicPain?.duration || "",
         duration_per_cycle_pp_not_menstrual_unsure: patientReproductiveInfo.duringCirclePelvicPain?.duration || "0",
         duration_per_mild_cycle_severity_pp_not_menstrual: patientReproductiveInfo.duringCirclePelvicPain?.colour || "",
         duration_per_cycle_pelvic_pain: patientReproductiveInfo.menstralBleedingPelvicPain?.duration || "",
         duration_per_cycle_pelvic_pain_unsure: patientReproductiveInfo.menstralBleedingPelvicPain?.duration === "0",
         duration_per_cycle_severity_pelvic_pain: patientReproductiveInfo.menstralBleedingPelvicPain?.colour || "",
-        is_pms_symptom: patientReproductiveInfo.doYouPmsSymptoms ? "Yes" : "No",
+        is_pms_symptom: normalizeYesNo(patientReproductiveInfo.doYouPmsSymptoms),
         pms_sympton: patientReproductiveInfo.pmsSymptoms || [],
         pms_sympton_severity: patientReproductiveInfo.pms?.colour || "",
         cycle_spotting_sub_number: patientReproductiveInfo.midCycleSpottingFrequency?.duration || "",
@@ -650,7 +655,7 @@ const ReproductiveHealth = ({ onComplete }) => {
         average_cycle_radio_unsure: patientReproductiveInfo.averageCycleLenght || "0",
         shortest_cycle_radio: patientReproductiveInfo.shortestCycleLenght || "",
         shortest_cycle_radio_unsure: patientReproductiveInfo.shortestCycleLenght || "0",
-        mid_cycle_spotting: patientReproductiveInfo.midCycleSpotting ? "Yes" : "No",
+        mid_cycle_spotting: normalizeYesNo(patientReproductiveInfo.midCycleSpotting),
         cervical_mucus: patientReproductiveInfo.cycleDischargeCreamy?.duration || "",
         cervical_mucus_unsure: patientReproductiveInfo.cycleDischargeCreamy?.duration || "0",
         cervical_mucus_sub: patientReproductiveInfo.cycleDischargeCreamy?.colour || "",

@@ -81,6 +81,13 @@ const questions = [
     type: "rating_scale",
     sub: "Other",
     name: "health_stress_other",
+    subQuestions: [
+      {
+        type: "long_textarea",
+        name: "health_stress_other_input",
+      },
+    ],
+    
   },
   {
     question: "Do you use relaxation techniques?",
@@ -277,11 +284,15 @@ const StressAndRelationship = ({ onComplete }) => {
   // Function to map API response to form format
   const mapApiToFormData = (apiData) => {
     if (!apiData) return {};
-
+    const normalizeYesNo = (value) => {
+      if (value === true) return "Yes";
+      if (value === false) return "No";
+      return null;
+    };
     const formData = {
       // Map boolean values back to "Yes"/"No"
-      do_you_feel_stress: apiData.excessStress ? "Yes" : "No",
-      can_you_handle_stress: apiData.easyToHandleStress ? "Yes" : "No",
+      do_you_feel_stress: normalizeYesNo(apiData.excessStress),
+      can_you_handle_stress: normalizeYesNo(apiData.easyToHandleStress),
       
       // Map stress ratings
       health_stress_work: apiData.stressFromWork || 0,
@@ -292,7 +303,7 @@ const StressAndRelationship = ({ onComplete }) => {
       health_stress_other: apiData.stressFromOther || 0,
       
       // Map relaxation techniques
-      relaxation_techniques: apiData.relaxationTechniques ? "Yes" : "No",
+      relaxation_techniques: normalizeYesNo(apiData.relaxationTechniques),
       how_often_relaxation: apiData.oftenRelaxationTechniques !== "N/A" ? apiData.oftenRelaxationTechniques : "",
       
       // Map technique types (convert string back to array)
@@ -301,12 +312,12 @@ const StressAndRelationship = ({ onComplete }) => {
         : [],
       
       // Map counseling and therapy
-      have_you_sought_counselling: apiData.soughtCounselling ? "Yes" : "No",
-      current_therapy: apiData.currentlyInTherapy ? "Yes" : "No",
+      have_you_sought_counselling: normalizeYesNo(apiData.soughtCounselling),
+      current_therapy: normalizeYesNo(apiData.currentlyInTherapy),
       therapy_description: apiData.describeTherapy !== "N/A" ? apiData.describeTherapy : "",
       
       // Map abuse question
-      been_abused: apiData.abused ? "Yes" : "No",
+      been_abused: normalizeYesNo(apiData.abused),
       
       // Map hobbies (this field seems to be missing in the API mapping, using a default)
       hobbies_and_leisure_activities: apiData.hobbiesLeisure !== "N/A" ? apiData.hobbiesLeisure : "",
@@ -321,7 +332,7 @@ const StressAndRelationship = ({ onComplete }) => {
       resourcces_for_emotional_support: Array.isArray(apiData.emotionalSupport) ? apiData.emotionalSupport : [],
       
       // Map spiritual practice
-      spiritual_practice: apiData.religiousPractice ? "Yes" : "No",
+      spiritual_practice: normalizeYesNo(apiData.religiousPractice),
       spiritual_practice_desciption: apiData.typeReligiousPractice !== "N/A" ? apiData.typeReligiousPractice : "",
     };
 
@@ -420,22 +431,36 @@ const StressAndRelationship = ({ onComplete }) => {
         break;
   
       case "radio": {
-        if (answers[question.name] === undefined) {
+        const value = answers[question.name];
+      
+        // Check if a value was selected
+        if (value === undefined || value === null || value === "") {
+          console.log(`Validation failed: '${question.name}' radio question not answered.`);
           return false;
         }
-  
-        if (answers[question.name] === "Yes" && (
-          question.name === "do_you_use_sleeping_aids" ||
-          question.name === "problems_limiting_exercise" ||
-          question.name === "sore_after_exercise"
-        )) {
+      
+        // If "Yes" is selected, and this radio has a corresponding input field, validate it
+        const requiresFollowUp = [
+          "do_you_use_sleeping_aids",
+          "problems_limiting_exercise",
+          "sore_after_exercise"
+        ];
+      
+        if (value === "Yes" && requiresFollowUp.includes(question.name)) {
           const inputFieldName = `${question.name}_other`;
-          if (!answers[inputFieldName] || answers[inputFieldName] === "") {
-            console.log(`Validation Failed: ${question.name} is Yes, but input field is empty.`);
+          if (!answers[inputFieldName] || answers[inputFieldName].trim() === "") {
             return false;
           }
         }
-  
+      
+        return true;
+      }
+      
+      case "rating_scale": {
+        const value = answers[question.name];
+        if (value === undefined || value === null || value === 0) {
+          return false;
+        }
         return true;
       }
   
@@ -774,8 +799,9 @@ const StressAndRelationship = ({ onComplete }) => {
         );
       case "rating_scale":
         return (
-          <div style={{ padding: "0 10px" }}>
-            <div style={{ marginTop: "10px" }}>
+          <div style={{ padding: "0 10px", marginBottom: "30px" }}>
+            {/* Slider Section */}
+            <div style={{ marginTop: "10px", marginBottom: "20px" }}>
               <Slider
                 min={0}
                 max={10}
@@ -797,8 +823,41 @@ const StressAndRelationship = ({ onComplete }) => {
                 style={{ width: isMobile ? "100%" : "50%" }}
               />
             </div>
+
+            {/* Subquestions: long_textarea */}
+            {question.subQuestions &&
+              question.subQuestions.length > 0 &&
+              question.subQuestions.map((subQuestion, index) => (
+                <div key={index} style={{ marginBottom: "20px" }}>
+                  <label
+                    style={{
+                      fontWeight: "bold",
+                      display: "block",
+                      marginTop: "5%",
+                      color: "#000",
+                    }}
+                  >
+                    {subQuestion.question}
+                  </label>
+                  {subQuestion.type === "long_textarea" && (
+                    <Input.TextArea
+                      className="input_questtionnaire"
+                      name={subQuestion.name}
+                      value={answers[subQuestion.name] || ""}
+                      onChange={(e) => handleChange(e.target.value, subQuestion.name)}
+                      rows={5}
+                      style={{
+                        width: isMobile ? "100%" : "40%",
+                        resize: "vertical",
+                        minHeight: "100px",
+                        borderColor: "#00ADEF",
+                      }}
+                    />
+                  )}
+                </div>
+              ))}
           </div>
-        );
+        );    
 
       case "long_textarea":
         return (

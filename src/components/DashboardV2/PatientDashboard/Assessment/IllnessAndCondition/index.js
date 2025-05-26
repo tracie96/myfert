@@ -1108,18 +1108,24 @@ const IllnessAndCondition = ({ onComplete }) => {
       case "multi_yes_no":
         return (
           <div style={{ marginTop: "20px" }}>
-            <Button
-              type="primary"
-              style={{
-                background: "#335CAD",
-                padding: isMobile ? "10px" : "20px",
-                fontSize: isMobile ? "13px" : "15px",
-                fontWeight: "bold",
-                width: isMobile ? "100%" : "auto",
-              }}
-            >
-              {question.sub}
-            </Button>
+            <div style={{
+                    background: "#335CAD",
+                    padding: isMobile ? "10px 16px" : "12px 20px",
+                    fontSize: isMobile ? "13px" : "15px",
+                    fontWeight: "bold",
+                    width: "fit-content",
+                    height: "40px", // optional if using padding + flex
+                    borderRadius: "4px",
+                    color: "#fff",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer", // makes it behave like a button
+                    userSelect: "none",
+                
+                  }}>
+                     {question.sub}
+                  </div>
 
             {question.subQuestions.map((subQuestion) => (
               <div key={subQuestion.name} style={{ marginTop: 20 }}>

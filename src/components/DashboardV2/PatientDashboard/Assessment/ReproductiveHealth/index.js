@@ -615,8 +615,9 @@ const ReproductiveHealth = ({ onComplete }) => {
   useEffect(() => {
     if (patientReproductiveInfo) {
       const normalizeYesNo = (value) => {
-        if (value === true) return "Yes";
-        if (value === false) return "No";
+        if (value === true || value === "Yes") return "Yes";
+        if (value === false || value === "No") return "No";
+        if (value === "Unsure") return "Unsure";
         return null;
       };
       const mappedAnswers = {
@@ -630,7 +631,7 @@ const ReproductiveHealth = ({ onComplete }) => {
         is_trying_to_conceive_time: patientReproductiveInfo.howLongTryingToConceive || "",
         methods_trying_to_conceive: patientReproductiveInfo.methodToConceive || [],
         is_charting_cycles: patientReproductiveInfo.chartingToConceive || [],
-        current_therapy: normalizeYesNo(patientReproductiveInfo.currentTherapy),
+        current_therapy: "No",
         charting_method: patientReproductiveInfo.methodFertilityAwareness || "",
         // intercourse_during_fertile_sub: patientReproductiveInfo.intercourse_during_fertile || "",
         is_frequent_intercourse_cycle: patientReproductiveInfo.intercouseEachCycle || "",

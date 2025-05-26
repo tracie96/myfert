@@ -300,18 +300,16 @@ const CurrentLifeStyle = ({ onComplete }) => {
   const [tempConcern, setTempConcern] = useState({});
   const [tempAllergy, setTempAllergy] = useState({});
   const patientHealthLifeStyleInfo = useSelector((state) => state.intake?.patientHealthLifestyle);
-console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
   const totalQuestions = questions.length;
 
   const isMobile = useMediaQuery({ maxWidth: 767 });
 
   const mapHealthLifestyleInfoToState = (info) => {
     const normalizeYesNo = (value) => {
-      if (value === true) return "Yes";
-      if (value === false) return "No";
-      return null;
+      if (value === true || value === "Yes" || value === "true") return "Yes";
+      if (value === false || value === "No" || value === "false") return "No";
+      return ""; // ← Fix: always return a string
     };
-
     const answersFromApi = {
       do_you_have_current_health_concern: normalizeYesNo(info.doYouOngoingHealth),
       do_you_have_any_allergies: normalizeYesNo(info.doYouAllergies),
@@ -363,7 +361,7 @@ console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
       sore_after_exercise: normalizeYesNo(info.soreAfterExercise?.yesNo),
       sore_after_exercise_other: info.soreAfterExercise?.describe || "",
     };
-  
+
     return {
       answers: answersFromApi,
       concerns: info.ongoingHealth?.map((item, index) => ({
@@ -385,12 +383,12 @@ console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
   useEffect(() => {
     dispatch(getHealthLifestylePatient());
   }, [dispatch]);
-
+  
   useEffect(() => {
-    const savedIndex = parseInt(localStorage.getItem("currentQuestionIndex2"), 10);
-    const savedAnswers = JSON.parse(localStorage.getItem("answers"));
-    const savedConcern = JSON.parse(localStorage.getItem("currentConcern"));
-    const savedAllergies = JSON.parse(localStorage.getItem("currentAllergies"));
+    const savedIndex = parseInt(localStorage.getItem("currentQuestionIndex_LS"), 10);
+    const savedAnswers = JSON.parse(localStorage.getItem("answers_LS")); // changed key
+    const savedConcern = JSON.parse(localStorage.getItem("currentConcern_LS"));
+    const savedAllergies = JSON.parse(localStorage.getItem("currentAllergies_LS"));
   
     const hasApiData = patientHealthLifeStyleInfo && Object.keys(patientHealthLifeStyleInfo).length > 0;
     const mapped = hasApiData ? mapHealthLifestyleInfoToState(patientHealthLifeStyleInfo) : null;
@@ -401,24 +399,23 @@ console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
   
     if (savedAnswers && Object.keys(savedAnswers).length > 0) {
       setAnswers(savedAnswers);
-    } else if (mapped) {
+    } else if (mapped?.answers) {
       setAnswers(mapped.answers);
-      localStorage.setItem("answers", JSON.stringify(mapped.answers));
+      localStorage.setItem("answers_LS", JSON.stringify(mapped.answers));
     }
   
-    // ⚠️ THIS is where the fix happens
-    if (savedConcern && savedConcern.length > 0) {
+    if (Array.isArray(savedConcern) && savedConcern.length > 0) {
       setCurrentConcern(savedConcern);
-    } else if (mapped) {
+    } else if (mapped?.concerns) {
       setCurrentConcern(mapped.concerns);
-      localStorage.setItem("currentConcern", JSON.stringify(mapped.concerns));
+      localStorage.setItem("currentConcern_LS", JSON.stringify(mapped.concerns));
     }
   
-    if (savedAllergies && savedAllergies.length > 0) {
+    if (Array.isArray(savedAllergies) && savedAllergies.length > 0) {
       setCurrentAllergies(savedAllergies);
-    } else if (mapped) {
+    } else if (mapped?.allergies) {
       setCurrentAllergies(mapped.allergies);
-      localStorage.setItem("currentAllergies", JSON.stringify(mapped.allergies));
+      localStorage.setItem("currentAllergies_LS", JSON.stringify(mapped.allergies));
     }
   }, [patientHealthLifeStyleInfo]);
   
@@ -552,10 +549,10 @@ console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
       }
     }
 
-    localStorage.setItem("currentQuestionIndex2", 0);
-    localStorage.setItem("answers", JSON.stringify(answers));
-    localStorage.setItem("currentAllergies", JSON.stringify(currentAllergies));
-    localStorage.setItem("currentConcern", JSON.stringify(currentConcern));
+    localStorage.setItem("currentQuestionIndex_LS", nextQuestionIndex);
+    localStorage.setItem("answers_LS", JSON.stringify(answers));
+    localStorage.setItem("currentConcern_LS", JSON.stringify(currentConcern));
+    localStorage.setItem("currentAllergies_LS", JSON.stringify(currentAllergies));
 
     // If no specific next question was determined, proceed to the next in sequence
     if (

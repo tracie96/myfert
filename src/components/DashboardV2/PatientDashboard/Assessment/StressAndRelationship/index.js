@@ -301,6 +301,7 @@ const StressAndRelationship = ({ onComplete }) => {
       health_stress_financies: apiData.stressFromFinances || 0,
       health_stress_health: apiData.stressFromHealth || 0,
       health_stress_other: apiData.stressFromOther || 0,
+      health_stress_other_input: apiData.stressFromOtherName || "",
       
       // Map relaxation techniques
       relaxation_techniques: normalizeYesNo(apiData.relaxationTechniques),
@@ -569,6 +570,7 @@ const StressAndRelationship = ({ onComplete }) => {
         stressFromFinances: answers.health_stress_financies || 0,
         stressFromHealth: answers.health_stress_health || 0,
         stressFromOther: answers.health_stress_other || 0,
+        stressFromOtherName: answers.health_stress_other_input || "",
         relaxationTechniques: answers.relaxation_techniques === "Yes",
         oftenRelaxationTechniques: answers.how_often_relaxation || "N/A",
         typeRelaxationTechniques: answers.special_nutritional_program?.join(", ") || "N/A",

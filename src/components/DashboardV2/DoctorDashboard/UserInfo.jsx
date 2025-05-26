@@ -1232,49 +1232,76 @@ function SwitchContent({
             <Row gutter={16}>
               <Col xs={24} md={12}>
                 <Descriptions column={1} bordered>
-                  {Object.entries(illness || {}).map(([category, conditions]) => {
-                    // Skip diagnostic/surgery/injury categories
-                    if (category.startsWith('diagnostic') || category.startsWith('surgery') || category.startsWith('injuries')) {
+                  {/* First show all the condition categories */}
+                  {[
+                    'gastroIntestinal',
+                    'respiratory',
+                    'urinary',
+                    'endocrine',
+                    'inflammatory',
+                    'musculoskeletal',
+                    'skin',
+                    'cardiovascular',
+                    'neurologic',
+                    'cancer'
+                  ].map((category) => {
+                    const displayName = category
+                      .replace(/([A-Z])/g, ' $1')
+                      .replace(/^./, str => str.toUpperCase())
+                      .trim();
+
+                    const conditions = illness?.[category] || [];
+                    
+                    return (
+                      <Descriptions.Item 
+                        label={displayName} 
+                        key={category}
+                      >
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                          {conditions.length > 0 ? (
+                            conditions.map((condition, index) => (
+                              <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <Tag color={condition.yesNoNA === 'yes' ? 'green' : condition.yesNoNA === 'no' ? 'red' : 'default'}>
+                                  {condition.typeName}: {condition.yesNoNA || 'Answer not provided'}
+                                </Tag>
+                              </div>
+                            ))
+                          ) : (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <Tag color="default">Answer not provided</Tag>
+                            </div>
+                          )}
+                        </div>
+                      </Descriptions.Item>
+                    );
+                  })}
+
+                  {Object.entries(illness || {}).map(([category, data]) => {
+                    if (['gastroIntestinal', 'respiratory', 'urinary', 'endocrine', 'inflammatory', 
+                         'musculoskeletal', 'skin', 'cardiovascular', 'neurologic', 'cancer'].includes(category)) {
                       return null;
                     }
 
-                    // Handle arrays of conditions (like gastroIntestinal, respiratory, etc.)
-                    if (Array.isArray(conditions)) {
-                      return (
-                        <Descriptions.Item 
-                          label={category.charAt(0).toUpperCase() + category.slice(1)} 
-                          key={category}
-                        >
-                 
-                          {conditions && conditions.length > 0 ? (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                              
-                              {conditions.filter(condition => condition && typeof condition === 'object').map((condition, index) => {
-                                if (!condition || !condition.typeName || !condition.yesNoNA) {
-                                  return (
-                                    <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                      <Tag color="default">
-                                        {condition?.typeName?.replace(/_/g, ' ').split('/').join('/') || 'Unknown'}: Answer not provided
-                                      </Tag>
-                                    </div>
-                                  );
-                                }
-                                return (
-                                  <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                    <Tag color={condition.yesNoNA === 'n/a' ? 'default' : condition.yesNoNA === 'yes' ? 'green' : 'red'}>
-                                      {condition.typeName.replace(/_/g, ' ').split('/').join('/')}:
-                                      {' '}
-                                      {condition.yesNoNA === 'n/a' ? 'Answer not provided' : condition.yesNoNA.toUpperCase()}
-                                    </Tag>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          ) :''
-                          }
-                        </Descriptions.Item>
-                      );
-                    }
+                
+
+                    // if (typeof data === 'object' && data !== null && !Array.isArray(data)) {
+                    //   return (
+                    //     <Descriptions.Item
+                    //       label={displayName}
+                    //       key={category}
+                    //     >
+                    //       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    //         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    //           <Tag color="default">
+                    //             {(!data.date && !data.value && !data.otherName) ? 'Answer not provided' : 
+                    //               `${data.date ? `Date: ${data.date}` : 'Date: N/A'}${data.value ? `, Value: ${data.value}` : ''}${data.otherName ? `, Name: ${data.otherName}` : ''}`
+                    //             }
+                    //           </Tag>
+                    //         </div>
+                    //       </div>
+                    //     </Descriptions.Item>
+                    //   );
+                    // }
                     return null;
                   })}
                 </Descriptions>

@@ -435,24 +435,24 @@ const questions = [
 
   {
     question:
-    "Discharge: Egg white, long (>1”), slippery, stretchy cervical mucus",
+    "Discharge: Egg white, long (>1\"), slippery, stretchy cervical mucus",
     type: "number_with_radio",
     title: "Duration(put 0 if you do not experience it)",
     name: "egg_white_mucus",
     subQuestions: [
-        {
-          type: "number_with_radio_sub",
-          label: "",
-          name: "egg_white_mucus_sub",
-        },
-        {
-          question: "Colour",
-          type: "radio",
-          label: "Colour",
-          options: ["White","Other"],
-          name: "egg_white_mucus_colour",
-        },
-      ],
+      {
+        type: "number_with_radio_sub",
+        label: "",
+        name: "egg_white_mucus_sub",
+      },
+      {
+        question: "Colour",
+        type: "radio",
+        label: "Colour",
+        options: ["White","Other"],
+        name: "egg_white_mucus_colour",
+      },
+    ],
   },
 
   {
@@ -613,6 +613,18 @@ const ReproductiveHealth = ({ onComplete }) => {
   const patientReproductiveInfo = useSelector((state) => state.intake?.patientReproductiveInfo);
 
   useEffect(() => {
+    // First try to load from localStorage
+    const savedAnswers = localStorage.getItem("reproductiveHealthAnswers");
+    const savedIndex = localStorage.getItem("currentQuestionIndex5");
+    
+    if (savedAnswers) {
+      setAnswers(JSON.parse(savedAnswers));
+      if (savedIndex) {
+        setCurrentQuestionIndex(parseInt(savedIndex, 10));
+      }
+    }
+
+    // Then check if we have API data
     if (patientReproductiveInfo) {
       const normalizeYesNo = (value) => {
         if (value === true || value === "Yes") return "Yes";
@@ -676,27 +688,23 @@ const ReproductiveHealth = ({ onComplete }) => {
         intercourse_during_fertile_sub_unsure: patientReproductiveInfo.intercouseDays === "0",
         // Add more mappings as needed...
       };
-      setAnswers((prev) => ({
-        ...prev,
-        ...mappedAnswers,
-      }));
+      
+      // Only override localStorage data if we have API data
+      if (Object.keys(mappedAnswers).some(key => mappedAnswers[key])) {
+        setAnswers((prev) => ({
+          ...prev,
+          ...mappedAnswers,
+        }));
+        // Clear localStorage since we're using API data
+        localStorage.removeItem("reproductiveHealthAnswers");
+        localStorage.removeItem("currentQuestionIndex5");
+      }
     }
   }, [patientReproductiveInfo]);
   
   useEffect(() => {
     dispatch(getReproductiveHealthPatient());
   }, [dispatch]);
-
-  useEffect(() => {
-    const savedIndex = parseInt(
-      localStorage.getItem("currentQuestionIndex5"),
-      10
-    );
-    const savedAnswers = JSON.parse(localStorage.getItem("answers"));
-    if (!isNaN(savedIndex) && savedAnswers) {
-      setAnswers(savedAnswers);
-    }
-  }, []);
 
   const validateQuestion = () => {
 
@@ -781,29 +789,17 @@ const ReproductiveHealth = ({ onComplete }) => {
 
 
   const handleSave = () => {
-    const question = questions[currentQuestionIndex];
-    // Allow skipping validation if "Unsure" is selected for subQuestions
-    if (
-      question.type === "number_with_radio" &&
-      question.subQuestions &&
-      answers[`${question.subQuestions[0].name}_radio`] === "Unsure"
-    ) {
-      localStorage.setItem("currentQuestionIndex5", currentQuestionIndex + 1);
-      localStorage.setItem("answers", JSON.stringify(answers));
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-      return; // Exit early
-    }
-  
-    // Validate the question before proceeding
-    if (!validateQuestion() && question.name !== "info") {
+    if (!validateQuestion()) {
       message.error("Please answer the current question before saving.");
       return;
     }
-  
-    localStorage.setItem("currentQuestionIndex5", currentQuestionIndex + 1);
-    localStorage.setItem("answers", JSON.stringify(answers));
     
-    if(question.name === "is_pms_symptom" && answers.is_pms_symptom === "No"){
+    // Save current answers and question index to localStorage
+    localStorage.setItem("reproductiveHealthAnswers", JSON.stringify(answers));
+    localStorage.setItem("currentQuestionIndex5", currentQuestionIndex + 1);
+
+    const currentQuestion = questions[currentQuestionIndex];
+    if(currentQuestion.name === "is_pms_symptom" && answers.is_pms_symptom === "No"){
       setCurrentQuestionIndex(currentQuestionIndex + 2);
       return;
     }
@@ -1054,12 +1050,13 @@ const ReproductiveHealth = ({ onComplete }) => {
         const result = await response.json();
         console.log("API response:", result);
         message.success("Form submitted successfully!");
+        // Clear localStorage after successful submission
+        localStorage.removeItem("reproductiveHealthAnswers");
+        localStorage.removeItem("currentQuestionIndex5");
         dispatch(completeCard("/questionnaire/11"));
         localStorage.setItem("currentQuestionIndex11", 0);
         localStorage.setItem("currentStep", 1);
-        localStorage.setItem("answers", JSON.stringify(answers));
         handleStepChange(2);
-
         navigate("/assessment");
       } else {
         console.error("API error:", response.statusText);
@@ -1322,7 +1319,7 @@ const ReproductiveHealth = ({ onComplete }) => {
                   {option === "Other" &&
                     answers[subQuestion.name]?.includes("Other") && (
                       <Input
-                        className="input_questionnaire"
+                        className="input_questtionnaire"
                         placeholder="Please specify"
                         value={answers[`${subQuestion.name}_other`] || ""}
                         onChange={(e) =>

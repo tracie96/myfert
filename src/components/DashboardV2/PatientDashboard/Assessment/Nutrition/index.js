@@ -332,8 +332,10 @@ const Nutrition = ({ onComplete }) => {
       sensitive_food_other: info.sensitiveToFood?.describe || "",
       sensitive_food_info: info.sensitiveToFood?.describe || "",
       aversion_to_certain_food: normalizeYesNo(info.aversionToFood?.yesNo),
+      aversion_to_certain_food_other: info.aversionToFood?.describe || "",
       adversely_react: info.adverseList || [],
       crave_for_foods: normalizeYesNo(info.anyFoodCraving?.yesNo),
+      crave_for_foods_other: info.anyFoodCraving?.describe || "",
       eat_3_meals: normalizeYesNo(info.have3MealADay?.yesNo),
       eat_3_meals_detail: info.have3MealADay?.yesNo === "NO" ? info.have3MealADay.level : "",
       meals_per_day: info.howManyEatOutPerWeek || "",
@@ -535,12 +537,12 @@ const Nutrition = ({ onComplete }) => {
       },
       aversionToFood: {
         yesNo: answers.aversion_to_certain_food === "Yes",
-        describe: "",
+        describe: answers.aversion_to_certain_food_other || "",
       },
       adverseList: answers.adversely_react || [],
       anyFoodCraving: {
         yesNo: answers.crave_for_foods === "Yes",
-        describe: "",
+        describe: answers.crave_for_foods_other || "",
       },
       have3MealADay: {
         yesNo: answers.eat_3_meals === "Yes",

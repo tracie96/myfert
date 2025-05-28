@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Progress, Button, Radio, Col, Row, Input, message, Checkbox } from "antd";
+import { Progress, Button, Radio, Col, Row, Input, message, Checkbox, DatePicker } from "antd";
 import { useNavigate } from "react-router-dom"; // useNavigate for react-router v6
 import { useDispatch, useSelector } from "react-redux";
 import { completeCard } from "../../../../redux/assessmentSlice";
@@ -9,6 +9,7 @@ import "../assesment.css";
 import { DeleteOutlined } from "@ant-design/icons";
 import { useMediaQuery } from "react-responsive";
 import { backBtnTxt, exitBtnTxt, saveAndContinueBtn, submitBtn } from "../../../../../utils/constant";
+import dayjs from "dayjs";
 
 const questions = [
   {
@@ -331,16 +332,16 @@ const questions = [
     radioName: "injuries",
     radioOptions: [{ label: "comments", value: "Comments" }],
   },
-  {
-    type: "date_radio",
-    name: "back_injury",
-    question: "Injuries",
-    sub: "Back Injury",
-    dateName: "back_injury",
-    title: "Medical History: Illnesses/Conditions",
-    radioName: "back_injury",
-    radioOptions: [{ label: "comments", value: "Comments" }],
-  },
+  // {
+  //   type: "date_radio",
+  //   name: "back_injury",
+  //   question: "Injuries",
+  //   sub: "Back Injury",
+  //   dateName: "back_injury",
+  //   title: "Medical History: Illnesses/Conditions",
+  //   radioName: "back_injury",
+  //   radioOptions: [{ label: "comments", value: "Comments" }],
+  // },
   {
     type: "date_radio",
     name: "head_injury",
@@ -985,14 +986,13 @@ const IllnessAndCondition = ({ onComplete }) => {
             <div style={{ marginBottom: "10px" }}>
               <label style={{ color: "#000", fontSize: isMobile ? "13px" : "14px" }}>Date:</label>
               <br />
-              <Input
-                type="date"
+              <DatePicker
+                disabledDate={(current) => current && current > dayjs().endOf('day')}
+                value={answers[question.dateName] ? dayjs(answers[question.dateName]) : null}
+                format="YYYY-MM-DD"
                 className="input_questionnaire"
                 name={question.dateName}
-                value={answers[question.dateName] || ""}
-                onChange={(e) =>
-                  handleChange(e.target.value, question.dateName)
-                }
+                onChange={(date, dateString) => handleChange(dateString, question.dateName)}
                 style={{ width: isMobile ? "100%" : "200px" }}
                 disabled={isNA}
               />
@@ -1048,12 +1048,13 @@ const IllnessAndCondition = ({ onComplete }) => {
                     gap: "10px",
                   }}
                 >
-                  <Input
-                    type="date"
-                    value={entry.date || ""}
-                    onChange={(e) =>
+                  <DatePicker
+                    disabledDate={(current) => current && current > dayjs().endOf('day')}
+                    value={entry.date ? dayjs(entry.date) : null}
+                    format="YYYY-MM-DD"
+                    onChange={(date, dateString) =>
                       handleHospitalizationChange(
-                        e.target.value,
+                        dateString,
                         "date",
                         index,
                         question.name,

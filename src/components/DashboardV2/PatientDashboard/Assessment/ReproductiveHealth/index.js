@@ -709,16 +709,17 @@ const ReproductiveHealth = ({ onComplete }) => {
   }, [dispatch]);
 
   const validateQuestion = () => {
-
     const question = questions[currentQuestionIndex];
+
+    // Skip validation for info and info_spotting type questions
+    if (question.type === "info" || question.type === "info_spotting") {
+      return true;
+    }
+
     const mainAnswer = answers[question.name];
-    // const isUnsureChecked = answers[`${question.name}_unsure`];
     const isMainQuestionValid = mainAnswer !== undefined && mainAnswer !== "";
     let subQuestionsValid = true;
 
-    if (question.type === "info_spotting") {
-      return true;
-  }
     // Handle main question validation when no subquestions are present or main answer is "No"
     if (!question.subQuestions || mainAnswer === "No") {
         if (question.type === "checkbox") {

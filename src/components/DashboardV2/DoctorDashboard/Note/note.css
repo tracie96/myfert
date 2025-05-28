@@ -304,6 +304,9 @@
 .ant-select {
   width: 100% ;
 }
+.ant-avatar >img{
+  object-fit: contain;
+}
 
 /* Style the select options for better visibility */
 .ant-select-item {

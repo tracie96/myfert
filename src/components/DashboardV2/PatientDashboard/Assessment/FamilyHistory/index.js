@@ -11,6 +11,7 @@ import {
   message,
   Checkbox,
   Switch,
+  DatePicker,
 } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,15 +21,17 @@ import "../assesment.css";
 import { useMediaQuery } from "react-responsive";
 import { backBtnTxt, exitBtnTxt, saveAndContinueBtn, submitBtn } from "../../../../../utils/constant";
 import { getPersonalFamilyPatient } from "../../../../redux/AssessmentController";
+import dayjs from 'dayjs';
 
 const { Option } = Select;
+
 
 const questions = [
   {
     question: "(Check box and provide number if applicable)",
     title: "Obstetric History",
     type: "checkbox_with_select",
-    name: "general",
+    name: "obstetricHistory",
     options: [
       {
         label: "Pregnancies",
@@ -80,27 +83,27 @@ const questions = [
       },
     ],
   },
-  // {
-  //   question: "(Check box and provide number if applicable)",
-  //   type: "unit_toggle",
-  //   name: "weight_unit",
-  //   title: "Obstetric History",
-  //   options: ["Metric", "Imperial"],
-  //   subQuestions: [
-  //     {
-  //       question: "Birth weight of smallest baby",
-  //       type: "checkbox_with_number",
-  //       name: "smallest_baby_weight",
-  //       unit: "kg",
-  //     },
-  //     {
-  //       question: "Birth weight of largest baby",
-  //       type: "checkbox_with_number",
-  //       name: "largest_baby_weight",
-  //       unit: "kg",
-  //     },
-  //   ],
-  // },
+  {
+    question: "Provide number if applicable",
+    type: "unit_toggle",
+    name: "weight_unit",
+    title: "Obstetric History",
+    options: ["Metric", "Imperial"],
+    subQuestions: [
+      {
+        question: "Birth weight of smallest baby",
+        type: "number_with_unit",
+        name: "smallest_baby_weight",
+        unit: "kg",
+      },
+      {
+        question: "Birth weight of largest baby",
+        type: "number_with_unit",
+        name: "largest_baby_weight",
+        unit: "kg",
+      },
+    ],
+  },
   {
     question:
       "Did you develop any problems in or after pregnancy, for example, toxemia (high blood pressure), diabetes, post-partum depression, issues with breast feeding, etc.?",
@@ -383,6 +386,19 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
       });
     }
   
+    // Map weightChild data
+    if (info.weightChild) {
+      setUnit(info.weightChild.metricImperialScale ? "Metric" : "Imperial");
+      mapped.smallest_baby_weight = info.weightChild.weightSmallest || "";
+      mapped.largest_baby_weight = info.weightChild.weightLargest || "";
+
+      // If Imperial, convert the weights from kg to lbs
+      if (!info.weightChild.metricImperialScale) {
+        mapped.smallest_baby_weight = mapped.smallest_baby_weight ? (mapped.smallest_baby_weight * 2.20462).toFixed(2) : "";
+        mapped.largest_baby_weight = mapped.largest_baby_weight ? (mapped.largest_baby_weight * 2.20462).toFixed(2) : "";
+      }
+    }
+  
     // General fields
     mapped.pregnancy_problems = info.problemsAfterPregnancy ? "Yes" : "No";
     mapped.pregnancy_problems_sub = info.problemsAfterPregnancyExplain || "";
@@ -452,80 +468,88 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
     console.log('patientPersonalFamilyInfo received:', patientPersonalFamilyInfo);
     
     if (patientPersonalFamilyInfo && Object.keys(patientPersonalFamilyInfo).length > 0) {
-      // First map the obstetric history
-      const obstetricHistoryMap = {};
-      patientPersonalFamilyInfo.obstetricHistory?.forEach(item => {
-        const key = item.name.toLowerCase().replace(/\s+/g, '_');
-        // Set the checkbox state
-        obstetricHistoryMap[key] = item.level !== null && item.level !== undefined;
-        // Set the select value with the correct selectName format
-        obstetricHistoryMap[`${key}_select`] = item.level;
-      });
+      const mapped = {};
+  
+      // Map obstetricHistory
+      if (patientPersonalFamilyInfo.obstetricHistory && Array.isArray(patientPersonalFamilyInfo.obstetricHistory)) {
+        patientPersonalFamilyInfo.obstetricHistory.forEach((item) => {
+          const key = item.name.toLowerCase().replace(/\s+/g, '_');
+          // Set the checkbox state
+          mapped[key] = item.level !== null && item.level !== undefined;
+          // Set the select value with the correct selectName format
+          mapped[`${key}_select`] = item.level;
+        });
+      }
 
-      const normalizeYesNo = (value) => {
-        if (value === true) return "Yes";
-        if (value === false) return "No";
-        return null;
-      };
-      const mappedAnswers = {
-        ...obstetricHistoryMap,
-        // Map pregnancy problems
-        pregnancy_problems: normalizeYesNo(patientPersonalFamilyInfo.problemsAfterPregnancy),
-        pregnancy_problems_sub: patientPersonalFamilyInfo.problemsAfterPregnancyExplain || "",
+      // Map weightChild data
+      if (patientPersonalFamilyInfo.weightChild) {
+        setUnit(patientPersonalFamilyInfo.weightChild.metricImperialScale ? "Metric" : "Imperial");
+        mapped.smallest_baby_weight = patientPersonalFamilyInfo.weightChild.weightSmallest || "";
+        mapped.largest_baby_weight = patientPersonalFamilyInfo.weightChild.weightLargest || "";
 
-        // Map menstrual history
-        age_of_period: patientPersonalFamilyInfo.ageStartMenstrual || "",
-        date_of_last_period: patientPersonalFamilyInfo.startDateLastMenstrual || "",
-        length_of_cycle: patientPersonalFamilyInfo.lenghtOfCycle || "",
-        times_between_of_cycle: patientPersonalFamilyInfo.timeBtwCycles || "",
-        cramping: normalizeYesNo(patientPersonalFamilyInfo.cramping),
-        pain: normalizeYesNo(patientPersonalFamilyInfo.painInPeriod),
+        // If Imperial, convert the weights from kg to lbs
+        if (!patientPersonalFamilyInfo.weightChild.metricImperialScale) {
+          mapped.smallest_baby_weight = mapped.smallest_baby_weight ? (mapped.smallest_baby_weight * 2.20462).toFixed(2) : "";
+          mapped.largest_baby_weight = mapped.largest_baby_weight ? (mapped.largest_baby_weight * 2.20462).toFixed(2) : "";
+        }
+      }
+  
+      // General fields
+      mapped.pregnancy_problems = patientPersonalFamilyInfo.problemsAfterPregnancy ? "Yes" : "No";
+      mapped.pregnancy_problems_sub = patientPersonalFamilyInfo.problemsAfterPregnancyExplain || "";
 
-        // Map premenstrual problems
-        premenstrual_problems: normalizeYesNo(patientPersonalFamilyInfo.everHadPreMenstrualProblems?.yesNo),
-        premenstrual_problems_describe: patientPersonalFamilyInfo.everHadPreMenstrualProblems?.describe || "",
+      // Map menstrual history
+      mapped.age_of_period = patientPersonalFamilyInfo.ageStartMenstrual || "";
+      mapped.date_of_last_period = patientPersonalFamilyInfo.startDateLastMenstrual || "";
+      mapped.length_of_cycle = patientPersonalFamilyInfo.lenghtOfCycle || "";
+      mapped.times_between_of_cycle = patientPersonalFamilyInfo.timeBtwCycles || "";
+      mapped.cramping = patientPersonalFamilyInfo.cramping ? "Yes" : "No";
+      mapped.pain = patientPersonalFamilyInfo.painInPeriod ? "Yes" : "No";
 
-        // Map other menstrual problems
-        other_premenstrual_problems: normalizeYesNo(patientPersonalFamilyInfo.otherMenstrualProblems?.yesNo),
-        other_hormonal_problems_history: patientPersonalFamilyInfo.otherMenstrualProblems?.describe || "",
+      // Map premenstrual problems
+      mapped.premenstrual_problems = patientPersonalFamilyInfo.everHadPreMenstrualProblems?.yesNo ? "Yes" : "No";
+      mapped.premenstrual_problems_describe = patientPersonalFamilyInfo.everHadPreMenstrualProblems?.describe || "";
 
-        // Map hormonal birth control
-        hormonal_birthcontrol: normalizeYesNo(patientPersonalFamilyInfo.hormonalBirthControlType?.name),
-        hormonal_birthcontrol_often: patientPersonalFamilyInfo.hormonalBirthControlType?.name || "",
-        hormonal_birthcontrol_long: "", // Not provided in API
+      // Map other menstrual problems
+      mapped.other_premenstrual_problems = patientPersonalFamilyInfo.otherMenstrualProblems?.yesNo ? "Yes" : "No";
+      mapped.other_hormonal_problems_history = patientPersonalFamilyInfo.otherMenstrualProblems?.describe || "";
 
-        // Map hormonal birth control problems
-        other_hormonal_problems: normalizeYesNo(patientPersonalFamilyInfo.problemsWithHormonalBirthControl?.yesNo),
-        any_hormonal_problems_bc: patientPersonalFamilyInfo.problemsWithHormonalBirthControl?.describe || "",
+      // Map hormonal birth control
+      mapped.hormonal_birthcontrol = patientPersonalFamilyInfo.hormonalBirthControlType?.name ? "Yes" : "No";
+      mapped.hormonal_birthcontrol_often = patientPersonalFamilyInfo.hormonalBirthControlType?.name || "";
+      mapped.hormonal_birthcontrol_long = ""; // Not provided in API
 
-        // Map contraception
-        use_of_contraception: normalizeYesNo(patientPersonalFamilyInfo.useContraception?.yesNo),
-        use_of_contraception_sub: patientPersonalFamilyInfo.useContraception?.describe || "",
+      // Map hormonal birth control problems
+      mapped.other_hormonal_problems = patientPersonalFamilyInfo.problemsWithHormonalBirthControl?.yesNo ? "Yes" : "No";
+      mapped.any_hormonal_problems_bc = patientPersonalFamilyInfo.problemsWithHormonalBirthControl?.describe || "";
 
-        // Map menopause
-        is_menopause: normalizeYesNo(patientPersonalFamilyInfo.inMenopause?.yesNo),
-        age_at_last_period: patientPersonalFamilyInfo.inMenopause?.level || "",
+      // Map contraception
+      mapped.use_of_contraception = patientPersonalFamilyInfo.useContraception?.yesNo ? "Yes" : "No";
+      mapped.use_of_contraception_sub = patientPersonalFamilyInfo.useContraception?.describe || "";
 
-        // Map surgical menopause
-        surgical_menopause: normalizeYesNo(patientPersonalFamilyInfo.surgicalMenopause?.yesNo),
-        surgical_menopause_detail: patientPersonalFamilyInfo.surgicalMenopause?.describe || "",
+      // Map menopause
+      mapped.is_menopause = patientPersonalFamilyInfo.inMenopause?.yesNo ? "Yes" : "No";
+      mapped.age_at_last_period = patientPersonalFamilyInfo.inMenopause?.level || "";
 
-        // Map symptomatic problems
-        symptomatic_problems_menopause_history: patientPersonalFamilyInfo.symptomicProblems || [],
+      // Map surgical menopause
+      mapped.surgical_menopause = patientPersonalFamilyInfo.surgicalMenopause?.yesNo ? "Yes" : "No";
+      mapped.surgical_menopause_detail = patientPersonalFamilyInfo.surgicalMenopause?.describe || "";
 
-        // Map hormone replacement
-        hormone_replacement_therapy: normalizeYesNo(patientPersonalFamilyInfo.hormonalReplacement?.yesNo),
-        hormone_replacement_therapy_sub: patientPersonalFamilyInfo.hormonalReplacement?.describe || "",
+      // Map symptomatic problems
+      mapped.symptomatic_problems_menopause_history = patientPersonalFamilyInfo.symptomicProblems || [];
 
-        // Map gynecological symptoms
-        symptomatic_problems_menopause_other: patientPersonalFamilyInfo.gynSymptoms || [],
+      // Map hormone replacement
+      mapped.hormone_replacement_therapy = patientPersonalFamilyInfo.hormonalReplacement?.yesNo ? "Yes" : "No";
+      mapped.hormone_replacement_therapy_sub = patientPersonalFamilyInfo.hormonalReplacement?.describe || "";
 
-        // Map other tests
-        other_test_procedures: patientPersonalFamilyInfo.otherTest || "",
-      };
+      // Map gynecological symptoms
+      mapped.symptomatic_problems_menopause_other = patientPersonalFamilyInfo.gynSymptoms || [];
 
-      console.log('Mapped answers:', mappedAnswers);
-      setAnswers(mappedAnswers);
+      // Map other tests
+      mapped.other_test_procedures = patientPersonalFamilyInfo.otherTest || "";
+
+      console.log('Mapped answers:', mapped);
+      setAnswers(mapped);
     }
   }, [patientPersonalFamilyInfo]);
 
@@ -600,6 +624,55 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
   
         return true;
   
+      case "unit_toggle": {
+        // For weight inputs, at least one weight should be provided
+        const hasSmallestWeight = answers.smallest_baby_weight !== undefined && 
+                                answers.smallest_baby_weight !== "" && 
+                                !isNaN(answers.smallest_baby_weight) && 
+                                parseFloat(answers.smallest_baby_weight) >= 0;
+        
+        const hasLargestWeight = answers.largest_baby_weight !== undefined && 
+                               answers.largest_baby_weight !== "" && 
+                               !isNaN(answers.largest_baby_weight) && 
+                               parseFloat(answers.largest_baby_weight) >= 0;
+        
+        // If either weight is provided, validate that it's a reasonable value
+        if (hasSmallestWeight) {
+          const weight = parseFloat(answers.smallest_baby_weight);
+          const isMetric = unit === "Metric";
+          // Valid range: 0.5-15 kg or 1-33 lbs
+          if ((isMetric && (weight < 0.5 || weight > 15)) || 
+              (!isMetric && (weight < 1 || weight > 33))) {
+            message.error("Please enter a valid weight for smallest baby");
+            return false;
+          }
+        }
+        
+        if (hasLargestWeight) {
+          const weight = parseFloat(answers.largest_baby_weight);
+          const isMetric = unit === "Metric";
+          // Valid range: 0.5-15 kg or 1-33 lbs
+          if ((isMetric && (weight < 0.5 || weight > 15)) || 
+              (!isMetric && (weight < 1 || weight > 33))) {
+            message.error("Please enter a valid weight for largest baby");
+            return false;
+          }
+        }
+        
+        // If both weights are provided, validate that largest is not smaller than smallest
+        if (hasSmallestWeight && hasLargestWeight) {
+          const smallest = parseFloat(answers.smallest_baby_weight);
+          const largest = parseFloat(answers.largest_baby_weight);
+          if (largest < smallest) {
+            message.error("Largest baby weight cannot be smaller than smallest baby weight");
+            return false;
+          }
+        }
+        
+        // At least one weight should be provided
+        return hasSmallestWeight || hasLargestWeight;
+      }
+      
       default:
         return answers[question.name] !== undefined && answers[question.name] !== "";
     }
@@ -636,11 +709,12 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
   };
 
   const handleSubmit = async () => {
-    // Prepare the API payload
     if (!validateQuestion()) {
       message.error("Please answer the current question before Submitting.");
       return;
     }
+
+    // Prepare obstetric history data
     const obstetricCategories = [
       "Pregnancies",
       "Miscarriages",
@@ -652,106 +726,111 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
       "Premature birth"
     ];
     
+    const obstetricHistory = obstetricCategories.map(category => ({
+      name: category,
+      level: answers[`${category.toLowerCase().replace(/\s+/g, "_")}_select`] || 0
+    }));
+
+    // Prepare weight data and handle unit conversion if needed
+    const smallestWeight = answers.smallest_baby_weight ? parseFloat(answers.smallest_baby_weight) : 0;
+    const largestWeight = answers.largest_baby_weight ? parseFloat(answers.largest_baby_weight) : 0;
+    
+    // Convert weights if in Imperial units
+    const weightMultiplier = unit === "Imperial" ? 0.45359237 : 1; // Convert lbs to kg if Imperial
+    
     const apiPayload = {
-      obstetricHistory: obstetricCategories.map((category) => ({
-        name: category,
-        level: Number.isInteger(answers[`${category.toLowerCase().replace(/\s+/g, "_")}_select`])
-          ? answers[`${category.toLowerCase().replace(/\s+/g, "_")}_select`]
-          : null,
-      })),
+      obstetricHistory: obstetricHistory,
+      weightChild: {
+        metricImperialScale: unit === "Metric",
+        weightSmallest: smallestWeight * weightMultiplier,
+        weightLargest: largestWeight * weightMultiplier
+      },
+      problemsAfterPregnancy: answers.pregnancy_problems === "Yes",
+      problemsAfterPregnancyExplain: answers.pregnancy_problems_sub || "",
+      ageStartMenstrual: answers.age_of_period || 0,
+      startDateLastMenstrual: answers.date_of_last_period || "string",
+      lenghtOfCycle: answers.length_of_cycle || 0,
+      timeBtwCycles: answers.times_between_of_cycle || 0,
+      cramping: answers.cramping === "Yes",
+      painInPeriod: answers.pain === "Yes",
+      everHadPreMenstrualProblems: {
+          yesNo: answers.premenstrual_problems === "Yes",
+          describe: answers.premenstrual_problems_describe || "",
+      },
+      otherMenstrualProblems: {
+          yesNo: answers.other_premenstrual_problems === "Yes",
+          describe: answers.other_hormonal_problems_history || "",
+      },
+      hormonalBirthControlType: {
+          level: 0, // Adjust if applicable
+          name: answers.hormonal_birthcontrol_often || "string",
+      },
+      problemsWithHormonalBirthControl: {
+          yesNo: answers.other_hormonal_problems === "Yes",
+          describe: answers.any_hormonal_problems_bc || "",
+      },
+      useContraception: {
+          yesNo: answers.use_of_contraception === "Yes",
+          describe: answers.use_of_contraception_sub || "",
+      },
+      inMenopause: {
+          yesNo: answers.is_menopause === "Yes",
+          level: answers.age_at_last_period || 0, 
+      },
+      surgicalMenopause: {
+          yesNo: answers.surgical_menopause === "Yes",
+          describe: answers.symptomatic_problems_menopause_history?.join(", ") || "",
+      },
+      symptomicProblems: answers.symptomatic_problems_menopause_history || [],
+      hormonalReplacement: {
+          yesNo: answers.hormone_replacement_therapy === "Yes",
+          describe: answers.hormone_replacement_therapy_sub || "",
+      },
+      gynSymptoms: answers.symptomatic_problems_menopause_other || [],
+      gynScreeningLastPapTest: {
+          date: "", // Adjust if applicable
+          value: "", // Adjust if applicable
+      },
+      gynScreeningLastMammo: {
+          date: "", // Adjust if applicable
+          value: "", // Adjust if applicable
+      },
+      gynScreeningLastBoneDesity: {
+          date: "", // Adjust if applicable
+          value: "", // Adjust if applicable
+      },
+      otherTest: answers.other_test_procedures || "none",
+  };
 
-        weightChild: {
-            metricImperialScale: true, 
-            weightSmallest: 0,
-            weightLargest: 0, 
-        },
-        problemsAfterPregnancy: answers.pregnancy_problems === "Yes",
-        problemsAfterPregnancyExplain: answers.pregnancy_problems || "",
-        ageStartMenstrual: answers.age_of_period || 0,
-        startDateLastMenstrual: answers.date_of_last_period || "string",
-        lenghtOfCycle: answers.length_of_cycle || 0,
-        timeBtwCycles: answers.times_between_of_cycle || 0,
-        cramping: answers.cramping === "Yes",
-        painInPeriod: answers.pain === "Yes",
-        everHadPreMenstrualProblems: {
-            yesNo: answers.premenstrual_problems === "Yes",
-            describe: answers.premenstrual_problems_describe || "",
-        },
-        otherMenstrualProblems: {
-            yesNo: answers.other_premenstrual_problems === "Yes",
-            describe: answers.other_hormonal_problems_history || "",
-        },
-        hormonalBirthControlType: {
-            level: 0, // Adjust if applicable
-            name: answers.hormonal_birthcontrol_often || "string",
-        },
-        problemsWithHormonalBirthControl: {
-            yesNo: answers.other_hormonal_problems === "Yes",
-            describe: answers.any_hormonal_problems_bc || "",
-        },
-        useContraception: {
-            yesNo: answers.use_of_contraception === "Yes",
-            describe: answers.use_of_contraception_sub || "",
-        },
-        inMenopause: {
-            yesNo: answers.is_menopause === "Yes",
-            level: answers.age_at_last_period || 0, 
-        },
-        surgicalMenopause: {
-            yesNo: answers.surgical_menopause === "Yes",
-            describe: answers.symptomatic_problems_menopause_history?.join(", ") || "",
-        },
-        symptomicProblems: answers.symptomatic_problems_menopause_history || [],
-        hormonalReplacement: {
-            yesNo: answers.hormone_replacement_therapy === "Yes",
-            describe: answers.hormone_replacement_therapy_sub || "",
-        },
-        gynSymptoms: answers.symptomatic_problems_menopause_other || [],
-        gynScreeningLastPapTest: {
-            date: "", // Adjust if applicable
-            value: "", // Adjust if applicable
-        },
-        gynScreeningLastMammo: {
-            date: "", // Adjust if applicable
-            value: "", // Adjust if applicable
-        },
-        gynScreeningLastBoneDesity: {
-            date: "", // Adjust if applicable
-            value: "", // Adjust if applicable
-        },
-        otherTest: answers.other_test_procedures || "none",
-    };
-    const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
-      const token = userInfo.obj?.token || "";
-    // Submit the API request
-    try {
-        const response = await fetch(
-            "https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/AddPersonalFamily",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Accept: "text/plain",
-                    Authorization: `Bearer ${token}`,
+  const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
+  const token = userInfo.obj?.token || "";
 
-                },
-                body: JSON.stringify(apiPayload),
-            }
-        );
+  try {
+    const response = await fetch(
+      "https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/AddPersonalFamily",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "text/plain",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(apiPayload),
+      }
+    );
 
-        if (!response.ok) {
-            throw new Error("Failed to submit data");
-        }
-
-        // Handle success
-        dispatch(completeCard("/questionnaire/7"));
-        localStorage.setItem("currentQuestionIndex7", 0);
-        localStorage.setItem("answers", JSON.stringify(answers));
-        navigate("/assessment");
-    } catch (error) {
-        console.error("Error submitting the form:", error);
-        // Optionally show an error message to the user
+    if (!response.ok) {
+      throw new Error("Failed to submit data");
     }
+
+    dispatch(completeCard("/questionnaire/7"));
+    localStorage.setItem("currentQuestionIndex7", 0);
+    localStorage.setItem("answers", JSON.stringify(answers));
+    navigate("/assessment");
+  } catch (error) {
+    console.error("Error submitting the form:", error);
+    message.error("Failed to submit the form. Please try again.");
+  }
 };
 
   
@@ -836,12 +915,16 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
     switch (question.type) {
       case "date":
         return (
-          <Input
-            type="date"
-            className="input_questtionnaire"
-            name={question.name}
-            value={answers[question.name] || ""}
-            onChange={(e) => handleChange(e.target.value, question.name)}
+          <DatePicker
+            disabledDate={(current) => current && current > dayjs().endOf('day')}
+            value={answers[question.name] ? dayjs(answers[question.name]) : null}
+            format="YYYY-MM-DD"
+            style={{
+              width: isMobile ? "100%" : "50%",
+              height: "42px",
+              borderColor: "#ccc"
+            }}
+            onChange={(date, dateString) => handleChange(dateString, question.name)}
           />
         );
       case "select":
@@ -909,43 +992,32 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                padding: 10,
+                padding: "8px 16px",
                 color: "#000",
-                marginBottom: 30,
+                marginBottom: 20,
                 borderRadius: 10,
-                width: "50%",
-                fontSize: "15px",
+                width: isMobile ? "100%" : "200px",
               }}
             >
-              <p
-                style={{
-                  margin: 0,
-                  marginLeft: 10,
-                  fontSize: "15px",
-                }}
-              >
-                Metric
-              </p>
+              <span style={{ marginRight: 10 }}>Metric</span>
               <Switch
-                checked={unit === "Metric"}
-                onChange={(checked) => setUnit(checked ? "Metric" : "Imperial")}
-                checkedChildren=""
-                unCheckedChildren=""
+                checked={unit === "Imperial"}
+                onChange={(checked) => setUnit(checked ? "Imperial" : "Metric")}
               />
-              <p
-                style={{
-                  margin: 0,
-                  marginRight: 10,
-                  fontSize: "15px",
-                }}
-              >
-                Imperial
-              </p>
+              <span style={{ marginLeft: 10 }}>Imperial</span>
             </div>
-
-            {question.subQuestions.map((subQuestion) =>
-              renderInput(subQuestion),
-            )}
+            {question.subQuestions.map((subQuestion, index) => (
+              <div key={index} style={{ marginBottom: 15 }}>
+                <div style={{ marginBottom: 5 }}>{subQuestion.question}</div>
+                <Input
+                  type="number"
+                  style={{ width: isMobile ? "100%" : "200px" }}
+                  value={answers[subQuestion.name] || ""}
+                  onChange={(e) => handleChange(e.target.value, subQuestion.name)}
+                  suffix={unit === "Metric" ? "kg" : "lbs"}
+                />
+              </div>
+            ))}
           </div>
         );
 
@@ -1012,7 +1084,7 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
                   </Checkbox>
                 </div>
                 {option.selectName && (
-                  <div style={{ display: "flex", alignItems: "center", width: isMobile ? "100%" : "20%" }}>
+                  <div style={{ display: "flex", alignItems: "center", width: isMobile ? "100%" : "50%" }}>
                     <Select
                       name={option.selectName}
                       value={answers[option.selectName] || undefined}

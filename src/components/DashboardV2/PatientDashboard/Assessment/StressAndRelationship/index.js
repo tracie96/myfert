@@ -462,6 +462,17 @@ const StressAndRelationship = ({ onComplete }) => {
         if (value === undefined || value === null || value === 0) {
           return false;
         }
+
+        // Special check for "Other" stress rating
+        if (question.name === "health_stress_other" && value > 0) {
+          // Check if the textarea input exists and is not empty
+          const textareaValue = answers["health_stress_other_input"];
+          if (!textareaValue || textareaValue.trim() === "") {
+            message.error("Please specify what 'Other' stress you are rating.");
+            return false;
+          }
+        }
+
         return true;
       }
   

@@ -137,8 +137,11 @@ width: 150px !important;}
   align-items: center;
   justify-content: "space-between";
 }
+.ant-select {
+  width: 50% !important;
+}
 .select_questtionnaire {
-  width: 150px;
+  width: 50% !important;
   margin-bottom: 5px;
   height: 41px;
   border-color: #bcbcbc;
@@ -220,7 +223,10 @@ width: 150px !important;}
     text-align: center !important;
   }
   .select_questtionnaire {
-    width: 100%;
+    width: 100% !important;
+  }
+  .ant-select {
+    width: 100% !important;
   }
 }
 

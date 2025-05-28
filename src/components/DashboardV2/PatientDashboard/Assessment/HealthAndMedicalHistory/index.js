@@ -22,8 +22,15 @@ import "../assesment.css";
 import moment from "moment";
 import { useMediaQuery } from "react-responsive";
 import { backBtnTxt, exitBtnTxt, saveAndContinueBtn, submitBtn } from "../../../../../utils/constant";
+import dayjs from 'dayjs';
 
 const { Option } = Select;
+
+const startYear = 2025;
+
+const disableBefore2006 = (current) => {
+  return current && current > dayjs(`${startYear}-01-01`);
+};
 
 const questions = [
   {
@@ -687,6 +694,22 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
   };
 
   const handleChange = (value, name) => {
+    // For date type fields, validate that the date is not in the future
+    if (value && (name.includes("date") || (
+      questions[currentQuestionIndex]?.type === "long_radio" && 
+      questions[currentQuestionIndex]?.subQuestions?.some(sq => 
+        sq.type === "date" && sq.name === name
+      )
+    ))) {
+      const selectedDate = moment(value);
+      const today = moment().endOf('day');
+      
+      if (selectedDate.isAfter(today)) {
+        message.error("Future dates are not allowed");
+        return;
+      }
+    }
+    
     setAnswers({
       ...answers,
       [name]: value,
@@ -841,6 +864,11 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
             value={answers[subQuestion.name] || ""}
             onChange={(e) => handleChange(e.target.value, subQuestion.name)}
             className="input_questtionnaire"
+            style={{
+              width: isMobile ? "100%" : "50%",
+              height: "42px",
+              borderColor: "#ccc"
+            }}
           />
         )}
         {subQuestion.type === "inputNumber" && (
@@ -849,6 +877,11 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
             value={answers[subQuestion.name] || 0}
             onChange={(value) => handleChange(value, subQuestion.name)}
             className="input_questtionnaire"
+            style={{
+              width: isMobile ? "100%" : "50%",
+              height: "42px",
+              borderColor: "#ccc"
+            }}
           />
         )}
         {subQuestion.type === "radio" && (
@@ -874,7 +907,11 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
             placeholder="Select an option"
             value={answers[subQuestion.name] || ""}
             onChange={(value) => handleChange(value, subQuestion.name)}
-            style={{ width: isMobile ? "100%" : "50%" }}
+            style={{
+              width: isMobile ? "100%" : "50%",
+              height: "42px",
+              borderColor: "#ccc"
+            }}
           >
             {subQuestion.options.map((option, idx) => (
               <Option key={idx} value={option}>
@@ -885,19 +922,16 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
         )}
         {subQuestion.type === "date" && (
           <DatePicker
+            disabledDate={disableBefore2006}
+            defaultPickerValue={dayjs(`${startYear}-01-01`)}
+            value={answers[subQuestion.name] ? dayjs(answers[subQuestion.name]) : null}
             format="YYYY-MM-DD"
-            value={
-              answers[subQuestion.name]
-                ? moment(answers[subQuestion.name])
-                : null
-            }
-            onChange={(date) =>
-              handleChange(
-                date ? date.format("YYYY-MM-DD") : "",
-                subQuestion.name,
-              )
-            }
-            style={{ width: isMobile ? "100%" : "50%" }}
+            style={{
+              width: isMobile ? "100%" : "50%",
+              height: "42px",
+              borderColor: "#000"
+            }}
+            onChange={(date, dateString) => handleChange(dateString, subQuestion.name)}
           />
         )}
         {subQuestion.type === "checkbox" && (
@@ -907,6 +941,7 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
               handleChange(checkedValues, subQuestion.name)
             }
             value={answers[subQuestion.name] || []}
+            style={{ width: isMobile ? "100%" : "50%" }}
           >
             {subQuestion.options.map((option, idx) => (
               <Checkbox
@@ -929,6 +964,11 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
                             `${subQuestion.name}_other`,
                           )
                         }
+                        style={{
+                          width: isMobile ? "100%" : "50%",
+                          height: "42px",
+                          borderColor: "#000"
+                        }}
                       />
                     </>
                   )}

@@ -1082,24 +1082,31 @@ function SwitchContent({
       ) : (
         <div className="p-6 rounded-md shadow-md">
           <Row gutter={16}>
-          <Col xs={24} md={12}>
-            {/* First Column */}
-            <Descriptions column={1} bordered>
-            { Object.entries(personalFamily?.obstetricHistory || {}).map(([key, value]) => {
-                  console.log("baibhav--", 'key',key,value);
-                  return (value.level > 0 && <Descriptions.Item
-                        label={value.name}
-                        key={key}
-                      >
-                        {value.level || 'N/A'}
-                        {/* <span className="font-medium">{value.name || 'N/A'}</span> */}
-                      </Descriptions.Item>)
-                })
-                }
-             
+            <Col xs={24} md={12}>
+              {/* First Column */}
+              <Descriptions column={1} bordered>
+                <Descriptions.Item label="Birth Weight Information">
+                  <div>
+                    <p><strong>Unit System:</strong> {personalFamily?.weightChild?.metricImperialScale ? "Metric (kg)" : "Imperial (lbs)"}</p>
+                    <p><strong>Smallest Baby:</strong> {personalFamily?.weightChild?.weightSmallest || 'N/A'} {personalFamily?.weightChild?.metricImperialScale ? "kg" : "lbs"}</p>
+                    <p><strong>Largest Baby:</strong> {personalFamily?.weightChild?.weightLargest || 'N/A'} {personalFamily?.weightChild?.metricImperialScale ? "kg" : "lbs"}</p>
+                  </div>
+                </Descriptions.Item>
 
+                {/* Obstetric History */}
+                <Descriptions.Item label="Obstetric History">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {Object.entries(personalFamily?.obstetricHistory || {}).map(([key, value]) => (
+                      value.level > 0 && (
+                        <Tag key={key} color="blue" style={{ margin: '2px', padding: '4px 8px' }}>
+                          {value.name}: {value.level}
+                        </Tag>
+                      )
+                    ))}
+                  </div>
+                </Descriptions.Item>
 
-                 <Descriptions.Item label="Problems After Pregnancy">
+                <Descriptions.Item label="Problems After Pregnancy">
                   {personalFamily?.problemsAfterPregnancy ? "Yes" : "No"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Problems After Pregnancy Explain">
@@ -1111,7 +1118,7 @@ function SwitchContent({
                 <Descriptions.Item label="Start Date Last Menstrual">
                   {personalFamily?.startDateLastMenstrual || "N/A"}
                 </Descriptions.Item>
-                <Descriptions.Item label="Lenght Of Cycle">
+                <Descriptions.Item label="Length Of Cycle">
                   {personalFamily?.lenghtOfCycle || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Time Between Cycles">
@@ -1127,100 +1134,87 @@ function SwitchContent({
                   {personalFamily?.everHadPreMenstrualProblems?.yesNo
                     ? personalFamily.everHadPreMenstrualProblems.describe || "No Description"
                     : "No"}
-                </Descriptions.Item> 
+                </Descriptions.Item>
               </Descriptions>
             </Col>
 
             {/* Second Column */}
             <Col xs={24} md={12}>
-               <Descriptions column={1} bordered>
+              <Descriptions column={1} bordered>
                 <Descriptions.Item label="Other Menstrual Problems">
-                {personalFamily?.otherMenstrualProblems?.yesNo
+                  {personalFamily?.otherMenstrualProblems?.yesNo
                     ? personalFamily.otherMenstrualProblems.describe || "No Description"
-                    : "No"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Health Last Time">
-                {personalFamily?.everHadPreMenstrualProblems?.yesNo
-                    ? personalFamily?.everHadPreMenstrualProblems?.describe || "No Description"
                     : "No"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Hormonal Birth Control Type">
                   {personalFamily?.hormonalBirthControlType?.name || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Problems With Hormonal Birth Control">
-                {personalFamily?.problemsWithHormonalBirthControl?.yesNo
+                  {personalFamily?.problemsWithHormonalBirthControl?.yesNo
                     ? personalFamily.problemsWithHormonalBirthControl.describe || "No Description"
                     : "No"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Use Contraception">
-                {personalFamily?.useContraception?.yesNo
+                  {personalFamily?.useContraception?.yesNo
                     ? personalFamily.useContraception.describe || "No Description"
                     : "No"}
                 </Descriptions.Item>
                 <Descriptions.Item label="In Menopause">
-                {personalFamily?.inMenopause?.yesNo
+                  {personalFamily?.inMenopause?.yesNo
                     ? personalFamily.inMenopause.level || "No level"
                     : "No"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Surgical Menopause">
-                {personalFamily?.surgicalMenopause?.yesNo
+                  {personalFamily?.surgicalMenopause?.yesNo
                     ? personalFamily.surgicalMenopause.describe || "No describe"
                     : "No"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Symptomic Problems">
-                  <div>{personalFamily?.symptomicProblems || "N/A"}</div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                    {Array.isArray(personalFamily?.symptomicProblems) ? 
+                      personalFamily.symptomicProblems.map((problem, index) => (
+                        <Tag key={index} color="green">{problem}</Tag>
+                      ))
+                      : "N/A"
+                    }
+                  </div>
                 </Descriptions.Item>
                 <Descriptions.Item label="Hormonal Replacement">
-                {personalFamily?.hormonalReplacement?.yesNo
+                  {personalFamily?.hormonalReplacement?.yesNo
                     ? personalFamily.hormonalReplacement.describe || "No describe"
                     : "No"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Gyn Symptoms">
-                {personalFamily?.gynSymptoms || "N/A"}
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                    {Array.isArray(personalFamily?.gynSymptoms) ? 
+                      personalFamily.gynSymptoms.map((symptom, index) => (
+                        <Tag key={index} color="purple">{symptom}</Tag>
+                      ))
+                      : "N/A"
+                    }
+                  </div>
                 </Descriptions.Item>
                 <Descriptions.Item label="Gyn Screening Last Pap Test">
-                {personalFamily?.gynScreeningLastPapTest?.date || "N/A"}
-                {personalFamily?.gynScreeningLastPapTest?.value || ""}
+                  <div>
+                    <p>Date: {personalFamily?.gynScreeningLastPapTest?.date || "N/A"}</p>
+                    <p>Result: {personalFamily?.gynScreeningLastPapTest?.value || "N/A"}</p>
+                  </div>
                 </Descriptions.Item>
                 <Descriptions.Item label="Gyn Screening Last Mammo">
-                {personalFamily?.gynScreeningLastMammo?.date || "N/A"}
-                {personalFamily?.gynScreeningLastMammo?.value || ""}
+                  <div>
+                    <p>Date: {personalFamily?.gynScreeningLastMammo?.date || "N/A"}</p>
+                    <p>Result: {personalFamily?.gynScreeningLastMammo?.value || "N/A"}</p>
+                  </div>
                 </Descriptions.Item>
-                <Descriptions.Item label="Gyn Screening Last Bone Desity">
-                {personalFamily?.gynScreeningLastBoneDesity?.date || "N/A"}
-                {personalFamily?.gynScreeningLastBoneDesity?.value || ""}
+                <Descriptions.Item label="Gyn Screening Last Bone Density">
+                  <div>
+                    <p>Date: {personalFamily?.gynScreeningLastBoneDesity?.date || "N/A"}</p>
+                    <p>Result: {personalFamily?.gynScreeningLastBoneDesity?.value || "N/A"}</p>
+                  </div>
                 </Descriptions.Item>
-               
-              </Descriptions> 
+              </Descriptions>
             </Col>
           </Row>
-          {/* <Row gutter={16}>
-            <Col xs={24} md={12}>
-              <Descriptions column={1} bordered>
-                {Object.entries(personalFamily).map(([key, value]) => (
-                  <Descriptions.Item
-                    label={key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-                    key={key}
-                  >
-                    <span className="font-medium">{value !== null ? value : 'N/A'}</span>
-                  </Descriptions.Item>
-                ))}
-              </Descriptions>
-            </Col>
-
-            <Col xs={24} md={12}>
-              <Descriptions column={1} bordered>
-                {Object.entries(personalFamily).map(([key, value]) => (
-                  <Descriptions.Item
-                    label={key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-                    key={key}
-                  >
-                    <span className="font-medium">{value !== null ? value : 'N/A'}</span>
-                  </Descriptions.Item>
-                ))}
-              </Descriptions>
-            </Col>
-          </Row> */}
         </div>
       );
 

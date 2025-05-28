@@ -302,7 +302,7 @@
 
 /* Ensure the select input field is properly sized */
 .ant-select {
-  width: 100% !important;
+  width: 100% ;
 }
 
 /* Style the select options for better visibility */

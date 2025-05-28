@@ -445,7 +445,7 @@ const questions = [
   },
   {
     type: "multi_yes_no",
-    name: "premenstrual",
+    name: "preMenstrual",
     sub: "Premenstrual",
     question:
       "Please check if these symptoms occur presently or have occurred in the last 6 months",
@@ -670,11 +670,13 @@ const SymptomReview = ({ onComplete }) => {
       }
     };
 
+
+
     const symptomCategories = [
       'general', 'headEyesEars', 'musco', 'moodNerves', 'cardio', 
       'urinary', 'digestion', 'digestionCont', 'eating', 'itchingSkin', 'respiratory', 
       'nails', 'lymph', 'skin', 'skinProblems', 'skinProblemsContr', 
-      'femaleReproductive', 'menstrual', 'premenstrual'
+      'femaleReproductive', 'menstrual', 'preMenstrual'
     ];
 
     symptomCategories.forEach(category => {
@@ -870,7 +872,7 @@ const SymptomReview = ({ onComplete }) => {
       itchingSkin: [],
       femaleReproductive: [],
       menstrual: [],
-      premenstrual: [],
+      preMenstrual: [],
       currentMedication: [],
       nutritionalSupplements: [],
       femaleReproductiveCont:[]
@@ -1373,8 +1375,8 @@ const SymptomReview = ({ onComplete }) => {
 
     premenstrualQuestions.forEach((question) => {
       if (answers[question]) {
-        apiFormat.premenstrual = apiFormat.premenstrual || [];
-        apiFormat.premenstrual.push({
+        apiFormat.preMenstrual = apiFormat.preMenstrual || [];
+        apiFormat.preMenstrual.push({
           level: getLevel(answers[question]),
           name: question,
         });
@@ -1410,7 +1412,7 @@ const SymptomReview = ({ onComplete }) => {
       skinProblemsContr: apiFormat.skinProblemsContr,
       femaleReproductive: apiFormat.femaleReproductive,
       menstrual: apiFormat.menstrual,
-      premenstrual: apiFormat.premenstrual,
+      preMenstrual: apiFormat.preMenstrual,
       currentMedication: answers.current_medication
         ? answers.current_medication.map((med) => ({
           medication: med.medication || "",

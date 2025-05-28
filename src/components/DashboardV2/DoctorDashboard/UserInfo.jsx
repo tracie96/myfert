@@ -396,6 +396,9 @@ function SwitchContent({
             {/* First Column */}
             <Col xs={24} md={12}>
               <Descriptions column={1} bordered>
+              <Descriptions.Item label="Age">
+                  {generalInfo.age || "N/A"}
+                </Descriptions.Item>
                 <Descriptions.Item label="Genetic Background">
                   {generalInfo.geneticBackground || "N/A"}
                 </Descriptions.Item>
@@ -425,6 +428,9 @@ function SwitchContent({
                 </Descriptions.Item>
                 <Descriptions.Item label="How Did You Hear About Us?">
                   {generalInfo.howDidHearAbout || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Phone Type">
+                  {generalInfo.emergencyPhoneWork || "N/A"}
                 </Descriptions.Item>
               </Descriptions>
             </Col>
@@ -847,6 +853,12 @@ function SwitchContent({
                 <Descriptions.Item label="Stress from Work">
                   {stress.stressFromWork || "N/A"}
                 </Descriptions.Item>
+                <Descriptions.Item label="Stress From Other">
+                  {stress?.stressFromOther || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Stress From Other Name">
+                  {stress?.stressFromOtherName || "N/A"}
+                </Descriptions.Item>
               </Descriptions>
             </Col>
 
@@ -951,6 +963,9 @@ function SwitchContent({
                       ? "Yes"
                       : "No"
                     : "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Were You Born With Complications describe">
+                  {healthMedical?.wereYouBornWithComplication?.describe || ""}
                 </Descriptions.Item>
                 <Descriptions.Item label="Breast Fed and How Long">
                   {healthMedical?.breastFedHowLong || "N/A"}

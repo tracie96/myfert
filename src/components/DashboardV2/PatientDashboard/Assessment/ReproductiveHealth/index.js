@@ -80,12 +80,12 @@ const questions = [
     name: "is_family_health_concern",
     options: ["Yes", "No", "Unsure"],
   },
-  {
-    question: "Since what date have you been trying to conceive?",
-    type: "date",
-    title: "Trying to Conceive",
-    name: "is_trying_to_conceive_time",
-  },
+  // {
+  //   question: "Since what date have you been trying to conceive?",
+  //   type: "date",
+  //   title: "Trying to Conceive",
+  //   name: "is_trying_to_conceive_time",
+  // },
 
   {
     question:
@@ -813,10 +813,8 @@ const ReproductiveHealth = ({ onComplete }) => {
   
   
   const handlePrevious = () => {
-    // const question = questions[currentQuestionIndex];
-    
-    let getPmsSymtom = JSON.parse(localStorage.getItem("answers"));
-    if(getPmsSymtom.is_pms_symptom === "No"){
+    let getPmsSymtom = JSON.parse(localStorage.getItem("reproductiveHealthAnswers"));
+    if(getPmsSymtom?.is_pms_symptom === "No"){
       setCurrentQuestionIndex(currentQuestionIndex - 2);
       return;
     }
@@ -922,7 +920,7 @@ const ReproductiveHealth = ({ onComplete }) => {
   }; 
 
   
-
+console.log("answers", answers);
   const handleExit = () => {
     navigate("/assessment");
   };
@@ -944,7 +942,6 @@ const ReproductiveHealth = ({ onComplete }) => {
     }
     try {
       const requestData = {
-        
         birthControl: answers.relaxation_techniques === "Yes",
         hormonalBirthControl: answers.how_often_hormonal_bc || "N/A",
         nonHormonalBirthControl: answers.how_often_non_hormonal_bc || "N/A",
@@ -955,10 +952,10 @@ const ReproductiveHealth = ({ onComplete }) => {
           answers.is_family_health_concern === "Yes"
             ? "Yes"
             : answers.is_family_health_concern || "No",
-        howLongTryingToConceive: answers.is_trying_to_conceive_time || "Unknown",
-        methodToConceive: answers.methods_trying_to_conceive || [],
+        howLongTryingToConceive: answers.is_trying_to_conceive === "Yes" ? (answers.is_trying_to_conceive_time || "N/A") : "N/A",
+        methodToConceive: answers?.methods_trying_to_conceive || [],
         chartingToConceive: answers.is_charting_cycles || [],
-        currentTherapy:answers.current_therapy === "Yes",
+        currentTherapy: answers.current_therapy === "Yes",
         intercouseEachCycle: answers.is_frequent_intercourse_cycle || "Unknown",
         menstrualPainDuringPeriod: answers.is_menstrual_pain || ["None"],
         experiencePelvicPain: answers.is_lower_back_pain === "Yes",

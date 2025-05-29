@@ -75,61 +75,71 @@ export default function UserInfo() {
     return doctorAccessDetails[accessKey] === true;
   });
 
+  // Add this useEffect for access details
   useEffect(() => {
-    dispatch(getAccessDetailsDoctor(userInfo?.user?.userRef));
-    if (visibleModal !== null) {
-      console.log(`Modal ${visibleModal} is visible`);
-      switch (visibleModal) {
-        case 0:
-          console.log("Dispatching getGeneralInformation");
-          dispatch(getGeneralInformation(userInfo?.user?.userRef));
-          break;
-        case 1:
-          console.log("Dispatching getCurrentHealthLifestyle");
-          dispatch(getCurrentHealthLifestyle(userInfo?.user?.userRef));
-          break;
-        case 2:
-          console.log("Dispatching getNutritionAndDietaryHabits");
-          dispatch(getNutritionAndDietaryHabits(userInfo?.user?.userRef));
-          break;
-        case 3:
-          console.log("Dispatching getSubstanceAbuse");
-          dispatch(getSubstanceAbuse(userInfo?.user?.userRef));
-          break;
+    if (userInfo?.user?.userRef) {
+      dispatch(getAccessDetailsDoctor(userInfo.user.userRef));
+    }
+  }, [dispatch, userInfo?.user?.userRef]);
 
-        case 4:
-          console.log("Dispatching getSubstanceAbuse");
-          dispatch(getGetStress(userInfo?.user?.userRef));
+  // Separate useEffect for modal content
+  useEffect(() => {
+    let isSubscribed = true;
+
+    const fetchModalData = async () => {
+      if (visibleModal === null || !userInfo?.user?.userRef || !modalContent[visibleModal]) {
+        return;
+      }
+
+      const selectedContent = modalContent[visibleModal];
+      
+      if (!isSubscribed) return;
+
+      switch (selectedContent) {
+        case "General Information":
+          await dispatch(getGeneralInformation(userInfo.user.userRef));
           break;
-        case 5:
-          console.log("Dispatching getSubstanceAbuse");
-          dispatch(getHealthandMedical(userInfo?.user?.userRef));
+        case "Current Health & Lifestyle":
+          await dispatch(getCurrentHealthLifestyle(userInfo.user.userRef));
           break;
-        case 6:
-          console.log("Dispatching getSubstanceAbuse");
-          dispatch(getPersonalFamily(userInfo?.user?.userRef));
+        case "Nutrition & Dietary Habits":
+          await dispatch(getNutritionAndDietaryHabits(userInfo.user.userRef));
           break;
-        case 7:
-          console.log("Dispatching getSubstanceAbuse");
-          dispatch(getIllnessCondition(userInfo?.user?.userRef));
+        case "Substance Use":
+          await dispatch(getSubstanceAbuse(userInfo.user.userRef));
           break;
-        case 8:
-          console.log("Dispatching getSubstanceAbuse");
-          dispatch(getSymptomReview(userInfo?.user?.userRef));
+        case "Stress & Relationships":
+          await dispatch(getGetStress(userInfo.user.userRef));
           break;
-        case 9:
-          console.log("Dispatching getSubstanceAbuse");
-          dispatch(getReadiness(userInfo?.user?.userRef));
+        case "Health & Medical History":
+          await dispatch(getHealthandMedical(userInfo.user.userRef));
           break;
-        case 10:
-          console.log("Dispatching Reproductive");
-          dispatch(getReproductiveReview(userInfo?.user?.userRef));
+        case "Personal & Family History":
+          await dispatch(getPersonalFamily(userInfo.user.userRef));
+          break;
+        case "Illness & Conditions":
+          await dispatch(getIllnessCondition(userInfo.user.userRef));
+          break;
+        case "Symptom Review & Medications":
+          await dispatch(getSymptomReview(userInfo.user.userRef));
+          break;
+        case "Readiness & Health Goals":
+          await dispatch(getReadiness(userInfo.user.userRef));
+          break;
+        case "Reproductive Health":
+          await dispatch(getReproductiveReview(userInfo.user.userRef));
           break;
         default:
           break;
       }
-    }
-  }, [visibleModal, dispatch, userInfo]);
+    };
+
+    fetchModalData();
+
+    return () => {
+      isSubscribed = false;
+    };
+  }, [visibleModal, userInfo?.user?.userRef, dispatch, modalContent]);
 
   const showModal = (index) => {
     setVisibleModal(index);
@@ -420,7 +430,24 @@ function SwitchContent({
   reproductiveInfo,
   loading,
 }) {
-  switch (index) {
+  // Map content to case
+  const contentToCase = {
+    "General Information": 0,
+    "Current Health & Lifestyle": 1,
+    "Nutrition & Dietary Habits": 2,
+    "Substance Use": 3,
+    "Stress & Relationships": 4,
+    "Health & Medical History": 5,
+    "Personal & Family History": 6,
+    "Illness & Conditions": 7,
+    "Symptom Review & Medications": 8,
+    "Readiness & Health Goals": 9,
+    "Reproductive Health": 10,
+  };
+
+  const caseIndex = contentToCase[content];
+  
+  switch (caseIndex) {
     case 0: // General Information section
       return loading ? (
         <p>Loading...</p>
@@ -1601,9 +1628,9 @@ function SwitchContent({
                 <Descriptions.Item label="Family Member With Reproductive Concerns">
                   {reproductiveInfo?.familyMemberWithReproductiveConcerns || "N/A"}
                 </Descriptions.Item>
-                <Descriptions.Item label="How Long Trying To Conceive">
+                {/* <Descriptions.Item label="How Long Trying To Conceive">
                   {reproductiveInfo?.howLongTryingToConceive || "N/A"}
-                </Descriptions.Item>
+                </Descriptions.Item> */}
                 <Descriptions.Item label="Method To Conceive">
                   {reproductiveInfo?.methodToConceive?.length ? reproductiveInfo.methodToConceive.join(', ') : "N/A"}
                 </Descriptions.Item>

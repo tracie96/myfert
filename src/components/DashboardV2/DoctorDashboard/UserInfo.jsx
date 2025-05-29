@@ -14,6 +14,7 @@ import {
   getReproductiveReview,
   getSubstanceAbuse,
   getSymptomReview,
+  getAccessDetailsDoctor,
 } from "../../redux/AssessmentController";
 import { Tag } from "antd";
 
@@ -36,6 +37,23 @@ export default function UserInfo() {
   const symptom = useSelector((state) => state.intake?.symptomInfo);
   const readiness = useSelector((state) => state.intake?.readinessInfo);
   const loading = useSelector((state) => state.user?.loading);
+  const doctorAccessDetails = useSelector((state) => state.intake?.doctorAccessDetails);
+
+  // Map modal content to their corresponding access detail keys
+  const modalContentMapping = {
+    "General Information": "generalInformation",
+    "Current Health & Lifestyle": "healthLifestyle",
+    "Nutrition & Dietary Habits": "nutrition",
+    "Substance Use": "substanceUse",
+    "Stress & Relationships": "stressRelationship",
+    "Health & Medical History": "healthMedical",
+    "Personal & Family History": "personalFamily",
+    "Illness & Conditions": "illnessConditions",
+    "Symptom Review & Medications": "symptomsReview",
+    "Readiness & Health Goals": "readinessHealth",
+    "Reproductive Health": "reproductiveHealth",
+  };
+
   const modalContent = [
     "General Information",
     "Current Health & Lifestyle",
@@ -48,13 +66,17 @@ export default function UserInfo() {
     "Symptom Review & Medications",
     "Readiness & Health Goals",
     "Reproductive Health",
+  ].filter(content => {
+    // If doctorAccessDetails is not available yet, don't show any cards
+    if (!doctorAccessDetails) return false;
+    // Get the corresponding access key for this content
+    const accessKey = modalContentMapping[content];
+    // Show the card if the access is true
+    return doctorAccessDetails[accessKey] === true;
+  });
 
-  ];
-  console.log({ personalFamily })
-  console.log(useSelector((state) => state.intake));
   useEffect(() => {
-    console.log("useEffect is running");
-
+    dispatch(getAccessDetailsDoctor(userInfo?.user?.userRef));
     if (visibleModal !== null) {
       console.log(`Modal ${visibleModal} is visible`);
       switch (visibleModal) {
@@ -142,6 +164,9 @@ export default function UserInfo() {
                   {userInfo?.user?.phoneNumber || "N/A"}
                 </p>
               </Col>
+           
+            </Row>
+            <Row gutter={16} style={{ marginTop: "16px" }}>
               {/* <Col span={12} md={6}>
                 <p>
                   <strong>RRM</strong> : {userInfo?.rrm || "N/A"}
@@ -188,39 +213,48 @@ export default function UserInfo() {
       </Col>
       <Row gutter={18}>
         <Col xs={24} md={24} lg={24} style={{ paddingBottom: "16px" }}>
-          <Row gutter={16}>
-            {modalContent.map((_, index) => (
+          <Row gutter={[16, 16]}>
+            {modalContent.map((content, index) => (
               <Col
                 xs={24}
                 sm={12}
-                md={8} // One-third width on medium screens
-                lg={6} // One-fourth width on large screens
-                xl={4} // One-sixth width on extra large screens
+                md={8}
+                lg={8}
+                xl={6}
                 key={index}
-                style={{ paddingBottom: "16px" }}
               >
                 <Card
                   hoverable
                   style={{
                     border: "1px solid #C2E6F8",
                     borderRadius: 10,
-                    textAlign: "center",
-                    height: 100,
+                    height: "100%",
                     background: "#C2E6F8",
-                    color: "#000",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center"
                   }}
                   onClick={() => showModal(index)}
                 >
-                  <h4 style={{ fontSize: 18 }}>{modalContent[index]}</h4>
+                  <div style={{ textAlign: "center" }}>
+                    <h4 style={{ 
+                      fontSize: 16, 
+                      margin: 0,
+                      color: "#000",
+                      fontWeight: "500",
+                      lineHeight: 1.4
+                    }}>{content}</h4>
+                  </div>
                 </Card>
               </Col>
             ))}
           </Row>
 
+          {/* Add back the modals */}
           {modalContent.map((content, index) => (
             <Modal
               key={index}
-              title={`Details for ${modalContent[index]}`}
+              title={`Details for ${content}`}
               visible={visibleModal === index}
               width={"1200px"}
               footer={null}

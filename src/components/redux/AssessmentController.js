@@ -147,13 +147,14 @@ export const getSubstancePatient = createAsyncThunk(
 );
 
 export const getAccessDetails = createAsyncThunk(
-  "Patient/GetAccessDetails", // Unique action type prefix
-  async (_, { getState }) => { //  No id parameter needed, use _ to indicate unused parameter
-      console.log("Fetching access details...");
-
+  "Patient/GetAccessDetails",
+  async (_, { getState }) => { 
       const user = getState()?.authentication?.userAuth;
-      const token = user?.obj?.token;
+      console.log("User from state:", user);
+      console.log("User token:", user?.obj?.token);
+      console.log("User reference:", user?.user?.userRef);
 
+      const token = user?.obj?.token;
       const config = {
           headers: {
               accept: "text/plain",
@@ -162,15 +163,18 @@ export const getAccessDetails = createAsyncThunk(
       };
 
       try {
+          console.log("Making API call to GetAccessDetails...");
           const response = await axios.get(
-              `${baseUrl}/Patient/GetAccessDetails`,
+              `${baseUrl}Patient/GetAccessDetails`,
               config,
           );
 
-          console.log("Access details response:", response);
+          console.log("Access details full response:", response);
+          console.log("Access details data:", response.data);
           return response.data;
       } catch (error) {
           console.error("Error fetching access details:", error);
+          console.error("Error response:", error.response);
           return handleApiError(error); // Use the error handling function
       }
   },
@@ -729,6 +733,46 @@ export const getReadiness = createAsyncThunk(
   }
 );
 
+export const getAccessDetailsDoctor = createAsyncThunk(
+  "Doctor/GetAccessDetails",
+  async (patientref, { getState }) => {
+    console.log("Fetching access details for patient...", patientref);
+
+    const user = getState()?.authentication?.userAuth;
+    const token = user?.obj?.token;
+    const config = {
+      headers: {
+        accept: "text/plain",
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    try {
+      const response = await axios.get(
+        `${baseUrl}/Doctor/GetAccessDetails/${patientref}`,
+        config,
+      );
+
+      console.log("Access details API response:", {
+        status: response.status,
+        data: response.data,
+        type: typeof response.data
+      });
+      
+      // If response.data is an object with a value property, return that
+      if (response.data && typeof response.data === 'object' && 'value' in response.data) {
+        return response.data.value;
+      }
+      
+      // Otherwise return the data as is
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching access details:", error);
+      return handleApiError(error);
+    }
+  },
+);
+
 const initialState = {
   generalInfo: {},
   healthLifestyle: {},
@@ -744,6 +788,8 @@ const initialState = {
   loading: false,
   error: null,
   accessDetails: {},
+  accessDetailsValue: null,
+  doctorAccessDetails: {},
   patientGeneralInfo:{},
   patientNutritionInfo:{},
   patientSubstanceInfo:{},
@@ -961,14 +1007,17 @@ const intakeFormSlice = createSlice({
       .addCase(getAccessDetails.pending, (state) => {
           state.loading = true;
           state.error = null;
+          state.accessDetailsValue = null;
       })
       .addCase(getAccessDetails.fulfilled, (state, action) => {
           state.loading = false;
           state.accessDetails = action.payload;
+          state.accessDetailsValue = action.payload?.value || null;
       })
       .addCase(getAccessDetails.rejected, (state, action) => {
           state.loading = false;
-          state.error = action.payload?.message || 'Failed to fetch access details.'; // Access the message from the error object
+          state.error = action.payload?.message || 'Failed to fetch access details.';
+          state.accessDetailsValue = null;
       });
 
     // New patient APIs extraReducers
@@ -1090,6 +1139,20 @@ const intakeFormSlice = createSlice({
       .addCase(getReadinessPatient.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
+      });
+
+    builder
+      .addCase(getAccessDetailsDoctor.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getAccessDetailsDoctor.fulfilled, (state, action) => {
+        state.loading = false;
+        state.doctorAccessDetails = action.payload;
+      })
+      .addCase(getAccessDetailsDoctor.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message || 'Failed to fetch access details.';
       });
   },
 });

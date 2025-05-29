@@ -1649,7 +1649,7 @@ function SwitchContent({
                 <Descriptions.Item label="Menstral Bleeding Pelvic Pain Duration">
                   {reproductiveInfo?.menstralBleedingPelvicPain?.duration || "N/A"}
                 </Descriptions.Item>
-                <Descriptions.Item label="Menstral Bleeding Pelvic Pain Colour">
+                <Descriptions.Item label="Menstral Bleeding Pelvic Pain Severity">
                   {reproductiveInfo?.menstralBleedingPelvicPain?.colour || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Experience Pelvic Pain">

@@ -1784,7 +1784,7 @@ function SwitchContent({
                 <Descriptions.Item label="Cycle Discharge After Period Spotting Duration">
                   {reproductiveInfo?.cycleDischargeAfterPeriodSpotting?.duration || 'N/A'}
                 </Descriptions.Item>
-                <Descriptions.Item label="Cycle Discharge After Period Spotting">
+                <Descriptions.Item label="Cycle Discharge After Period Color">
                   {reproductiveInfo?.cycleDischargeAfterPeriodSpotting?.colour || 'N/A'}
                 </Descriptions.Item>
 

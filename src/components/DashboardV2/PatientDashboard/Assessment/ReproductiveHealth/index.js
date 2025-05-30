@@ -145,20 +145,20 @@ const questions = [
     ],
   },
 
-  {
-    question:
-    "How frequently do you have intercourse during your fertile window?",
-    type: "number_with_radio",
-    title: "Trying to Conceive",
-    name: "intercourse_during_fertile",
-    subQuestions: [
-        {
-          type: "number_with_radio_sub",
-          label: "",
-          name: "intercourse_during_fertile_sub",
-        },
-      ],
-  },
+  // {
+  //   question:
+  //   "How frequently do you have intercourse during your fertile window?",
+  //   type: "number_with_radio",
+  //   title: "Trying to Conceive",
+  //   name: "intercourse_during_fertile",
+  //   subQuestions: [
+  //       {
+  //         type: "number_with_radio_sub",
+  //         label: "",
+  //         name: "intercourse_during_fertile_sub",
+  //       },
+  //     ],
+  // },
 
   {
     question: "How much do you have intercourse each cycle?",
@@ -645,8 +645,8 @@ const ReproductiveHealth = ({ onComplete }) => {
         is_charting_cycles: patientReproductiveInfo.chartingToConceive || [],
         current_therapy: normalizeYesNo(patientReproductiveInfo.currentTherapy),
         charting_method: patientReproductiveInfo.methodFertilityAwareness || "",
-        // intercourse_during_fertile_sub: patientReproductiveInfo.intercourse_during_fertile || "",
         is_frequent_intercourse_cycle: patientReproductiveInfo.intercouseEachCycle || "",
+        // intercourse_during_fertile_sub: patientReproductiveInfo.intercourse_during_fertile || "",
         is_menstrual_pain: patientReproductiveInfo.menstrualPainDuringPeriod || [],
         is_lower_back_pain: normalizeYesNo(patientReproductiveInfo.experiencePelvicPain),
         duration_per_cycle_pp_not_menstrual: patientReproductiveInfo.duringCirclePelvicPain?.duration || "",
@@ -920,7 +920,6 @@ const ReproductiveHealth = ({ onComplete }) => {
   }; 
 
   
-console.log("answers", answers);
   const handleExit = () => {
     navigate("/assessment");
   };
@@ -941,94 +940,90 @@ console.log("answers", answers);
       return;
     }
     try {
+      const reproductiveHealthAnswers = JSON.parse(localStorage.getItem("reproductiveHealthAnswers")) || {};
       const requestData = {
-        birthControl: answers.relaxation_techniques === "Yes",
-        hormonalBirthControl: answers.how_often_hormonal_bc || "N/A",
-        nonHormonalBirthControl: answers.how_often_non_hormonal_bc || "N/A",
-        currentlyPregnant: answers.isPregnant === "Yes",
-        tryingToConceive: answers.is_trying_to_conceive === "Yes",
-        difficultyTryingToConceive: answers.is_difficulty_to_conceive === "Yes",
+        birthControl: reproductiveHealthAnswers.relaxation_techniques === "Yes",
+        hormonalBirthControl: reproductiveHealthAnswers.how_often_hormonal_bc || "N/A",
+        nonHormonalBirthControl: reproductiveHealthAnswers.how_often_non_hormonal_bc || "N/A",
+        currentlyPregnant: reproductiveHealthAnswers.isPregnant === "Yes",
+        tryingToConceive: reproductiveHealthAnswers.is_trying_to_conceive === "Yes",
+        difficultyTryingToConceive: reproductiveHealthAnswers.is_difficulty_to_conceive === "Yes",
         familyMemberWithReproductiveConcerns: 
-          answers.is_family_health_concern === "Yes"
+          reproductiveHealthAnswers.is_family_health_concern === "Yes"
             ? "Yes"
-            : answers.is_family_health_concern || "No",
-        howLongTryingToConceive: answers.is_trying_to_conceive === "Yes" ? (answers.is_trying_to_conceive_time || "N/A") : "N/A",
-        methodToConceive: answers?.methods_trying_to_conceive || [],
-        chartingToConceive: answers.is_charting_cycles || [],
-        currentTherapy: answers.current_therapy === "Yes",
-        intercouseEachCycle: answers.is_frequent_intercourse_cycle || "Unknown",
-        menstrualPainDuringPeriod: answers.is_menstrual_pain || ["None"],
-        experiencePelvicPain: answers.is_lower_back_pain === "Yes",
+            : reproductiveHealthAnswers.is_family_health_concern || "No",
+        howLongTryingToConceive: reproductiveHealthAnswers.is_trying_to_conceive === "Yes" ? (reproductiveHealthAnswers.is_trying_to_conceive_time || "N/A") : "N/A",
+        methodToConceive: reproductiveHealthAnswers?.methods_trying_to_conceive || [],
+        chartingToConceive: reproductiveHealthAnswers.is_charting_cycles || [],
+        utilizingFertilityAwareness: reproductiveHealthAnswers.current_therapy === "Yes",
+        methodFertilityAwareness: reproductiveHealthAnswers.charting_method || "N/A",
+        intercouseDays: reproductiveHealthAnswers.intercourse_during_fertile_sub || "N/A",
+        intercouseEachCycle: reproductiveHealthAnswers.is_frequent_intercourse_cycle || "N/A",
+        menstrualPainDuringPeriod: reproductiveHealthAnswers.is_menstrual_pain || [],
         menstralBleedingPelvicPain: {
-          duration: `${answers.duration_per_cycle_pelvic_pain}` || "0",
-          colour: answers.duration_per_cycle_severity_pelvic_pain, 
+          duration: String(reproductiveHealthAnswers.duration_per_cycle_pelvic_pain || "0"),
+          colour: reproductiveHealthAnswers.duration_per_cycle_severity_pelvic_pain || "N/A"
         },
-        doYouPmsSymptoms: answers.is_pms_symptom === "Yes",
-        pmsSymptoms: answers.pms_sympton || ["None"],
-        pms: {
-          duration: `${answers.pms_sympton_check}` || "0", 
-          colour: answers.pms_sympton_severity || "Mild",
-        },
-        midCycleSpottingFrequency:{
-          duration: `${answers.cycle_spotting_sub_number}` || "None", 
-          colour: `${answers.cycle_spotting_sub}` || "None",
-          frequency: `${answers.cycle_spotting_sub_frq}` || "None",
-        },
-        longestCycleLenght: `${answers.longest_cycle_radio}` || "0",
-        averageCycleLenght: `${answers.average_cycle_radio}` || "0",
-        shortestCycleLenght: `${answers.shortest_cycle_radio}` || "0",
-        who_do_you_live_with: answers.who_do_you_live_with || 'N/A',
-        current_occupation: answers.current_occupation || 'N/A',
-        previous_occupation: answers.previous_occupation || 'N/A',
-        resourcces_for_emotional_support: answers.resourcces_for_emotional_support || [],
-        spiritual_practice:answers.spiritual_practice || 'N/A',
-
-        utilizingFertilityAwareness: false, 
-        methodFertilityAwareness: answers.charting_method || "None",
-        intercouseDays: `${answers.intercourse_during_fertile_sub}` || "0",
-        is_charting_cycles: answers.is_charting_cycles || 'N/A',
+        experiencePelvicPain: reproductiveHealthAnswers.is_lower_back_pain === "Yes",
         duringCirclePelvicPain: {
-          duration: `${answers.duration_per_cycle_pp_not_menstrual}` || "0",
-          colour: `${answers.duration_per_mild_cycle_severity_pp_not_menstrual}` || "N/A",
+          duration: String(reproductiveHealthAnswers.duration_per_cycle_pp_not_menstrual || "0"),
+          colour: reproductiveHealthAnswers.duration_per_mild_cycle_severity_pp_not_menstrual || "N/A"
         },
-        midCycleSpotting: answers.mid_cycle_spotting === "Yes",
-        menstralCycleFrequency: answers.menstralCycleFrequency || "Unknown", // Example default
-        menstralCycleDuration: answers.menstralCycleDuration || "Unknown", // Example default
-        menstralCycleColour: answers.menstralCycleColour || "Unknown",
-        relaxation_techniques: answers.relaxation_techniques || 'N/A',
-        methods_trying_to_conceive: answers.methods_trying_to_conceive || [],
+        doYouPmsSymptoms: reproductiveHealthAnswers.is_pms_symptom === "Yes",
+        pmsSymptoms: reproductiveHealthAnswers.pms_sympton || [],
+        pms: {
+          duration: String(reproductiveHealthAnswers.pms_sympton_check || "0"),
+          colour: reproductiveHealthAnswers.pms_sympton_severity || "N/A"
+        },
+        longestCycleLenght: String(reproductiveHealthAnswers.longest_cycle_radio || "0"),
+        shortestCycleLenght: String(reproductiveHealthAnswers.shortest_cycle_radio || "0"),
+        averageCycleLenght: String(reproductiveHealthAnswers.average_cycle_radio || "0"),
+        midCycleSpotting: reproductiveHealthAnswers.mid_cycle_spotting === "Yes",
+        midCycleSpottingFrequency: reproductiveHealthAnswers.mid_cycle_spotting === "Yes" ? {
+          frequency: reproductiveHealthAnswers.cycle_spotting_sub_frq || "None",
+          duration: String(reproductiveHealthAnswers.cycle_spotting_sub_number || "0"),
+          colour: reproductiveHealthAnswers.cycle_spotting_sub || "None"
+        } : {
+          frequency: "None",
+          duration: "0",
+          colour: "None"
+        },
+        menstralCycleFrequency: reproductiveHealthAnswers.menstralCycleFrequency || "Unknown",
+        menstralCycleDuration: reproductiveHealthAnswers.menstralCycleDuration || "Unknown",
+        menstralCycleColour: reproductiveHealthAnswers.menstralCycleColour || "Unknown",
         cycleDischargeCreamy: {
-          duration: `${answers.cervical_mucus}` || "0", // Example default
-          colour: answers.cervical_mucus_sub || "N/A", // Example default
+          duration: String(reproductiveHealthAnswers.cervical_mucus || "0"),
+          colour: reproductiveHealthAnswers.cervical_mucus_sub || "N/A"
         },
         cycleDischargeWatery: {
-          duration: `${answers.Watery_mucus_sub}` || "0", // Example default
-          colour: answers.Watery_mucus_colour === "Other"
-            ? answers.Watery_mucus_colour_other
-            : (answers.Watery_mucus_colour || "N/A"),
+          duration: String(reproductiveHealthAnswers.Watery_mucus_sub || "0"),
+          colour: reproductiveHealthAnswers.Watery_mucus_colour === "Other"
+            ? reproductiveHealthAnswers.Watery_mucus_colour_other
+            : (reproductiveHealthAnswers.Watery_mucus_colour || "N/A")
         },
         cycleDischargeEggWhite: {
-          duration: `${answers.egg_white_mucus_sub}` || "0", // Example default
-          colour: answers.egg_white_mucus_colour === "Other"
-            ? answers.egg_white_mucus_colour_other
-            : (answers.egg_white_mucus_colour || "N/A"),
+          duration: String(reproductiveHealthAnswers.egg_white_mucus_sub || "0"),
+          colour: reproductiveHealthAnswers.egg_white_mucus_colour === "Other"
+            ? reproductiveHealthAnswers.egg_white_mucus_colour_other
+            : (reproductiveHealthAnswers.egg_white_mucus_colour || "N/A")
         },
         cycleDischargePrePeriod: {
-          duration: `${answers.pre_spotting_sub}` || "0", // Example default
-          colour: answers.pre_spotting_colour === "Other"
-            ? answers.pre_spotting_colour_other
-            : (answers.pre_spotting_colour || "N/A"),
+          duration: String(reproductiveHealthAnswers.pre_spotting_sub || "0"),
+          colour: reproductiveHealthAnswers.pre_spotting_colour === "Other"
+            ? reproductiveHealthAnswers.pre_spotting_colour_other
+            : (reproductiveHealthAnswers.pre_spotting_colour || "N/A")
         },
         cycleDischargeMenstralBleeding: {
-          duration: `${answers.menstrual_bleeding_sub+ ", " +answers.days_light_bleeding+ ", " +answers.days_moderate_bleeding+ ", " +answers.days_heavy_bleeding+ ", " +answers.days_very_heavy_bleeding}` || "N/A", // Example default
-          colour: answers.menstrual_bleeding_sub_colour || "N/A", // Example default
-          clots: answers.menstrual_bleeding_sub_clots || "N/A", // Example default
+          duration: String(reproductiveHealthAnswers.menstrual_bleeding_sub+ ", " +reproductiveHealthAnswers.days_light_bleeding+ ", " +reproductiveHealthAnswers.days_moderate_bleeding+ ", " +reproductiveHealthAnswers.days_heavy_bleeding+ ", " +reproductiveHealthAnswers.days_very_heavy_bleeding || "N/A"),
+          colour: reproductiveHealthAnswers.menstrual_bleeding_sub_colour || "N/A",
+          clots: reproductiveHealthAnswers.menstrual_bleeding_sub_clots || "N/A"
         },
         cycleDischargeAfterPeriodSpotting: {
-          duration: `${answers.after_period_spot_sub}` || "0", // Example default
-          colour: answers.after_period_spot_colour || "N/A", // Example default
+          duration: String(reproductiveHealthAnswers.after_period_spot_sub || "0"),
+          colour: reproductiveHealthAnswers.after_period_spot_colour || "N/A"
         },
-        chartBase64: answers.charting_method || "",
+        chartBase64: reproductiveHealthAnswers.charting_method || "",
+        currentTherapy: reproductiveHealthAnswers.current_therapy === "Yes"
       };
       const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
       const token = userInfo.obj?.token || "";

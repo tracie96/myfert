@@ -125,7 +125,7 @@ const questions = [
       "Eat more than 50% of meals away from home",
       "Healthy foods not readily available",
       "Poor snack choices",
-      "Signifcant other or family members don’t like healthy foods",
+      "Signifcant other or family members don't like healthy foods",
       "Signifcant other or family members have special dietary needs",
       "Love to eat",
       "Eat because I have to",
@@ -134,7 +134,7 @@ const questions = [
       "Emotional eater (eat when sad, lonely, bored, etc.)",
       "Eat too much under stress",
       "Eat too little under stress",
-      "Don’t care to cook",
+      "Don't care to cook",
       "Confused about nutrition advice",
     ],
   },
@@ -299,6 +299,13 @@ const questions = [
     type: "radio",
     name: "sensitive_food_caffeine",
     options: ["Yes", "No"],
+    subQuestions: [
+      {
+        question: "If Yes, please describe your reaction:",
+        type: "text",
+        name: "sensitive_food_caffeine_other"
+      }
+    ]
   },
   {
     question: "When you drink caffeine do you feel:",
@@ -346,7 +353,7 @@ const Nutrition = ({ onComplete }) => {
       diet_detail_dinner: info.typicalDinner || "",
       diet_detail_snacks: info.typicalSnacks || "",
       diet_detail_fluids: info.typicalFluid || "",
-      diet_servings_fruits: info.noTypicalFruits !== undefined ? String(info.noTypicalFruits) : "",
+      diet_servings_fruits: info.noTypicalFruits || 0,
       diet_serving_vegetables: info.noTypicalVegetables || 0,
       diet_servings_legumes: info.noTypicalLegumes || 0,
       diet_servings_meat: info.noTypicalRedMeat || 0,
@@ -384,6 +391,11 @@ const Nutrition = ({ onComplete }) => {
     } else if (patientNutritionInfo && Object.keys(patientNutritionInfo).length > 0) {
       const prefilledAnswers = mapNutritionInfoToAnswers(patientNutritionInfo);
       setAnswers(prefilledAnswers);
+    } else {
+      // Initialize with default values
+      setAnswers({
+        diet_servings_fruits: "0",
+      });
     }
   }, [patientNutritionInfo]);
 
@@ -574,9 +586,11 @@ const Nutrition = ({ onComplete }) => {
       coffeeCups: answers.coffee_amount,
       teaCups: answers.tea_amount || "",
       sodaCups: answers.soda_amount || "",
-      adverseReactionToCoffee: answers.sensitive_food_caffeine === "Yes",
-      explainAdverseReactionToCoffee:
-        answers.sensitive_food_caffeine_feel || "",
+      adverseReactionToCoffee: {
+        yesNo: answers.sensitive_food_caffeine === "Yes",
+        describe: answers.sensitive_food_caffeine_other || "",
+      },
+      explainAdverseReactionToCoffee: answers.sensitive_food_caffeine_other || "",
       reactionToCaffeine: answers.sensitive_food_caffeine_feel || "",
       specialDietReason:answers.special_diet_reason || "",
       breakfastTime:answers.breakfast_time || "",
@@ -676,7 +690,21 @@ const Nutrition = ({ onComplete }) => {
               ))}
             </Radio.Group>
 
-            {answers[question.name] === "Yes" && (
+            {answers[question.name] === "Yes" && question.subQuestions && question.subQuestions.map((subQ, index) => (
+              <div key={index}>
+                <p style={{ marginTop: "10px", color: "#000", fontWeight: "600" }}>{subQ.question}</p>
+                <Input
+                  className="input_questtionnaire"
+                  required
+                  placeholder="Please describe"
+                  value={answers[subQ.name] || ""}
+                  onChange={(e) => handleChange(e.target.value, subQ.name)}
+                  style={{ marginTop: "10px" }}
+                />
+              </div>
+            ))}
+
+            {answers[question.name] === "Yes" && !question.subQuestions && (
               <Input
                 className="input_questtionnaire"
                 required
@@ -827,9 +855,10 @@ const Nutrition = ({ onComplete }) => {
               <Select
                 className="select_questtionnaire"
                 name={question.name}
-                value={answers[question.name] !== undefined && answers[question.name] !== null ? answers[question.name] : ""}
+                value={answers[question.name] ?? ""}
                 onChange={(value) => handleChange(value, question.name)}
                 style={{ width: "292px", marginTop: "10px" }}
+                placeholder="Select number of servings"
               >
                 {question.selectOptions.map((option, index) => (
                   <Option key={index} value={option}>

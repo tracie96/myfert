@@ -850,10 +850,10 @@ function SwitchContent({
                 <Descriptions column={1} bordered>
                   {[
                     { label: "Previous Alcohol Intake", value: substance.previousAlcoholIntake?.yesNo ? "Yes" : "No" },
-                    { label: "Describe Previous Alcohol Intake", value: substance.previousAlcoholIntake?.describe || "N/A" },
+                    { label: "Describe Previous Alcohol Intake", value: substance.previousAlcoholIntake?.describe || "No description Provided" },
                     { label: "Problem with Alcohol", value: substance.problemAlcohol ? "Yes" : "No" },
-                    { label: "Problem with Alcohol When", value: substance.problemAlcoholWhen || "N/A" },
-                    { label: "Explain Problem with Alcohol", value: substance.problemAlcoholExplain || "N/A" },
+                    { label: "Problem with Alcohol When", value: substance.problemAlcoholWhen || "No Problem given" },
+                    { label: "Explain Problem with Alcohol", value: substance.problemAlcoholExplain || "No Problem given" },
                     { label: "Get Help for Drinking", value: substance.getHelpForDrinking ? "Yes" : "No" },
                     { label: "Currently Using Recreational Drugs", value: substance.currentlyRecreationalDrugs ? "Yes" : "No" },
                     // { label: "Type of Recreational Drugs", value: substance.currentlyRecreationalDrugsType || "N/A" },
@@ -1656,6 +1656,22 @@ function SwitchContent({
                   {reproductiveInfo?.experiencePelvicPain === null || reproductiveInfo?.experiencePelvicPain === undefined ? 'N/A' : (reproductiveInfo.experiencePelvicPain ? 'Yes' : 'No')}
                 </Descriptions.Item>
 
+                <Descriptions.Item label="Mid Cycle Spotting">
+                  {reproductiveInfo?.midCycleSpotting === null || reproductiveInfo?.midCycleSpotting === undefined ? 'N/A' : (reproductiveInfo.midCycleSpotting ? 'Yes' : 'No')}
+                </Descriptions.Item>
+
+                <Descriptions.Item label="Mid Cycle Spotting Frequency">
+                  {reproductiveInfo?.midCycleSpottingFrequency?.frequency || 'N/A'}
+                </Descriptions.Item>
+
+                <Descriptions.Item label="Mid Cycle Spotting Duration">
+                  {reproductiveInfo?.midCycleSpottingFrequency?.duration || 'N/A'}
+                </Descriptions.Item>
+
+                <Descriptions.Item label="Mid Cycle Spotting Colour">
+                  {reproductiveInfo?.midCycleSpottingFrequency?.colour || 'N/A'}
+                </Descriptions.Item>
+
                 <>
                   {/* <Descriptions.Item label="Utilizing Fertility Awareness">
                     {reproductiveInfo?.utilizingFertilityAwareness === null || reproductiveInfo.utilizingFertilityAwareness === undefined ? 'N/A' : (reproductiveInfo.utilizingFertilityAwareness ? 'Yes' : 'No')}
@@ -1746,7 +1762,7 @@ function SwitchContent({
                   {reproductiveInfo.who_do_you_live_with || 'N/A'}
                   </Descriptions.Item> */}
                 <Descriptions.Item label="Mid Cycle Spotting">
-                  {reproductiveInfo?.midCycleSpotting ? "Yes" : "No"}
+                  {reproductiveInfo?.midCycleSpotting === null || reproductiveInfo?.midCycleSpotting === undefined ? 'N/A' : (reproductiveInfo.midCycleSpotting ? 'Yes' : 'No')}
                 </Descriptions.Item>
                 <Descriptions.Item label="Cycle Discharge Creamy Duration">
                   {reproductiveInfo?.cycleDischargeCreamy?.duration || 'N/A'}

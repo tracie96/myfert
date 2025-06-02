@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Card, Typography, Button, Row, Col, List, message } from "antd";
 import { FilePdfOutlined, FileImageOutlined, FileOutlined } from "@ant-design/icons";
-
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import Lab from "../../../../assets/images/lab.png";
 import { downloadBloodWork, getPatientLabs } from "../../../redux/patientSlice";
 import moment from 'moment';
@@ -27,6 +27,7 @@ const getFileIcon = (filename) => {
 
 const LabScreen = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const { loading, error } = useSelector((state) => state.patient);
     const [labRequisitions, setLabRequisitions] = useState([]);
     const [labResults, setLabResults] = useState([]);
@@ -263,6 +264,7 @@ const LabScreen = () => {
                     </Text>
                     <Button
                         type="primary"
+                        onClick={() => navigate('/learn')}
                         style={{ marginTop: "20px", borderRadius: "5px", background: "#335CAD" }}
                     >
                         Learn More

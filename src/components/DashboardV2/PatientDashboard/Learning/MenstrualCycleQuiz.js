@@ -199,6 +199,53 @@ const fertileWindowQuizData = [
   }
 ];
 
+const timingBloodworkQuizData = [
+  {
+    question: "How do you know you are in a new cycle (Cycle Day 1)?",
+    options: [
+      "Spotting marks the start of the cycle.",
+      "The first day of menstrual flow (not spotting) is considered Day 1.",
+      "Day 1 is the first day after your period ends.",
+      "Ovulation marks the start of the cycle."
+    ],
+    answer: 1,
+    explanation: "Light spotting before full flow does not count as the start of the menstrual cycle, and any spotting days will remain in the previous cycle."
+  },
+  {
+    question: "When do you take your Cycle Day 3 blood test, relative to your menstrual flow?",
+    options: [
+      "On the first day of menstrual spotting.",
+      "On the 3rd day after menstrual spotting.",
+      "On the 3rd day of your new cycle, usually the 3rd day of menstrual flow.",
+      "On the 3rd day after your period ends."
+    ],
+    answer: 2,
+    explanation: "Cycle Day 1 is the first day of menstrual flow, usually when you need to start using period products. Days of spotting before your period will remain in the previous cycle. Cycle Day 3 is the 3rd day of your new cycle, usually on the 3rd day of menstrual flow, though if you have short periods, you might only have spotting at that time."
+  },
+  {
+    question: "How can you determine the best time to test your progesterone?",
+    options: [
+      "By identifying the Peak +7 day, which is 7 days after the last day of peak type cervical mucus (clear or semi-clear, stretching > 1 inch, or causing a slippery sensation at the vulva).",
+      "By performing an ultrasound at the start of menstruation.",
+      "By tracking estrogen levels on Day 3.",
+      "By testing LH levels during menstruation."
+    ],
+    answer: 0,
+    explanation: "Progesterone rises only after ovulation and reaches its highest level about 7 days after ovulation. Peak +7 testing is done at the estimated highest level of progesterone to both confirm ovulation and look for adequate luteal phase support."
+  },
+  {
+    question: "Is Peak +7 testing the same as Cycle Day 21 testing?",
+    options: [
+      "Yes, they are identical and interchangeable.",
+      "No, Peak +7 is based on individual cycle ovulation timing, while Cycle Day 21 assumes that ovulation occurred on Day 14.",
+      "Yes, but only for people with PCOS.",
+      "No, Peak +7 testing is performed during menstruation."
+    ],
+    answer: 1,
+    explanation: "Cycle Day 21 testing is only accurate for individuals that ovulated on or around Day 14 of their menstrual cycle (Day 14+7 = 21). However, because Day 14 ovulation is an average, and timing of ovulation can vary greatly among individuals and even among cycles, Peak +7 testing is much more accurate."
+  }
+];
+
 const MenstrualCycleQuiz = () => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState({});
@@ -214,8 +261,16 @@ const MenstrualCycleQuiz = () => {
     buttonColor: '#8B3A8B'
   };
 
-  const quizData = quizType === 'menstrual' ? menstrualCycleQuizData : fertileWindowQuizData;
-  const quizTitle = quizType === 'menstrual' ? 'MENSTRUAL CYCLE 101 QUIZ' : 'FERTILE WINDOW QUIZ';
+  const quizData = quizType === 'menstrual' 
+    ? menstrualCycleQuizData 
+    : quizType === 'fertile' 
+      ? fertileWindowQuizData 
+      : timingBloodworkQuizData;
+  const quizTitle = quizType === 'menstrual' 
+    ? 'MENSTRUAL CYCLE 101 QUIZ' 
+    : quizType === 'fertile' 
+      ? 'FERTILE WINDOW QUIZ' 
+      : 'TIMING BLOODWORK QUIZ';
 
   useEffect(() => {
     localStorage.setItem('hasOpenedQuiz', 'true');
@@ -289,7 +344,7 @@ const MenstrualCycleQuiz = () => {
           
           <Paragraph style={{ fontSize: window.innerWidth <= 480 ? '14px' : '16px' }}>
             This is a great chance to assess how much you've learned. The questions will focus on the{' '}
-            <Text style={{ color: colors.text }}>{quizType === 'menstrual' ? 'Menstrual Cycle 101' : 'Fertile Window'}</Text>, so make sure you review as much as needed.
+            <Text style={{ color: colors.text }}>{quizType === 'menstrual' ? 'Menstrual Cycle 101' : quizType === 'fertile' ? 'Fertile Window' : 'Timing Bloodwork'}</Text>, so make sure you review as much as needed.
           </Paragraph>
           
           <Paragraph style={{ fontSize: window.innerWidth <= 480 ? '14px' : '16px' }}>

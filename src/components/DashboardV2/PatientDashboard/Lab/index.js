@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Card, Typography, Button, Row, Col, List, message } from "antd";
-import { FilePdfOutlined } from "@ant-design/icons";
+import { FilePdfOutlined, FileImageOutlined, FileOutlined } from "@ant-design/icons";
 
 import { useDispatch, useSelector } from "react-redux";
 import Lab from "../../../../assets/images/lab.png";
@@ -9,78 +9,21 @@ import moment from 'moment';
 
 const { Title, Text, Link } = Typography;
 
-// const LabResults = () => {
-//     const dispatch = useDispatch();  
-
-//     const { bloodWork, lastUpdated } = useSelector((state) => state?.patient);
-
-//     const handleDownload = async (fileRef) => {
-//         try {
-//             const resultAction = await dispatch(downloadBloodWork(fileRef));
-//             if (downloadBloodWork.fulfilled.match(resultAction)) {
-//                 const blob = new Blob([resultAction.payload], { type: "application/pdf" });
-//                 const url = window.URL.createObjectURL(blob);
-//                 const a = document.createElement("a");
-//                 a.href = url;
-//                 a.download = `${fileRef}.pdf`;
-//                 document.body.appendChild(a);
-//                 a.click();
-//                 window.URL.revokeObjectURL(url);
-//             } else {
-//                 message.error("Failed to download file.");
-//             }
-//         } catch (error) {
-//             message.error("Download error.");
-//         }
-//     };
-
-//     const columns = [
-//         {
-//             title: 'File Name',
-//             dataIndex: 'filename',
-//             key: 'filename',
-//             render: (text) => <span style={{ fontWeight: 500 }}>{text}</span>,
-//         },
-//         {
-//             title: 'Title',
-//             dataIndex: 'fileTitle',
-//             key: 'fileTitle',
-//         },
-//         {
-//             title: 'Created On',
-//             dataIndex: 'createdOn',
-//             key: 'createdOn',
-//             render: (text) => new Date(text).toLocaleDateString(),
-//         },
-//         {
-//             title: '',
-//             dataIndex: 'fileRef',
-//             key: 'fileRef',
-//             render: (fileRef) => (
-//                 <div className="file-container">
-//                     <FontAwesomeIcon icon={faFilePdf} color="red" className="pdf-icon ml-4" style={{ fontSize: "20px", marginRight: "4px" }} />
-//                     <Link onClick={() => handleDownload(fileRef)} style={{ color: "#1890ff", cursor: "pointer" }}>
-//                         Download
-//                     </Link>
-//                 </div>
-//             )
-//         }
-//     ];
-
-//     return (
-//         <Card style={{ border: '1px solid #C2E6F8', borderRadius: 8, marginTop: "10px" }}>
-//             <p style={{ fontStyle: 'italic', marginBottom: 16 }}>Last updated: {lastUpdated}</p>
-//             <Table
-//                 dataSource={bloodWork}
-//                 columns={columns}
-//                 pagination={false}
-//                 rowKey="id"
-//                 style={{ overflowX: 'auto' }}
-//                 rowClassName={() => 'lab-result-row'}
-//             />
-//         </Card>
-//     );
-// };
+const getFileIcon = (filename) => {
+    if (!filename) return <FileOutlined style={{ color: '#1890ff', fontSize: 24 }} />;
+    
+    const extension = filename.split('.').pop().toLowerCase();
+    switch (extension) {
+        case 'pdf':
+            return <FilePdfOutlined style={{ color: 'red', fontSize: 24 }} />;
+        case 'png':
+        case 'jpg':
+        case 'jpeg':
+            return <FileImageOutlined style={{ color: '#52c41a', fontSize: 24 }} />;
+        default:
+            return <FileOutlined style={{ color: '#1890ff', fontSize: 24 }} />;
+    }
+};
 
 const LabScreen = () => {
     const dispatch = useDispatch();
@@ -88,15 +31,29 @@ const LabScreen = () => {
     const [labRequisitions, setLabRequisitions] = useState([]);
     const [labResults, setLabResults] = useState([]);
 
+    const getFileType = (filename) => {
+        if (!filename) return 'application/pdf';
+        const extension = filename.split('.').pop().toLowerCase();
+        switch (extension) {
+            case 'pdf':
+                return 'application/pdf';
+            case 'png':
+                return 'image/png';
+            case 'jpg':
+            case 'jpeg':
+                return 'image/jpeg';
+            default:
+                return 'application/pdf';
+        }
+    };
+
     useEffect(() => {
-        // Fetch lab requisitions (type 1)
         dispatch(getPatientLabs(2)).then((result) => {
             if (getPatientLabs.fulfilled.match(result)) {
                 setLabRequisitions(result.payload);
             }
         });
 
-        // Fetch lab results (type 2)
         dispatch(getPatientLabs(1)).then((result) => {
             if (getPatientLabs.fulfilled.match(result)) {
                 setLabResults(result.payload);
@@ -104,17 +61,19 @@ const LabScreen = () => {
         });
     }, [dispatch]);
 
-    const handleDownload = async (fileRef) => {
+    const handleDownload = async (fileRef, filename) => {
         try {
             const resultAction = await dispatch(downloadBloodWork(fileRef));
             if (downloadBloodWork.fulfilled.match(resultAction)) {
-                const blob = new Blob([resultAction.payload], { type: "application/pdf" });
+                const mimeType = getFileType(filename);
+                const blob = new Blob([resultAction.payload], { type: mimeType });
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement("a");
                 a.href = url;
-                a.download = `${fileRef}.pdf`;
+                a.download = filename || `${fileRef}.pdf`;
                 document.body.appendChild(a);
                 a.click();
+                document.body.removeChild(a);
                 window.URL.revokeObjectURL(url);
             } else {
                 message.error("Failed to download file.");
@@ -138,14 +97,13 @@ const LabScreen = () => {
                 </Text>
                 <br />
                 <Text>Thanks!</Text>
-                <div style={{ borderRadius: 12 }}>
+                <div style={{ marginBottom: 40, borderRadius: 12 }}>
                     <div
                         style={{
                             width: "100%",
                             backgroundColor: "#335CAD",
                             borderRadius: "12px 12px 0 0",
                             height: "61px",
-                            marginTop: 40,
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "left",
@@ -160,7 +118,7 @@ const LabScreen = () => {
                                 fontWeight: "bold",
                             }}
                         >
-                            LAB REQUISITION
+                            LAB REQUISITIONS
                         </h3>
                     </div>
                     <div
@@ -198,8 +156,8 @@ const LabScreen = () => {
                                             </Text>
                                         </div>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                            <FilePdfOutlined style={{ color: 'red', fontSize: 24 }} />
-                                            <Link onClick={() => handleDownload(file.fileRef)} style={{ color: "#1890ff", cursor: "pointer" }}>
+                                            {getFileIcon(file.filename)}
+                                            <Link onClick={() => handleDownload(file.fileRef, file.filename)} style={{ color: "#1890ff", cursor: "pointer" }}>
                                                 {file.filename || 'LabResults.pdf'}
                                             </Link>
                                         </div>
@@ -266,8 +224,8 @@ const LabScreen = () => {
                                         </div>
 
                                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                            <FilePdfOutlined style={{ color: 'red', fontSize: 24 }} />
-                                            <Link onClick={() => handleDownload(file.fileRef)} style={{ color: "#1890ff", cursor: "pointer" }}>
+                                            {getFileIcon(file.filename)}
+                                            <Link onClick={() => handleDownload(file.fileRef, file.filename)} style={{ color: "#1890ff", cursor: "pointer" }}>
                                                 {file.filename || 'LabResults.pdf'}
                                             </Link>
                                         </div>

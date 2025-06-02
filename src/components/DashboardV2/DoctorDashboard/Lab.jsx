@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Upload, List, Typography, message, Card, Modal, Button, Input } from 'antd';
-import { InboxOutlined, FilePdfOutlined, EditOutlined, DeleteOutlined, LeftOutlined, UploadOutlined } from '@ant-design/icons';
+import { InboxOutlined, FilePdfOutlined, EditOutlined, DeleteOutlined, LeftOutlined, UploadOutlined, FileImageOutlined, FileOutlined } from '@ant-design/icons';
 import Header from './Components/Header';
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
@@ -52,6 +52,8 @@ const LabsAndRequisitions = () => {
                 break;
             case 'newLabResult':
                 setIsNewLabResultVisible(false);
+                setNewLabResultFile(null);
+                setNewLabResultName('');
                 break;
             case 'editLabResult':
                 setIsEditModalVisible(false);
@@ -93,7 +95,8 @@ const LabsAndRequisitions = () => {
             setFiles(bloodWorkFile1.map(file => ({
                 id: file.fileRef,
                 name: file.filename,
-                date: file.createdOn
+                date: file.createdOn,
+                title:file.fileTitle	
             })));
         } else if (status === 'failed') {
             message.error(error || 'Failed to retrieve files.');
@@ -105,17 +108,35 @@ const LabsAndRequisitions = () => {
         closeModal('patientSelect');
     };
 
-    const handleDownload = async (fileRef) => {
+    const getFileType = (filename) => {
+        if (!filename) return 'application/pdf'; // default to PDF
+        const extension = filename.split('.').pop().toLowerCase();
+        switch (extension) {
+            case 'pdf':
+                return 'application/pdf';
+            case 'png':
+                return 'image/png';
+            case 'jpg':
+            case 'jpeg':
+                return 'image/jpeg';
+            default:
+                return 'application/pdf';
+        }
+    };
+
+    const handleDownload = async (fileRef, filename) => {
         try {
             const resultAction = await dispatch(downloadBloodWork(fileRef));
             if (downloadBloodWork.fulfilled.match(resultAction)) {
-                const blob = new Blob([resultAction.payload], { type: "application/pdf" });
+                const mimeType = getFileType(filename);
+                const blob = new Blob([resultAction.payload], { type: mimeType });
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement("a");
                 a.href = url;
-                a.download = `${fileRef}.pdf`;
+                a.download = filename || `${fileRef}.pdf`;
                 document.body.appendChild(a);
                 a.click();
+                document.body.removeChild(a);
                 window.URL.revokeObjectURL(url);
             } else {
                 message.error("Failed to download file.");
@@ -163,21 +184,15 @@ const LabsAndRequisitions = () => {
           };
       
           try {
-            await dispatch(addPatientDocuments(payload));
-            // Update the bloodWorkFile1 state instead of a generic files state
-            setBloodWorkFile1((prev) => [
-              ...prev,
-              {
-                id: Date.now(), // Generate a unique id (or use the id from the response if available)
-                name: newLabResultName,
-                filename: newLabResultFile.name,
-                uploadedDate: new Date().toLocaleDateString(),
-              }
-            ]);
-            message.success(`${newLabResultName} uploaded successfully.`);
-            closeModal('newLabResult');
-            setNewLabResultFile(null);
-            setNewLabResultName('');
+            const resultAction = await dispatch(addPatientDocuments(payload));
+            if (addPatientDocuments.fulfilled.match(resultAction)) {
+              // Fetch updated blood work to refresh the list
+              await fetchPatientBloodWork(1);
+              message.success(`${newLabResultName} uploaded successfully.`);
+              closeModal('newLabResult');
+              setNewLabResultFile(null);
+              setNewLabResultName('');
+            }
           } catch (error) {
             message.error(`Error uploading ${newLabResultName}: ${error.message}`);
           }
@@ -196,7 +211,8 @@ const LabsAndRequisitions = () => {
 
     const uploadProps = {
         name: 'file',
-        multiple: true,
+        multiple: false,
+        showUploadList: false,
         beforeUpload: (file) => {
             if (bloodWorkFile2.length >= 2) { // Enforce max 2 files
                 message.error('You can only upload a maximum of 2 files.');
@@ -223,17 +239,8 @@ const LabsAndRequisitions = () => {
     
                 try {
                     await dispatch(addPatientDocuments(payload));
-    
-                    // Update the correct state
-                    setBloodWorkFile2((prev) => [...prev, {
-                        id: Date.now(), // Generate a temporary ID
-                        name: file.name,
-                        filename: file.name,
-                        uploadedDate: new Date().toLocaleDateString(),
-                    }]);
-    
+                    await fetchPatientBloodWork(2); // Refresh the list after upload
                     message.success(`${file.name} uploaded successfully.`);
-                    setNewLabResultName('');
                 } catch (error) {
                     message.error(`Error uploading ${file.name}: ${error.message}`);
                 }
@@ -242,10 +249,26 @@ const LabsAndRequisitions = () => {
             reader.readAsDataURL(file);
             return false; // Prevent automatic upload
         },
+        fileList: [], // Keep fileList empty to hide files
     };
     
 
+    const getFileIcon = (filename) => {
+        console.log(filename,'lll')
 
+        if (!filename) return <FileOutlined style={{ color: '#1890ff', fontSize: 24 }} />;
+        const extension = filename.split('.').pop().toLowerCase();
+        switch (extension) {
+            case 'pdf':
+                return <FilePdfOutlined style={{ color: 'red', fontSize: 24 }} />;
+            case 'png':
+            case 'jpg':
+            case 'jpeg':
+                return <FileImageOutlined style={{ color: '#52c41a', fontSize: 24 }} />;
+            default:
+                return <FileOutlined style={{ color: '#1890ff', fontSize: 24 }} />;
+        }
+    };
 
     return (
         <>
@@ -288,7 +311,7 @@ const LabsAndRequisitions = () => {
                 <Dragger
                     name="file"
                     multiple={false}
-                    showUploadList={true}
+                    showUploadList={false}
                     beforeUpload={(file) => {
                         const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
                         if (!allowedTypes.includes(file.type)) {
@@ -298,6 +321,7 @@ const LabsAndRequisitions = () => {
                         setNewLabResultFile(file);
                         return false;
                     }}
+                    fileList={newLabResultFile ? [newLabResultFile] : []}
                 >
                     <p className="ant-upload-drag-icon">
                         <UploadOutlined />
@@ -306,7 +330,11 @@ const LabsAndRequisitions = () => {
                     <p className="ant-upload-hint">- OR -</p>
                     <Button icon={<UploadOutlined />}>Browse Files</Button>
                 </Dragger>
-                {newLabResultFile && <Text>Selected File: {newLabResultFile.name}</Text>}
+                {newLabResultFile && (
+                    <div style={{ marginTop: '10px' }}>
+                        <Text>Selected File: {newLabResultFile.name}</Text>
+                    </div>
+                )}
             </Modal>
 
             <div className="p-6 mt-4" style={{ padding: "0 1%" }}>
@@ -388,9 +416,9 @@ const LabsAndRequisitions = () => {
                                                 gap: 8,
                                                 width: window.innerWidth <= 480 ? '100%' : 'auto'
                                             }}>
-                                                <FilePdfOutlined style={{ color: 'red', fontSize: 24 }} />
-                                                <Link style={{ color: '#1890ff' }} onClick={() => handleDownload(file.id)}>
-                                                    {file.filename || 'LabResults.pdf'}
+                                                {getFileIcon(file?.filename || file?.name)}
+                                                <Link style={{ color: '#1890ff' }} onClick={() => handleDownload(file.id, file?.filename || file?.name)}>
+                                                    {file.title}
                                                 </Link>
                                             </div>
                                             <div style={{ 
@@ -415,23 +443,18 @@ const LabsAndRequisitions = () => {
                         {bloodWorkFile2?.map((file, index) => (
                             <Card key={index} style={{border: 'none', boxShadow: 'none' }}>
                                 <Text strong>{index === 0 ? 'Day 1 Requisition' : 'Day 2 Requisition'}</Text>
-                                <List.Item  style={{ borderBottom: '1px solid #f0f0f0', padding: '12px 16px' }}>
-                                    <div class="labCard" style={{ display: 'flex', alignItems: 'center', gap: 15, width: '100%' }}>
-                                        <div class="listCardSideBorder" style={{ width: '3px', height: '40px', backgroundColor: 'red' }}></div>
+                                <List.Item style={{ borderBottom: '1px solid #f0f0f0', padding: '12px 16px' }}>
+                                    <div className="labCard" style={{ display: 'flex', alignItems: 'center', gap: 15, width: '100%' }}>
+                                        <div className="listCardSideBorder" style={{ width: '3px', height: '40px', backgroundColor: 'red' }}></div>
 
-                                        <div style={{ flex: 1 }}>
-                                            {/* <Text style={{ fontWeight: 500 }}>{file.name}</Text> */}
-                                            <br />
-                                        </div>
-
+                                      
                                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                            <FilePdfOutlined style={{ color: 'red', fontSize: 24 }} />
-                                            <Link style={{ color: '#1890ff' }} onClick={() => handleDownload(file.id)}>
-                                                {file.filename || 'LabResults.pdf'}
+                                            {getFileIcon(file?.filename || file?.name)}
+                                            <Link style={{ color: '#1890ff' }} onClick={() => handleDownload(file.id, file?.filename || file?.name)}>
+                                                {file.filename || file.name || 'LabResults.pdf'}
                                             </Link>
                                         </div>
                                         <div style={{ display: 'flex', gap: 10 }}>
-
                                             <DeleteOutlined style={{ color: 'red', cursor: 'pointer' }} onClick={() => handleDelete(file.id)} />
                                         </div>
                                     </div>
@@ -439,7 +462,6 @@ const LabsAndRequisitions = () => {
                             </Card>
                         ))}
 
-                        {/* File Upload Section */}
                         <Dragger {...uploadProps} style={{ marginTop: 10 }}>
                             <p className="ant-upload-drag-icon">
                                 <InboxOutlined />
@@ -477,7 +499,7 @@ const LabsAndRequisitions = () => {
                                 <Text>{file.name}</Text>
                                 <Text>{moment(file.date).format('MMMM DD, YYYY')}</Text>
                                 <FilePdfOutlined style={{ color: 'red', fontSize: 24 }} />
-                                <Link onClick={() => handleDownload(file.id)}>{file.filename || 'LabResults.pdf'}</Link>
+                                <Link onClick={() => handleDownload(file.id, file?.filename || file?.name)}>{file.filename || 'LabResults.pdf'}</Link>
                                 <EditOutlined style={{ color: '#1890ff', cursor: 'pointer' }} onClick={() => openModal('editLabResult')} />
                                 <DeleteOutlined style={{ color: 'red', cursor: 'pointer' }} onClick={() => handleDelete(file.id)} />
                             </div>

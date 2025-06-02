@@ -1625,10 +1625,19 @@ const SymptomReview = ({ onComplete }) => {
       case "radio":
         return (
           <>
-            <Button
+            <div
               type="primary"
-              style={{ background: "#335CAD", padding: 20, marginBottom: 10, overflowX:"auto"}}
-            ><span>{question?.sub ? question.sub : ''}</span></Button>
+              style={{
+                background: "#335CAD",
+                padding: "10px 20px",
+                marginBottom: 10,
+                display: "inline-block",
+                borderRadius: "4px",
+                color: "#fff"
+              }}
+            >
+              <span>{question?.sub ? question.sub : ''}</span>
+            </div>
 
             <Radio.Group
               name={question.name}
@@ -1780,22 +1789,22 @@ const SymptomReview = ({ onComplete }) => {
       case "multi_yes_no":
         return (
           <div style={{ marginTop: "20px" }}>
-            <Button
-              type="primary"
+            <div
               style={{
                 background: "#335CAD",
                 padding: isMobile ? "10px" : "20px",
                 fontSize: isMobile ? "14px" : "15px",
                 fontWeight: "bold",
                 width: "100%",
-                textAlign: "left",
                 whiteSpace: "normal",
                 height: "auto",
-                lineHeight: "1.4"
+                lineHeight: "1.4",
+                textAlign: "center",
+                color: "#fff",
               }}
             >
               {question.sub}
-            </Button>
+            </div>
 
             {question.subQuestions.map((subQuestion) => (
               <div 
@@ -1886,10 +1895,9 @@ const SymptomReview = ({ onComplete }) => {
       case "long_radio":
         return (
           <div style={{ flexDirection: "column" }}>
-           {question?.sub?  <Button
-              type="primary"
+           {question?.sub?  <div
               style={{ background: "#335CAD", padding: 20, marginBottom: 10 }}
-            > {question.sub}</Button>:''}
+            > {question.sub}</div>:''}
             <Radio.Group
               name={question.name}
               onChange={(e) => handleChange(e.target.value, question.name)}

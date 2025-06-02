@@ -1,6 +1,7 @@
 import React from 'react';
 import { Row, Col, Card, Typography } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
+import moment from 'moment';
 
 const { Text } = Typography;
 
@@ -32,7 +33,7 @@ export default function Header() {
                                         <Text strong>Pronouns:</Text> {userAuth.pronouns || "N/A"}
                                     </p>
                                     <p>
-                                        <Text strong>DOB:</Text> {userAuth.dob || "N/A"}
+                                        <Text strong>DOB:</Text> {userAuth.dob ? moment(userAuth.dob).format('MMMM DD, YYYY') : "N/A"}
                                     </p>
                                 </Col>
 
@@ -64,17 +65,17 @@ export default function Header() {
                                         <Text strong>Partner:</Text> {userAuth.partner || "N/A"}
                                     </p>
                                     <p>
-                                        <Text strong>Partner’s Sex:</Text> {userAuth.partnerSex || "N/A"}
+                                        <Text strong>Partner's Sex:</Text> {userAuth.partnerSex || "N/A"}
                                     </p>
                                     <p>
-                                        <Text strong>Partner’s Pronouns:</Text> {userAuth.partnerPronouns || "N/A"}
+                                        <Text strong>Partner's Pronouns:</Text> {userAuth.partnerPronouns || "N/A"}
                                     </p>
                                 </Col>
 
                                 {/* HCP Last Visits - Inline */}
                                 <Col>
                                     <Text style={{ color: "#1890ff", cursor: "pointer" }}>
-                                        <strong>HCP’s Last Visits  <DownOutlined style={{ color: "#595959", fontSize: "12px" }} />
+                                        <strong>HCP's Last Visits  <DownOutlined style={{ color: "#595959", fontSize: "12px" }} />
 </strong>
                                     </Text>
                                 </Col>

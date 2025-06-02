@@ -367,12 +367,13 @@ const Nutrition = ({ onComplete }) => {
       coffee_amount: info.coffeeCups || "",
       tea_amount: info.teaCups || "",
       soda_amount: info.sodaCups || "",
-      sensitive_food_caffeine: normalizeYesNo(info.adverseReactionToCoffee),
+      sensitive_food_caffeine: normalizeYesNo(info.adverseReactionToCoffee?.yesNo),
       sensitive_food_caffeine_feel: info.reactionToCaffeine || "",
       breakfast_time: info.breakfastTime || "",
       lunch_time: info.lunchTime || "",
       snack_time: info.snacksTime || "",
       dinner_time: info.dinnerTime || "",
+      sensitive_food_caffeine_other: info.adverseReactionToCoffee?.describe || "",
     };
   };
   

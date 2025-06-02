@@ -284,6 +284,7 @@ const questions = [
       "Decreased libido",
       "Loss of control of urine",
       "Palpitations",
+      "N/A",
     ],
   },
 
@@ -557,7 +558,7 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
 
   const validateQuestion = () => {
     const question = questions[currentQuestionIndex];
-    if (question.question === "(Check if applicable)") {
+    if (question.question === "(Check if applicable)" || question.name === "other_test_procedures") {
       return true;
     }
   
@@ -837,7 +838,7 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
   const renderSubQuestions = (subQuestions) => {
     return subQuestions.map((subQuestion, index) => (
       <div key={index} style={{ marginTop: "20px" }}>
-        <p>{subQuestion.type !== "text" && subQuestion.question}</p>
+        <p style={{color:"#000"}}>{subQuestion.type !== "text" && subQuestion.question}</p>
         {subQuestion.type === "text" && (
           <Input
             placeholder={subQuestion.question}
@@ -929,19 +930,26 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
         );
       case "select":
         return (
-          <Select
-            className="select_questtionnaire"
-            name={question.name}
-            value={answers[question.name] || ""}
-            onChange={(value) => handleChange(value, question.name)}
-          >
-            {question.options.map((option, index) => (
-              <Option key={index} value={option}>
-                {option}
-              </Option>
-            ))}
-          </Select>
-        );
+          <div className="select_questionnaire-wrapper">
+            <Select
+              className="select_questionnaire"
+              name={question.name}
+              value={answers?.[question.name] || ""}
+              onChange={(value) => handleChange(value, question.name)}
+            >
+              {question.options?.map((option, index) => (
+                <Option key={index} value={option}>
+                  {option}
+                </Option>
+              ))}
+            </Select>
+            {(question.name === "length_of_cycle" || question.name === "times_between_of_cycle") ? (
+              <span style={{color:"#000"}} className="select-suffix"> Days</span>
+            ) : (
+              ""
+            )}
+          </div>
+        );        
       case "radio":
         return (
           <Radio.Group
@@ -1335,7 +1343,7 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
   const label = (
     <span>
       {
-        questions[currentQuestionIndex].name !== "symptomatic_problems_menopause_other"? <span style={{ color: "red" }}>* </span>: undefined
+        questions[currentQuestionIndex].name !== "symptomatic_problems_menopause_other" && questions[currentQuestionIndex].name !== "other_test_procedures"? <span style={{ color: "red" }}>* </span>: undefined
       }
     </span>
   );

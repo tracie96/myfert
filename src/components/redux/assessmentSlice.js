@@ -51,7 +51,7 @@ const initialState = [
     meta:"healthMedical"
   },
   {
-    title: "Family History",
+    title: "Personal & Family History",
     component: "/questionnaire/7",
     icon: "https://res.cloudinary.com/tracysoft/image/upload/v1738258164/substance_h41r7q.svg",
     isComplete: false,

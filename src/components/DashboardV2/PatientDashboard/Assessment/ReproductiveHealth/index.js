@@ -612,7 +612,7 @@ const ReproductiveHealth = ({ onComplete }) => {
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const patientReproductiveInfo = useSelector((state) => state.intake?.patientReproductiveInfo);
   const [disabledSeverity, setDisabledSeverity] = useState({});
-
+console.log(setisDisabled);
   useEffect(() => {
     // First try to load from localStorage
     const savedAnswers = localStorage.getItem("reproductiveHealthAnswers");

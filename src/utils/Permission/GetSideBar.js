@@ -18,6 +18,7 @@ import {
   FaServicestack,
   FaBook,
   FaSignOutAlt,
+  FaStickyNote,
 } from "react-icons/fa";
 import { FaNotesMedical } from "react-icons/fa";
 export const GetSideBar = () => {
@@ -188,6 +189,11 @@ export const GetSideBar = () => {
       <Menu.Item key="6" icon={<FaNotesMedical style={{ color: "#00ADEF" }} />}>
         <NavLink to="/doctor/notes" style={{ textDecoration: "none" }}>
           <span>NOTES</span>
+        </NavLink>
+      </Menu.Item>
+      <Menu.Item key="8" icon={<FaStickyNote style={{ color: "#00ADEF" }} />}>
+        <NavLink to="/doctor/fax" style={{ textDecoration: "none" }}>
+          <span>Fax</span>
         </NavLink>
       </Menu.Item>
       <Menu.Item 

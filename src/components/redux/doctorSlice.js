@@ -692,6 +692,29 @@ export const deletePatientNote = createAsyncThunk(
   }
 );
 
+export const fetchDocumo = createAsyncThunk(
+  "doctor/fetchDocumo",
+  async (_, { rejectWithValue, getState }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        Accept: "text/plain",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+
+    try {
+      const response = await axios.get(
+        `${baseUrl}Doctor/FetchDocumo`,
+        config
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error?.response?.data);
+    }
+  }
+);
+
 const doctorSlices = createSlice({
   name: "doctor",
   initialState: {
@@ -712,7 +735,10 @@ const doctorSlices = createSlice({
     editingNote: false,
     editNoteError: null,
     deletingNote: false,
-    deleteNoteError: null
+    deleteNoteError: null,
+    documoData: [],
+    documoLoading: false,
+    documoError: null
   },
   extraReducers: (builder) => {
     builder.addCase(patientList.pending, (state, action) => {
@@ -1002,6 +1028,21 @@ const doctorSlices = createSlice({
       .addCase(deletePatientNote.rejected, (state, action) => {
         state.deletingNote = false;
         state.deleteNoteError = action.payload;
+      });
+
+    builder
+      .addCase(fetchDocumo.pending, (state) => {
+        state.documoLoading = true;
+        state.documoError = null;
+      })
+      .addCase(fetchDocumo.fulfilled, (state, action) => {
+        state.documoLoading = false;
+        state.documoData = action.payload;
+        state.documoError = null;
+      })
+      .addCase(fetchDocumo.rejected, (state, action) => {
+        state.documoLoading = false;
+        state.documoError = action.payload;
       });
   },
 });

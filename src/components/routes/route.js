@@ -94,6 +94,7 @@ import PrivacyPolicy from "../../pages/PrivacyPolicy";
 import ConfidentialityAgreement from "../../pages/ConfidentialityAgreement";
 import Note from "../DashboardV2/DoctorDashboard/Note";
 import PatientNote from "../DashboardV2/PatientDashboard/Note";
+import Fax from "../DashboardV2/DoctorDashboard/Fax";
 
 //#endregion
 
@@ -239,6 +240,8 @@ const getRouter = createBrowserRouter(
 
         <Route path="doctor/appointments" element={<AppointmentList />} />
         <Route path="doctor/labs" element={<LabsAndRequisitions />} />
+        <Route path="doctor/fax" element={<Fax />} />
+
         <Route path="doctor/meds" element={<MedicationTable />} />
         
         <Route path="doctor/notes" element={<Note />} />

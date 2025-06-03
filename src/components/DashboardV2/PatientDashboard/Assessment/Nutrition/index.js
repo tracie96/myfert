@@ -41,6 +41,7 @@ const questions = [
       "No Wheat",
       "Gluten Free",
       "Other",
+      "None",
     ],
   },
   {
@@ -84,6 +85,7 @@ const questions = [
       "Preservatives",
       "Food coloring",
       "Other",
+      "None"
     ],
   },
   {
@@ -193,7 +195,7 @@ const questions = [
   {
     question: "Please record what you eat in a typical day:",
     type: "long_textarea",
-    sub: "Fluids",
+    sub: "Drink",
     name: "diet_detail_fluids",
   },
   {
@@ -277,19 +279,19 @@ const questions = [
         question: "If yes, check amount:",
         type: "radio",
         name: "coffee_amount",
-        options: ["1", "2-4", "More than 4"],
+        options: ["1", "2-4", "More than 4", "none"],
         label: "Coffee (cups per day)",
       },
       {
         type: "radio",
         name: "tea_amount",
-        options: ["1", "2-4", "More than 4"],
+        options: ["1", "2-4", "More than 4", "None"],
         label: "Tea (cups per day)",
       },
       {
         type: "radio",
         name: "soda_amount",
-        options: ["1", "2-4", "More than 4"],
+        options: ["1", "2-4", "More than 4", "None"],
         label: "Caffeinated sodas—regular or diet (cans per day)",
       },
     ],
@@ -424,8 +426,7 @@ const Nutrition = ({ onComplete }) => {
     switch (question.type) {
       case "long_select": {
         const value = answers[question.name];
-        console.log("value--", value);
-        if (value === undefined || value === null || value === "" || value === 0) {
+        if (value === undefined || value === null || value === "") {
           console.log(`Validation Failed: No value selected for ${question.name}`);
           return false;
         }

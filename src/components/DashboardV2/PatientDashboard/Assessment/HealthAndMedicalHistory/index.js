@@ -377,17 +377,28 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
         return null;
       };
       const prefillAnswers = {
-        overll_wellbeing: lifestyle.howWellThingsGoingOverall || 1,
+        overll_wellbeing: lifestyle.howWellThingsGoingOverall ?? 1,
+        overll_wellbeing_na: lifestyle.howWellThingsGoingOverall === 0, 
         school_wellbeing: lifestyle.howWellThingsGoingSchool || 1,
+        school_wellbeing_na: lifestyle.howWellThingsGoingSchool === 0,
         job_wellbeing: lifestyle.howWellThingsGoingJob || 1,
+        job_wellbeing_na: lifestyle.howWellThingsGoingJob === 0,  
         social_life_wellbeing: lifestyle.howWellThingsGoingSocialLife || 1,
+        social_life_wellbeing_na: lifestyle.howWellThingsGoingSocialLife === 0,
         close_friends_wellbeing: lifestyle.howWellThingsGoingCloseFriends || 1,
+        close_friends_wellbeing_na: lifestyle.howWellThingsGoingCloseFriends === 0,
         sex_wellbeing: lifestyle.howWellThingsGoingSex || 1,
+        sex_wellbeing_na: lifestyle.howWellThingsGoingSex === 0,
         attitude_wellbeing: lifestyle.howWellThingsGoingAttitude || 1,
+        attitude_wellbeing_na: lifestyle.howWellThingsGoingAttitude === 0,
         relationship_wellbeing: lifestyle.howWellThingsGoingPartner || 1,
+        relationship_wellbeing_na: lifestyle.howWellThingsGoingPartner === 0,
         children_wellbeing: lifestyle.howWellThingsGoingKids || 1,
+        children_wellbeing_na: lifestyle.howWellThingsGoingKids === 0,
         parents_wellbeing: lifestyle.howWellThingsGoingParents || 1,
+        parents_wellbeing_na: lifestyle.howWellThingsGoingParents === 0,
         spouse_wellbeing: lifestyle.howWellThingsGoingSpouse || 1,
+        spouse_wellbeing_na: lifestyle.howWellThingsGoingSpouse === 0,
         mode_of_own_birth: lifestyle.howWereYouBorn,
         birth_complications: normalizeYesNo(lifestyle.wereYouBornWithComplication?.yesNo),
         birth_complications_details: lifestyle.wereYouBornWithComplication?.describe || "",
@@ -552,7 +563,7 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
       Object.keys(patientHealthMedicalInfo.obj).length > 0
     ) {
       const transformedAnswers = transformApiDataToAnswers(patientHealthMedicalInfo);
-      console.log("Prefilling from API:", transformedAnswers);
+
       setAnswers(transformedAnswers);
       setCurrentQuestionIndex(0);
       // Clear localStorage to avoid confusion
@@ -579,7 +590,7 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
     switch (question.type) { 
       case "rating_scale": {
         const value = answers[question.name];
-        if (value === undefined || value === null || value === 0) {
+        if (value === undefined || value === null) {
           return false;
         }
         return true;

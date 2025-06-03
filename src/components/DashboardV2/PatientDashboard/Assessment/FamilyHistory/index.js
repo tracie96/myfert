@@ -37,49 +37,49 @@ const questions = [
         label: "Pregnancies",
         name: "pregnancies",
         selectName: "pregnancies_select",
-        selectOptions: Array.from({ length: 30 }, (_, i) => 0 + i),
+        selectOptions: Array.from({ length: 30 }, (_, i) => 1 + i),
       },
       {
         label: "Miscarriages",
         name: "miscarriages",
         selectName: "miscarriages_select",
-        selectOptions: Array.from({ length: 30 }, (_, i) => 0 + i),
+        selectOptions: Array.from({ length: 30 }, (_, i) => 1 + i),
       },
       {
         label: "Abortions",
         name: "abortions",
         selectName: "abortions_select",
-        selectOptions: Array.from({ length: 30 }, (_, i) => 0 + i),
+        selectOptions: Array.from({ length: 30 }, (_, i) => 1 + i),
       },
       {
         label: "Living children",
         name: "living_children",
         selectName: "living_children_select",
-        selectOptions: Array.from({ length: 30 }, (_, i) => 0 + i),
+        selectOptions: Array.from({ length: 30 }, (_, i) => 1 + i),
       },
       {
         label: "Vaginal deliveries",
         name: "vaginal_deliveries",
         selectName: "vaginal_deliveries_select",
-        selectOptions: Array.from({ length: 30 }, (_, i) => 0 + i),
+        selectOptions: Array.from({ length: 30 }, (_, i) => 1 + i),
       },
       {
         label: "Caeseran",
         name: "caeserean",
         selectName: "caeserean_select",
-        selectOptions: Array.from({ length: 30 }, (_, i) => 0 + i),
+        selectOptions: Array.from({ length: 30 }, (_, i) => 1 + i),
       },
       {
         label: "Term births",
         name: "term_births",
         selectName: "term_births_select",
-        selectOptions: Array.from({ length: 30 }, (_, i) => 0 + i),
+        selectOptions: Array.from({ length: 30 }, (_, i) => 1 + i),
       },
       {
         label: "Premature birth",
         name: "premature_birth",
         selectName: "premature_birth_select",
-        selectOptions: Array.from({ length: 30 }, (_, i) => 0 + i),
+        selectOptions: Array.from({ length: 30 }, (_, i) => 1 + i),
       },
     ],
   },
@@ -476,7 +476,7 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
         patientPersonalFamilyInfo.obstetricHistory.forEach((item) => {
           const key = item.name.toLowerCase().replace(/\s+/g, '_');
           // Set the checkbox state
-          mapped[key] = item.level !== null && item.level !== undefined;
+          mapped[key] = item.level !== null && item.level !== undefined && item.level > 0;
           // Set the select value with the correct selectName format
           mapped[`${key}_select`] = item.level;
         });

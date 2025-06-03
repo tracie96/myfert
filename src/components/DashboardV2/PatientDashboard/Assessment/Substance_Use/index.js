@@ -371,7 +371,7 @@ const SubstanceUse = ({ onComplete }) => {
       exposedTo2ndSmoke: answers.exposed_to_second_hand_smoke === "Yes",
       howManyAlcoholWeek: answers.exposed_to_smoke || "",
       previousAlcoholIntake: {
-        yesNo: answers.alcohol_problem === "Yes",
+        yesNo: answers.previous_alcohol_intake === "Yes",
         describe:answers.previous_packs_per_day || "",
       },
       problemAlcohol: answers.alcohol_problem === "Yes",

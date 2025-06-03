@@ -30,7 +30,6 @@ import {
   fetchDocumo
 } from "../../redux/doctorSlice";
 import moment from "moment";
-import Fax from './Fax';
 const { Dragger } = Upload;
 const { Text, Link } = Typography;
 
@@ -685,7 +684,6 @@ const LabsAndRequisitions = () => {
           </div>
         </div>
 
-        <Fax />
       </div>
 
       <Modal

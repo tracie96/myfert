@@ -611,6 +611,7 @@ const ReproductiveHealth = ({ onComplete }) => {
   const navigate = useNavigate();
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const patientReproductiveInfo = useSelector((state) => state.intake?.patientReproductiveInfo);
+  const [disabledSeverity, setDisabledSeverity] = useState({});
 
   useEffect(() => {
     // First try to load from localStorage
@@ -757,25 +758,48 @@ const ReproductiveHealth = ({ onComplete }) => {
 
 
             // Validate number_with_radio_sub questions if not "Unsure" 
-            if (subQuestion.type === "number_with_radio_sub" && subQuestion.name !== "longest_cycle_radio" && subQuestion.name !== "shortest_cycle_radio" && subQuestion.name !== "average_cycle_radio") {
-
-              if (!subUnsure) {
-                const parsed = Number(subAnswer);
-                if (isNaN(parsed) || parsed === 0) {
-                  subQuestionsValid = false;
-                  break; // No need to continue if one subquestion is invalid
-                }
+            if (
+              subQuestion.type === "number_with_radio_sub" &&
+              !["longest_cycle_radio", "shortest_cycle_radio", "average_cycle_radio"].includes(subQuestion.name)
+            ) {
+              const parsed = Number(subAnswer);
+              // ⛔ Only validate if NOT unsure and NOT 0
+              if (!subUnsure && (isNaN(parsed) || parsed < 0)) {
+                subQuestionsValid = false;
+                break;
+              }
+            
+              // ✅ Skip further validation (like dependent severity) if duration is 0
+              if (!isNaN(parsed) && parsed === 0) {
+                // Skip: it's intentionally 0, so no severity required
+                continue;
               }
             }
             
             // Validate radio questions
             if (subQuestion.type === "radio") {
-                if (!subAnswer) {
-                    subQuestionsValid = false;
-                    break; // No need to continue if one subquestion is invalid
-                }
-            }
+              const skipValidationMap = {
+                duration_per_cycle_severity_pelvic_pain: "duration_per_cycle_pelvic_pain",
+                duration_per_mild_cycle_severity_pp_not_menstrual: "duration_per_cycle_pp_not_menstrual",
+                pms_sympton_severity: "pms_sympton_check",
+                cervical_mucus_sub: "cervical_mucus",
+                Watery_mucus_colour: "Watery_mucus_sub",
+                egg_white_mucus_colour: "egg_white_mucus_sub",
+                pre_spotting_colour: "pre_spotting_sub",
+                after_period_spot_colour: "after_period_spot_sub",
+                cycle_spotting_sub: "cycle_spotting_sub_number",
+              };
             
+              const controllingField = skipValidationMap[subQuestion.name];
+              const controllingValue = answers[controllingField];
+              const skip = controllingValue === 0 || controllingValue === "0";
+            
+              if (!subAnswer && !skip) {
+                subQuestionsValid = false;
+                break;
+              }
+            }
+               
             // Validate checkbox questions
              if (subQuestion.type === "checkbox") {
                 if (!subAnswer || !Array.isArray(subAnswer) || subAnswer.length === 0) {
@@ -825,16 +849,63 @@ const ReproductiveHealth = ({ onComplete }) => {
 
   const handleChange = (value, name) => {
     let updatedAnswers = { ...answers };
+    if (
+      name === "duration_per_cycle_pelvic_pain" ||
+      name === "duration_per_cycle_pp_not_menstrual" ||
+      name === "pms_sympton_check"
+    ) {
+      const severityFieldMap = {
+        duration_per_cycle_pelvic_pain: "duration_per_cycle_severity_pelvic_pain",
+        duration_per_cycle_pp_not_menstrual: "duration_per_mild_cycle_severity_pp_not_menstrual",
+        pms_sympton_check: "pms_sympton_severity",
+      };
+      const severityField = severityFieldMap[name];
+      if (value === 0 || value === "0") {
+        updatedAnswers[severityField] = "";
+        setDisabledSeverity((prev) => ({ ...prev, [severityField]: true }));
+      } else {
+        setDisabledSeverity((prev) => ({ ...prev, [severityField]: false }));
+      }
+    }
 
-    const disabledNames = [
-      "cervical_mucus",
-      "pre_spotting_sub",
-      "Watery_mucus_sub",
-      "egg_white_mucus_sub",
-      "after_period_spot_sub"
-    ];
+    if (name === "cervical_mucus") {
+      if (value === 0 || value === "0") {
+        updatedAnswers["cervical_mucus_sub"] = "";
+        setDisabledSeverity((prev) => ({ ...prev, cervical_mucus_sub: true }));
+      } else {
+        setDisabledSeverity((prev) => ({ ...prev, cervical_mucus_sub: false }));
+      }
+    }
+
+    if (name === "cycle_spotting_sub_number") {
+      if (value === 0 || value === "0") {
+        updatedAnswers["cycle_spotting_sub"] = "";
+        setDisabledSeverity((prev) => ({ ...prev, cycle_spotting_sub: true }));
+      } else {
+        setDisabledSeverity((prev) => ({ ...prev, cycle_spotting_sub: false }));
+      }
+    }
     
-    setisDisabled(value === 0 && disabledNames.includes(name));
+    
+    const dischargeMap = {
+      cervical_mucus: "cervical_mucus_sub",
+      Watery_mucus_sub: "Watery_mucus_colour",
+      egg_white_mucus_sub: "egg_white_mucus_colour",
+      pre_spotting_sub: "pre_spotting_colour",
+      after_period_spot_sub: "after_period_spot_colour",
+      cycle_spotting_sub_number: "cycle_spotting_sub",
+    };
+    
+    if (name in dischargeMap) {
+      const relatedColourField = dischargeMap[name];
+      if (value === 0 || value === "0") {
+        updatedAnswers[relatedColourField] = "";
+        setDisabledSeverity((prev) => ({ ...prev, [relatedColourField]: true }));
+      } else {
+        setDisabledSeverity((prev) => ({ ...prev, [relatedColourField]: false }));
+      }
+    }
+    
     
     updatedAnswers["menstrual_bleeding"] =  0;
     if (name === "relaxation_techniques") { 
@@ -1256,6 +1327,7 @@ const ReproductiveHealth = ({ onComplete }) => {
            className="radioGroup"
            onChange={(e) => handleChange(e.target.value, subQuestion.name)}
            value={answers[subQuestion.name]}
+           disabled={disabledSeverity[subQuestion.name]}
            style={{ width: "100%" }}
          >
            {subQuestion.options.map((option, idx) => {
@@ -1267,7 +1339,8 @@ const ReproductiveHealth = ({ onComplete }) => {
                    value={option}
                    name={option}
                    style={{ display: "block", marginBottom: "10px" }}
-                   disabled={isDisabled}
+                   disabled={isDisabled || disabledSeverity[subQuestion.name]}
+
                  >
                   <span style={{ verticalAlign: 'text-bottom' }}>{option}</span>
                  </Radio>
@@ -1787,7 +1860,7 @@ const ReproductiveHealth = ({ onComplete }) => {
       </i>
 
       <h3 style={{ margin: "20px 0", fontWeight:"600", color: "#000", fontSize: "15px" }}>
-        {label}
+        {["info", "infoSpotting"].includes(questions[currentQuestionIndex]?.name) ? "" : label}
         {questions[currentQuestionIndex].question}{" "}
         <span style={{cursor: "pointer"}} onClick={handleInfoModal}>{questions[currentQuestionIndex]?.infoIconBtn}</span>
         <div>{

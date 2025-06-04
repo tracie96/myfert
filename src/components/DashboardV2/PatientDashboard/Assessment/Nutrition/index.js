@@ -311,10 +311,18 @@ const questions = [
   },
   {
     question: "When you drink caffeine do you feel:",
-    type: "radio",
+    type: "checkbox",
     name: "sensitive_food_caffeine_feel",
-    options: ["Irritable or weird", "Aches or pains"],
-  },
+    options: ["Irritable or weird", "Aches or pains", "Other"],
+    subQuestions: [
+      {
+        question: "Other",
+        type: "text",
+        name: "sensitive_food_caffeine_feel_other"
+      }
+    ]
+  }
+  
 ];
 
 const Nutrition = ({ onComplete }) => {
@@ -371,6 +379,7 @@ const Nutrition = ({ onComplete }) => {
       soda_amount: info.sodaCups || "",
       sensitive_food_caffeine: normalizeYesNo(info.adverseReactionToCoffee?.yesNo),
       sensitive_food_caffeine_feel: info.reactionToCaffeine || "",
+      sensitive_food_caffeine_feel_other: info.sensitiveCaffeineOther || "",
       breakfast_time: info.breakfastTime || "",
       lunch_time: info.lunchTime || "",
       snack_time: info.snacksTime || "",
@@ -594,6 +603,7 @@ const Nutrition = ({ onComplete }) => {
       },
       explainAdverseReactionToCoffee: answers.sensitive_food_caffeine_other || "",
       reactionToCaffeine: answers.sensitive_food_caffeine_feel || "",
+      sensitiveCaffeineOther: answers.sensitive_food_caffeine_feel_other || "",
       specialDietReason:answers.special_diet_reason || "",
       breakfastTime:answers.breakfast_time || "",
       lunchTime:answers.lunch_time || "",
@@ -724,42 +734,40 @@ const Nutrition = ({ onComplete }) => {
       case "checkbox":
         return (
           <Checkbox.Group
-            name={question.name}
-            onChange={(checkedValues) =>
-              handleChange(checkedValues, question.name)
-            }
-            value={answers[question.name] || []}
-            className="checkbox-group"
-          >
-            {question.options.map((option, index) => (
-              <Checkbox key={index} value={option} className="checkbox-item">
-                {option === "Other" ? (
-                  <>
-                    {option}
-                    {answers[question.name] &&
-                      answers[question.name].includes("Other") && (
-                        <>
-                          <br />
-                          <Input
-                            className="input_questtionnaire"
-                            placeholder="Please specify"
-                            value={answers[`${question.name}_other`] || ""}
-                            onChange={(e) =>
-                              handleChange(
-                                e.target.value,
-                                `${question.name}_other`,
-                              )
-                            }
-                          />
-                        </>
-                      )}
-                  </>
-                ) : (
-                  option
-                )}
-              </Checkbox>
-            ))}
-          </Checkbox.Group>
+          name={question.name}
+          onChange={(checkedValues) =>
+            handleChange(checkedValues, question.name)
+          }
+          value={answers[question.name] || []}
+          className="checkbox-group"
+        >
+          {question.options.map((option, index) => (
+            <Checkbox key={index} value={option} className="checkbox-item">
+              {option === "Other" ? (
+                <>
+                  {option}
+                  {answers[question.name] &&
+                    answers[question.name].includes("Other") && (
+                      <>
+                        <br />
+                        <Input
+                          className="input_questtionnaire"
+                          placeholder="Please describe"
+                          value={answers[`${question.name}_other`] || ""}
+                          onChange={(e) =>
+                            handleChange(e.target.value, `${question.name}_other`)
+                          }
+                          style={{ marginTop: "10px" }}
+                        />
+                      </>
+                    )}
+                </>
+              ) : (
+                option
+              )}
+            </Checkbox>
+          ))}
+        </Checkbox.Group>        
         );
       
         case "radiowithselect":

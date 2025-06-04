@@ -1,4 +1,11 @@
-const env = process.env.NODE_ENV || 'development';
+const getEnvironment = () => {
+  if (typeof window !== 'undefined' && window.location.href.includes('myfert-dev.netlify.app')) {
+    return 'development';
+  }
+  return process.env.NODE_ENV || 'development';
+};
+
+const env = getEnvironment();
 
 export const baseUrl = env === 'production' 
   ? 'https://myfertilitydevapi-prod.azurewebsites.net/api/'

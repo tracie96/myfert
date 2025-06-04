@@ -17,6 +17,7 @@ import {
   getAccessDetailsDoctor,
 } from "../../redux/AssessmentController";
 import { Tag } from "antd";
+import Header from "./Components/Header";
 
 export default function UserInfo() {
   const location = useLocation();
@@ -147,79 +148,10 @@ export default function UserInfo() {
   };
   return (
     <Row gutter={16} justify="" style={{ padding: "0 5%" }}>
-      <Col xs={24} sm={24} md={24} lg={24} xl={24}>
-        <div style={{ padding: "2% 0" }}>
-          <Card
-            style={{
-              border: "1px solid #DAA520",
-              borderRadius: 10,
-              maxWidth: "100%",
-            }}
-          >
-            <Row gutter={16}>
-              <Col span={12} md={6}>
-                <p>
-                  <strong>Client</strong> :
-                  {userInfo?.user?.lastname || "N/A"}
-                </p>
-              </Col>
-              <Col span={12} md={6}>
-                <p>
-                  <strong>Age</strong> : {userInfo?.user?.age}
-                </p>
-              </Col>
-              <Col span={12} md={6}>
-                <p>
-                  <strong>Preferred Phone</strong> :{" "}
-                  {userInfo?.user?.phoneNumber || "N/A"}
-                </p>
-              </Col>
-           
-            </Row>
-            <Row gutter={16} style={{ marginTop: "16px" }}>
-              {/* <Col span={12} md={6}>
-                <p>
-                  <strong>RRM</strong> : {userInfo?.rrm || "N/A"}
-                </p>
-              </Col>
-            </Row>
-            <Row gutter={16} style={{ marginTop: "16px" }}>
-              <Col span={12} md={6}>
-                <p>
-                  <strong>Partner</strong> : {userInfo?.partner || "N/A"}
-                </p>
-              </Col>
-              <Col span={12} md={6}>
-                <p>
-                  <strong>Weeks in Program</strong> :{" "}
-                  {userInfo?.weeksInProgram || "N/A"}
-                </p>
-              </Col>
-              <Col span={12} md={6}>
-                <p>
-                  <strong>#RRM Visits</strong> : {userInfo?.rrmVisits || "N/A"}
-                </p>
-              </Col>
-              <Col span={12} md={6}>
-                <p>
-                  <strong>Coach</strong> : {userInfo?.coach || "N/A"}
-                </p>
-              </Col> */}
-            </Row>
-            <Row gutter={16} style={{ marginTop: "16px" }}>
-              {/* <Col span={12} md={6}>
-                <p>
-                  <strong>Care Type</strong> : {userInfo?.careType || "N/A"}
-                </p>
-              </Col>
-              <Col span={12} md={6}>
-                <p>
-                  <strong>LMP</strong> : {userInfo?.lmp || "N/A"}
-                </p>
-              </Col> */}
-            </Row>
-          </Card>
-        </div>
+
+      <Col xs={24} sm={24} md={24} lg={24} xl={24}>      
+      <Header />
+
       </Col>
       <Row gutter={18}>
         <Col xs={24} md={24} lg={24} style={{ paddingBottom: "16px" }}>

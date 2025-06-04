@@ -11,14 +11,14 @@ const Header = () => {
     return (
         <div>
             {userAuth?.userRef && (
-                <Row style={{ padding: "0 1%" }}>
+                <Row style={{marginBottom: "20px" }}>
                     <Col span={24}>
                         <Card
-                            style={{
-                                borderRadius: 10,
-                                maxWidth: "100%",
-                                background: '#DDF5FE',
-                            }}
+                           style={{
+                            border: "1px solid #DAA520",
+                            borderRadius: 10,
+                            maxWidth: "100%",
+                          }}
                         >
                             <Row gutter={16} align="middle" justify="space-between">
                                 {/* Left Column */}

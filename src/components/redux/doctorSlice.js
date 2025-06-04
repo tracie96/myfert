@@ -714,6 +714,30 @@ export const fetchDocumo = createAsyncThunk(
   }
 );
 
+export const downloadDocumo = createAsyncThunk(
+  "doctor/downloadDocumo",
+  async (messageNumber, { rejectWithValue, getState }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        Accept: "*/*",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+      responseType: "blob", // Important for handling file downloads
+    };
+
+    try {
+      const response = await axios.get(
+        `${baseUrl}Doctor/DownloadDocumo/${messageNumber}`,
+        config
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error?.response?.data || "Download failed");
+    }
+  }
+);
+
 const doctorSlices = createSlice({
   name: "doctor",
   initialState: {
@@ -1040,6 +1064,22 @@ const doctorSlices = createSlice({
         state.documoError = null;
       })
       .addCase(fetchDocumo.rejected, (state, action) => {
+        state.documoLoading = false;
+        state.documoError = action.payload;
+      });
+
+    builder
+      .addCase(downloadDocumo.pending, (state) => {
+        // Don't modify documoData during download
+        state.documoLoading = true;
+        state.documoError = null;
+      })
+      .addCase(downloadDocumo.fulfilled, (state, action) => {
+        // Don't modify documoData after successful download
+        state.documoLoading = false;
+        state.documoError = null;
+      })
+      .addCase(downloadDocumo.rejected, (state, action) => {
         state.documoLoading = false;
         state.documoError = action.payload;
       });

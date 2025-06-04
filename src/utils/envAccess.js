@@ -1,5 +1,5 @@
 const getEnvironment = () => {
-  if (typeof window !== 'undefined' && window.location.href.includes('myfertility.netlify.app/')) {
+  if (typeof window !== 'undefined' && window.location.href.includes('myfert-dev.netlify.app/')) {
     return 'development';
   }
   return process.env.NODE_ENV || 'development';

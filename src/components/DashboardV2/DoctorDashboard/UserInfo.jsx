@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import { Row, Col, Card, Modal, Descriptions, Typography } from "antd";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,6 +18,7 @@ import {
 } from "../../redux/AssessmentController";
 import { Tag } from "antd";
 import Header from "./Components/Header";
+import { LockOutlined } from "@ant-design/icons";
 
 export default function UserInfo() {
   const location = useLocation();
@@ -55,7 +56,7 @@ export default function UserInfo() {
     "Reproductive Health": "reproductiveHealth",
   };
 
-  const modalContent = [
+  const modalContent = useMemo(() => [
     "General Information",
     "Current Health & Lifestyle",
     "Nutrition & Dietary Habits",
@@ -67,14 +68,7 @@ export default function UserInfo() {
     "Symptom Review & Medications",
     "Readiness & Health Goals",
     "Reproductive Health",
-  ].filter(content => {
-    // If doctorAccessDetails is not available yet, don't show any cards
-    if (!doctorAccessDetails) return false;
-    // Get the corresponding access key for this content
-    const accessKey = modalContentMapping[content];
-    // Show the card if the access is true
-    return doctorAccessDetails[accessKey] === true;
-  });
+  ], []);
 
   // Add this useEffect for access details
   useEffect(() => {
@@ -171,10 +165,11 @@ export default function UserInfo() {
                     border: "1px solid #C2E6F8",
                     borderRadius: 10,
                     height: "100%",
-                    background: "#C2E6F8",
+                    background: doctorAccessDetails && doctorAccessDetails[modalContentMapping[content]] ? "#C2E6F8" : "#f5f5f5",
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "center"
+                    justifyContent: "center",
+                    opacity: doctorAccessDetails && doctorAccessDetails[modalContentMapping[content]] ? 1 : 0.7,
                   }}
                   onClick={() => showModal(index)}
                 >
@@ -182,10 +177,19 @@ export default function UserInfo() {
                     <h4 style={{ 
                       fontSize: 16, 
                       margin: 0,
-                      color: "#000",
+                      color: doctorAccessDetails && doctorAccessDetails[modalContentMapping[content]] ? "#000" : "#666",
                       fontWeight: "500",
-                      lineHeight: 1.4
-                    }}>{content}</h4>
+                      lineHeight: 1.4,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      justifyContent: "center"
+                    }}>
+                      {content}
+                      {doctorAccessDetails && !doctorAccessDetails[modalContentMapping[content]] && (
+                        <LockOutlined style={{ fontSize: 14 }} />
+                      )}
+                    </h4>
                   </div>
                 </Card>
               </Col>

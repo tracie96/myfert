@@ -9,6 +9,7 @@ import { DeleteOutlined } from "@ant-design/icons";
 import { useMediaQuery } from "react-responsive";
 import { backBtnTxt, exitBtnTxt, saveAndContinueBtn, submitBtn } from "../../../../../utils/constant";
 import { getSymptomsPatient } from "../../../../redux/AssessmentController";
+import { baseUrl } from "../../../../../utils/envAccess";
 
 const questions = [
   {
@@ -1474,7 +1475,7 @@ const SymptomReview = ({ onComplete }) => {
       const token = userInfo.obj.token || "";
 
       fetch(
-        "https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/AddSymptoms",
+        `${baseUrl}Patient/AddSymptoms`,
         {
           method: "POST",
           headers: {

@@ -1,13 +1,19 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card, Table, Typography } from 'antd';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import moment from 'moment';
+import { fetchDocumo } from '../../redux/doctorSlice';
 
 const { Text } = Typography;
 
 const Fax = () => {
+  const dispatch = useDispatch();
   const documoData = useSelector((state) => state.doctor.documoData);
   const documoLoading = useSelector((state) => state.doctor.documoLoading);
+
+  useEffect(() => {
+    dispatch(fetchDocumo());
+  }, [dispatch]);
 
   const columns = [
     {

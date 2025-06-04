@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getUpcomingAppointments, getZohoClientID } from "../../redux/doctorSlice";
 import moment from "moment";
 import axios from "axios";
+import { baseUrl } from '../../../utils/envAccess';
 
 export default function AppointmentList() {
   const dispatch = useDispatch();
@@ -47,7 +48,7 @@ console.log({dateFilter})
       const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
       const token = userInfo.obj.token || "";
       const response = await axios.get(
-        `https://myfertilitydevapi-prod.azurewebsites.net/api/Doctor/MarkAppointmentDone/${appointId}`,
+        `${baseUrl}Doctor/MarkAppointmentDone/${appointId}`,
         {
           headers: {
             "Content-Type": "application/json",

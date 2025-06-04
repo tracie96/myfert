@@ -22,6 +22,7 @@ import { useMediaQuery } from "react-responsive";
 import { backBtnTxt, exitBtnTxt, saveAndContinueBtn, submitBtn } from "../../../../../utils/constant";
 import Paragraph from "antd/es/typography/Paragraph";
 import Title from "antd/es/typography/Title";
+import { baseUrl } from "../../../../../utils/envAccess";
 
 const { Option } = Select;
 
@@ -600,7 +601,7 @@ const StressAndRelationship = ({ onComplete }) => {
       };
   
       // Send data to API
-      fetch("https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/AddStress", {
+      fetch(`${baseUrl}Patient/AddStress`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

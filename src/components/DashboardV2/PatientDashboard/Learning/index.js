@@ -5,6 +5,7 @@ import { useMediaQuery } from "react-responsive";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import { baseUrl } from '../../../../utils/envAccess';
 
 import { Button, Typography, List } from "antd";
 const { Title, Text } = Typography;
@@ -59,7 +60,7 @@ const LearnInfo = () => {
   useEffect(() => {
     const markVideosAsWatched = async () => {
       try {
-        await axios.get('https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/MarkVideoAsWatch', {
+        await axios.get(`${baseUrl}Patient/MarkVideoAsWatch`, {
           headers: {
             'Authorization': `Bearer ${userAuth?.obj?.token}`
           }

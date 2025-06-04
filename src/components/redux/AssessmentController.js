@@ -17,7 +17,7 @@ export const submitGeneralInformation = createAsyncThunk(
     };
     try {
       const response = await axios.post(
-        `${baseUrl}/Patient/AddGeneralInformation`,
+        `${baseUrl}Patient/AddGeneralInformation`,
         transformedData.payload,
         config,
       );
@@ -43,7 +43,7 @@ export const getGeneralInformation = createAsyncThunk(
 
     try {
       const response = await axios.get(
-        `${baseUrl}/Doctor/GetGeneralInformation/${id}`,
+        `${baseUrl}Doctor/GetGeneralInformation/${id}`,
         config,
       );
 
@@ -73,7 +73,7 @@ export const getGeneralInformationPatient = createAsyncThunk(
 
       try {
           const response = await axios.get(
-              `${baseUrl}/Patient/GetGeneralInformation`,
+              `${baseUrl}Patient/GetGeneralInformation`,
               config,
           );
 
@@ -103,7 +103,7 @@ export const getNutritionPatient = createAsyncThunk(
 
       try {
           const response = await axios.get(
-              `${baseUrl}/Patient/GetNutrition`,
+              `${baseUrl}Patient/GetNutrition`,
               config,
           );
 
@@ -133,7 +133,7 @@ export const getSubstancePatient = createAsyncThunk(
 
       try {
           const response = await axios.get(
-              `${baseUrl}/Patient/getSubstanceUse`,
+              `${baseUrl}Patient/getSubstanceUse`,
               config,
           );
 
@@ -197,7 +197,7 @@ export const getHealthLifestylePatient = createAsyncThunk(
 
     try {
       const response = await axios.get(
-        `${baseUrl}/Patient/GetHealthLifestyle`,
+        `${baseUrl}Patient/GetHealthLifestyle`,
         config,
       );
 
@@ -226,7 +226,7 @@ export const getStressPatient = createAsyncThunk(
 
     try {
       const response = await axios.get(
-        `${baseUrl}/Patient/GetStress`,
+        `${baseUrl}Patient/GetStress`,
         config,
       );
 
@@ -256,7 +256,7 @@ export const getHealthMedicalPatient = createAsyncThunk(
 
     try {
       const response = await axios.get(
-        `${baseUrl}/Patient/GetHealthMedicalHistory`,
+        `${baseUrl}Patient/GetHealthMedicalHistory`,
         config,
       );
 
@@ -286,7 +286,7 @@ export const getPersonalFamilyPatient = createAsyncThunk(
 
     try {
       const response = await axios.get(
-        `${baseUrl}/Patient/GetPersonalFamily`,
+        `${baseUrl}Patient/GetPersonalFamily`,
         config,
       );
 
@@ -316,7 +316,7 @@ export const getIllnessConditionPatient = createAsyncThunk(
 
     try {
       const response = await axios.get(
-        `${baseUrl}/Patient/GetIllnessConditions`,
+        `${baseUrl}Patient/GetIllnessConditions`,
         config,
       );
 
@@ -346,7 +346,7 @@ export const getReproductiveHealthPatient = createAsyncThunk(
 
     try {
       const response = await axios.get(
-        `${baseUrl}/Patient/GetReproductiveHealth`,
+        `${baseUrl}Patient/GetReproductiveHealth`,
         config,
       );
 
@@ -376,7 +376,7 @@ export const getSymptomsPatient = createAsyncThunk(
 
     try {
       const response = await axios.get(
-        `${baseUrl}/Patient/GetSymptoms`,
+        `${baseUrl}Patient/GetSymptoms`,
         config,
       );
 
@@ -405,7 +405,7 @@ export const getReadinessPatient = createAsyncThunk(
 
     try {
       const response = await axios.get(
-        `${baseUrl}/Patient/GetReadiness`,
+        `${baseUrl}Patient/GetReadiness`,
         config
       );
 
@@ -456,7 +456,7 @@ export const getCurrentHealthLifestyle = createAsyncThunk(
 
     try {
       const response = await axios.get(
-        `${baseUrl}/Doctor/GetHealthLifestyle/${id}`,
+        `${baseUrl}Doctor/GetHealthLifestyle/${id}`,
         config,
       );
       return response.data;
@@ -482,7 +482,7 @@ export const getNutritionAndDietaryHabits = createAsyncThunk(
 
     try {
       const response = await axios.get(
-        `${baseUrl}/Doctor/GetNutrition/${id}`,
+        `${baseUrl}Doctor/GetNutrition/${id}`,
         config,
       );
       return response.data;
@@ -508,7 +508,7 @@ export const getSubstanceAbuse = createAsyncThunk(
 
     try {
       const response = await axios.get(
-        `${baseUrl}/Doctor/GetSubstanceUse/${id}`,
+        `${baseUrl}Doctor/GetSubstanceUse/${id}`,
         config,
       );
       return response.data;
@@ -534,7 +534,7 @@ export const getGetStress = createAsyncThunk(
 
     try {
       const response = await axios.get(
-        `${baseUrl}/Doctor/GetStress/${id}`,
+        `${baseUrl}Doctor/GetStress/${id}`,
         config,
       );
       console.log(response.data);
@@ -561,7 +561,7 @@ export const getHealthandMedical = createAsyncThunk(
 
     try {
       const response = await axios.get(
-        `${baseUrl}/Doctor/GetHealthMedicalHistory/${id}`,
+        `${baseUrl}Doctor/GetHealthMedicalHistory/${id}`,
         config,
       );
       console.log(response.data);
@@ -588,7 +588,7 @@ export const getPersonalFamily = createAsyncThunk(
 
     try {
       const response = await axios.get(
-        `${baseUrl}/Doctor/GetPersonalFamily/${id}`,
+        `${baseUrl}Doctor/GetPersonalFamily/${id}`,
         config,
       );
       console.log(response.data);
@@ -615,7 +615,7 @@ export const getIllnessCondition = createAsyncThunk(
 
     try {
       const response = await axios.get(
-        `${baseUrl}/Doctor/GetIllnessConditions/${id}`,
+        `${baseUrl}Doctor/GetIllnessConditions/${id}`,
         config,
       );
       console.log(response.data);
@@ -642,7 +642,7 @@ export const getReproductiveReview = createAsyncThunk(
 
     try {
       const response = await axios.get(
-        `${baseUrl}/Doctor/GetReproductiveHealth/${id}`,
+        `${baseUrl}Doctor/GetReproductiveHealth/${id}`,
         config,
       );
       console.log({ response});
@@ -669,7 +669,7 @@ export const getSymptomReview = createAsyncThunk(
 
     try {
       const response = await axios.get(
-        `${baseUrl}/Doctor/GetSymptoms/${id}`,
+        `${baseUrl}Doctor/GetSymptoms/${id}`,
         config,
       );
       console.log({ response});
@@ -696,7 +696,7 @@ export const getReadiness = createAsyncThunk(
 
     try {
       const response = await axios.get(
-        `${baseUrl}/Doctor/GetReadiness/${id}`,
+        `${baseUrl}Doctor/GetReadiness/${id}`,
         config
       );
 
@@ -749,7 +749,7 @@ export const getAccessDetailsDoctor = createAsyncThunk(
 
     try {
       const response = await axios.get(
-        `${baseUrl}/Doctor/GetAccessDetails/${patientref}`,
+            `${baseUrl}Doctor/GetAccessDetails/${patientref}`,
         config,
       );
 

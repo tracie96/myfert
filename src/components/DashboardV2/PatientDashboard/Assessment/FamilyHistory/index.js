@@ -22,6 +22,7 @@ import { useMediaQuery } from "react-responsive";
 import { backBtnTxt, exitBtnTxt, saveAndContinueBtn, submitBtn } from "../../../../../utils/constant";
 import { getPersonalFamilyPatient } from "../../../../redux/AssessmentController";
 import dayjs from 'dayjs';
+import { baseUrl } from "../../../../../utils/envAccess";
 
 const { Option } = Select;
 
@@ -808,7 +809,7 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
 
   try {
     const response = await fetch(
-      "https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/AddPersonalFamily",
+      `${baseUrl}Patient/AddPersonalFamily`,
       {
         method: "POST",
         headers: {

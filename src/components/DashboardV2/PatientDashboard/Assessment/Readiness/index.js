@@ -8,6 +8,7 @@ import "../assesment.css";
 import { useMediaQuery } from "react-responsive";
 import { backBtnTxt, exitBtnTxt, saveAndContinueBtn, submitBtn } from "../../../../../utils/constant";
 import { getReadinessPatient } from "../../../../redux/AssessmentController";
+import { baseUrl } from "../../../../../utils/envAccess";
 
 const questions = [
   {
@@ -248,7 +249,7 @@ const Readiness = ({ onComplete }) => {
       const transformedData = transformReadinessData(answers)
 
     fetch(
-      "https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/AddReadiness",
+      `${baseUrl}Patient/AddReadiness`,
       {
         method: "POST",
         headers: {

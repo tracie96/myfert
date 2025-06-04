@@ -10,6 +10,7 @@ import { DeleteOutlined } from "@ant-design/icons";
 import { useMediaQuery } from "react-responsive";
 import { backBtnTxt, exitBtnTxt, saveAndContinueBtn, submitBtn } from "../../../../../utils/constant";
 import dayjs from "dayjs";
+import { baseUrl } from "../../../../../utils/envAccess";
 
 const questions = [
   {
@@ -872,13 +873,12 @@ const IllnessAndCondition = ({ onComplete }) => {
 
     const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
     const token = userInfo.obj.token || "";
-    fetch("https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/AddIllnessConditions", {
+    fetch(`${baseUrl}Patient/AddIllnessConditions`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         accept: "text/plain",
         Authorization: `${token}`,
-
       },
       body: JSON.stringify(apiData),
     })

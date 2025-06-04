@@ -20,6 +20,7 @@ import { useMediaQuery } from "react-responsive";
 import { DeleteTwoTone, EditTwoTone } from "@ant-design/icons";
 import { backBtnTxt, exitBtnTxt, saveAndContinueBtn, submitBtn } from "../../../../../utils/constant";
 import { getHealthLifestylePatient } from "../../../../redux/AssessmentController";
+import { baseUrl } from "../../../../../utils/envAccess";
 
 const { Option } = Select;
 
@@ -1056,7 +1057,7 @@ const CurrentLifeStyle = ({ onComplete }) => {
     };
 
     fetch(
-      "https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/AddHealthLifestyle",
+      `${baseUrl}Patient/AddHealthLifestyle`,
       {
         method: "POST",
         headers: {

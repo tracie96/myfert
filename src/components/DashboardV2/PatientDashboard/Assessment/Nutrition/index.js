@@ -18,6 +18,7 @@ import "../assesment.css";
 import { useMediaQuery } from "react-responsive";
 import { backBtnTxt, exitBtnTxt, saveAndContinueBtn, submitBtn } from "../../../../../utils/constant";
 import { getNutritionPatient } from "../../../../redux/AssessmentController";
+import { baseUrl } from "../../../../../utils/envAccess";
 
 const { Option } = Select;
 
@@ -613,7 +614,7 @@ const Nutrition = ({ onComplete }) => {
     const transformedData = transformNutritionData(answers);
 
     fetch(
-      "https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/AddNutrition",
+      `${baseUrl}Patient/AddNutrition`,
       {
         method: "POST",
         headers: {

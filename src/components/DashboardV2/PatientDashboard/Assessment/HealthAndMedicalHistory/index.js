@@ -23,6 +23,7 @@ import moment from "moment";
 import { useMediaQuery } from "react-responsive";
 import { backBtnTxt, exitBtnTxt, saveAndContinueBtn, submitBtn } from "../../../../../utils/constant";
 import dayjs from 'dayjs';
+import { baseUrl } from "../../../../../utils/envAccess";
 
 const { Option } = Select;
 
@@ -784,14 +785,13 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
       const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
       const token = userInfo.obj.token || "";
       const response = await fetch(
-        "https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/AddHealthMedicalHistory",
+        `${baseUrl}Patient/AddHealthMedicalHistory`,
         {
           method: "POST",
           headers: {
             "Accept": "text/plain",
             "Content-Type": "application/json",
             Authorization: `${token}`,
-
           },
           body: JSON.stringify(payload),
         }

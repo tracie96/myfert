@@ -26,6 +26,7 @@ import Paragraph from "antd/es/typography/Paragraph";
 import { backBtnTxt, exitBtnTxt, reproductiveGeneralHeading, reproductiveGeneralInfo, saveAndContinueBtn, submitBtn } from "../../../../../utils/constant";
 import InfoModal from "./InfoModal";
 import { getReproductiveHealthPatient } from "../../../../redux/AssessmentController";
+import { baseUrl } from "../../../../../utils/envAccess";
 
 const { Option } = Select;
 
@@ -612,7 +613,7 @@ const ReproductiveHealth = ({ onComplete }) => {
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const patientReproductiveInfo = useSelector((state) => state.intake?.patientReproductiveInfo);
   const [disabledSeverity, setDisabledSeverity] = useState({});
-console.log(setisDisabled);
+  console.log(setisDisabled);
   useEffect(() => {
     // First try to load from localStorage
     const savedAnswers = localStorage.getItem("reproductiveHealthAnswers");
@@ -1100,7 +1101,7 @@ console.log(setisDisabled);
       const token = userInfo.obj?.token || "";
   
       const response = await fetch(
-        "https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/AddReproductiveHealth",
+        `${baseUrl}Patient/AddReproductiveHealth`,
         {
           method: "POST",
           headers: {

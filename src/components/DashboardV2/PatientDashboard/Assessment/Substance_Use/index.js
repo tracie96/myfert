@@ -17,6 +17,7 @@ import "../assesment.css";
 import { useMediaQuery } from "react-responsive";
 import { backBtnTxt, exitBtnTxt, saveAndContinueBtn, submitBtn } from "../../../../../utils/constant";
 import { getSubstancePatient } from "../../../../redux/AssessmentController";
+import { baseUrl } from "../../../../../utils/envAccess";
 
 const questions = [
   {
@@ -395,7 +396,7 @@ const SubstanceUse = ({ onComplete }) => {
     const token = userInfo.obj.token || "";
 
     fetch(
-      "https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/AddSubstanceUse",
+      `${baseUrl}Patient/AddSubstanceUse`,
       {
         method: "POST",
         headers: {

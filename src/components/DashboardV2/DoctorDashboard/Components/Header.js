@@ -5,7 +5,7 @@ import moment from 'moment';
 
 const { Text } = Typography;
 
-export default function Header() {
+const Header = () => {
     const userAuth = JSON.parse(localStorage.getItem("patient") || "{}");
 
     return (
@@ -24,51 +24,51 @@ export default function Header() {
                                 {/* Left Column */}
                                 <Col span={12} md={6}>
                                     <p>
-                                        <Text strong>Patient:</Text> {userAuth.lastname || "N/A"}
+                                        <Text strong>Patient:</Text> {`${userAuth?.firstname || 'N/A'} ${userAuth?.lastname || ''}`}
                                     </p>
                                     <p>
-                                        <Text strong>Sex:</Text> {userAuth.sex || "N/A"}
+                                        <Text strong>Sex:</Text> {userAuth?.partnerGender || 'N/A'}
                                     </p>
                                     <p>
-                                        <Text strong>Pronouns:</Text> {userAuth.pronouns || "N/A"}
+                                        <Text strong>Pronouns:</Text> {userAuth?.pronoun || 'N/A'}
                                     </p>
                                     <p>
-                                        <Text strong>DOB:</Text> {userAuth.dob ? moment(userAuth.dob).format('MMMM DD, YYYY') : "N/A"}
+                                        <Text strong>DOB:</Text> {userAuth?.dob ? moment(userAuth.dob).format('MMMM DD, YYYY') : 'N/A'}
                                     </p>
                                 </Col>
 
                                 {/* Middle Column */}
                                 <Col span={12} md={6}>
                                     <p>
-                                        <Text strong>Healthcare #:</Text> {userAuth.healthcare || "N/A"}
+                                        <Text strong>Age:</Text> {userAuth?.age || 'N/A'}
                                     </p>
                                     <p>
-                                        <Text strong>Status:</Text> {userAuth.status || "N/A"}
+                                        <Text strong>Status:</Text> {userAuth?.patientStat?.statRemark || 'N/A'}
                                     </p>
                                     <p>
-                                        <Text strong>LMP:</Text> {userAuth.lmp || "N/A"}
+                                        <Text strong>City:</Text> {userAuth?.city || 'N/A'}
                                     </p>
                                     <p>
-                                        <Text strong>Past MC #:</Text> {userAuth.pastMc || "N/A"}
+                                        <Text strong>Province:</Text> {userAuth?.stateOrProvince || 'N/A'}
                                     </p>
                                 </Col>
 
                                 {/* Right Column */}
                                 <Col span={12} md={6}>
                                     <p>
-                                        <Text strong>Phone #:</Text> {userAuth.phoneNumber || "N/A"}
+                                        <Text strong>Phone #:</Text> {userAuth?.phoneNumber || 'N/A'}
                                     </p>
                                     <p>
-                                        <Text strong>Email:</Text> {userAuth.email || "N/A"}
+                                        <Text strong>Email:</Text> {userAuth?.email || 'N/A'}
                                     </p>
                                     <p>
-                                        <Text strong>Partner:</Text> {userAuth.partner || "N/A"}
+                                        <Text strong>Partner:</Text> {userAuth?.partner || 'N/A'}
                                     </p>
                                     <p>
-                                        <Text strong>Partner's Sex:</Text> {userAuth.partnerSex || "N/A"}
+                                        <Text strong>Partner's Gender:</Text> {userAuth?.gender || 'N/A'}
                                     </p>
                                     <p>
-                                        <Text strong>Partner's Pronouns:</Text> {userAuth.partnerPronouns || "N/A"}
+                                        <Text strong>Partner's Pronouns:</Text> {userAuth?.parterPronoun || 'N/A'}
                                     </p>
                                 </Col>
 
@@ -76,7 +76,7 @@ export default function Header() {
                                 <Col>
                                     <Text style={{ color: "#1890ff", cursor: "pointer" }}>
                                         <strong>HCP's Last Visits  <DownOutlined style={{ color: "#595959", fontSize: "12px" }} />
-</strong>
+                                        </strong>
                                     </Text>
                                 </Col>
                             </Row>
@@ -86,4 +86,6 @@ export default function Header() {
             )}
         </div>
     );
-}
+};
+
+export default Header;

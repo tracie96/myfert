@@ -5,11 +5,11 @@ const getEnvironment = () => {
   return process.env.NODE_ENV || 'development';
 };
 
-const env = getEnvironment();
+const env = getEnvironment(); 
 
 export const baseUrl = env === 'production' 
   ? 'https://myfertilitydevapi-prod.azurewebsites.net/api/'
-  : 'https://myfertilitydevapi.azurewebsites.net/api/';
+  : 'https://myfertilitydevapi-prod.azurewebsites.net/api/';
 
 export const getBaseUrl = () => baseUrl;
 

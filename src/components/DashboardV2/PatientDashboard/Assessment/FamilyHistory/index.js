@@ -82,6 +82,11 @@ const questions = [
         selectName: "premature_birth_select",
         selectOptions: Array.from({ length: 30 }, (_, i) => 1 + i),
       },
+      {
+        label: "None of the above",
+        name: "obstetricHistory_none",
+        selectName: null,
+      }
     ],
   },
   {
@@ -389,15 +394,20 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
     }
   
     // Map weightChild data
-    if (info.weightChild) {
+    if (!info.weightChild || info.weightChild === null) {
+      mapped.weight_unit_na = true;
+    } else {
       setUnit(info.weightChild.metricImperialScale ? "Metric" : "Imperial");
       mapped.smallest_baby_weight = info.weightChild.weightSmallest || "";
       mapped.largest_baby_weight = info.weightChild.weightLargest || "";
-
-      // If Imperial, convert the weights from kg to lbs
+    
       if (!info.weightChild.metricImperialScale) {
-        mapped.smallest_baby_weight = mapped.smallest_baby_weight ? (mapped.smallest_baby_weight * 2.20462).toFixed(2) : "";
-        mapped.largest_baby_weight = mapped.largest_baby_weight ? (mapped.largest_baby_weight * 2.20462).toFixed(2) : "";
+        mapped.smallest_baby_weight = mapped.smallest_baby_weight
+          ? (mapped.smallest_baby_weight * 2.20462).toFixed(2)
+          : "";
+        mapped.largest_baby_weight = mapped.largest_baby_weight
+          ? (mapped.largest_baby_weight * 2.20462).toFixed(2)
+          : "";
       }
     }
   
@@ -474,14 +484,26 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
   
       // Map obstetricHistory
       if (patientPersonalFamilyInfo.obstetricHistory && Array.isArray(patientPersonalFamilyInfo.obstetricHistory)) {
+        let allZero = true;
+      
         patientPersonalFamilyInfo.obstetricHistory.forEach((item) => {
           const key = item.name.toLowerCase().replace(/\s+/g, '_');
-          // Set the checkbox state
-          mapped[key] = item.level !== null && item.level !== undefined && item.level > 0;
-          // Set the select value with the correct selectName format
-          mapped[`${key}_select`] = item.level;
+          const level = item.level || 0;
+      
+          if (level > 0) {
+            allZero = false;
+            mapped[key] = true;
+          }
+      
+          mapped[`${key}_select`] = level;
         });
+      
+        // Auto-select "None of the above" if all values are 0
+        if (allZero) {
+          mapped["obstetricHistory_none"] = true;
+        }
       }
+      
 
       // Map weightChild data
       if (patientPersonalFamilyInfo.weightChild) {
@@ -627,6 +649,7 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
         return true;
   
       case "unit_toggle": {
+        if (answers.weight_unit_na) return true;
         // For weight inputs, at least one weight should be provided
         const hasSmallestWeight = answers.smallest_baby_weight !== undefined && 
                                 answers.smallest_baby_weight !== "" && 
@@ -715,6 +738,7 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
       message.error("Please answer the current question before Submitting.");
       return;
     }
+    
 
     // Prepare obstetric history data
     const obstetricCategories = [
@@ -725,7 +749,8 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
       "Vaginal deliveries",
       "Caesarean",
       "Term births",
-      "Premature birth"
+      "Premature birth",
+      "None of the above"
     ];
     
     const obstetricHistory = obstetricCategories.map(category => ({
@@ -739,7 +764,7 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
     
     // Convert weights if in Imperial units
     const weightMultiplier = unit === "Imperial" ? 0.45359237 : 1; // Convert lbs to kg if Imperial
-    
+    //const weightUnitNA = answers.weight_unit_na === true;
     const apiPayload = {
       obstetricHistory: obstetricHistory,
       weightChild: {
@@ -894,14 +919,27 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
   };
 
   const handleSelectCheckChange = (checked, name, selectName, options) => {
-    console.log(`handleSelectCheckChange: checked=${checked}, name=${name}, selectName=${selectName}`);
     setAnswers(prevAnswers => {
-      const updatedAnswers = { ...prevAnswers, [name]: checked };
-      if (!checked && selectName) {
-        updatedAnswers[selectName] = undefined;
-        console.log(`  Clearing select value for ${selectName}`);
+      const updatedAnswers = { ...prevAnswers };
+      if (name === "obstetricHistory_none" && checked) {
+        // Uncheck all others
+        options.forEach(opt => {
+          updatedAnswers[opt.name] = false;
+          if (opt.selectName) {
+            updatedAnswers[opt.selectName] = undefined;
+          }
+        });
+        updatedAnswers["obstetricHistory_none"] = true;
+      } else {
+        updatedAnswers[name] = checked;
+        if (!checked && selectName) {
+          updatedAnswers[selectName] = undefined;
+        }
+        // If any other checkbox is checked, uncheck "none"
+        if (checked && updatedAnswers["obstetricHistory_none"]) {
+          updatedAnswers["obstetricHistory_none"] = false;
+        }
       }
-      console.log(`  Updated answers:`, updatedAnswers);
       return updatedAnswers;
     });
   };
@@ -995,38 +1033,66 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
       case "unit_toggle":
         return (
           <div>
+            {/* Metric / Imperial toggle + inputs */}
             <div
               style={{
-                background: "#C2E6F8",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "8px 16px",
-                color: "#000",
-                marginBottom: 20,
-                borderRadius: 10,
-                width: isMobile ? "100%" : "200px",
+                opacity: answers.weight_unit_na ? 0.5 : 1,
+                pointerEvents: answers.weight_unit_na ? "none" : "auto",
               }}
             >
-              <span style={{ marginRight: 10 }}>Metric</span>
-              <Switch
-                checked={unit === "Imperial"}
-                onChange={(checked) => setUnit(checked ? "Imperial" : "Metric")}
-              />
-              <span style={{ marginLeft: 10 }}>Imperial</span>
-            </div>
-            {question.subQuestions.map((subQuestion, index) => (
-              <div key={index} style={{ marginBottom: 15 }}>
-                <div style={{ marginBottom: 5 }}>{subQuestion.question}</div>
-                <Input
-                  type="number"
-                  style={{ width: isMobile ? "100%" : "200px" }}
-                  value={answers[subQuestion.name] || ""}
-                  onChange={(e) => handleChange(e.target.value, subQuestion.name)}
-                  suffix={unit === "Metric" ? "kg" : "lbs"}
+              {/* switch */}
+              <div
+                style={{
+                  background: "#C2E6F8",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "8px 16px",
+                  color: "#000",
+                  marginBottom: 20,
+                  borderRadius: 10,
+                  width: isMobile ? "100%" : "200px",
+                }}
+              >
+                <span style={{ marginRight: 10 }}>Metric</span>
+                <Switch
+                  checked={unit === "Imperial"}
+                  onChange={(checked) => setUnit(checked ? "Imperial" : "Metric")}
                 />
+                <span style={{ marginLeft: 10 }}>Imperial</span>
               </div>
-            ))}
+        
+              {/* inputs */}
+              {question.subQuestions.map((sub, idx) => (
+                <div key={idx} style={{ marginBottom: 15 }}>
+                  <div style={{ marginBottom: 5 }}>{sub.question}</div>
+                  <Input
+                    type="number"
+                    style={{ width: isMobile ? "100%" : "200px" }}
+                    value={answers[sub.name] || ""}
+                    onChange={(e) => handleChange(e.target.value, sub.name)}
+                    suffix={unit === "Metric" ? "kg" : "lbs"}
+                  />
+                </div>
+              ))}
+            </div>
+        
+            {/* N / A CHECKBOX at bottom */}
+            <Checkbox
+              style={{ marginTop: 10 }}
+              checked={answers.weight_unit_na || false}
+              onChange={(e) => {
+                const checked = e.target.checked;
+                handleChange(checked, "weight_unit_na");
+        
+                if (checked) {
+                  handleChange("", "smallest_baby_weight");
+                  handleChange("", "largest_baby_weight");
+                }
+              }}
+            >
+              N/A
+            </Checkbox>
           </div>
         );
 

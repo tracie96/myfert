@@ -285,6 +285,7 @@ const questions = [
       "Cigarette smoke",
       "Perfume/colognes",
       "Auto exhaust fumes",
+      "None",
       "Other",
     ],
   },
@@ -311,6 +312,7 @@ const questions = [
       "Harsh chemicals (solvents, glues, gas, acids, etc)",
       "Paints",
       "Airplane travel",
+      "None",
       "Other",
     ],
   },
@@ -429,6 +431,11 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
   
         pets_or_animal: normalizeYesNo(lifestyle.petsFarmAnimal),
         where_they_live: lifestyle.petsAnimalLiveWhere || "",
+        age_of_solid_food_intro_unsure: lifestyle.ageIntroductionSolidFood === 0,
+        age_of_wheat_food_intro_unsure: lifestyle.ageIntroductionWheat === 0,
+        age_of_diary_food_intro_unsure: lifestyle.ageIntroductionDiary === 0,
+        fillings_removed_unsure: lifestyle.fillingsAsKid === 0,
+
       };
   
       setAnswers(prefillAnswers);
@@ -680,10 +687,23 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
           answers[question.name] !== undefined && answers[question.name] !== ""
         );
   
-      default:
-            return (
-              answers[question.name] !== undefined && answers[question.name] !== ""
-            );
+        default: {
+          const unsureFields = [
+            "age_of_solid_food_intro",
+            "age_of_wheat_food_intro",
+            "age_of_diary_food_intro",
+            "fillings_removed"
+          ];
+        
+          if (unsureFields.includes(question.name) && answers[`${question.name}_unsure`]) {
+            return true; // skip validation if unsure is selected
+          }
+        
+          return (
+            answers[question.name] !== undefined && answers[question.name] !== ""
+          );
+        }
+        
     }
   };
   
@@ -705,28 +725,42 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
     }
   };
 
-  const handleChange = (value, name) => {
-    // For date type fields, validate that the date is not in the future
-    if (value && (name.includes("date") || (
-      questions[currentQuestionIndex]?.type === "long_radio" && 
-      questions[currentQuestionIndex]?.subQuestions?.some(sq => 
-        sq.type === "date" && sq.name === name
-      )
-    ))) {
-      const selectedDate = moment(value);
-      const today = moment().endOf('day');
-      
-      if (selectedDate.isAfter(today)) {
-        message.error("Future dates are not allowed");
-        return;
+    const handleChange = (value, name) => {
+      const updatedAnswers = { ...answers };
+
+      if (name.endsWith("_unsure")) {
+        const fieldName = name.replace("_unsure", "");
+
+        if (value) {
+          updatedAnswers[fieldName] = ""; // Clear select value
+        }
+
+        updatedAnswers[name] = value;
+      } else {
+        updatedAnswers[name] = value;
       }
-    }
-    
-    setAnswers({
-      ...answers,
-      [name]: value,
-    });
-  };
+
+      // Handle future date validation
+      if (
+        value &&
+        (name.includes("date") ||
+          (questions[currentQuestionIndex]?.type === "long_radio" &&
+            questions[currentQuestionIndex]?.subQuestions?.some(
+              (sq) => sq.type === "date" && sq.name === name
+            )))
+      ) {
+        const selectedDate = moment(value);
+        const today = moment().endOf("day");
+
+        if (selectedDate.isAfter(today)) {
+          message.error("Future dates are not allowed");
+          return;
+        }
+      }
+
+      setAnswers(updatedAnswers);
+    };
+
 
   const handleSubmit = async () => {
     if (!validateQuestion()) {
@@ -995,11 +1029,13 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
     switch (question.type) {
       case "select":
         return (
+          <div>
           <Select
             className="select_questtionnaire"
             name={question.name}
             value={answers[question.name] || ""}
             onChange={(value) => handleChange(value, question.name)}
+            disabled={answers[`${question.name}_unsure`] || false}
           >
             {question.options.map((option, index) => (
               <Option key={index} value={option}>
@@ -1007,6 +1043,22 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
               </Option>
             ))}
           </Select>
+           {(question.name === "age_of_solid_food_intro" || question.name === "age_of_wheat_food_intro" || question.name === "age_of_diary_food_intro") && (
+            <span style={{ color: "#000" }}> Months</span>
+           )}
+          {(question.name === "age_of_solid_food_intro" || question.name === "age_of_wheat_food_intro" || question.name === "age_of_diary_food_intro" || question.name === "fillings_removed") && (
+            <div>
+              <Checkbox
+                name={`${question.name}_unsure`}
+                checked={answers[`${question.name}_unsure`] || false}
+                onChange={(e) => handleChange(e.target.checked, `${question.name}_unsure`)}
+              >
+                Unsure
+              </Checkbox>
+            </div>
+          )}
+
+          </div>
         );
       case "radio":
         return (

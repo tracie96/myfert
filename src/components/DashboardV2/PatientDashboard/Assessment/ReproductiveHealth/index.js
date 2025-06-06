@@ -793,7 +793,8 @@ const ReproductiveHealth = ({ onComplete }) => {
             
               const controllingField = skipValidationMap[subQuestion.name];
               const controllingValue = answers[controllingField];
-              const skip = controllingValue === 0 || controllingValue === "0";
+              const skip = controllingValue === 0 || controllingValue === "0" || answers[`${controllingField}_unsure`] === true;
+
             
               if (!subAnswer && !skip) {
                 subQuestionsValid = false;
@@ -850,6 +851,31 @@ const ReproductiveHealth = ({ onComplete }) => {
 
   const handleChange = (value, name) => {
     let updatedAnswers = { ...answers };
+    // Handle disabling of color/severity when unsure is selected
+    if (name.endsWith("_unsure") && value === true) {
+      const baseName = name.replace("_unsure", "");
+
+      // These are the corresponding fields to disable/clear
+      const relatedDisables = {
+        cervical_mucus: "cervical_mucus_sub",
+        Watery_mucus_sub: "Watery_mucus_colour",
+        egg_white_mucus_sub: "egg_white_mucus_colour",
+        pre_spotting_sub: "pre_spotting_colour",
+        after_period_spot_sub: "after_period_spot_colour",
+        duration_per_cycle_pelvic_pain: "duration_per_cycle_severity_pelvic_pain",
+        duration_per_cycle_pp_not_menstrual: "duration_per_mild_cycle_severity_pp_not_menstrual",
+        pms_sympton_check: "pms_sympton_severity",
+        cycle_spotting_sub_number: "cycle_spotting_sub",
+        intercourse_during_fertile_sub: null, // Optional: for completeness
+      };
+
+      const relatedField = relatedDisables[baseName];
+      if (relatedField) {
+        updatedAnswers[relatedField] = "";
+        setDisabledSeverity((prev) => ({ ...prev, [relatedField]: true }));
+      }
+    }
+
     if (
       name === "duration_per_cycle_pelvic_pain" ||
       name === "duration_per_cycle_pp_not_menstrual" ||

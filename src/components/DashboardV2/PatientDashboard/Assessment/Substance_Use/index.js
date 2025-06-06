@@ -615,16 +615,13 @@ const SubstanceUse = ({ onComplete }) => {
 
   const progressColor =
     currentQuestionIndex === totalQuestions - 1 ? "#01ACEE" : "#C2E6F8";
-  const progressPercentage =
-    ((currentQuestionIndex + 1) / totalQuestions) * 100;
-
-    const percentProgressBar = Math.round(100/totalQuestions);
+    const progressPercent = Math.round((currentQuestionIndex / (totalQuestions - 1)) * 100);
   return (
     <Row gutter={16} style={{ padding: "0 5%" }}>
       <Col xs={24} sm={24} md={24} lg={24} xl={24}>
         <FormWrapper name="FEMALE INTAKE QUESTIONNAIRE" />
         <Progress
-          percent={Math.round(progressPercentage)- percentProgressBar}
+          percent={progressPercent}
           strokeColor={progressColor}
         />
         <h3 style={{ margin: "20px 0", fontSize:"15px", fontWeight:"600", color: "#F2AA93" }}>

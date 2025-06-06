@@ -65,9 +65,9 @@ const questions = [
         selectOptions: Array.from({ length: 30 }, (_, i) => 1 + i),
       },
       {
-        label: "Caeseran",
-        name: "caeserean",
-        selectName: "caeserean_select",
+        label: "Caesarean",
+        name: "caesarean",
+        selectName: "caesarean_select",
         selectOptions: Array.from({ length: 30 }, (_, i) => 1 + i),
       },
       {
@@ -144,7 +144,7 @@ const questions = [
     type: "select",
     title: "Menstrual History",
     name: "length_of_cycle",
-    options: ["Under 21", ...Array.from({ length: 15 }, (_, i) => (20 + i).toString()), "Above 35"],
+    options: ["Under 20", ...Array.from({ length: 15 }, (_, i) => (20 + i).toString()), "Above 34"],
   },
   {
     question: "Times between cycles",

@@ -53,6 +53,8 @@ const PatientSignup = () => {
   });
   const [username, setUsername] = useState("");
   const [dob, setDob] = useState("");
+  const [partnerDob, setPartnerDob] = useState("");
+  console.log({partnerDob})
   const initialValues = {
     role: "4",
     userName: "",
@@ -268,9 +270,24 @@ const PatientSignup = () => {
   }, [password, username]);
 
   const handleDateChange = (date, dateString) => {
-
-
     setDob(dateString);
+  };
+
+  const handlePartnerDateChange = (date, dateString) => {
+    setPartnerDob(dateString);
+   
+  };
+
+  const handleGenderChange = (value) => {
+    form.setFieldsValue({
+      gender: value
+    });
+  };
+
+  const handlePartnerGenderChange = (value) => {
+    form.setFieldsValue({
+      PartnerSex: value
+    });
   };
 
   const disableUnder18Years = (current) => {
@@ -698,12 +715,7 @@ const PatientSignup = () => {
                                         },
                                       ]}>
                                         <Select
-                                          onChange={(selectedOption) => {
-                                            form.setFieldsValue({
-                                              stateProvince:
-                                                selectedOption.label,
-                                            });
-                                          }}
+                                          onChange={handleGenderChange}
                                           options={[
                                             { label: "Male", value: "male" },
                                             {
@@ -1251,12 +1263,7 @@ const PatientSignup = () => {
                                     <div className="col-lg-12 col-sm-12">
                                       <FormItem label="Sex" name="PartnerSex">
                                         <Select
-                                          onChange={(selectedOption) => {
-                                            form.setFieldsValue({
-                                              stateProvince:
-                                                selectedOption.label,
-                                            });
-                                          }}
+                                          onChange={handlePartnerGenderChange}
                                           options={[
                                             { label: "Male", value: "male" },
                                             {
@@ -1281,7 +1288,7 @@ const PatientSignup = () => {
                                               selectedOption,
                                             );
                                             form.setFieldsValue({
-                                              partner_pronouns: selectedOption,
+                                              PartnerPronouns: selectedOption.value,
                                             });
                                           }}
                                           value={pronouns.find(
@@ -1300,15 +1307,14 @@ const PatientSignup = () => {
                                         name="PartnerDob"
                                       >
                                         <DatePicker
-                                         defaultPickerValue={dayjs(`${startYear}-01-01`)}
-
-                                          format="DD-MM-YYYY"
+                                          defaultPickerValue={dayjs(`${startYear}-01-01`)}
+                                          format="YYYY-MM-DD"
                                           style={{
                                             width: "100%",
                                             height: "42px",
                                             borderColor: "#000",
                                           }}
-                                          onChange={handleDateChange}
+                                          onChange={handlePartnerDateChange}
                                           disabledDate={disableUnder18Years}
                                         />
                                       </Form.Item>

@@ -79,7 +79,6 @@ export default function DoctorDash() {
         sortConfig.sortField,
         sortConfig.sortOrder,
         loggedInUserId,
-        pagination.pageSize
     ]);
 
     useEffect(() => {
@@ -114,9 +113,10 @@ export default function DoctorDash() {
         // Update the data displayed based on the new pagination
         const startIndex = (current - 1) * pageSize;
         const endIndex = startIndex + pageSize;
-       // setData(allData.slice(startIndex, endIndex));
-    }, [allData]);
+        console.log({endIndex})
 
+       // setData(allData.slice(startIndex, endIndex));
+    }, []);
     const handleSearch = useCallback((value) => {
         setSearchQuery(value);
     }, []);

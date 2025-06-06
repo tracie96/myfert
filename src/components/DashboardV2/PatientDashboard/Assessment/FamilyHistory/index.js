@@ -144,7 +144,7 @@ const questions = [
     type: "select",
     title: "Menstrual History",
     name: "length_of_cycle",
-    options: Array.from({ length: 15 }, (_, i) => 20 + i),
+    options: ["Under 21", ...Array.from({ length: 15 }, (_, i) => (20 + i).toString()), "Above 35"],
   },
   {
     question: "Times between cycles",
@@ -974,7 +974,17 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
               className="select_questionnaire"
               name={question.name}
               value={answers?.[question.name] || ""}
-              onChange={(value) => handleChange(value, question.name)}
+              onChange={(value) => {
+                // Special handling for length_of_cycle
+                if (question.name === "length_of_cycle") {
+                  let apiValue = value;
+                  if (value === "Under 21") apiValue = "20";
+                  if (value === "Above 35") apiValue = "35";
+                  handleChange(apiValue, question.name);
+                } else {
+                  handleChange(value, question.name);
+                }
+              }}
             >
               {question.options?.map((option, index) => (
                 <Option key={index} value={option}>

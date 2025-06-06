@@ -268,8 +268,7 @@ const PatientSignup = () => {
   }, [password, username]);
 
   const handleDateChange = (date, dateString) => {
-    console.log("Selected date:", date); // This should be a moment object
-    console.log("Date string:", dateString); // This should be a formatted string
+
 
     setDob(dateString);
   };
@@ -282,7 +281,6 @@ const PatientSignup = () => {
   const checkRequiredFields = (values) => {
     return requiredFields.every((field) => values[field]);
   };
-  console.log(formValues);
 
   const handleChange = (name) => (event) => {
     const value =
@@ -301,7 +299,6 @@ const PatientSignup = () => {
       [name]: value,
     }));
   };
-  console.log(formValues)
 
   const handleFinish = async (values) => {
     const allFormValues = { ...formValues, ...values };
@@ -320,7 +317,6 @@ const PatientSignup = () => {
       setTimeout(() => {
         setEmailVerificationVisible(true);
       }, 1000);
-      console.log(allFormValues)
       const processedValues = {
         ...allFormValues,
         country: selectedCountry.label,
@@ -436,7 +432,6 @@ const PatientSignup = () => {
   const handleCloseCollectionNoticeModal = () => {
     setShowCollectionNoticeModal(false);
   };
-  console.log(dob);
   const customizeRequiredMark = (label, { required }) => (
     <>
       {label}
@@ -735,7 +730,6 @@ const PatientSignup = () => {
                                           options={pronouns}
                                           onChange={(selectedOption) => {
                                             setSelectedPronoun(selectedOption);
-                                            console.log(selectedPronoun, "sel");
                                             form.setFieldsValue({
                                               pronouns: selectedOption,
                                             });

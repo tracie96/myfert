@@ -31,7 +31,7 @@ export default function DoctorDash() {
     );
 
     const [allData, setAllData] = useState([]); // Store all data fetched from the API
-    const [data, setData] = useState([]); // Data for the current page
+    //const [data, setData] = useState([]); // Data for the current page
     const [loading, setLoading] = useState(false);
     const [pagination, setPagination] = useState({
         current: 1,
@@ -42,7 +42,6 @@ export default function DoctorDash() {
         sortField: null,
         sortOrder: null,
     });
-    console.log({data})
 
     const fetchPatientList = useCallback(async () => {
         setLoading(true);
@@ -67,7 +66,7 @@ export default function DoctorDash() {
                     ...prev,
                     total: updatedList?.length, // Set total from the fetched data
                 }));
-                setData(updatedList?.slice(0, pagination.pageSize)); // Display the first page
+               // setData(updatedList?.slice(0, pagination.pageSize)); // Display the first page
             }
         } catch (error) {
             console.error("Error fetching users:", error);
@@ -115,7 +114,7 @@ export default function DoctorDash() {
         // Update the data displayed based on the new pagination
         const startIndex = (current - 1) * pageSize;
         const endIndex = startIndex + pageSize;
-        setData(allData.slice(startIndex, endIndex));
+       // setData(allData.slice(startIndex, endIndex));
     }, [allData]);
 
     const handleSearch = useCallback((value) => {
@@ -276,7 +275,11 @@ export default function DoctorDash() {
 
                 <Table
                     columns={columns}
-                    dataSource={filteredData}
+                    dataSource={filteredData.slice(
+                        (pagination.current - 1) * pagination.pageSize,
+                        pagination.current * pagination.pageSize
+                      )}
+                      
                     loading={loading}
                     // scroll={{ x: "max-content" }}
                     pagination={{

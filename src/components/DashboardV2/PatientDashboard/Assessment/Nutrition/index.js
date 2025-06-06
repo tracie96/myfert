@@ -356,16 +356,16 @@ const Nutrition = ({ onComplete }) => {
       diet_detail_dinner: info.typicalDinner || "",
       diet_detail_snacks: info.typicalSnacks || "",
       diet_detail_fluids: info.typicalFluid || "",
-      diet_servings_fruits: info.noTypicalFruits || 0,
-      diet_serving_vegetables: info.noTypicalVegetables || 0,
-      diet_servings_legumes: info.noTypicalLegumes || 0,
-      diet_servings_meat: info.noTypicalRedMeat || 0,
-      diet_servings_fish: info.noTypicalFish || 0,
-      diet_servings_dairyalt: info.noTypicalDairy || 0,
-      diet_servings_nuts: info.noTypicalNuts || 0,
-      diet_servings_fatsandoil: info.noTypicalFats || 0,
-      diet_servings_soda: info.noTypicalCanSoda || 0,
-      diet_servings_sweets: info.noTypicalSweets || 0,
+      diet_servings_fruits: info.noTypicalFruits || "",
+      diet_serving_vegetables: info.noTypicalVegetables || "",
+      diet_servings_legumes: info.noTypicalLegumes || "",
+      diet_servings_meat: info.noTypicalRedMeat || "",
+      diet_servings_fish: info.noTypicalFish || "",
+      diet_servings_dairyalt: info.noTypicalDairy || "",
+      diet_servings_nuts: info.noTypicalNuts || "",
+      diet_servings_fatsandoil: info.noTypicalFats || "",
+      diet_servings_soda: info.noTypicalCanSoda || "",
+      diet_servings_sweets: info.noTypicalSweets || "",
       caffeinated_beverages: normalizeYesNo(info.caffeinatedBeverages),
       coffee_amount: info.coffeeCups || "",
       tea_amount: info.teaCups || "",
@@ -467,19 +467,38 @@ const Nutrition = ({ onComplete }) => {
           if (value === undefined || value === null || value === "") {
             console.log(`Validation Failed: No selection made for ${question.name}`);
             return false;
+          }      
+          
+          if (question.name === "does_skipping_meal_affect_you" && value === "Yes") {
+            const requiredField = "does_skipping_meal_affect_you_other";
+            if (!answers[requiredField] || answers[requiredField].trim() === "") {
+              console.log(`Validation Failed: ${requiredField} is required when 'Yes' is selected.`);
+              return false;
+            }
           }
-        
+
+          if (question.name === "aversion_to_certain_food" && value === "Yes") {
+            const requiredField = "aversion_to_certain_food_other";
+            if (!answers[requiredField] || answers[requiredField].trim() === "") {
+              console.log(`Validation Failed: ${requiredField} is required when 'Yes' is selected.`);
+              return false;
+            }
+          }
           // Optional logic for specific radios needing extra input
-          if (
-            value === "Yes" &&
-            ["sensitive_food", "sensitive_food_caffeine"].includes(question.name)
-          ) {
-            const detailField = `${question.name}_other`;
+          if (question.name === "sensitive_food" && value === "Yes") {
+            const detailField = "sensitive_food_info";
             if (!answers[detailField] || answers[detailField].trim() === "") {
               console.log(`Validation Failed: ${detailField} required.`);
               return false;
             }
           }
+          if (question.name === "sensitive_food_caffeine" && value === "Yes") {
+            const detailField = "sensitive_food_caffeine_other";
+            if (!answers[detailField] || answers[detailField].trim() === "") {
+              console.log(`Validation Failed: ${detailField} required.`);
+              return false;
+            }
+          }        
         
           return true;
         }
@@ -548,7 +567,7 @@ const Nutrition = ({ onComplete }) => {
       specialDietProgram: answers.special_nutritional_program || [],
       sensitiveToFood: {
         yesNo: answers.sensitive_food === "Yes",
-        describe: answers.sensitive_food_caffeine_feel || "",
+        describe: answers.sensitive_food_info || "",
       },
       aversionToFood: {
         yesNo: answers.aversion_to_certain_food === "Yes",

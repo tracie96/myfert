@@ -629,12 +629,14 @@ function SwitchContent({
                     )}
                   </div>
                   </Descriptions.Item>
-
-
+                  <Descriptions.Item label="Special Diet Reason">
+                    {nutrition.specialDietReason || "N/A"}
+                  </Descriptions.Item>
                   <Descriptions.Item label="Sensitive to Food">
-                    {nutrition.sensitiveToFood?.yesNo
-                      ? nutrition.sensitiveToFood.describe
-                      : "No" || "N/A"}
+                  {nutrition.sensitiveToFood ? "Yes" : "No"}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Sensitive to Food Describe">
+                    {nutrition.sensitiveToFood?.describe|| ""}
                   </Descriptions.Item>
                   <Descriptions.Item label="Aversion to Food">
                     {nutrition.aversionToFood?.yesNo === true
@@ -642,6 +644,9 @@ function SwitchContent({
                       : nutrition.aversionToFood?.yesNo === false
                         ? "No"
                         : "N/A"}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Aversion To Food Describe">
+                    {nutrition.aversionToFood?.describe|| ""}
                   </Descriptions.Item>
 
                   <Descriptions.Item label="Adverse List">
@@ -664,6 +669,9 @@ function SwitchContent({
                         ? "No"
                         : "N/A"}
                   </Descriptions.Item>
+                  <Descriptions.Item label="Any Food Craving Describe">
+                    {nutrition.anyFoodCraving?.describe|| ""}
+                  </Descriptions.Item>
 
                   <Descriptions.Item label="Have 3 Meals a Day">
                     {nutrition.have3MealADay?.yesNo
@@ -672,6 +680,9 @@ function SwitchContent({
                   </Descriptions.Item>
                   <Descriptions.Item label="Skipping a Meal">
                     {nutrition.skippingAMeal ? "Yes" : "No"}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Reason Skip Meal">
+                    {nutrition.reasonSkipMeal || ""}
                   </Descriptions.Item>
                   <Descriptions.Item label="How Many Eat Out Per Week">
                     {nutrition.howManyEatOutPerWeek || "N/A"}
@@ -697,20 +708,31 @@ function SwitchContent({
                         )}
                       </div>
                   </Descriptions.Item>
-
+                  <Descriptions.Item label="Break Fast Time">
+                    {nutrition.breakfastTime || "N/A"}
+                  </Descriptions.Item>
                   <Descriptions.Item label="Typical Breakfast">
                     {nutrition.typicalBreakfast || "N/A"}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Lunch Time">
+                    {nutrition.lunchTime || "N/A"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Typical Lunch">
                     {nutrition.typicalLunch || "N/A"}
                   </Descriptions.Item>
+                  <Descriptions.Item label="Dinner Time">
+                    {nutrition.dinnerTime || "N/A"}
+                  </Descriptions.Item>
                   <Descriptions.Item label="Typical Dinner">
                     {nutrition.typicalDinner || "N/A"}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Snacks Time">
+                    {nutrition.snacksTime || "N/A"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Typical Snacks">
                     {nutrition.typicalSnacks || "N/A"}
                   </Descriptions.Item>
-                  <Descriptions.Item label="Typical Fluid">
+                  <Descriptions.Item label="Typical Drink">
                     {nutrition.typicalFluid || "N/A"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Number of Fruits/Day">
@@ -744,9 +766,37 @@ function SwitchContent({
                   </Descriptions.Item>
                   <Descriptions.Item label="Number of Typical Fats">
                     {nutrition.noTypicalFats || "N/A"}
+                  </Descriptions.Item> 
+                  <Descriptions.Item label="Number Typical Can Soda">
+                    {nutrition.noTypicalCanSoda || "N/A"}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Number Typical Sweets">
+                    {nutrition.noTypicalSweets || "N/A"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Caffeinated Beverages">
                     {nutrition.caffeinatedBeverages ? "Yes" : "No"}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Coffee Cups">
+                    {nutrition.coffeeCups}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Tea Cups">
+                    {nutrition.teaCups }
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Soda Cups">
+                    {nutrition.sodaCups}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Adverse Reaction To Coffee">
+                    {nutrition.adverseReactionToCoffee?.yesNo === true
+                      ? "Yes"
+                      : nutrition.adverseReactionToCoffee?.yesNo === false
+                        ? "No"
+                        : "N/A"}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Adverse Reaction To Coffee">
+                  {nutrition.adverseReactionToCoffee?.describe|| ""}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Reaction To Caffeine">
+                  {nutrition.reactionToCaffeine || ""}
                   </Descriptions.Item>
                 </Descriptions>
               )}
@@ -1547,7 +1597,7 @@ function SwitchContent({
                     (reproductiveInfo?.birthControl === null || reproductiveInfo?.birthControl === undefined) ? '' :
                       (
                         (reproductiveInfo?.birthControl ? 'Yes, ' : 'No') + '' +
-                        (reproductiveInfo?.birthControl && reproductiveInfo?.hormonalBirthControl !== "N/A" ? reproductiveInfo?.hormonalBirthControl : ' ') + '' +
+                        (reproductiveInfo?.birthControl && reproductiveInfo?.hormonalBirthControl !== "N/A" ? reproductiveInfo?.hormonalBirthControl+ ', '  : ' ') + '' +
                         (reproductiveInfo?.birthControl && reproductiveInfo?.nonHormonalBirthControl !== "N/A" ? reproductiveInfo?.nonHormonalBirthControl : ' ')
                       )
                   }
@@ -1572,6 +1622,9 @@ function SwitchContent({
                 </Descriptions.Item>
                 <Descriptions.Item label="Charting To Conceive">
                   {reproductiveInfo?.chartingToConceive?.length ? reproductiveInfo.chartingToConceive.join(', ') : "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Current Therapy">
+                {reproductiveInfo?.currentTherapy === null || reproductiveInfo?.currentTherapy === undefined ? 'N/A' : (reproductiveInfo?.currentTherapy ? 'Yes' : 'No')}
                 </Descriptions.Item>
                 <Descriptions.Item label="Method Fertility Awareness">
                   {reproductiveInfo?.methodFertilityAwareness || "N/A"}
@@ -1667,6 +1720,9 @@ function SwitchContent({
                   {reproductiveInfo?.duringCirclePelvicPain?.colour || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Do You Pms Symptoms">
+                {reproductiveInfo?.doYouPmsSymptoms === null || reproductiveInfo?.doYouPmsSymptoms === undefined ? 'N/A' : (reproductiveInfo?.doYouPmsSymptoms ? 'Yes' : 'No')}
+                </Descriptions.Item>
+                <Descriptions.Item label="Pms Symptoms">
                   {Array.isArray(reproductiveInfo?.pmsSymptoms) && reproductiveInfo.pmsSymptoms.length > 0 ? (
                     <div className="inside-table-content">
                       {reproductiveInfo.pmsSymptoms.map((symptom, index) => (
@@ -1697,9 +1753,6 @@ function SwitchContent({
                 {/* <Descriptions.Item label="Who Do You Live With?">
                   {reproductiveInfo.who_do_you_live_with || 'N/A'}
                   </Descriptions.Item> */}
-                <Descriptions.Item label="Mid Cycle Spotting">
-                  {reproductiveInfo?.midCycleSpotting === null || reproductiveInfo?.midCycleSpotting === undefined ? 'N/A' : (reproductiveInfo.midCycleSpotting ? 'Yes' : 'No')}
-                </Descriptions.Item>
                 <Descriptions.Item label="Cycle Discharge Creamy Duration">
                   {reproductiveInfo?.cycleDischargeCreamy?.duration || 'N/A'}
                 </Descriptions.Item>

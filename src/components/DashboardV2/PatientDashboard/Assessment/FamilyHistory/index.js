@@ -978,8 +978,8 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
                 // Special handling for length_of_cycle
                 if (question.name === "length_of_cycle") {
                   let apiValue = value;
-                  if (value === "Under 21") apiValue = "20";
-                  if (value === "Above 35") apiValue = "35";
+                  if (value === "Under 20") apiValue = 20;
+                  if (value === "Above 34") apiValue = 35;
                   handleChange(apiValue, question.name);
                 } else {
                   handleChange(value, question.name);

@@ -1420,7 +1420,7 @@ function SwitchContent({
                         label={category.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
                         key={category}
                       >
-                       <Tag color="cyan">Answer not provided1</Tag>
+                       <Tag color="cyan">Answer not provided</Tag>
                       </Descriptions.Item>
                     );
                   })}

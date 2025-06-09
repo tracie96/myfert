@@ -804,10 +804,11 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
           yesNo: answers.is_menopause === "Yes",
           level: answers.age_at_last_period || 0, 
       },
+   
       surgicalMenopause: {
-          yesNo: answers.surgical_menopause === "Yes",
-          describe: answers.symptomatic_problems_menopause_history?.join(", ") || "",
-      },
+        yesNo: answers.surgical_menopause === "Yes",
+        describe: answers.surgical_menopause_detail || "",
+    },
       symptomicProblems: answers.symptomatic_problems_menopause_history || [],
       hormonalReplacement: {
           yesNo: answers.hormone_replacement_therapy === "Yes",

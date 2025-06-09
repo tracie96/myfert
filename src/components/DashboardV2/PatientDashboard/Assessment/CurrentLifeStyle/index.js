@@ -296,7 +296,7 @@ const CurrentLifeStyle = ({ onComplete }) => {
   const navigate = useNavigate();
   const [currentConcern, setCurrentConcern] = useState([]);
   const [currentAllergies, setCurrentAllergies] = useState([]);
-  const [editingAllergies, setEditingAllergies] = useState(false);
+  const [editingAllergies, setEditingAllergies] = useState(null);
   const [editingKey, setEditingKey] = useState("");
   const [tempConcern, setTempConcern] = useState({});
   const [tempAllergy, setTempAllergy] = useState({});
@@ -571,6 +571,12 @@ const CurrentLifeStyle = ({ onComplete }) => {
   };
 
   const addConcern = () => {
+    // Check if there's an unsaved entry being edited
+    if (editingKey !== "") {
+      message.warning("Please save or cancel the current entry before adding a new one.");
+      return;
+    }
+
     const newConcern = {
       key: Date.now().toString(),
       problem: "",
@@ -887,6 +893,12 @@ const CurrentLifeStyle = ({ onComplete }) => {
 
   // Allergy Functions
   const addAllergy = () => {
+    // Check if there's an unsaved entry being edited
+    if (editingAllergies !== null) {
+      message.warning("Please save or cancel the current entry before adding a new one.");
+      return;
+    }
+
     const newAllergy = {
       key: Date.now().toString(),
       food: "",
@@ -901,7 +913,7 @@ const CurrentLifeStyle = ({ onComplete }) => {
     setCurrentAllergies((prev) =>
       prev.filter((allergy) => allergy.key !== key),
     );
-    if (editingAllergies === key) setEditingAllergies("");
+    if (editingAllergies === key) setEditingAllergies(null);
   };
 
   const editAllergy = (record) => {
@@ -913,10 +925,10 @@ const CurrentLifeStyle = ({ onComplete }) => {
   const cancelAllergy = () => {
     if (tempAllergy.food === "" && tempAllergy.reaction === "") {
       setCurrentAllergies((prev) =>
-        prev.filter((allergy) => allergy.key !== editingAllergies),
+        prev.filter((allergy) => allergy.key !== editingAllergies)
       );
     }
-    setEditingAllergies("");
+    setEditingAllergies(null);
     setTempAllergy({});
   };
 
@@ -940,7 +952,7 @@ const CurrentLifeStyle = ({ onComplete }) => {
     if (index > -1) {
       newData[index] = { ...newData[index], ...tempAllergy };
       setCurrentAllergies(newData);
-      setEditingAllergies("");
+      setEditingAllergies(null);
       setTempAllergy({});
     }
   };

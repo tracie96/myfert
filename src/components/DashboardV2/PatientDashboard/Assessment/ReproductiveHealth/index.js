@@ -27,6 +27,7 @@ import { backBtnTxt, exitBtnTxt, reproductiveGeneralHeading, reproductiveGeneral
 import InfoModal from "./InfoModal";
 import { getReproductiveHealthPatient } from "../../../../redux/AssessmentController";
 import { baseUrl } from "../../../../../utils/envAccess";
+import CervicalMucusModal from "./CervicalMucusModal";
 
 const { Option } = Select;
 
@@ -397,6 +398,7 @@ const questions = [
     "Discharge: Creamy, yogurt-like, or glue-like cervical mucus",
     type: "number_with_radio",
     name: "cervical_mucus",
+    infoIcon: true,
     subQuestions: [
         {
           type: "number_with_radio_sub",
@@ -418,6 +420,7 @@ const questions = [
     type: "number_with_radio",
     title: "Duration(put 0 if you do not experience it)",
     name: "Watery_mucus",
+    infoIcon: true,
     subQuestions: [
         {
           type: "number_with_radio_sub",
@@ -440,6 +443,7 @@ const questions = [
     type: "number_with_radio",
     title: "Duration(put 0 if you do not experience it)",
     name: "egg_white_mucus",
+    infoIcon: true,
     subQuestions: [
       {
         type: "number_with_radio_sub",
@@ -606,6 +610,7 @@ const ReproductiveHealth = ({ onComplete }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [isDisabled, setisDisabled] = useState(false);
   const [showInfoMoal,setShowInfoMoal] = useState(false);
+  const [showCervicalMucusModal, setShowCervicalMucusModal] = useState(false);
   const [answers, setAnswers] = useState({});
   const totalQuestions = questions.length;
   const dispatch = useDispatch();
@@ -1541,7 +1546,7 @@ const ReproductiveHealth = ({ onComplete }) => {
                 className="info-title"
                 style={{ color: "#335CAD" }}
               >
-                ℹ️  Pre-Period Spotting:
+               <InfoCircleOutlined />  Pre-Period Spotting:
               </Title>
               <Paragraph>
                 This spotting happens just before menstrual bleeding begins.
@@ -1557,7 +1562,7 @@ const ReproductiveHealth = ({ onComplete }) => {
                 className="info-title"
                 style={{ color: "#335CAD" }}
               >
-                ℹ️  After Period Spotting:
+                <InfoCircleOutlined />  After Period Spotting:
               </Title>
             <Paragraph>
  
@@ -1570,7 +1575,7 @@ const ReproductiveHealth = ({ onComplete }) => {
                 className="info-title"
                 style={{ color: "#335CAD" }}
               >
-                ℹ️  Bleeding:
+                <InfoCircleOutlined />  Bleeding:
               </Title>
             <Paragraph>
               <div class="info-bleed-head"><span class="info-bleed">Light: </span>Tampons/Pads typically need to be changed every 7-8 hours. Menstrual cups can be worn for up to 12 hours.</div>
@@ -1894,7 +1899,22 @@ const ReproductiveHealth = ({ onComplete }) => {
       <h3 style={{ margin: "20px 0", fontWeight:"600", color: "#000", fontSize: "15px" }}>
         {["info", "infoSpotting"].includes(questions[currentQuestionIndex]?.name) ? "" : label}
         {questions[currentQuestionIndex].question}{" "}
-        <span style={{cursor: "pointer"}} onClick={handleInfoModal}>{questions[currentQuestionIndex]?.infoIconBtn}</span>
+        {questions[currentQuestionIndex]?.infoIconBtn && (
+          <span style={{cursor: "pointer"}} onClick={handleInfoModal}>
+            {questions[currentQuestionIndex]?.infoIconBtn}
+          </span>
+        )}
+        {questions[currentQuestionIndex]?.infoIcon && (
+          <InfoCircleOutlined 
+            style={{ 
+              marginLeft: '8px', 
+              color: '#00ADEF',
+              cursor: 'pointer',
+              fontSize: '18px'
+            }}
+            onClick={() => setShowCervicalMucusModal(true)}
+          />
+        )}
         <div>{
           questions[currentQuestionIndex]?.question_description}
           <span style={{color:"#325cae", fontWeight:"600", fontSize: "15px"}}>{questions[currentQuestionIndex]?.question_description_answer}</span>
@@ -1911,6 +1931,10 @@ const ReproductiveHealth = ({ onComplete }) => {
           handleInfoModal={handleInfoModal} 
         />
       }
+      <CervicalMucusModal 
+        visible={showCervicalMucusModal}
+        onClose={() => setShowCervicalMucusModal(false)}
+      />
       {renderInput(questions[currentQuestionIndex])}
     </div>
 

@@ -1236,11 +1236,11 @@ function SwitchContent({
                   { personalFamily.inMenopause?.level || " "
                   }
                 </Descriptions.Item>
-                <Descriptions.Item label="Surgical Menopause">
+                {/* <Descriptions.Item label="Surgical Menopause">
                   {personalFamily?.surgicalMenopause?.yesNo
                     ? personalFamily.surgicalMenopause.describe || "No describe"
                     : "No"}
-                </Descriptions.Item>
+                </Descriptions.Item> */}
                 <Descriptions.Item label="Symptomic Problems">
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
                     {Array.isArray(personalFamily?.symptomicProblems) ? 
@@ -1251,6 +1251,21 @@ function SwitchContent({
                     }
                   </div>
                 </Descriptions.Item>
+
+
+                <Descriptions.Item label="Surgical Menopause">
+                {personalFamily.surgicalMenopause?.yesNo === true
+                      ? "Yes"
+                      : personalFamily.surgicalMenopause?.yesNo === false
+                        ? "No"
+                        : "N/A"}
+                </Descriptions.Item>
+                
+                <Descriptions.Item label="Surgical Menopause describe">
+                  {  personalFamily.surgicalMenopause?.describe || " "}
+                </Descriptions.Item>
+
+
                 <Descriptions.Item label="Hormonal Replacement">
                   {personalFamily?.hormonalReplacement?.yesNo
                     ? personalFamily.hormonalReplacement.describe || "No describe"

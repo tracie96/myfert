@@ -687,6 +687,7 @@ const CurrentLifeStyle = ({ onComplete }) => {
               value={tempConcern.severity || ""}
               onChange={(value) => handleChangeTempConcern("severity", value)}
               placeholder="Select Severity"
+              className="moderate"
               style={{
                 width: "100%",
                 height: 40,
@@ -748,6 +749,7 @@ const CurrentLifeStyle = ({ onComplete }) => {
               onChange={(value) => handleChangeTempConcern("success", value)}
               placeholder="Select Success"
               data-label="Success"
+              className="success"
               style={{
                 width: "100%",
                 height: 40,

@@ -29,7 +29,7 @@ const questions = [
     subQuestions: [
       {
         question: "Packs per day:",
-        type: "inputNumberX",
+        type: "inputNumber",
         name: "packs_per_day",
       },
       {
@@ -245,6 +245,10 @@ const SubstanceUse = ({ onComplete }) => {
     // Validate subquestions only if they are required
     const areSubQuestionsValid = question.subQuestions.every((sub) => {
       const subAnswer = answers[sub.name];
+      if(subAnswer === 0) {
+        return false; 
+        // If subAnswer is undefined, it's invalid
+      }
       if (sub.type === "inputNumber") {
         return subAnswer !== undefined; // Allow default value of 0 for number inputs
       }

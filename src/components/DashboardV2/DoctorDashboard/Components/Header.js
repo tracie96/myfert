@@ -1,12 +1,22 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Row, Col, Card, Typography } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
+import {useDispatch,  useSelector } from "react-redux";
 import moment from 'moment';
+import { getGeneralInformation } from "../../../redux/AssessmentController";
 
 const { Text } = Typography;
 
 const Header = () => {
     const userAuth = JSON.parse(localStorage.getItem("patient") || "{}");
+    const generalInfo = useSelector((state) => state.intake?.generalInfo);
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (userAuth?.userRef) {
+            dispatch(getGeneralInformation(userAuth.userRef));
+        }
+    }, [userAuth?.userRef, dispatch]);
 
     return (
         <div>
@@ -40,7 +50,7 @@ const Header = () => {
                                 {/* Middle Column */}
                                 <Col span={12} md={6}>
                                     <p>
-                                        <Text strong>Age:</Text> {userAuth?.age || 'N/A'}
+                                        <Text strong>Age:</Text> {generalInfo?.age || 'N/A'}
                                     </p>
                                     <p>
                                         <Text strong>Status:</Text> {userAuth?.patientStat?.statRemark || 'N/A'}

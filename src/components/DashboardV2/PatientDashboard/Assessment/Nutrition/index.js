@@ -485,6 +485,13 @@ const Nutrition = ({ onComplete }) => {
               return false;
             }
           }
+          if (question.name === "crave_for_foods" && value === "Yes") {
+            const requiredField = "crave_for_foods_other";
+            if (!answers[requiredField] || answers[requiredField].trim() === "") {
+              console.log(`Validation Failed: ${requiredField} is required when 'Yes' is selected.`);
+              return false;
+            }
+          }
 
           if (question.name === "aversion_to_certain_food" && value === "Yes") {
             const requiredField = "aversion_to_certain_food_other";

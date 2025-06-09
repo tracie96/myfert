@@ -842,6 +842,7 @@ function SwitchContent({
                     { label: "Explain Problem with Alcohol", value: substance.problemAlcoholExplain || "No Problem given" },
                     { label: "Get Help for Drinking", value: substance.getHelpForDrinking ? "Yes" : "No" },
                     { label: "Currently Using Recreational Drugs", value: substance.currentlyRecreationalDrugs ? "Yes" : "No" },
+                    { label: "Currently Using Recreational Drugs type", value: substance.currentlyRecreationalDrugsType || "" },
                     // { label: "Type of Recreational Drugs", value: substance.currentlyRecreationalDrugsType || "N/A" },
                   ].map((item, index) => (
                     <Descriptions.Item key={index} label={item.label}>
@@ -1208,8 +1209,11 @@ function SwitchContent({
                     ? personalFamily.otherMenstrualProblems.describe || "No Description"
                     : "No"}
                 </Descriptions.Item>
+                <Descriptions.Item label="Hormonal Birth Control">
+                  {personalFamily?.hormonalBirthControlType?.name ? "Yes" : "No"}
+                </Descriptions.Item>
                 <Descriptions.Item label="Hormonal Birth Control Type">
-                  {personalFamily?.hormonalBirthControlType?.name || "N/A"}
+                  {personalFamily?.hormonalBirthControlType?.level || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Problems With Hormonal Birth Control">
                   {personalFamily?.problemsWithHormonalBirthControl?.yesNo
@@ -1221,10 +1225,16 @@ function SwitchContent({
                     ? personalFamily.useContraception.describe || "No Description"
                     : "No"}
                 </Descriptions.Item>
-                <Descriptions.Item label="In Menopause">
-                  {personalFamily?.inMenopause?.yesNo
-                    ? personalFamily.inMenopause.level || "No level"
-                    : "No"}
+                <Descriptions.Item label="Aversion to Food">
+                    {personalFamily.inMenopause?.yesNo === true
+                      ? "Yes"
+                      : personalFamily.inMenopause?.yesNo === false
+                        ? "No"
+                        : "N/A"}
+                  </Descriptions.Item>
+                <Descriptions.Item label="In Menopause Level">
+                  { personalFamily.inMenopause?.level || " "
+                  }
                 </Descriptions.Item>
                 <Descriptions.Item label="Surgical Menopause">
                   {personalFamily?.surgicalMenopause?.yesNo
@@ -1364,18 +1374,20 @@ function SwitchContent({
               </Col>
 
               <Col xs={24} md={12}>
-                <Descriptions column={1} bordered>
+                <Descriptions column={1} bordered>  
                   {Object.entries(illness || {}).map(([category, data]) => {
                     // Only handle diagnostic, surgery, and injury categories
-                    if (!category.startsWith('diagnostic') && !category.startsWith('surgery') && !category.startsWith('injuries')) {
+                    // if (!category.startsWith('diagnostic') && !category.startsWith('surgery') && !category.startsWith('injuries') || category.startsWith('addNew')) {
+                    //   return null;
+                    // }
+                    if ((data && !data.date) || (category === "gastroIntestinal")) {
                       return null;
                     }
-                 
                     if (typeof data === 'object' && data !== null) {
-                      const value = data.value || '';
+                      const value =  data.value || '';
                       const date = data.date || '';
                       const otherName = data.otherName;
-                      
+
                       return (
                         <Descriptions.Item
                           label={category.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}

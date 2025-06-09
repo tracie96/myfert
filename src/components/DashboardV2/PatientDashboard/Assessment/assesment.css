@@ -140,6 +140,8 @@ width: 150px !important;}
 .ant-select {
   width: 50% !important;
 }
+.moderate, .success, .ant-pagination-options-size-changer.ant-select-show-arrow{width: 100% !important;}
+
 .select_questtionnaire {
   width: 50% !important;
   margin-bottom: 5px;

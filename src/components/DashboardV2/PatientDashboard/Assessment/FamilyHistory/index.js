@@ -540,7 +540,7 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
 
       // Map hormonal birth control
       mapped.hormonal_birthcontrol = patientPersonalFamilyInfo.hormonalBirthControlType?.name ? "Yes" : "No";
-      mapped.hormonal_birthcontrol_often = patientPersonalFamilyInfo.hormonalBirthControlType?.name || "";
+      mapped.hormonal_birthcontrol_often = patientPersonalFamilyInfo.hormonalBirthControlType?.level || "";
       mapped.hormonal_birthcontrol_long = ""; // Not provided in API
 
       // Map hormonal birth control problems
@@ -789,8 +789,8 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
           describe: answers.other_hormonal_problems_history || "",
       },
       hormonalBirthControlType: {
-          level: 0, // Adjust if applicable
-          name: answers.hormonal_birthcontrol_often || "string",
+        level: answers.hormonal_birthcontrol_often || "",
+        name: answers.hormonal_birthcontrol === "Yes" ? "true" : "false",
       },
       problemsWithHormonalBirthControl: {
           yesNo: answers.other_hormonal_problems === "Yes",

@@ -1,8 +1,9 @@
 {
   "files": {
-    "main.css": "/static/css/main.0be37f9c.css",
-    "main.js": "/static/js/main.35152ba5.js",
+    "main.css": "/static/css/main.1d4cf079.css",
+    "main.js": "/static/js/main.450c6abc.js",
     "static/js/787.28637dfb.chunk.js": "/static/js/787.28637dfb.chunk.js",
+    "static/media/reproductive-image.png": "/static/media/reproductive-image.0d5a4adc0e2ebffd4bc3.png",
     "static/media/pharmacist_clinician.jpeg": "/static/media/pharmacist_clinician.fba42df8bf00c9e71db3.jpeg",
     "static/media/fertilityImage.svg": "/static/media/fertilityImage.e0b4c2e1fd3a68caf54d9eb8ff560447.svg",
     "static/media/fertility_educator.jpeg": "/static/media/fertility_educator.14657002e08822407b16.jpeg",
@@ -31,12 +32,12 @@
     "static/media/capsule.png": "/static/media/capsule.f5bcfe66aab44334d25f.png",
     "static/media/mirabutton.svg": "/static/media/mirabutton.8c4bb1d4eb9d220526aaa72f0a3946ac.svg",
     "index.html": "/index.html",
-    "main.0be37f9c.css.map": "/static/css/main.0be37f9c.css.map",
-    "main.35152ba5.js.map": "/static/js/main.35152ba5.js.map",
+    "main.1d4cf079.css.map": "/static/css/main.1d4cf079.css.map",
+    "main.450c6abc.js.map": "/static/js/main.450c6abc.js.map",
     "787.28637dfb.chunk.js.map": "/static/js/787.28637dfb.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.0be37f9c.css",
-    "static/js/main.35152ba5.js"
+    "static/css/main.1d4cf079.css",
+    "static/js/main.450c6abc.js"
   ]
 }

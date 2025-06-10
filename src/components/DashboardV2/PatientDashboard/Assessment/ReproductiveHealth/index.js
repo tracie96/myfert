@@ -689,29 +689,28 @@ const ReproductiveHealth = ({ onComplete }) => {
         Watery_mucus_colour: ["White", "Other"].includes(patientReproductiveInfo.cycleDischargeWatery?.colour)
         ? patientReproductiveInfo.cycleDischargeWatery.colour
         : "Other",
-        Watery_mucus_colour_other: ["White", "Other"].includes(patientReproductiveInfo.cycleDischargeWatery?.colour)
-        ? ""
-        : patientReproductiveInfo.cycleDischargeWatery?.colour || "",
 
-        Watery_mucus_colour_other: patientReproductiveInfo.otherWateryMucus || "",
+      Watery_mucus_colour_other: ["White", "Other"].includes(patientReproductiveInfo.cycleDischargeWatery?.colour)
+        ? ""
+        : (patientReproductiveInfo.otherWateryMucus || ""),
         egg_white_mucus_sub: patientReproductiveInfo.cycleDischargeEggWhite?.duration || "",
         egg_white_mucus_sub_unsure: patientReproductiveInfo?.cycleDischargeEggWhite?.duration === "0" ? "0" : "",
         egg_white_mucus_colour: ["White", "Other"].includes(patientReproductiveInfo.cycleDischargeEggWhite?.colour)
-          ? patientReproductiveInfo.cycleDischargeEggWhite.colour
-          : "Other",
-          egg_white_mucus_colour_other: ["White", "Other"].includes(patientReproductiveInfo.cycleDischargeEggWhite?.colour)
-          ? ""
-          : patientReproductiveInfo.cycleDischargeEggWhite?.colour || "",
-        egg_white_mucus_colour_other: patientReproductiveInfo.otherWhiteMucus || "",
+        ? patientReproductiveInfo.cycleDischargeEggWhite.colour
+        : "Other",
+
+      egg_white_mucus_colour_other: ["White", "Other"].includes(patientReproductiveInfo.cycleDischargeEggWhite?.colour)
+        ? ""
+        : (patientReproductiveInfo.otherWhiteMucus || ""),
         pre_spotting_sub: patientReproductiveInfo.cycleDischargePrePeriod?.duration || "",
         pre_spotting_sub_unsure: patientReproductiveInfo?.cycleDischargePrePeriod?.duration === "0" ? "0" : "",
-        pre_spotting_colour: ["White", "Other"].includes(patientReproductiveInfo.cycleDischargePrePeriod?.colour)
-          ? patientReproductiveInfo.cycleDischargePrePeriod.colour
-          : "Other",
-          pre_spotting_colour_other: ["White", "Other"].includes(patientReproductiveInfo.cycleDischargePrePeriod?.colour)
-          ? ""
-          : patientReproductiveInfo.cycleDischargePrePeriod?.colour || "",
-        pre_spotting_colour_other: patientReproductiveInfo.otherSpottingColour || "",
+        pre_spotting_colour: ["None", "Pink", "Red", "Brown", "Black", "Other"].includes(patientReproductiveInfo.cycleDischargePrePeriod?.colour)
+        ? patientReproductiveInfo.cycleDischargePrePeriod.colour
+        : "Other",
+      
+      pre_spotting_colour_other: ["None", "Pink", "Red", "Brown", "Black", "Other"].includes(patientReproductiveInfo.cycleDischargePrePeriod?.colour)
+        ? ""
+        : (patientReproductiveInfo.otherSpottingColour || ""),
         after_period_spot_sub: patientReproductiveInfo.cycleDischargeAfterPeriodSpotting?.duration || "",
         after_period_spot_sub_unsure: patientReproductiveInfo?.cycleDischargeAfterPeriodSpotting?.duration === "0" ? "0" : "",
         after_period_spot_colour: patientReproductiveInfo.cycleDischargeAfterPeriodSpotting?.colour || "",

@@ -48,6 +48,9 @@ const LabsAndRequisitions = () => {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [newLabResultFile, setNewLabResultFile] = useState(null);
   const [newLabResultName, setNewLabResultName] = useState("");
+  const [isNewRequisitionVisible, setIsNewRequisitionVisible] = useState(false);
+  const [newRequisitionFile, setNewRequisitionFile] = useState(null);
+  const [newRequisitionName, setNewRequisitionName] = useState("");
   const navigate = useNavigate();
   const documoData = useSelector((state) => state.doctor.documoData);
   const documoLoading = useSelector((state) => state.doctor.documoLoading);
@@ -57,6 +60,7 @@ const LabsAndRequisitions = () => {
     setIsModalVisible(false);
     setIsNewLabResultVisible(false);
     setIsEditModalVisible(false);
+    setIsNewRequisitionVisible(false);
 
     switch (modalType) {
       case "patientSelect":
@@ -67,6 +71,9 @@ const LabsAndRequisitions = () => {
         break;
       case "editLabResult":
         setIsEditModalVisible(true);
+        break;
+      case "newRequisition":
+        setIsNewRequisitionVisible(true);
         break;
       default:
         break;
@@ -85,6 +92,11 @@ const LabsAndRequisitions = () => {
         break;
       case "editLabResult":
         setIsEditModalVisible(false);
+        break;
+      case "newRequisition":
+        setIsNewRequisitionVisible(false);
+        setNewRequisitionFile(null);
+        setNewRequisitionName("");
         break;
       default:
         break;
@@ -250,56 +262,56 @@ const LabsAndRequisitions = () => {
     }
   };
 
-  const uploadProps = {
-    name: "file",
-    multiple: false,
-    showUploadList: false,
-    beforeUpload: (file) => {
-      if (bloodWorkFile2.length >= 2) {
-        // Enforce max 2 files
-        message.error("You can only upload a maximum of 2 files.");
-        return Upload.LIST_IGNORE;
-      }
-      const allowedTypes = [
-        "application/pdf",
-        "image/jpeg",
-        "image/jpg",
-        "image/png",
-      ];
-      if (!allowedTypes.includes(file.type)) {
-        message.error("Only PDF, JPG, and PNG files are allowed.");
-        return Upload.LIST_IGNORE;
-      }
+  // const uploadProps = {
+  //   name: "file",
+  //   multiple: false,
+  //   showUploadList: false,
+  //   beforeUpload: (file) => {
+  //     if (bloodWorkFile2.length >= 2) {
+  //       // Enforce max 2 files
+  //       message.error("You can only upload a maximum of 2 files.");
+  //       return Upload.LIST_IGNORE;
+  //     }
+  //     const allowedTypes = [
+  //       "application/pdf",
+  //       "image/jpeg",
+  //       "image/jpg",
+  //       "image/png",
+  //     ];
+  //     if (!allowedTypes.includes(file.type)) {
+  //       message.error("Only PDF, JPG, and PNG files are allowed.");
+  //       return Upload.LIST_IGNORE;
+  //     }
 
-      const reader = new FileReader();
-      reader.onload = async () => {
-        const base64String = reader.result.split(",")[1];
-        const payload = {
-          patientRef: patient.userRef,
-          bloodWork: [
-            {
-              base64: base64String,
-              filename: file.name,
-              fileTitle: newLabResultName.trim(),
-              fileType: 2,
-            },
-          ],
-        };
+  //     const reader = new FileReader();
+  //     reader.onload = async () => {
+  //       const base64String = reader.result.split(",")[1];
+  //       const payload = {
+  //         patientRef: patient.userRef,
+  //         bloodWork: [
+  //           {
+  //             base64: base64String,
+  //             filename: file.name,
+  //             fileTitle: newLabResultName.trim(),
+  //             fileType: 2,
+  //           },
+  //         ],
+  //       };
 
-        try {
-          await dispatch(addPatientDocuments(payload));
-          await fetchPatientBloodWork(2); // Refresh the list after upload
-          message.success(`${file.name} uploaded successfully.`);
-        } catch (error) {
-          message.error(`Error uploading ${file.name}: ${error.message}`);
-        }
-      };
+  //       try {
+  //         await dispatch(addPatientDocuments(payload));
+  //         await fetchPatientBloodWork(2); // Refresh the list after upload
+  //         message.success(`${file.name} uploaded successfully.`);
+  //       } catch (error) {
+  //         message.error(`Error uploading ${file.name}: ${error.message}`);
+  //       }
+  //     };
 
-      reader.readAsDataURL(file);
-      return false; // Prevent automatic upload
-    },
-    fileList: [], // Keep fileList empty to hide files
-  };
+  //     reader.readAsDataURL(file);
+  //     return false; // Prevent automatic upload
+  //   },
+  //   fileList: [], // Keep fileList empty to hide files
+  // };
 
   const getFileIcon = (filename) => {
     console.log(filename, "lll");
@@ -317,6 +329,56 @@ const LabsAndRequisitions = () => {
       default:
         return <FileOutlined style={{ color: "#1890ff", fontSize: 24 }} />;
     }
+  };
+
+  const handleNewRequisitionNameChange = (e) => {
+    setNewRequisitionName(e.target.value);
+  };
+
+  const handleAddRequisition = async () => {
+    if (!newRequisitionFile) {
+      message.error("Please upload a requisition file.");
+      return;
+    }
+    if (!newRequisitionName.trim()) {
+      message.error("Please enter a requisition name.");
+      return;
+    }
+
+    if (bloodWorkFile2?.length >= 2) {
+      message.error("You can only upload a maximum of 2 files.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.readAsDataURL(newRequisitionFile);
+    reader.onload = async () => {
+      const base64String = reader.result.split(",")[1];
+      const payload = {
+        patientRef: patient.userRef,
+        bloodWork: [
+          {
+            base64: base64String,
+            filename: newRequisitionFile.name,
+            fileTitle: newRequisitionName.trim(),
+            fileType: 2, // requisition file type
+          },
+        ],
+      };
+
+      try {
+        const resultAction = await dispatch(addPatientDocuments(payload));
+        if (addPatientDocuments.fulfilled.match(resultAction)) {
+          await fetchPatientBloodWork(2);
+          message.success(`${newRequisitionName} uploaded successfully.`);
+          closeModal("newRequisition");
+          setNewRequisitionFile(null);
+          setNewRequisitionName("");
+        }
+      } catch (error) {
+        message.error(`Error uploading ${newRequisitionName}: ${error.message}`);
+      }
+    };
   };
 
   return (
@@ -405,6 +467,75 @@ const LabsAndRequisitions = () => {
         {newLabResultFile && (
           <div style={{ marginTop: "10px" }}>
             <Text>Selected File: {newLabResultFile.name}</Text>
+          </div>
+        )}
+      </Modal>
+
+      <Modal
+        title={
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <LeftOutlined
+              onClick={() => closeModal("newRequisition")}
+              style={{ cursor: "pointer" }}
+            />
+            <Text strong>NEW REQUISITION</Text>
+          </div>
+        }
+        open={isNewRequisitionVisible}
+        onCancel={() => closeModal("newRequisition")}
+        footer={[
+          <Button key="cancel" onClick={() => closeModal("newRequisition")}>
+            Cancel
+          </Button>,
+          <Button
+            key="save"
+            type="primary"
+            onClick={handleAddRequisition}
+            style={{
+              background: "#00ADEF",
+            }}
+          >
+            Add Requisition
+          </Button>,
+        ]}
+      >
+        <Input
+          placeholder="Enter requisition name"
+          style={{ marginBottom: "15px" }}
+          value={newRequisitionName}
+          onChange={handleNewRequisitionNameChange}
+        />
+        <Text strong>Upload requisition</Text>
+        <Dragger
+          name="file"
+          multiple={false}
+          showUploadList={false}
+          beforeUpload={(file) => {
+            const allowedTypes = [
+              "application/pdf",
+              "image/jpeg",
+              "image/jpg",
+              "image/png",
+            ];
+            if (!allowedTypes.includes(file.type)) {
+              message.error("Only PDF, JPG, and PNG files are allowed.");
+              return Upload.LIST_IGNORE;
+            }
+            setNewRequisitionFile(file);
+            return false;
+          }}
+          fileList={newRequisitionFile ? [newRequisitionFile] : []}
+        >
+          <p className="ant-upload-drag-icon">
+            <UploadOutlined />
+          </p>
+          <p className="ant-upload-text">Drag and drop</p>
+          <p className="ant-upload-hint">- OR -</p>
+          <Button icon={<UploadOutlined />}>Browse Files</Button>
+        </Dragger>
+        {newRequisitionFile && (
+          <div style={{ marginTop: "10px" }}>
+            <Text>Selected File: {newRequisitionFile.name}</Text>
           </div>
         )}
       </Modal>
@@ -586,6 +717,7 @@ const LabsAndRequisitions = () => {
                     message.error("You can only upload a maximum of 2 files.");
                     return;
                   }
+                  openModal("newRequisition");
                 }}
               >
                 + Add Requisition
@@ -672,7 +804,18 @@ const LabsAndRequisitions = () => {
                 </Card>
               ))}
 
-              <Dragger {...uploadProps} style={{ marginTop: 10 }}>
+              <Dragger
+                style={{ marginTop: 10 }}
+                showUploadList={false}
+                beforeUpload={() => {
+                  if (bloodWorkFile2?.length >= 2) {
+                    message.error("You can only upload a maximum of 2 files.");
+                    return Upload.LIST_IGNORE;
+                  }
+                  openModal("newRequisition");
+                  return false;
+                }}
+              >
                 <p className="ant-upload-drag-icon">
                   <InboxOutlined />
                 </p>

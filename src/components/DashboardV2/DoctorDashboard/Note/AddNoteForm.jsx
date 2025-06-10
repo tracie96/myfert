@@ -7,7 +7,7 @@ const { Option } = Select;
 const AddNoteForm = ({ onClose, onSubmit, isLoading }) => {
   const [form] = Form.useForm();
 
-  const handleSubmit = async (values, isDraft = false) => {
+  const handleSubmit = async (values, isDraft) => {
     try {
       await onSubmit({
         ...values,
@@ -101,6 +101,7 @@ const AddNoteForm = ({ onClose, onSubmit, isLoading }) => {
           <Button onClick={onClose} disabled={isLoading}>
             Cancel
           </Button>
+
           <Button onClick={() => {
             form.validateFields()
               .then(values => handleSubmit(values, true))
@@ -108,6 +109,7 @@ const AddNoteForm = ({ onClose, onSubmit, isLoading }) => {
           }}>
             Save as Draft
           </Button>
+
           <Button type="primary" htmlType="submit" loading={isLoading}>
             Submit Note
           </Button>

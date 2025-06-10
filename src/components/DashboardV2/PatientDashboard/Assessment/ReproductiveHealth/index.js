@@ -649,9 +649,9 @@ const ReproductiveHealth = ({ onComplete }) => {
         is_family_health_concern: normalizeYesNo(patientReproductiveInfo.familyMemberWithReproductiveConcerns),
         is_trying_to_conceive_time: patientReproductiveInfo.howLongTryingToConceive || "",
         methods_trying_to_conceive: patientReproductiveInfo.methodToConceive || [],
-        //methods_trying_to_conceive_other: patientReproductiveInfo.methodToConceiveOther || [],
+        methods_trying_to_conceive_other: patientReproductiveInfo.otherMethodsConceive || [],
         is_charting_cycles: patientReproductiveInfo.chartingToConceive || [],
-        //is_charting_cycles_other: patientReproductiveInfo.chartingToConceiveOther || [],
+        is_charting_cycles_other: patientReproductiveInfo.otherChartingCycle || [],
         current_therapy: normalizeYesNo(patientReproductiveInfo.currentTherapy),
         charting_method: patientReproductiveInfo.methodFertilityAwareness || "",
         is_frequent_intercourse_cycle: patientReproductiveInfo.intercouseEachCycle || "",
@@ -683,17 +683,35 @@ const ReproductiveHealth = ({ onComplete }) => {
         cervical_mucus: patientReproductiveInfo.cycleDischargeCreamy?.duration || "",
         cervical_mucus_unsure: patientReproductiveInfo?.cycleDischargeCreamy?.duration === "0" ? "0" : "",
         cervical_mucus_sub: patientReproductiveInfo.cycleDischargeCreamy?.colour || "",
-        //cervical_mucus_sub_other: patientReproductiveInfo.cycleDischargeCreamyOther || "",
+        cervical_mucus_sub_other: patientReproductiveInfo.otherMucusSub || "",
         Watery_mucus_sub: patientReproductiveInfo.cycleDischargeWatery?.duration || "",
         Watery_mucus_sub_unsure: patientReproductiveInfo?.cycleDischargeWatery?.duration === "0" ? "0" : "",
-        Watery_mucus_colour: patientReproductiveInfo.cycleDischargeWatery?.colour || "",
-        //Watery_mucus_colour_other: patientReproductiveInfo.cycleDischargeWatery?.colour || "",
+        Watery_mucus_colour: ["White", "Other"].includes(patientReproductiveInfo.cycleDischargeWatery?.colour)
+        ? patientReproductiveInfo.cycleDischargeWatery.colour
+        : "Other",
+        Watery_mucus_colour_other: ["White", "Other"].includes(patientReproductiveInfo.cycleDischargeWatery?.colour)
+        ? ""
+        : patientReproductiveInfo.cycleDischargeWatery?.colour || "",
+
+        Watery_mucus_colour_other: patientReproductiveInfo.otherWateryMucus || "",
         egg_white_mucus_sub: patientReproductiveInfo.cycleDischargeEggWhite?.duration || "",
         egg_white_mucus_sub_unsure: patientReproductiveInfo?.cycleDischargeEggWhite?.duration === "0" ? "0" : "",
-        egg_white_mucus_colour: patientReproductiveInfo.cycleDischargeEggWhite?.colour || "",
+        egg_white_mucus_colour: ["White", "Other"].includes(patientReproductiveInfo.cycleDischargeEggWhite?.colour)
+          ? patientReproductiveInfo.cycleDischargeEggWhite.colour
+          : "Other",
+          egg_white_mucus_colour_other: ["White", "Other"].includes(patientReproductiveInfo.cycleDischargeEggWhite?.colour)
+          ? ""
+          : patientReproductiveInfo.cycleDischargeEggWhite?.colour || "",
+        egg_white_mucus_colour_other: patientReproductiveInfo.otherWhiteMucus || "",
         pre_spotting_sub: patientReproductiveInfo.cycleDischargePrePeriod?.duration || "",
         pre_spotting_sub_unsure: patientReproductiveInfo?.cycleDischargePrePeriod?.duration === "0" ? "0" : "",
-        pre_spotting_colour: patientReproductiveInfo.cycleDischargePrePeriod?.colour || "",
+        pre_spotting_colour: ["White", "Other"].includes(patientReproductiveInfo.cycleDischargePrePeriod?.colour)
+          ? patientReproductiveInfo.cycleDischargePrePeriod.colour
+          : "Other",
+          pre_spotting_colour_other: ["White", "Other"].includes(patientReproductiveInfo.cycleDischargePrePeriod?.colour)
+          ? ""
+          : patientReproductiveInfo.cycleDischargePrePeriod?.colour || "",
+        pre_spotting_colour_other: patientReproductiveInfo.otherSpottingColour || "",
         after_period_spot_sub: patientReproductiveInfo.cycleDischargeAfterPeriodSpotting?.duration || "",
         after_period_spot_sub_unsure: patientReproductiveInfo?.cycleDischargeAfterPeriodSpotting?.duration === "0" ? "0" : "",
         after_period_spot_colour: patientReproductiveInfo.cycleDischargeAfterPeriodSpotting?.colour || "",
@@ -721,13 +739,33 @@ const ReproductiveHealth = ({ onComplete }) => {
 
   const validateQuestion = () => {
     const question = questions[currentQuestionIndex];
-
+    const mainAnswer = answers[question.name];
     // Skip validation for info and info_spotting type questions
     if (question.type === "info" || question.type === "info_spotting") {
       return true;
     }
-
-    const mainAnswer = answers[question.name];
+    //console.log("answers[subQuestion.name]--", answers[subQuestion.name]);
+    if(question.type === "long_radio" &&  (mainAnswer === "" || mainAnswer === undefined || mainAnswer === null)){
+      return false;
+    }
+    if (
+      questions[currentQuestionIndex].name === "relaxation_techniques" &&
+      answers["relaxation_techniques"] === "Yes" &&
+      (!answers["how_often_hormonal_bc"] || !answers["how_often_non_hormonal_bc"])
+    ) {
+      return;
+    }
+    if (
+      questions[currentQuestionIndex].name === "current_therapy" &&
+      answers["current_therapy"] === "Yes" &&
+      (!answers["charting_method"])
+    ) {
+      return;
+    }
+    if (questions[currentQuestionIndex].name !== "cervical_mucus" && (mainAnswer === null || mainAnswer === "")) {
+      console.log(`Validation Failed: No selection made for ${question.name}`);
+      return false;
+    } 
     const isMainQuestionValid = mainAnswer !== undefined && mainAnswer !== "";
     let subQuestionsValid = true;
 
@@ -1061,8 +1099,9 @@ const ReproductiveHealth = ({ onComplete }) => {
             : reproductiveHealthAnswers.is_family_health_concern || "No",
         howLongTryingToConceive: reproductiveHealthAnswers.is_trying_to_conceive === "Yes" ? (reproductiveHealthAnswers.is_trying_to_conceive_time || "N/A") : "N/A",
         methodToConceive: reproductiveHealthAnswers?.methods_trying_to_conceive || [],
-        //methodToConceiveOther: reproductiveHealthAnswers?.methods_trying_to_conceive_other || "",
+        otherMethodsConceive: reproductiveHealthAnswers?.methods_trying_to_conceive_other || "",
         chartingToConceive: reproductiveHealthAnswers.is_charting_cycles || [],
+        otherChartingCycle: reproductiveHealthAnswers?.is_charting_cycles_other || "",
         utilizingFertilityAwareness: reproductiveHealthAnswers.current_therapy === "Yes",
         methodFertilityAwareness: reproductiveHealthAnswers.charting_method || "N/A",
         intercouseDays: reproductiveHealthAnswers.intercourse_during_fertile_sub || "N/A",
@@ -1103,24 +1142,28 @@ const ReproductiveHealth = ({ onComplete }) => {
           duration: String(reproductiveHealthAnswers.cervical_mucus || "0"),
           colour: reproductiveHealthAnswers.cervical_mucus_sub || "N/A"
         },
+        otherMucusSub: reproductiveHealthAnswers.cervical_mucus_sub_other || "",
         cycleDischargeWatery: {
           duration: String(reproductiveHealthAnswers.Watery_mucus_sub || "0"),
           colour: reproductiveHealthAnswers.Watery_mucus_colour === "Other"
             ? reproductiveHealthAnswers.Watery_mucus_colour_other
             : (reproductiveHealthAnswers.Watery_mucus_colour || "N/A")
         },
+        otherWateryMucus: reproductiveHealthAnswers.Watery_mucus_colour_other || "",
         cycleDischargeEggWhite: {
           duration: String(reproductiveHealthAnswers.egg_white_mucus_sub || "0"),
           colour: reproductiveHealthAnswers.egg_white_mucus_colour === "Other"
             ? reproductiveHealthAnswers.egg_white_mucus_colour_other
             : (reproductiveHealthAnswers.egg_white_mucus_colour || "N/A")
         },
+        otherWhiteMucus: reproductiveHealthAnswers.egg_white_mucus_colour_other || "",
         cycleDischargePrePeriod: {
           duration: String(reproductiveHealthAnswers.pre_spotting_sub || "0"),
           colour: reproductiveHealthAnswers.pre_spotting_colour === "Other"
             ? reproductiveHealthAnswers.pre_spotting_colour_other
             : (reproductiveHealthAnswers.pre_spotting_colour || "N/A")
         },
+        otherSpottingColour: reproductiveHealthAnswers.pre_spotting_colour_other || "",
         cycleDischargeMenstralBleeding: {
           duration: String(reproductiveHealthAnswers.menstrual_bleeding_sub+ ", " +reproductiveHealthAnswers.days_light_bleeding+ ", " +reproductiveHealthAnswers.days_moderate_bleeding+ ", " +reproductiveHealthAnswers.days_heavy_bleeding+ ", " +reproductiveHealthAnswers.days_very_heavy_bleeding || "N/A"),
           colour: reproductiveHealthAnswers.menstrual_bleeding_sub_colour || "N/A",

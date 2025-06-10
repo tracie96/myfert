@@ -658,7 +658,7 @@ const CurrentLifeStyle = ({ onComplete }) => {
       render: (text, record) =>
         isEditing(record) ? (
           <>
-            <i>Example: Post Nasal Drip</i>
+            <i>Post Nasal Drip</i>
             <Input
               value={tempConcern.problem || ""}
               onChange={(e) => handleChangeTempConcern("problem", e.target.value)}

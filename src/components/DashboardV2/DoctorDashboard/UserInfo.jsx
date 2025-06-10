@@ -1412,18 +1412,15 @@ function SwitchContent({
                             <Tag color="default">Answer not provided</Tag>
                           ) : (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                              {otherName ? (
-                                <Tag color="blue">Name: {otherName}</Tag>
-                              ) : null}
                               {date ? (
                                 <Tag color="purple">Date: {date}</Tag>
                               ) : (
                                 <Tag color="default">Date: Answer not provided</Tag>
                               )}
                               {value ? (
-                                <Tag color="cyan">Value: {value}</Tag>
+                                <Tag color="cyan">Comment: {value}</Tag>
                               ) : (
-                                <Tag color="default">Value: Answer not provided</Tag>
+                                <Tag color="default">Comment: Answer not provided</Tag>
                               )}
                             </div>
                           )}
@@ -1453,9 +1450,9 @@ function SwitchContent({
                               <Tag color="cyan">Date: Answer not provided</Tag>
                             )}
                             {record.value ? (
-                              <Tag color="green">Value: {record.value}</Tag>
+                              <Tag color="green">Comment: {record.value}</Tag>
                             ) : (
-                              <Tag color="cyan">Value: Answer not provided</Tag>
+                              <Tag color="cyan">Comment: Answer not provided</Tag>
                             )}
                           </div>
                         );

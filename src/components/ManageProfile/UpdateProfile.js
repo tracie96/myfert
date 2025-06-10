@@ -85,6 +85,7 @@ const UpdateProfile = () => {
       setFieldValue("address", response.address || "");
       setFieldValue("phoneNumber", response.phoneNumber || "");
       setFieldValue("picture", response.picture || "");
+      setFieldValue("DOB", response.dob || "");
 
       // If there's an existing profile image URL, set it
       setUploadedFileUrl(response.profile || null);
@@ -285,6 +286,24 @@ const UpdateProfile = () => {
                       <small className="text-danger">
                         {errors.phoneNumber}
                       </small>
+                    )}
+                  </div>
+                </div>
+
+                <div className="col-md-12">
+                  <div className="form-group">
+                    <label>Date of Birth</label>
+                    <input
+                      className="form-control"
+                      name="DOB"
+                      type="date"
+                      value={values.DOB}
+                      onChange={handleChange("DOB")}
+                      onBlur={handleBlur("DOB")}
+                      max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split('T')[0]}
+                    />
+                    {errors.DOB && (
+                      <small className="text-danger">{errors.DOB}</small>
                     )}
                   </div>
                 </div>

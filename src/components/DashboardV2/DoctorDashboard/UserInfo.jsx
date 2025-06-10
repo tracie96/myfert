@@ -1260,10 +1260,11 @@ function SwitchContent({
                         ? "No"
                         : "N/A"}
                 </Descriptions.Item>
-                
+
                 <Descriptions.Item label="Surgical Menopause describe">
                   {  personalFamily.surgicalMenopause?.describe || " "}
                 </Descriptions.Item>
+            
 
 
                 <Descriptions.Item label="Hormonal Replacement">

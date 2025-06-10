@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Form, Input, Select, Button, Space, message } from 'antd';
 import './note.css';
 const { TextArea } = Input;
@@ -7,90 +7,26 @@ const { Option } = Select;
 const AddNoteForm = ({ onClose, onSubmit, isLoading }) => {
   const [form] = Form.useForm();
 
-  useEffect(() => {
-    // Load drafts when component mounts
-    const loadDrafts = () => {
-      const fields = ['appointmentType', 'subjective', 'objective', 'assessment', 'patientPlan', 'personalNote'];
-      const drafts = {};
-      
-      fields.forEach(field => {
-        const draft = localStorage.getItem(`note_draft_${field}`);
-        if (draft) {
-          drafts[field] = JSON.parse(draft);
-        }
-      });
-
-      form.setFieldsValue(drafts);
-    };
-
-    loadDrafts();
-  }, [form]);
-
-  const handleSubmit = async (values) => {
+  const handleSubmit = async (values, isDraft = false) => {
     try {
       await onSubmit({
         ...values,
-        status: 'SUBMITTED',  // Mark as officially submitted
-        lastUpdated: new Date().toISOString()
-      });
-      
-      // Clear drafts after successful submission
-      ['appointmentType', 'subjective', 'objective', 'assessment', 'patientPlan', 'personalNote'].forEach(field => {
-        localStorage.removeItem(`note_draft_${field}`);
+        isDraft
       });
       
       form.resetFields();
-      message.success('Note submitted successfully');
+      message.success(isDraft ? 'Note saved as draft' : 'Note submitted successfully');
       onClose();
     } catch (error) {
-      message.error('Failed to submit note. Please try again.');
+      message.error(isDraft ? 'Failed to save draft' : 'Failed to submit note. Please try again.');
     }
-  };
-
-  const saveDraft = (fieldName) => {
-    const value = form.getFieldValue(fieldName);
-    
-    // Save the current field and its timestamp
-    localStorage.setItem(`note_draft_${fieldName}`, JSON.stringify({
-      value,
-      lastSaved: new Date().toISOString()
-    }));
-
-    // Save the draft status
-    localStorage.setItem('note_draft_status', JSON.stringify({
-      status: 'DRAFT',
-      lastUpdated: new Date().toISOString()
-    }));
-
-    message.success(`${fieldName} saved as draft`);
-    onClose(); // Close the modal after saving draft
-  };
-
-  const saveAllAsDraft = () => {
-    const values = form.getFieldsValue();
-    Object.keys(values).forEach(field => {
-      if (values[field]) {
-        localStorage.setItem(`note_draft_${field}`, JSON.stringify({
-          value: values[field],
-          lastSaved: new Date().toISOString()
-        }));
-      }
-    });
-
-    localStorage.setItem('note_draft_status', JSON.stringify({
-      status: 'DRAFT',
-      lastUpdated: new Date().toISOString()
-    }));
-
-    message.success('All sections saved as draft');
-    onClose();
   };
 
   return (
     <Form
       form={form}
       layout="vertical"
-      onFinish={handleSubmit}
+      onFinish={(values) => handleSubmit(values, false)}
     >
       <Form.Item
         name="appointmentType"
@@ -109,15 +45,10 @@ const AddNoteForm = ({ onClose, onSubmit, isLoading }) => {
         label="Subjective"
         rules={[{ required: true, message: 'Please enter subjective notes' }]}
       >
-        <div>
-          <TextArea 
-            rows={4} 
-            placeholder="Enter patient's reported symptoms and concerns"
-          />
-          <Button size="small" onClick={() => saveDraft('subjective')} style={{ marginTop: '8px' }}>
-            Save as Draft
-          </Button>
-        </div>
+        <TextArea 
+          rows={4} 
+          placeholder="Enter patient's reported symptoms and concerns"
+        />
       </Form.Item>
 
       <Form.Item
@@ -125,15 +56,10 @@ const AddNoteForm = ({ onClose, onSubmit, isLoading }) => {
         label="Objective"
         rules={[{ required: true, message: 'Please enter objective findings' }]}
       >
-        <div>
-          <TextArea 
-            rows={4} 
-            placeholder="Enter measurable observations and test results"
-          />
-          <Button size="small" onClick={() => saveDraft('objective')} style={{ marginTop: '8px' }}>
-            Save as Draft
-          </Button>
-        </div>
+        <TextArea 
+          rows={4} 
+          placeholder="Enter measurable observations and test results"
+        />
       </Form.Item>
 
       <Form.Item
@@ -141,15 +67,10 @@ const AddNoteForm = ({ onClose, onSubmit, isLoading }) => {
         label="Assessment"
         rules={[{ required: true, message: 'Please enter assessment' }]}
       >
-        <div>
-          <TextArea 
-            rows={4} 
-            placeholder="Enter your professional assessment and diagnosis"
-          />
-          <Button size="small" onClick={() => saveDraft('assessment')} style={{ marginTop: '8px' }}>
-            Save as Draft
-          </Button>
-        </div>
+        <TextArea 
+          rows={4} 
+          placeholder="Enter your professional assessment and diagnosis"
+        />
       </Form.Item>
 
       <Form.Item
@@ -158,15 +79,10 @@ const AddNoteForm = ({ onClose, onSubmit, isLoading }) => {
         rules={[{ required: true, message: 'Please enter treatment plan' }]}
         extra="This section will be visible to the patient after submission"
       >
-        <div>
-          <TextArea 
-            rows={4} 
-            placeholder="Enter treatment plan and next steps"
-          />
-          <Button size="small" onClick={() => saveDraft('patientPlan')} style={{ marginTop: '8px' }}>
-            Save as Draft
-          </Button>
-        </div>
+        <TextArea 
+          rows={4} 
+          placeholder="Enter treatment plan and next steps"
+        />
       </Form.Item>
 
       <Form.Item
@@ -174,15 +90,10 @@ const AddNoteForm = ({ onClose, onSubmit, isLoading }) => {
         label="Personal Notes"
         rules={[{ required: true, message: 'Please enter personal notes' }]}
       >
-        <div>
-          <TextArea 
-            rows={4} 
-            placeholder="Enter personal notes"
-          />
-          <Button size="small" onClick={() => saveDraft('personalNote')} style={{ marginTop: '8px' }}>
-            Save as Draft
-          </Button>
-        </div>
+        <TextArea 
+          rows={4} 
+          placeholder="Enter personal notes"
+        />
       </Form.Item>
 
       <Form.Item>
@@ -190,8 +101,12 @@ const AddNoteForm = ({ onClose, onSubmit, isLoading }) => {
           <Button onClick={onClose} disabled={isLoading}>
             Cancel
           </Button>
-          <Button onClick={saveAllAsDraft}>
-            Save All as Draft
+          <Button onClick={() => {
+            form.validateFields()
+              .then(values => handleSubmit(values, true))
+              .catch(err => console.error('Validation failed:', err));
+          }}>
+            Save as Draft
           </Button>
           <Button type="primary" htmlType="submit" loading={isLoading}>
             Submit Note

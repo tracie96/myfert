@@ -706,7 +706,7 @@ const LabsAndRequisitions = () => {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                marginBottom: "20px",
+                marginBottom: "45px",
               }}
             >
               <Button

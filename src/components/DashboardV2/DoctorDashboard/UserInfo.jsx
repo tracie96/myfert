@@ -1282,24 +1282,6 @@ function SwitchContent({
                     }
                   </div>
                 </Descriptions.Item>
-                <Descriptions.Item label="Gyn Screening Last Pap Test">
-                  <div>
-                    <p>Date: {personalFamily?.gynScreeningLastPapTest?.date || "N/A"}</p>
-                    <p>Result: {personalFamily?.gynScreeningLastPapTest?.value || "N/A"}</p>
-                  </div>
-                </Descriptions.Item>
-                <Descriptions.Item label="Gyn Screening Last Mammo">
-                  <div>
-                    <p>Date: {personalFamily?.gynScreeningLastMammo?.date || "N/A"}</p>
-                    <p>Result: {personalFamily?.gynScreeningLastMammo?.value || "N/A"}</p>
-                  </div>
-                </Descriptions.Item>
-                <Descriptions.Item label="Gyn Screening Last Bone Density">
-                  <div>
-                    <p>Date: {personalFamily?.gynScreeningLastBoneDesity?.date || "N/A"}</p>
-                    <p>Result: {personalFamily?.gynScreeningLastBoneDesity?.value || "N/A"}</p>
-                  </div>
-                </Descriptions.Item>
               </Descriptions>
             </Col>
           </Row>
@@ -1684,6 +1666,24 @@ function SwitchContent({
 
                 <Descriptions.Item label="Mid Cycle Spotting Colour">
                   {reproductiveInfo?.midCycleSpottingFrequency?.colour || 'N/A'}
+                </Descriptions.Item>
+                <Descriptions.Item label="Other Charting Cycle">
+                  {reproductiveInfo?.otherChartingCycle || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Other Methods Conceive">
+                  {reproductiveInfo?.otherMethodsConceive || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Other Mucus Sub">
+                  {reproductiveInfo?.otherMucusSub || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Other Spotting Colour">
+                  {reproductiveInfo?.otherSpottingColour || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Other Watery Mucus">
+                  {reproductiveInfo?.otherWateryMucus || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Other White Mucus">
+                  {reproductiveInfo?.otherWhiteMucus || "N/A"}
                 </Descriptions.Item>
 
                 <>

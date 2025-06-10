@@ -736,9 +736,25 @@ const ReproductiveHealth = ({ onComplete }) => {
     dispatch(getReproductiveHealthPatient());
   }, [dispatch]);
 
+  const isOtherOptionInvalid = (name, value) => {
+    if (value === "Other" || (Array.isArray(value) && value.includes("Other"))) {
+      const otherText = answers[`${name}_other`];
+      return typeof otherText !== "string" || otherText.trim() === "";
+    }
+    return false;
+  };
+  
+  
+
   const validateQuestion = () => {
     const question = questions[currentQuestionIndex];
     const mainAnswer = answers[question.name];
+    // Additional check for "Other" option
+   
+
+    if (isOtherOptionInvalid(question.name, mainAnswer)) {
+      return false;
+    }
     // Skip validation for info and info_spotting type questions
     if (question.type === "info" || question.type === "info_spotting") {
       return true;
@@ -766,6 +782,10 @@ const ReproductiveHealth = ({ onComplete }) => {
       return false;
     } 
     const isMainQuestionValid = mainAnswer !== undefined && mainAnswer !== "";
+    if (isOtherOptionInvalid(question.name, mainAnswer)) {
+      return false;
+    }
+    
     let subQuestionsValid = true;
 
     // Handle main question validation when no subquestions are present or main answer is "No"
@@ -785,7 +805,25 @@ const ReproductiveHealth = ({ onComplete }) => {
         for (const subQuestion of question.subQuestions) {
             const subAnswer = answers[subQuestion.name];
             const subUnsure = answers[`${subQuestion.name}_unsure`];
-
+            if (isOtherOptionInvalid(subQuestion.name, subAnswer)) {
+              subQuestionsValid = false;
+              break;
+            }
+            
+            // if (subAnswer === "Other" || (Array.isArray(subAnswer) && subAnswer.includes("Other"))) {
+            //   const otherFieldName = `${subQuestion.name}_other`;
+            //   if (!answers[otherFieldName] || answers[otherFieldName].trim() === "") {
+            //     subQuestionsValid = false;
+            //     return false;
+            //   }
+            // }
+            // Check if "Other" selected in main answer, ensure input is provided
+            // if (mainAnswer === "Other" || (Array.isArray(mainAnswer) && mainAnswer.includes("Other"))) {
+            //   const otherFieldName = `${question.name}_other`;
+            //   if (!answers[otherFieldName] || answers[otherFieldName].trim() === "") {
+            //     return false;
+            //   }
+            // }
             // If at least one subquestion is not unsure, set flag to false
             if (!subUnsure) {
                 allSubQuestionsUnsure = false;
@@ -805,13 +843,11 @@ const ReproductiveHealth = ({ onComplete }) => {
 
 
             // Validate number_with_radio_sub questions if not "Unsure" 
-            if (
-              subQuestion.type === "number_with_radio_sub" &&
-              !["longest_cycle_radio", "shortest_cycle_radio", "average_cycle_radio"].includes(subQuestion.name)
-            ) {
+            if (subQuestion.type === "number_with_radio_sub") {
               const parsed = Number(subAnswer);
+              const subUnsure = answers[`${subQuestion.name}_unsure`];
               // ⛔ Only validate if NOT unsure and NOT 0
-              if (!subUnsure && (isNaN(parsed) || parsed < 0)) {
+              if (!subUnsure && (subAnswer === undefined || subAnswer === "" || isNaN(parsed) || parsed <= 0)) {
                 subQuestionsValid = false;
                 break;
               }

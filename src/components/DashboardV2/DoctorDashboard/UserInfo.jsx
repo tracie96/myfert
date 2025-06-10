@@ -1281,24 +1281,6 @@ function SwitchContent({
                     }
                   </div>
                 </Descriptions.Item>
-                <Descriptions.Item label="Gyn Screening Last Pap Test">
-                  <div>
-                    <p>Date: {personalFamily?.gynScreeningLastPapTest?.date || "N/A"}</p>
-                    <p>Result: {personalFamily?.gynScreeningLastPapTest?.value || "N/A"}</p>
-                  </div>
-                </Descriptions.Item>
-                <Descriptions.Item label="Gyn Screening Last Mammo">
-                  <div>
-                    <p>Date: {personalFamily?.gynScreeningLastMammo?.date || "N/A"}</p>
-                    <p>Result: {personalFamily?.gynScreeningLastMammo?.value || "N/A"}</p>
-                  </div>
-                </Descriptions.Item>
-                <Descriptions.Item label="Gyn Screening Last Bone Density">
-                  <div>
-                    <p>Date: {personalFamily?.gynScreeningLastBoneDesity?.date || "N/A"}</p>
-                    <p>Result: {personalFamily?.gynScreeningLastBoneDesity?.value || "N/A"}</p>
-                  </div>
-                </Descriptions.Item>
               </Descriptions>
             </Col>
           </Row>

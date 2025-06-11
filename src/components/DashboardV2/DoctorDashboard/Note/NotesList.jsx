@@ -287,12 +287,14 @@ const NotesList = ({ notes, onViewMore }) => {
   ];
 
   return (
+    <>
+    <Tabs 
+    defaultActiveKey="1" 
+    items={items}
+    style={{ marginBottom: 16 }}
+  />
     <Card bordered={false}>
-      <Tabs 
-        defaultActiveKey="1" 
-        items={items}
-        style={{ marginBottom: 16 }}
-      />
+     
       
       <Modal
         title="Edit Note"
@@ -385,6 +387,7 @@ const NotesList = ({ notes, onViewMore }) => {
         <p>Are you sure you want to delete this note? This action cannot be undone.</p>
       </Modal>
     </Card>
+    </>
   );
 };
 

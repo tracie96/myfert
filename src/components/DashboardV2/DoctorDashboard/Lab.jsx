@@ -10,7 +10,6 @@ import {
   Input,
 } from "antd";
 import {
-  InboxOutlined,
   FilePdfOutlined,
   EditOutlined,
   DeleteOutlined,
@@ -155,6 +154,7 @@ const LabsAndRequisitions = () => {
           name: file.filename,
           date: file.createdOn,
           title: file.fileTitle,
+
         }))
       );
     } else if (status === "failed") {
@@ -261,9 +261,12 @@ const LabsAndRequisitions = () => {
   };
 
   const handleDelete = async (fileId) => {
+    console.log(fileId,'fila')
     try {
       await dispatch(deletePatientBloodWork(fileId)).unwrap();
+      // Update both files and bloodWorkFile2 states
       setFiles((prevFiles) => prevFiles.filter((file) => file.id !== fileId));
+      setBloodWorkFile2((prevFiles) => prevFiles.filter((file) => file.fileRef !== fileId));
       message.success("File deleted successfully.");
     } catch (error) {
       message.error("Failed to delete file.");
@@ -806,17 +809,17 @@ const LabsAndRequisitions = () => {
                           flex: "1",
                         }}
                       >
-                        {getFileIcon(file?.filename || file?.name)}
+                        {getFileIcon(file?.filename)}
                         <Link
                           style={{ color: "#1890ff" }}
                           onClick={() =>
                             handleDownload(
-                              file.id,
-                              file?.filename || file?.name
+                              file.fileRef,
+                              file.filename
                             )
                           }
                         >
-                          {file.filename || file.name || "LabResults.pdf"}
+                          {file.fileTitle || file.filename || "Requisition.pdf"}
                         </Link>
                       </div>
                       <div
@@ -828,7 +831,7 @@ const LabsAndRequisitions = () => {
                       >
                         <DeleteOutlined
                           style={{ color: "red", cursor: "pointer" }}
-                          onClick={() => handleDelete(file.id)}
+                          onClick={() => handleDelete(file.fileRef)}
                         />
                       </div>
                     </div>
@@ -836,7 +839,7 @@ const LabsAndRequisitions = () => {
                 </Card>
               ))}
 
-              <Dragger
+              {/* <Dragger
                 style={{ marginTop: 10 }}
                 showUploadList={false}
                 beforeUpload={() => {
@@ -854,7 +857,7 @@ const LabsAndRequisitions = () => {
                 <p className="ant-upload-text">Drag and drop</p>
                 <p className="ant-upload-hint">- OR -</p>
                 <p className="ant-upload-text">Browse Files</p>
-              </Dragger>
+              </Dragger> */}
             </Card>
           </div>
         </div>
@@ -950,15 +953,15 @@ const LabsAndRequisitions = () => {
                     backgroundColor: "red",
                   }}
                 ></div>
-                <Text>{file.filename || "Requisition"}</Text>
+                <Text>{file.fileTitle || file.filename || "Requisition"}</Text>
                 <Text>{moment(file.createdOn).format("MMMM DD, YYYY")}</Text>
                 {getFileIcon(file?.filename)}
                 <Link
                   onClick={() =>
-                    handleDownload(file.fileRef, file?.filename)
+                    handleDownload(file.fileRef, file.filename)
                   }
                 >
-                  {file.filename || "Requisition.pdf"}
+                  {file.fileTitle || file.filename || "Requisition.pdf"}
                 </Link>
                 <DeleteOutlined
                   style={{ color: "red", cursor: "pointer" }}

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { List, Card, Avatar, Typography, Button, Divider, Row, Col, Modal, Form, Input, Dropdown, Menu, Space } from "antd";
+import { List, Card, Avatar, Typography, Button, Divider, Row, Col, Modal, Form, Input, Dropdown, Menu, Space, Tag } from "antd";
 import { MoreOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useDispatch } from 'react-redux';
 import { editPatientNote, fetchPatientNotes, deletePatientNote } from "../../../redux/doctorSlice";
@@ -188,7 +188,10 @@ const NotesList = ({ notes, onViewMore }) => {
                     size={48} 
                   />
                   <div>
-                    <Text strong style={{ color: "#335cad" }}>{item.name}</Text>
+                    <Space>
+                      <Text strong style={{ color: "#335cad" }}>{item.name}</Text>
+                      {item.isDraft && <Tag color="warning">Draft</Tag>}
+                    </Space>
                     <br />
                     <Text type="secondary">{item.role}</Text>
                     <br />
@@ -263,10 +266,7 @@ const NotesList = ({ notes, onViewMore }) => {
           </List.Item>
         )}
       />
-      <div style={{ textAlign: "right", marginTop: 16 }}>
-        <Button type="link" onClick={onViewMore}>View More</Button>
-      </div>
-
+  
       <Modal
         title="Edit Note"
         open={isEditModalVisible}

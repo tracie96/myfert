@@ -61,7 +61,8 @@ const Note = () => {
           ],
           personalNotes: note.personalNote || '',
           nameColor: "text-[#F2AA93]",
-          noteId: note.noteId
+          noteId: note.noteId,
+          isDraft: note.isDraft
         };
       });
       setNotes(formattedNotes);
@@ -75,8 +76,9 @@ const Note = () => {
   const handleViewMore = () => {
     setVisibleNotes(prev => prev + 3);
   };
-console.log({notes})
   const addNote = async (newNote) => {
+    console.log({newNote})
+
     try {
       const result = await dispatch(addPatientNotes({
         ...newNote,

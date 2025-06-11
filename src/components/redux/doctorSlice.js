@@ -619,7 +619,7 @@ export const fetchPatientNotes = createAsyncThunk(
 
 export const addPatientNotes = createAsyncThunk(
   "doctor/addPatientNotes",
-  async ({ personalNote, subjective, objective, assessment, patientPlan, appointmentType, patientRef }, { rejectWithValue, getState, dispatch }) => {
+  async ({ personalNote, subjective, objective, assessment, patientPlan, appointmentType, isDraft, patientRef }, { rejectWithValue, getState, dispatch }) => {
     const user = getState()?.authentication?.userAuth;
     const config = {
       headers: {
@@ -631,7 +631,7 @@ export const addPatientNotes = createAsyncThunk(
     try {
       const response = await axios.post(
         `${baseUrl}Doctor/AddPatientNotes`,
-        { personalNote, subjective, objective, assessment, patientPlan, appointmentType, patientRef },
+        { personalNote, subjective, objective, assessment, patientPlan, appointmentType, patientRef, isDraft },
         config
       );
       return response.data;

@@ -27,7 +27,7 @@ import {
   deletePatientBloodWork,
   downloadBloodWork,
   addPatientDocuments,
-  fetchDocumo
+  fetchDocumo,
 } from "../../redux/doctorSlice";
 import moment from "moment";
 const { Dragger } = Upload;
@@ -46,6 +46,7 @@ const LabsAndRequisitions = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isNewLabResultVisible, setIsNewLabResultVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [isEditRequisitionModalVisible, setIsEditRequisitionModalVisible] = useState(false);
   const [newLabResultFile, setNewLabResultFile] = useState(null);
   const [newLabResultName, setNewLabResultName] = useState("");
   const [isNewRequisitionVisible, setIsNewRequisitionVisible] = useState(false);
@@ -61,6 +62,7 @@ const LabsAndRequisitions = () => {
     setIsNewLabResultVisible(false);
     setIsEditModalVisible(false);
     setIsNewRequisitionVisible(false);
+    setIsEditRequisitionModalVisible(false);
 
     switch (modalType) {
       case "patientSelect":
@@ -74,6 +76,9 @@ const LabsAndRequisitions = () => {
         break;
       case "newRequisition":
         setIsNewRequisitionVisible(true);
+        break;
+      case "editRequisition":
+        setIsEditRequisitionModalVisible(true);
         break;
       default:
         break;
@@ -97,6 +102,9 @@ const LabsAndRequisitions = () => {
         setIsNewRequisitionVisible(false);
         setNewRequisitionFile(null);
         setNewRequisitionName("");
+        break;
+      case "editRequisition":
+        setIsEditRequisitionModalVisible(false);
         break;
       default:
         break;
@@ -376,7 +384,9 @@ const LabsAndRequisitions = () => {
           setNewRequisitionName("");
         }
       } catch (error) {
-        message.error(`Error uploading ${newRequisitionName}: ${error.message}`);
+        message.error(
+          `Error uploading ${newRequisitionName}: ${error.message}`
+        );
       }
     };
   };
@@ -617,10 +627,12 @@ const LabsAndRequisitions = () => {
                       className="listCard"
                       style={{
                         display: "flex",
-                        alignItems: window.innerWidth <= 480 ? "flex-start" : "center",
+                        alignItems:
+                          window.innerWidth <= 480 ? "flex-start" : "center",
                         gap: 15,
                         width: "100%",
-                        flexDirection: window.innerWidth <= 480 ? "column" : "row"
+                        flexDirection:
+                          window.innerWidth <= 480 ? "column" : "row",
                       }}
                     >
                       <div
@@ -629,7 +641,7 @@ const LabsAndRequisitions = () => {
                           width: window.innerWidth <= 480 ? "100%" : "3px",
                           height: window.innerWidth <= 480 ? "3px" : "40px",
                           backgroundColor: "red",
-                          flexShrink: 0
+                          flexShrink: 0,
                         }}
                       ></div>
 
@@ -637,7 +649,7 @@ const LabsAndRequisitions = () => {
                         className="listCardContent"
                         style={{
                           flex: "0 0 200px",
-                          width: window.innerWidth <= 480 ? "100%" : "auto"
+                          width: window.innerWidth <= 480 ? "100%" : "auto",
                         }}
                       >
                         <Text style={{ fontWeight: 500 }}>{file.name}</Text>
@@ -647,7 +659,7 @@ const LabsAndRequisitions = () => {
                         className="listCardContent"
                         style={{
                           flex: "0 0 200px",
-                          width: window.innerWidth <= 480 ? "100%" : "auto"
+                          width: window.innerWidth <= 480 ? "100%" : "auto",
                         }}
                       >
                         <Text style={{ fontWeight: 500 }}>
@@ -663,7 +675,7 @@ const LabsAndRequisitions = () => {
                           alignItems: "center",
                           gap: 8,
                           flex: "1",
-                          width: window.innerWidth <= 480 ? "100%" : "auto"
+                          width: window.innerWidth <= 480 ? "100%" : "auto",
                         }}
                       >
                         {getFileIcon(file?.filename || file?.name)}
@@ -684,8 +696,11 @@ const LabsAndRequisitions = () => {
                           display: "flex",
                           gap: 10,
                           width: window.innerWidth <= 480 ? "100%" : "auto",
-                          justifyContent: window.innerWidth <= 480 ? "flex-end" : "flex-start",
-                          flexShrink: 0
+                          justifyContent:
+                            window.innerWidth <= 480
+                              ? "flex-end"
+                              : "flex-start",
+                          flexShrink: 0,
                         }}
                       >
                         <DeleteOutlined
@@ -701,27 +716,28 @@ const LabsAndRequisitions = () => {
           </div>
 
           <div className="childCard" style={{ flex: 1 }}>
+
             <div
               style={{
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                marginBottom: "45px",
+                flexDirection: window.innerWidth <= 480 ? "column" : "row",
+                gap: window.innerWidth <= 480 ? "10px" : "0",
               }}
             >
-              <Button
-                type="link"
-                style={{ color: "#00ADEF", fontWeight: "bold", padding: 0 }}
-                onClick={() => {
-                  if (bloodWorkFile2?.length >= 2) {
-                    message.error("You can only upload a maximum of 2 files.");
-                    return;
-                  }
-                  openModal("newRequisition");
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  cursor: "pointer",
                 }}
+                onClick={() => openModal("editRequisition")}
               >
-                + Add Requisition
-              </Button>
+                <EditOutlined style={{ fontSize: "16px", color: "#1890ff" }} />
+                <Text strong> Edit Requisition</Text>
+              </div>
               <Text
                 type="secondary"
                 style={{ fontStyle: "italic", fontSize: "14px" }}
@@ -730,14 +746,30 @@ const LabsAndRequisitions = () => {
               </Text>
             </div>
 
+            <Button
+              type="primary"
+              style={{
+                marginTop: 10,
+                marginBottom: 10,
+                background: "#00ADEF",
+              }}
+              onClick={() => {
+                if (bloodWorkFile2?.length >= 2) {
+                  message.error("You can only upload a maximum of 2 files.");
+                  return;
+                }
+                openModal("newRequisition");
+              }}            >
+              + Add Requisition
+            </Button>
             <Card
-              className="bloodWorkFileStyle mt-4"
+              className="bloodWorkFileStyle mt-1"
               style={{
                 border: "1px solid #C2E6F8",
               }}
             >
               {bloodWorkFile2?.map((file, index) => (
-                <Card key={index} style={{ border: "none", boxShadow: "none" }}>
+                <Card key={index} className="mt-1" style={{ border: "none", boxShadow: "none" }}>
                   <Text strong>
                     {index === 0 ? "Day 1 Requisition" : "Day 2 Requisition"}
                   </Text>
@@ -753,7 +785,7 @@ const LabsAndRequisitions = () => {
                         display: "flex",
                         alignItems: "center",
                         gap: 15,
-                        width: "100%"
+                        width: "100%",
                       }}
                     >
                       <div
@@ -762,7 +794,7 @@ const LabsAndRequisitions = () => {
                           width: "3px",
                           height: "40px",
                           backgroundColor: "red",
-                          flexShrink: 0
+                          flexShrink: 0,
                         }}
                       ></div>
 
@@ -771,7 +803,7 @@ const LabsAndRequisitions = () => {
                           display: "flex",
                           alignItems: "center",
                           gap: 8,
-                          flex: "1"
+                          flex: "1",
                         }}
                       >
                         {getFileIcon(file?.filename || file?.name)}
@@ -791,7 +823,7 @@ const LabsAndRequisitions = () => {
                         style={{
                           display: "flex",
                           gap: 10,
-                          flexShrink: 0
+                          flexShrink: 0,
                         }}
                       >
                         <DeleteOutlined
@@ -826,7 +858,6 @@ const LabsAndRequisitions = () => {
             </Card>
           </div>
         </div>
-
       </div>
 
       <Modal
@@ -879,6 +910,59 @@ const LabsAndRequisitions = () => {
                 <DeleteOutlined
                   style={{ color: "red", cursor: "pointer" }}
                   onClick={() => handleDelete(file.id)}
+                />
+              </div>
+            </List.Item>
+          )}
+        />
+      </Modal>
+
+      <Modal
+        title="REQUISITIONS"
+        open={isEditRequisitionModalVisible}
+        width={800}
+        onCancel={() => closeModal("editRequisition")}
+        footer={[
+          <Button key="cancel" onClick={() => closeModal("editRequisition")}>
+            Cancel
+          </Button>,
+          <Button key="save" type="primary" style={{ background: "green" }}>
+            Save Changes
+          </Button>,
+        ]}
+      >
+        <List
+          dataSource={bloodWorkFile2}
+          renderItem={(file) => (
+            <List.Item>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  width: "100%",
+                  gap: 15,
+                }}
+              >
+                <div
+                  style={{
+                    width: "3px",
+                    height: "40px",
+                    backgroundColor: "red",
+                  }}
+                ></div>
+                <Text>{file.filename || "Requisition"}</Text>
+                <Text>{moment(file.createdOn).format("MMMM DD, YYYY")}</Text>
+                {getFileIcon(file?.filename)}
+                <Link
+                  onClick={() =>
+                    handleDownload(file.fileRef, file?.filename)
+                  }
+                >
+                  {file.filename || "Requisition.pdf"}
+                </Link>
+                <DeleteOutlined
+                  style={{ color: "red", cursor: "pointer" }}
+                  onClick={() => handleDelete(file.fileRef)}
                 />
               </div>
             </List.Item>

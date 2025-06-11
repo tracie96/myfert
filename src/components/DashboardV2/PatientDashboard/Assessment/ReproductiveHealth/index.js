@@ -626,6 +626,7 @@ const ReproductiveHealth = ({ onComplete }) => {
     
     if (savedAnswers) {
       setAnswers(JSON.parse(savedAnswers));
+      
       if (savedIndex) {
         setCurrentQuestionIndex(parseInt(savedIndex, 10));
       }
@@ -649,9 +650,9 @@ const ReproductiveHealth = ({ onComplete }) => {
         is_family_health_concern: normalizeYesNo(patientReproductiveInfo.familyMemberWithReproductiveConcerns),
         is_trying_to_conceive_time: patientReproductiveInfo.howLongTryingToConceive || "",
         methods_trying_to_conceive: patientReproductiveInfo.methodToConceive || [],
-        methods_trying_to_conceive_other: patientReproductiveInfo.otherMethodsConceive || [],
+        methods_trying_to_conceive_other: patientReproductiveInfo.otherMethodsConceive || "",
         is_charting_cycles: patientReproductiveInfo.chartingToConceive || [],
-        is_charting_cycles_other: patientReproductiveInfo.otherChartingCycle || [],
+        is_charting_cycles_other: patientReproductiveInfo.otherChartingCycle || "",
         current_therapy: normalizeYesNo(patientReproductiveInfo.currentTherapy),
         charting_method: patientReproductiveInfo.methodFertilityAwareness || "",
         is_frequent_intercourse_cycle: patientReproductiveInfo.intercouseEachCycle || "",
@@ -671,8 +672,11 @@ const ReproductiveHealth = ({ onComplete }) => {
         pms_sympton_severity: patientReproductiveInfo.pms?.colour || "",
         cycle_spotting_sub_number: patientReproductiveInfo.midCycleSpottingFrequency?.duration || "",
         cycle_spotting_sub: patientReproductiveInfo.midCycleSpottingFrequency?.colour || "",
+        cycle_spotting_sub_number_unsure: patientReproductiveInfo?.midCycleSpottingFrequency?.duration === "0" ? "0" : "",
         cycle_spotting_sub_frq: patientReproductiveInfo.midCycleSpottingFrequency?.frequency || "",
         pms_sympton_check: patientReproductiveInfo.pms?.duration || "",
+        pms_sympton_check_unsure: patientReproductiveInfo?.pms?.duration === "0" ? "0" : "",
+
         longest_cycle_radio: patientReproductiveInfo.longestCycleLenght || "",
         longest_cycle_radio_unsure: patientReproductiveInfo?.longestCycleLenght === "0" ? "0" : "",
         average_cycle_radio: patientReproductiveInfo.averageCycleLenght || "",
@@ -724,7 +728,64 @@ const ReproductiveHealth = ({ onComplete }) => {
         setAnswers((prev) => ({
           ...prev,
           ...mappedAnswers,
+          cervical_mucus_sub: "",
+          cervical_mucus_sub_other: "",
+          Watery_mucus_colour: "",
+          Watery_mucus_colour_other: "",
+          egg_white_mucus_colour: "",
+          egg_white_mucus_colour_other: "",
+          pre_spotting_colour: "",
+          pre_spotting_colour_other: "",
         }));
+        if (patientReproductiveInfo?.menstralBleedingPelvicPain?.duration === "0") {
+          setDisabledSeverity((prev) => ({
+            ...prev,
+            duration_per_cycle_severity_pelvic_pain: true
+          }));
+        }
+        if (patientReproductiveInfo?.duringCirclePelvicPain?.duration === "0") {
+          setDisabledSeverity((prev) => ({
+            ...prev,
+            duration_per_mild_cycle_severity_pp_not_menstrual: true,
+          }));
+        }
+        if (patientReproductiveInfo?.pms?.duration === "0") {
+          setDisabledSeverity((prev) => ({
+            ...prev,
+            pms_sympton_severity: true
+          }));
+        }
+        if (patientReproductiveInfo?.midCycleSpottingFrequency?.duration === "0") {
+          setDisabledSeverity((prev) => ({
+            ...prev,
+            cycle_spotting_sub: true,
+          }));
+        }
+        if (patientReproductiveInfo?.cycleDischargeCreamy?.duration === "0") {
+          setDisabledSeverity((prev) => ({
+            ...prev,
+            cervical_mucus_sub: true,
+          }));
+        }
+        if (patientReproductiveInfo?.cycleDischargeWatery?.duration === "0") {
+          setDisabledSeverity((prev) => ({
+            ...prev,
+            Watery_mucus_colour: true,
+          }));
+        }
+        if (patientReproductiveInfo?.cycleDischargeEggWhite?.duration === "0") {
+          setDisabledSeverity((prev) => ({
+            ...prev,
+            egg_white_mucus_colour: true,
+          }));
+        }
+        if (patientReproductiveInfo?.cycleDischargeBeforePeriodSpotting?.duration === "0") {
+          setDisabledSeverity((prev) => ({
+            ...prev,
+            pre_spotting_colour: true,
+          }));
+        }
+        
         // Clear localStorage since we're using API data
         localStorage.removeItem("reproductiveHealthAnswers");
         localStorage.removeItem("currentQuestionIndex5");
@@ -1120,7 +1181,11 @@ const ReproductiveHealth = ({ onComplete }) => {
       return;
     }
     try {
-      const reproductiveHealthAnswers = JSON.parse(localStorage.getItem("reproductiveHealthAnswers")) || {};
+      const reproductiveHealthAnswers = {
+        ...(JSON.parse(localStorage.getItem("reproductiveHealthAnswers")) || {}),
+        ...answers, // 🔥 this adds the latest state!
+      };
+      
       const requestData = {
         birthControl: reproductiveHealthAnswers.relaxation_techniques === "Yes",
         hormonalBirthControl: reproductiveHealthAnswers.how_often_hormonal_bc || "N/A",
@@ -1272,7 +1337,7 @@ const ReproductiveHealth = ({ onComplete }) => {
         {subQuestion.type === "inputNumber" && (
           <InputNumber
             name={subQuestion.name}
-            value={answers[subQuestion.name] || 0}
+            value={answers[subQuestion.name] !== undefined ? answers[subQuestion.name] : ""}
             onChange={(value) => handleChange(value, subQuestion.name)}
             className="input_questtionnaire"
            // disabled={answers[subQuestion.name] === "Unsure" || answers[subQuestion.name] === "None"}
@@ -1290,7 +1355,7 @@ const ReproductiveHealth = ({ onComplete }) => {
                     max={subQuestion.name === "shortest_cycle_radio" || subQuestion.name === "average_cycle_radio" ? answers.longest_cycle_radio : undefined}
                     min={subQuestion.name === "average_cycle_radio" ? answers.shortest_cycle_radio : 0}
                     name={`${subQuestion.name}_menstrual_bleeding`}
-                    value={answers[subQuestion.name] || 0} // Default to 0 instead of undefined
+                    value={answers[subQuestion.name] !== undefined ? answers[subQuestion.name] : ""} // Default to 0 instead of undefined
                     onChange={(value) => handleChange(value, subQuestion.name)}
                     disabled={answers[`${subQuestion.name}_unsure`]}
                     className="input_questionnaire"

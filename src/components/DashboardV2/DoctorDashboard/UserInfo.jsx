@@ -1470,9 +1470,20 @@ function SwitchContent({
                               <div key={index} className="mb-2">
                                 {Object.entries(item).map(([subKey, subValue]) => (
                                   <Tag color="blue" key={subKey} className="mr-2 mb-2">
-                                    <strong>
-                                      {subKey.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase())}:
-                                    </strong> {subValue}
+                                    {subKey === "level" ? (
+                                    subValue === 0 ? "None" :
+                                    subValue === 1 ? "Mild" :
+                                    subValue === 2 ? "Moderate" :
+                                    subValue === 3 ? "Severe" :
+                                    subValue
+                                  ) : (
+                                    <>
+                                      <strong>
+                                        {subKey.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase())}:
+                                      </strong>{" "}
+                                      {subValue}
+                                    </>
+                                  )}
                                   </Tag>
                                 ))}
                               </div>
@@ -1627,8 +1638,14 @@ function SwitchContent({
                 <Descriptions.Item label="Method To Conceive">
                   {reproductiveInfo?.methodToConceive?.length ? reproductiveInfo.methodToConceive.join(', ') : "N/A"}
                 </Descriptions.Item>
+                <Descriptions.Item label="Method To Conceive other">
+                  {reproductiveInfo?.otherMethodsConceive || ""}
+                </Descriptions.Item>
                 <Descriptions.Item label="Charting To Conceive">
                   {reproductiveInfo?.chartingToConceive?.length ? reproductiveInfo.chartingToConceive.join(', ') : "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Charting To Conceive other">
+                  {reproductiveInfo?.otherChartingCycle || ""}
                 </Descriptions.Item>
                 <Descriptions.Item label="Current Therapy">
                 {reproductiveInfo?.currentTherapy === null || reproductiveInfo?.currentTherapy === undefined ? 'N/A' : (reproductiveInfo?.currentTherapy ? 'Yes' : 'No')}

@@ -1634,7 +1634,7 @@ const SymptomReview = ({ onComplete }) => {
                 marginBottom: 10,
                 display: "inline-block",
                 borderRadius: "4px",
-                color: "#fff"
+                color: "#fff",
               }}
             >
               <span>{question?.sub ? question.sub : ''}</span>
@@ -1897,7 +1897,14 @@ const SymptomReview = ({ onComplete }) => {
         return (
           <div style={{ flexDirection: "column" }}>
            {question?.sub?  <div
-              style={{ background: "#335CAD", padding: 20, marginBottom: 10 }}
+              style={{
+                background: "#335CAD",
+                padding: "10px 20px",
+                marginBottom: 10,
+                display: "inline-block",
+                borderRadius: "4px",
+                color: "#fff",
+              }}
             > {question.sub}</div>:''}
             <Radio.Group
               name={question.name}

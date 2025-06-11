@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { List, Card, Avatar, Typography, Button, Divider, Row, Col, Modal, Form, Input, Dropdown, Menu, Space, Tag } from "antd";
+import { List, Card, Avatar, Typography, Button, Divider, Row, Col, Modal, Form, Input, Dropdown, Menu, Space, Tag, Tabs } from "antd";
 import { MoreOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useDispatch } from 'react-redux';
 import { editPatientNote, fetchPatientNotes, deletePatientNote } from "../../../redux/doctorSlice";
@@ -44,6 +44,10 @@ const NotesList = ({ notes, onViewMore }) => {
   
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 1023 });
+
+  // Separate notes into drafts and completed
+  const draftNotes = notes.filter(note => note.isDraft);
+  const completedNotes = notes.filter(note => !note.isDraft);
 
   const handleEdit = (note) => {
     setSelectedNote(note);
@@ -162,8 +166,8 @@ const NotesList = ({ notes, onViewMore }) => {
 
   const columns = getResponsiveColumns();
 
-  return (
-    <Card bordered={false}>
+  const NotesListContent = ({ notesData }) => (
+    <>
       <Row gutter={[16, 16]} style={{ marginBottom: 16 }} className="header-row">
         <Col xs={24} sm={columns.profile}><b>Profile</b></Col>
         <Col xs={24} sm={columns.apptType}><b>Appt Type</b></Col>
@@ -174,7 +178,7 @@ const NotesList = ({ notes, onViewMore }) => {
       <Divider style={{ margin: "8px 0" }} />
       <List
         itemLayout="vertical"
-        dataSource={notes}
+        dataSource={notesData}
         renderItem={item => (
           <List.Item
             key={item.name + item.date}
@@ -257,7 +261,7 @@ const NotesList = ({ notes, onViewMore }) => {
                 <Text style={{ wordBreak: 'break-word' }}>{item.personalNotes || 'No personal notes'}</Text>
               </Col>
               <Col xs={24} sm={columns.actions} style={{ textAlign: isMobile ? 'left' : 'right' }}>
-            {isMobile && <Button type="primary" onClick={() => handleEdit(item)}>Edit</Button> }
+                {isMobile && <Button type="primary" onClick={() => handleEdit(item)}>Edit</Button> }
                 {!isMobile && <Dropdown overlay={menu(item)} trigger={['click']}>
                   <MoreOutlined style={{ fontSize: '20px', cursor: 'pointer' }} />
                 </Dropdown> }
@@ -266,7 +270,30 @@ const NotesList = ({ notes, onViewMore }) => {
           </List.Item>
         )}
       />
-  
+    </>
+  );
+
+  const items = [
+    {
+      key: '1',
+      label: `Completed Notes (${completedNotes.length})`,
+      children: <NotesListContent notesData={completedNotes} />,
+    },
+    {
+      key: '2',
+      label: `Drafts (${draftNotes.length})`,
+      children: <NotesListContent notesData={draftNotes} />,
+    },
+  ];
+
+  return (
+    <Card bordered={false}>
+      <Tabs 
+        defaultActiveKey="1" 
+        items={items}
+        style={{ marginBottom: 16 }}
+      />
+      
       <Modal
         title="Edit Note"
         open={isEditModalVisible}

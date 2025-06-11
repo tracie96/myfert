@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Modal, Input, Form, Typography, message } from "antd";
+import { Table, Button, Modal, Input, Form, Typography, message, Select, Tabs } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import Header from "./Components/Header";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { addPatientMed, getPatientMed, deletePatientBloodWork } from "../../redux/doctorSlice";
+import { addPatientMed, getPatientMed, addPatientSupplement, getPatientSupplements, deletePatientBloodWork } from "../../redux/doctorSlice";
 
 const { Text } = Typography;
 
@@ -17,33 +17,36 @@ const MedicationTable = () => {
 
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+    const [isAddSupplementModalVisible, setIsAddSupplementModalVisible] = useState(false);
     const [medications, setMedications] = useState([]);
-
+    const [supplements, setSupplements] = useState([]);
+    const [activeTab, setActiveTab] = useState("medications");
 
     const [form] = Form.useForm();
+    const [supplementForm] = Form.useForm();
     const med = useSelector((state) => state.doctor.medications);
+    const supplementsList = useSelector((state) => state.doctor.supplements);
 
     useEffect(() => {
         if (!patient.userRef) {
             setIsModalVisible(true);
         } else {
             dispatch(getPatientMed(patient.userRef));
+            dispatch(getPatientSupplements(patient.userRef));
         }
     }, [dispatch, patient.userRef]);
 
-
     useEffect(() => {
         if (med) {
-            // Update medications state whenever med changes
             setMedications(med);
         }
     }, [med]);
 
     useEffect(() => {
-        if (!patient.userRef) {
-            setIsModalVisible(true);
+        if (supplementsList) {
+            setSupplements(supplementsList);
         }
-    }, [patient.userRef]);
+    }, [supplementsList]);
 
     const handleModalClose = () => {
         navigate("/doctor");
@@ -53,9 +56,12 @@ const MedicationTable = () => {
         setIsAddModalVisible(true);
     };
 
+    const showAddSupplementModal = () => {
+        setIsAddSupplementModalVisible(true);
+    };
+
     const handleAdd = () => {
         form.validateFields().then(async (values) => {
-
             try {
                 await dispatch(
                     addPatientMed({
@@ -65,13 +71,32 @@ const MedicationTable = () => {
                 ).unwrap();
 
                 message.success("Medication added successfully!");
-                dispatch(getPatientMed(patient.userRef)); // Refresh the med list
+                dispatch(getPatientMed(patient.userRef));
+                setIsAddModalVisible(false);
+                form.resetFields();
             } catch (error) {
                 message.error("Failed to add medication.");
             }
+        });
+    };
 
-            setIsAddModalVisible(false);
-            form.resetFields();
+    const handleAddSupplement = () => {
+        supplementForm.validateFields().then(async (values) => {
+            try {
+                await dispatch(
+                    addPatientSupplement({
+                        ...values,
+                        patientRef: patient.userRef,
+                    })
+                ).unwrap();
+
+                message.success("Supplement added successfully!");
+                dispatch(getPatientSupplements(patient.userRef));
+                setIsAddSupplementModalVisible(false);
+                supplementForm.resetFields();
+            } catch (error) {
+                message.error("Failed to add supplement.");
+            }
         });
     };
 
@@ -85,7 +110,7 @@ const MedicationTable = () => {
         }
     };
 
-    const columns = [
+    const medicationColumns = [
         {
             title: "Name",
             dataIndex: "drugName",
@@ -137,12 +162,121 @@ const MedicationTable = () => {
         },
     ];
 
+    const supplementColumns = [
+        {
+            title: "Name",
+            dataIndex: "supplementName",
+            key: "name",
+            render: (text) => <strong>{text}</strong>,
+        },
+        {
+            title: "Dose",
+            dataIndex: "dose",
+            key: "dose",
+        },
+        {
+            title: "Metric",
+            dataIndex: "metric",
+            key: "metric",
+        },
+        {
+            title: "Amount",
+            dataIndex: "amount",
+            key: "amount",
+        },
+        {
+            title: "Route",
+            dataIndex: "route",
+            key: "route",
+        },
+        {
+            title: "Frequency",
+            dataIndex: "frequency",
+            key: "frequency",
+        },
+        {
+            title: "Notes",
+            dataIndex: "notes",
+            key: "notes",
+        },
+        {
+            title: "Actions",
+            key: "actions",
+            render: (_, record) => (
+                <>
+                    <Button
+                        type="link"
+                        icon={<EditOutlined />}
+                        onClick={() => console.log("Edit", record)}
+                    >
+                        Edit
+                    </Button>
+                    <Button
+                        type="link"
+                        danger
+                        icon={<DeleteOutlined />}
+                        onClick={() => handleDelete(record.key)}
+                    >
+                        Delete
+                    </Button>
+                </>
+            ),
+        },
+    ];
+
+    const items = [
+        {
+            key: 'medications',
+            label: 'Medications',
+            children: (
+                <>
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                            marginBottom: "20px",
+                            cursor: "pointer",
+                        }}
+                        onClick={showAddModal}
+                    >
+                        <PlusOutlined style={{ fontSize: "16px", color: "#1890ff" }} />
+                        <Text strong>Add New Medication</Text>
+                    </div>
+                    <Table dataSource={medications} columns={medicationColumns} pagination={false} />
+                </>
+            ),
+        },
+        {
+            key: 'supplements',
+            label: 'Supplements',
+            children: (
+                <>
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                            marginBottom: "20px",
+                            cursor: "pointer",
+                        }}
+                        onClick={showAddSupplementModal}
+                    >
+                        <PlusOutlined style={{ fontSize: "16px", color: "#1890ff" }} />
+                        <Text strong>Add New Supplement</Text>
+                    </div>
+                    <Table dataSource={supplements} columns={supplementColumns} pagination={false} />
+                </>
+            ),
+        },
+    ];
+
     return (
         <div>
             {patient ? (
                 <Header />
             ) : (
-                "Select a patient to view their labs and requisitions"
+                "Select a patient to view their medications and supplements"
             )}
 
             {/* Modal for selecting a patient */}
@@ -157,25 +291,15 @@ const MedicationTable = () => {
                 closable={false}
                 maskClosable={false}
             >
-                <p>Please select a patient to view their labs and requisitions.</p>
+                <p>Please select a patient to view their medications and supplements.</p>
             </Modal>
 
             <div className="p-6 mt-4" style={{ padding: "0 1%" }}>
-                <div
-                    style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
-                        marginBottom: "20px",
-                        cursor: "pointer",
-                    }}
-                    onClick={showAddModal}
-                >
-                    <PlusOutlined style={{ fontSize: "16px", color: "#1890ff" }} />
-                    <Text strong>Add New Medication</Text>
-                </div>
-
-                <Table dataSource={medications} columns={columns} pagination={false} />
+                <Tabs 
+                    activeKey={activeTab}
+                    onChange={setActiveTab}
+                    items={items}
+                />
             </div>
 
             {/* Modal for adding a new medication */}
@@ -223,6 +347,88 @@ const MedicationTable = () => {
                         rules={[{ required: true, message: "Please enter frequency" }]}
                     >
                         <Input />
+                    </Form.Item>
+                </Form>
+            </Modal>
+
+            {/* Modal for adding a new supplement */}
+            <Modal
+                title="Add New Supplement"
+                visible={isAddSupplementModalVisible}
+                onOk={handleAddSupplement}
+                onCancel={() => setIsAddSupplementModalVisible(false)}
+                okText="Add"
+            >
+                <Form form={supplementForm} layout="vertical">
+                    <Form.Item
+                        label="Name"
+                        name="supplementName"
+                        rules={[
+                            { required: true, message: "Please enter supplement name" },
+                        ]}
+                    >
+                        <Input />
+                    </Form.Item>
+                    <Form.Item
+                        label="Dose"
+                        name="dose"
+                        rules={[{ required: true, message: "Please enter dose" }]}
+                    >
+                        <Input />
+                    </Form.Item>
+                    <Form.Item
+                        label="Metric"
+                        name="metric"
+                        rules={[{ required: true, message: "Please select metric" }]}
+                    >
+                        <Select>
+                            <Select.Option value="mg">mg</Select.Option>
+                            <Select.Option value="g">g</Select.Option>
+                            <Select.Option value="ml">ml</Select.Option>
+                            <Select.Option value="oz">oz</Select.Option>
+                        </Select>
+                    </Form.Item>
+                    <Form.Item
+                        label="Amount"
+                        name="amount"
+                        rules={[{ required: true, message: "Please enter amount" }]}
+                    >
+                        <Input />
+                    </Form.Item>
+                    <Form.Item
+                        label="Additional Amount"
+                        name="amountExtra"
+                    >
+                        <Input />
+                    </Form.Item>
+                    <Form.Item
+                        label="Route"
+                        name="route"
+                        rules={[{ required: true, message: "Please select route" }]}
+                    >
+                        <Select>
+                            <Select.Option value="oral">Oral</Select.Option>
+                            <Select.Option value="topical">Topical</Select.Option>
+                            <Select.Option value="injection">Injection</Select.Option>
+                        </Select>
+                    </Form.Item>
+                    <Form.Item
+                        label="Frequency"
+                        name="frequency"
+                        rules={[{ required: true, message: "Please select frequency" }]}
+                    >
+                        <Select>
+                            <Select.Option value="daily">Daily</Select.Option>
+                            <Select.Option value="twice_daily">Twice Daily</Select.Option>
+                            <Select.Option value="weekly">Weekly</Select.Option>
+                            <Select.Option value="monthly">Monthly</Select.Option>
+                        </Select>
+                    </Form.Item>
+                    <Form.Item
+                        label="Notes"
+                        name="notes"
+                    >
+                        <Input.TextArea rows={4} />
                     </Form.Item>
                 </Form>
             </Modal>

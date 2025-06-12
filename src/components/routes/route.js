@@ -95,6 +95,7 @@ import ConfidentialityAgreement from "../../pages/ConfidentialityAgreement";
 import Note from "../DashboardV2/DoctorDashboard/Note";
 import PatientNote from "../DashboardV2/PatientDashboard/Note";
 import Fax from "../DashboardV2/DoctorDashboard/Fax";
+import SupplementScreen from "../DashboardV2/PatientDashboard/Supplement";
 
 //#endregion
 
@@ -236,7 +237,7 @@ const getRouter = createBrowserRouter(
         <Route path="patient/services" element={<Services />} />
         <Route path="patient/appointment" element={<PatientAppointmentList />} />
         <Route path="patient/notes" element={<PatientNote />} />
-
+        <Route path="patient/supplements" element={<SupplementScreen />} />
 
         <Route path="doctor/appointments" element={<AppointmentList />} />
         <Route path="doctor/labs" element={<LabsAndRequisitions />} />

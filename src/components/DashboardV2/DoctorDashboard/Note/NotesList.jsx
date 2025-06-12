@@ -257,7 +257,7 @@ const NotesList = ({ notes, onViewMore }) => {
                   })}
                 </ul>
               </Col>
-              <Col xs={24} sm={columns.personalNotes}>
+            <Col xs={24} sm={columns.personalNotes}>
                 <Text style={{ wordBreak: 'break-word' }}>{item.personalNotes || 'No personal notes'}</Text>
               </Col>
               <Col xs={24} sm={columns.actions} style={{ textAlign: isMobile ? 'left' : 'right' }}>

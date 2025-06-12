@@ -14,8 +14,9 @@ const SupplementScreen = () => {
     const supplements = useSelector((state) => state.patient.supplements); 
     useEffect(() => {
         dispatch(getPatientSupplements(userAuth.userRef));
-        console.log('Supplements from Redux:', supplements);
-    }, [dispatch, userAuth.userRef,supplements]);
+    }, [dispatch, userAuth.userRef]);
+
+    console.log('Supplements from Redux:', supplements);
 
     return (
         <Row gutter={[16, 16]} style={{ padding: "20px" }}>

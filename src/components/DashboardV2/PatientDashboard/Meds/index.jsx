@@ -20,9 +20,9 @@ const MedScreen = () => {
 
 
     return (
-        <Row gutter={[16, 16]} style={{ padding: "20px" }}>
-            <Col xs={24} md={18}>
-                <Row gutter={[16, 16]} align="middle">
+        <Row style={{ padding: "20px" }}>
+            <Col xs={24} md={24}>
+                <Row align="middle">
                     <Col xs={24} md={16}>
                         <Title level={4} style={{ color: "#335CAD" }}>MEDICATION & PRESCRIPTION</Title>
                         <p style={{ color: '#000' }}>
@@ -84,7 +84,7 @@ const MedScreen = () => {
                     </div>
                 </div>
             </Col>
-            <Col xs={24} md={6}>
+            {/* <Col xs={24} md={6}>
                 <div
                     style={{
                         background: "#fff",
@@ -98,14 +98,9 @@ const MedScreen = () => {
                     }}
                 >
                     <Title level={5} style={{ marginBottom: 16, fontWeight: 700 }}>Current Prescription</Title>
-                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                        <img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4c4.svg" alt="PDF" style={{ width: 32, height: 32 }} />
-                        <a href="/path/to/E-prescription.pdf" target="_blank" rel="noopener noreferrer" style={{ color: "#1890ff", fontWeight: 500 }}>
-                            E-prescription.pdf
-                        </a>
-                    </div>
+                  
                 </div>
-            </Col>
+            </Col> */}
         </Row>
     );
 };

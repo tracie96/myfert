@@ -1,0 +1,53 @@
+.prescription-download {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  margin-top: 28px;
+}
+
+.prescription-download-title {
+  color: black;
+  font-size: 0.875rem;
+  font-weight: bold;
+}
+
+.prescription-download-button {
+  display: flex;
+  align-items: stretch;
+  gap: 20px;
+  font-size: 13px;
+  color: #00ADEF;
+  font-weight: normal;
+  white-space: nowrap;
+  margin-top: 17px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: color 0.2s ease;
+}
+
+.prescription-download-button:hover {
+  color: #0088cc;
+}
+
+.prescription-download-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 173, 239, 0.5);
+}
+
+.prescription-download-icon {
+  aspect-ratio: 0.78;
+  object-fit: contain;
+  width: 25px;
+  flex-shrink: 0;
+}
+
+.prescription-download-filename {
+  color: #00ADEF;
+  flex-grow: 1;
+  flex-shrink: 1;
+  width: 105px;
+  margin: auto 0;
+} 

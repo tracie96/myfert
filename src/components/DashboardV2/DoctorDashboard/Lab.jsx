@@ -771,93 +771,90 @@ const LabsAndRequisitions = () => {
                 border: "1px solid #C2E6F8",
               }}
             >
-              {bloodWorkFile2?.map((file, index) => (
-                <Card key={index} className="mt-1" style={{ border: "none", boxShadow: "none" }}>
-                  <Text strong>
-                    {index === 0 ? "Day 1 Requisition" : "Day 2 Requisition"}
-                  </Text>
-                  <List.Item
-                    style={{
-                      borderBottom: "1px solid #f0f0f0",
-                      padding: "12px 16px",
-                    }}
-                  >
-                    <div
-                      className="labCard"
+              {bloodWorkFile2 && bloodWorkFile2.length > 0 ? (
+                bloodWorkFile2.map((file, index) => (
+                  <Card key={index} className="mt-1" style={{ border: "none", boxShadow: "none" }}>
+                    <Text strong>
+                      {index === 0 ? "Day 1 Requisition" : "Day 2 Requisition"}
+                    </Text>
+                    <List.Item
                       style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 15,
-                        width: "100%",
+                        borderBottom: "1px solid #f0f0f0",
+                        padding: "12px 16px",
                       }}
                     >
                       <div
-                        className="listCardSideBorder"
-                        style={{
-                          width: "3px",
-                          height: "40px",
-                          backgroundColor: "red",
-                          flexShrink: 0,
-                        }}
-                      ></div>
-
-                      <div
+                        className="labCard"
                         style={{
                           display: "flex",
                           alignItems: "center",
-                          gap: 8,
-                          flex: "1",
+                          gap: 15,
+                          width: "100%",
                         }}
                       >
-                        {getFileIcon(file?.filename)}
-                        <Link
-                          style={{ color: "#1890ff" }}
-                          onClick={() =>
-                            handleDownload(
-                              file.fileRef,
-                              file.filename
-                            )
-                          }
-                        >
-                          {file.fileTitle || file.filename || "Requisition.pdf"}
-                        </Link>
-                      </div>
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: 10,
-                          flexShrink: 0,
-                        }}
-                      >
-                        <DeleteOutlined
-                          style={{ color: "red", cursor: "pointer" }}
-                          onClick={() => handleDelete(file.fileRef)}
-                        />
-                      </div>
-                    </div>
-                  </List.Item>
-                </Card>
-              ))}
+                        <div
+                          className="listCardSideBorder"
+                          style={{
+                            width: "3px",
+                            height: "40px",
+                            backgroundColor: "red",
+                            flexShrink: 0,
+                          }}
+                        ></div>
 
-              {/* <Dragger
-                style={{ marginTop: 10 }}
-                showUploadList={false}
-                beforeUpload={() => {
-                  if (bloodWorkFile2?.length >= 2) {
-                    message.error("You can only upload a maximum of 2 files.");
-                    return Upload.LIST_IGNORE;
-                  }
-                  openModal("newRequisition");
-                  return false;
-                }}
-              >
-                <p className="ant-upload-drag-icon">
-                  <InboxOutlined />
-                </p>
-                <p className="ant-upload-text">Drag and drop</p>
-                <p className="ant-upload-hint">- OR -</p>
-                <p className="ant-upload-text">Browse Files</p>
-              </Dragger> */}
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 8,
+                            flex: "1",
+                          }}
+                        >
+                          {getFileIcon(file?.filename)}
+                          <Link
+                            style={{ color: "#1890ff" }}
+                            onClick={() =>
+                              handleDownload(
+                                file.fileRef,
+                                file.filename
+                              )
+                            }
+                          >
+                            {file.fileTitle || file.filename || "Requisition.pdf"}
+                          </Link>
+                        </div>
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: 10,
+                            flexShrink: 0,
+                          }}
+                        >
+                          <DeleteOutlined
+                            style={{ color: "red", cursor: "pointer" }}
+                            onClick={() => handleDelete(file.fileRef)}
+                          />
+                        </div>
+                      </div>
+                    </List.Item>
+                  </Card>
+                ))
+              ) : (
+                <div style={{ 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  padding: '40px 20px',
+                  textAlign: 'center'
+                }}>
+                  <FileOutlined style={{ fontSize: '48px', color: '#C2E6F8', marginBottom: '16px' }} />
+                  <Text style={{ color: '#666' }}>No requisitions available</Text>
+                  <Text type="secondary" style={{ fontSize: '14px', marginTop: '8px' }}>
+                    Click "+ Add Requisition" to upload a new requisition
+                  </Text>
+                </div>
+              )}
             </Card>
           </div>
         </div>

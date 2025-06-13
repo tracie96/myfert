@@ -618,7 +618,6 @@ const ReproductiveHealth = ({ onComplete }) => {
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const patientReproductiveInfo = useSelector((state) => state.intake?.patientReproductiveInfo);
   const [disabledSeverity, setDisabledSeverity] = useState({});
-  console.log(setisDisabled);
   useEffect(() => {
     // First try to load from localStorage
     const savedAnswers = localStorage.getItem("reproductiveHealthAnswers");
@@ -639,6 +638,12 @@ const ReproductiveHealth = ({ onComplete }) => {
         if (value === "Unsure") return "Unsure";
         return null;
       };
+      const mapDuration = (val) => (val === "0" || val === 0 ? 0 : val || "");
+      const mapUnsure = (val) => val === "";
+      const mapColour = (val, validOptions) => validOptions.includes(val) ? val : "Other";
+      const mapOther = (val, mainVal, validOptions) => validOptions.includes(mainVal) ? "" : (val || "");
+
+      
       const mappedAnswers = {
         relaxation_techniques: normalizeYesNo(patientReproductiveInfo.birthControl),
         how_often_hormonal_bc: patientReproductiveInfo.hormonalBirthControl || "",
@@ -649,82 +654,169 @@ const ReproductiveHealth = ({ onComplete }) => {
         is_family_health_concern: normalizeYesNo(patientReproductiveInfo.familyMemberWithReproductiveConcerns),
         is_trying_to_conceive_time: patientReproductiveInfo.howLongTryingToConceive || "",
         methods_trying_to_conceive: patientReproductiveInfo.methodToConceive || [],
-        methods_trying_to_conceive_other: patientReproductiveInfo.otherMethodsConceive || [],
+        methods_trying_to_conceive_other: patientReproductiveInfo.otherMethodsConceive || "",
         is_charting_cycles: patientReproductiveInfo.chartingToConceive || [],
-        is_charting_cycles_other: patientReproductiveInfo.otherChartingCycle || [],
+        is_charting_cycles_other: patientReproductiveInfo.otherChartingCycle || "",
         current_therapy: normalizeYesNo(patientReproductiveInfo.currentTherapy),
         charting_method: patientReproductiveInfo.methodFertilityAwareness || "",
         is_frequent_intercourse_cycle: patientReproductiveInfo.intercouseEachCycle || "",
-        // intercourse_during_fertile_sub: patientReproductiveInfo.intercourse_during_fertile || "",
         is_menstrual_pain: patientReproductiveInfo.menstrualPainDuringPeriod || [],
         is_lower_back_pain: normalizeYesNo(patientReproductiveInfo.experiencePelvicPain),
-        duration_per_cycle_pp_not_menstrual: patientReproductiveInfo.duringCirclePelvicPain?.duration || "",
-        //duration_per_cycle_pp_not_menstrual_unsure: patientReproductiveInfo.duringCirclePelvicPain?.duration || "0",
-        duration_per_mild_cycle_severity_pp_not_menstrual: patientReproductiveInfo.duringCirclePelvicPain?.colour || "",
-        duration_per_cycle_pp_not_menstrual_unsure: patientReproductiveInfo?.duringCirclePelvicPain?.duration === "0" ? "0" : "",
-
-        duration_per_cycle_pelvic_pain: patientReproductiveInfo.menstralBleedingPelvicPain?.duration || "",
-        duration_per_cycle_pelvic_pain_unsure: patientReproductiveInfo?.menstralBleedingPelvicPain?.duration === "0" ? "0" : "",
-        duration_per_cycle_severity_pelvic_pain: patientReproductiveInfo.menstralBleedingPelvicPain?.colour || "",
         is_pms_symptom: normalizeYesNo(patientReproductiveInfo.doYouPmsSymptoms),
         pms_sympton: patientReproductiveInfo.pmsSymptoms || [],
         pms_sympton_severity: patientReproductiveInfo.pms?.colour || "",
-        cycle_spotting_sub_number: patientReproductiveInfo.midCycleSpottingFrequency?.duration || "",
+        pms_sympton_check: mapDuration(patientReproductiveInfo.pms?.duration),
+        pms_sympton_check_unsure: mapUnsure(patientReproductiveInfo.pms?.duration),
+      
+        // Pelvic pain
+        duration_per_cycle_pp_not_menstrual: mapDuration(patientReproductiveInfo?.duringCirclePelvicPain?.duration),
+        duration_per_mild_cycle_severity_pp_not_menstrual: patientReproductiveInfo?.duringCirclePelvicPain?.colour || "",
+        duration_per_cycle_pp_not_menstrual_unsure: mapUnsure(patientReproductiveInfo?.duringCirclePelvicPain?.duration),
+      
+        duration_per_cycle_pelvic_pain: mapDuration(patientReproductiveInfo?.menstralBleedingPelvicPain?.duration),
+        duration_per_cycle_pelvic_pain_unsure: mapUnsure(patientReproductiveInfo?.menstralBleedingPelvicPain?.duration),
+        duration_per_cycle_severity_pelvic_pain: patientReproductiveInfo.menstralBleedingPelvicPain?.colour || "",
+      
+        // Cycle lengths
+        longest_cycle_radio: mapDuration(patientReproductiveInfo?.longestCycleLenght),
+        longest_cycle_radio_unsure: mapUnsure(patientReproductiveInfo?.longestCycleLenght),
+        average_cycle_radio: mapDuration(patientReproductiveInfo?.averageCycleLenght),
+        average_cycle_radio_unsure: mapUnsure(patientReproductiveInfo?.averageCycleLenght),
+        shortest_cycle_radio: mapDuration(patientReproductiveInfo?.shortestCycleLenght),
+        shortest_cycle_radio_unsure: mapUnsure(patientReproductiveInfo?.shortestCycleLenght),
+      
+        // Spotting
+        mid_cycle_spotting: normalizeYesNo(patientReproductiveInfo.midCycleSpotting),
+        cycle_spotting_sub_number: mapDuration(patientReproductiveInfo?.midCycleSpottingFrequency?.duration),
+        cycle_spotting_sub_number_unsure: mapUnsure(patientReproductiveInfo?.midCycleSpottingFrequency?.duration),
         cycle_spotting_sub: patientReproductiveInfo.midCycleSpottingFrequency?.colour || "",
         cycle_spotting_sub_frq: patientReproductiveInfo.midCycleSpottingFrequency?.frequency || "",
-        pms_sympton_check: patientReproductiveInfo.pms?.duration || "",
-        longest_cycle_radio: patientReproductiveInfo.longestCycleLenght || "",
-        longest_cycle_radio_unsure: patientReproductiveInfo?.longestCycleLenght === "0" ? "0" : "",
-        average_cycle_radio: patientReproductiveInfo.averageCycleLenght || "",
-        average_cycle_radio_unsure: patientReproductiveInfo?.averageCycleLenght === "0" ? "0" : "",
-        shortest_cycle_radio: patientReproductiveInfo.shortestCycleLenght || "",
-        shortest_cycle_radio_unsure: patientReproductiveInfo?.shortestCycleLenght === "0" ? "0" : "",
-        mid_cycle_spotting: normalizeYesNo(patientReproductiveInfo.midCycleSpotting),
-        cervical_mucus: patientReproductiveInfo.cycleDischargeCreamy?.duration || "",
-        cervical_mucus_unsure: patientReproductiveInfo?.cycleDischargeCreamy?.duration === "0" ? "0" : "",
+      
+        // Cervical mucus
+        cervical_mucus: mapDuration(patientReproductiveInfo?.cycleDischargeCreamy?.duration),
+        cervical_mucus_unsure: mapUnsure(patientReproductiveInfo?.cycleDischargeCreamy?.duration),
         cervical_mucus_sub: patientReproductiveInfo.cycleDischargeCreamy?.colour || "",
         cervical_mucus_sub_other: patientReproductiveInfo.otherMucusSub || "",
-        Watery_mucus_sub: patientReproductiveInfo.cycleDischargeWatery?.duration || "",
-        Watery_mucus_sub_unsure: patientReproductiveInfo?.cycleDischargeWatery?.duration === "0" ? "0" : "",
-        Watery_mucus_colour: ["White", "Other"].includes(patientReproductiveInfo.cycleDischargeWatery?.colour)
-        ? patientReproductiveInfo.cycleDischargeWatery.colour
-        : "Other",
-
-      Watery_mucus_colour_other: ["White", "Other"].includes(patientReproductiveInfo.cycleDischargeWatery?.colour)
-        ? ""
-        : (patientReproductiveInfo.otherWateryMucus || ""),
-        egg_white_mucus_sub: patientReproductiveInfo.cycleDischargeEggWhite?.duration || "",
-        egg_white_mucus_sub_unsure: patientReproductiveInfo?.cycleDischargeEggWhite?.duration === "0" ? "0" : "",
-        egg_white_mucus_colour: ["White", "Other"].includes(patientReproductiveInfo.cycleDischargeEggWhite?.colour)
-        ? patientReproductiveInfo.cycleDischargeEggWhite.colour
-        : "Other",
-
-      egg_white_mucus_colour_other: ["White", "Other"].includes(patientReproductiveInfo.cycleDischargeEggWhite?.colour)
-        ? ""
-        : (patientReproductiveInfo.otherWhiteMucus || ""),
-        pre_spotting_sub: patientReproductiveInfo.cycleDischargePrePeriod?.duration || "",
-        pre_spotting_sub_unsure: patientReproductiveInfo?.cycleDischargePrePeriod?.duration === "0" ? "0" : "",
-        pre_spotting_colour: ["None", "Pink", "Red", "Brown", "Black", "Other"].includes(patientReproductiveInfo.cycleDischargePrePeriod?.colour)
-        ? patientReproductiveInfo.cycleDischargePrePeriod.colour
-        : "Other",
       
-      pre_spotting_colour_other: ["None", "Pink", "Red", "Brown", "Black", "Other"].includes(patientReproductiveInfo.cycleDischargePrePeriod?.colour)
-        ? ""
-        : (patientReproductiveInfo.otherSpottingColour || ""),
-        after_period_spot_sub: patientReproductiveInfo.cycleDischargeAfterPeriodSpotting?.duration || "",
-        after_period_spot_sub_unsure: patientReproductiveInfo?.cycleDischargeAfterPeriodSpotting?.duration === "0" ? "0" : "",
-        after_period_spot_colour: patientReproductiveInfo.cycleDischargeAfterPeriodSpotting?.colour || "",
-        intercourse_during_fertile_sub: patientReproductiveInfo.intercouseDays || "",
-        intercourse_during_fertile_sub_unsure: patientReproductiveInfo?.intercouseDays=== "0" ? "0" : "",
-        // Add more mappings as needed...
+        Watery_mucus_sub: mapDuration(patientReproductiveInfo?.cycleDischargeWatery?.duration),
+        Watery_mucus_sub_unsure: mapUnsure(patientReproductiveInfo?.cycleDischargeWatery?.duration),
+        Watery_mucus_colour: mapColour(patientReproductiveInfo.cycleDischargeWatery?.colour, ["White", "Other"]),
+        Watery_mucus_colour_other: mapOther(patientReproductiveInfo.otherWateryMucus, patientReproductiveInfo.cycleDischargeWatery?.colour, ["White", "Other"]),
+      
+        egg_white_mucus_sub: mapDuration(patientReproductiveInfo?.cycleDischargeEggWhite?.duration),
+        egg_white_mucus_sub_unsure: mapUnsure(patientReproductiveInfo?.cycleDischargeEggWhite?.duration),
+        egg_white_mucus_colour: mapColour(patientReproductiveInfo.cycleDischargeEggWhite?.colour, ["White", "Other"]),
+        egg_white_mucus_colour_other: mapOther(patientReproductiveInfo.otherWhiteMucus, patientReproductiveInfo.cycleDischargeEggWhite?.colour, ["White", "Other"]),
+      
+        pre_spotting_sub: mapDuration(patientReproductiveInfo?.cycleDischargePrePeriod?.duration),
+        pre_spotting_sub_unsure: mapUnsure(patientReproductiveInfo?.cycleDischargePrePeriod?.duration),
+        pre_spotting_colour: mapColour(patientReproductiveInfo.cycleDischargePrePeriod?.colour, ["None", "Pink", "Red", "Brown", "Black", "Other"]),
+        pre_spotting_colour_other: mapOther(patientReproductiveInfo.otherSpottingColour, patientReproductiveInfo.cycleDischargePrePeriod?.colour, ["None", "Pink", "Red", "Brown", "Black", "Other"]),
+      
+        after_period_spot_sub: mapDuration(patientReproductiveInfo?.cycleDischargeAfterPeriodSpotting?.duration),
+        after_period_spot_sub_unsure: mapUnsure(patientReproductiveInfo?.cycleDischargeAfterPeriodSpotting?.duration),
+        after_period_spot_colour: patientReproductiveInfo?.cycleDischargeAfterPeriodSpotting?.colour || "",
+      
+        intercourse_during_fertile_sub: mapDuration(patientReproductiveInfo?.intercouseDays),
+        intercourse_during_fertile_sub_unsure: mapUnsure(patientReproductiveInfo?.intercouseDays),
       };
-      
+           
       // Only override localStorage data if we have API data
       if (Object.keys(mappedAnswers).some(key => mappedAnswers[key])) {
         setAnswers((prev) => ({
           ...prev,
           ...mappedAnswers,
         }));
+        //  Add this after setAnswers(...) inside the if (patientReproductiveInfo) block
+        const newDisabledSeverity = {};
+
+        // Match same logic as in handleChange
+        if (patientReproductiveInfo.cycleDischargeAfterPeriodSpotting?.duration === "0") {
+          newDisabledSeverity["after_period_spot_colour"] = true;
+        }
+        if (patientReproductiveInfo.cycleDischargePrePeriod?.duration === "0") {
+          newDisabledSeverity["pre_spotting_colour"] = true;
+        }
+        if (patientReproductiveInfo.cycleDischargeWatery?.duration === "0") {
+          newDisabledSeverity["Watery_mucus_colour"] = true;
+        }
+        if (patientReproductiveInfo.cycleDischargeEggWhite?.duration === "0") {
+          newDisabledSeverity["egg_white_mucus_colour"] = true;
+        }
+        if (patientReproductiveInfo.cycleDischargeCreamy?.duration === "0") {
+          newDisabledSeverity["cervical_mucus_sub"] = true;
+        }
+        if (patientReproductiveInfo.midCycleSpottingFrequency?.duration === "0") {
+          newDisabledSeverity["cycle_spotting_sub"] = true;
+        }
+        if (patientReproductiveInfo.menstralBleedingPelvicPain?.duration === "0") {
+          newDisabledSeverity["duration_per_cycle_severity_pelvic_pain"] = true;
+        }
+        if (patientReproductiveInfo.duringCirclePelvicPain?.duration === "0") {
+          newDisabledSeverity["duration_per_mild_cycle_severity_pp_not_menstrual"] = true;
+        }
+        if (patientReproductiveInfo.pms?.duration === "0") {
+          newDisabledSeverity["pms_sympton_severity"] = true;
+        };
+
+        const newCleanedAnswers = { ...mappedAnswers };
+
+        // Watery mucus
+        // if (mappedAnswers.Watery_mucus_sub === "0") {
+        //   newDisabledSeverity["Watery_mucus_colour"] = true;
+        //   newCleanedAnswers["Watery_mucus_colour"] = "";
+        //   newCleanedAnswers["Watery_mucus_colour_other"] = "";
+        // }
+
+        // // Egg white mucus
+        // if (mappedAnswers.egg_white_mucus_sub === "0") {
+        //   newDisabledSeverity["egg_white_mucus_colour"] = true;
+        //   newCleanedAnswers["egg_white_mucus_colour"] = "";
+        //   newCleanedAnswers["egg_white_mucus_colour_other"] = "";
+        // }
+
+        // // Pre spotting
+        // if (mappedAnswers.pre_spotting_sub === "0") {
+        //   newDisabledSeverity["pre_spotting_colour"] = true;
+        //   newCleanedAnswers["pre_spotting_colour"] = "";
+        //   newCleanedAnswers["pre_spotting_colour_other"] = "";
+        // }
+
+        // //  Clean & disable if duration is 0
+        // const dischargeFields = [
+        //   { sub: "Watery_mucus_sub", colour: "Watery_mucus_colour" },
+        //   { sub: "egg_white_mucus_sub", colour: "egg_white_mucus_colour" },
+        //   { sub: "pre_spotting_sub", colour: "pre_spotting_colour" }
+        // ];
+
+        // dischargeFields.forEach(({ sub, colour }) => {
+        //   if (mappedAnswers[sub] === "0") {
+        //     newDisabledSeverity[colour] = true;
+        //     newCleanedAnswers[colour] = "";                  // 🔁 Clear colour radio value
+        //     newCleanedAnswers[`${colour}_other`] = "";       // 🔁 Clear "Other" text input
+        //   }
+        // });
+
+        const clearColourIfZero = (durationField, colourField) => {
+          if (mappedAnswers[durationField] === "0") {
+            newDisabledSeverity[colourField] = true;
+            newCleanedAnswers[colourField] = "";
+            newCleanedAnswers[`${colourField}_other`] = "";
+          }
+        };
+        
+        clearColourIfZero("Watery_mucus_sub", "Watery_mucus_colour");
+        clearColourIfZero("egg_white_mucus_sub", "egg_white_mucus_colour");
+        clearColourIfZero("pre_spotting_sub", "pre_spotting_colour");
+
+        // Apply to state
+        setAnswers((prev) => ({
+          ...prev,
+          ...newCleanedAnswers,
+        }));
+
+        setDisabledSeverity(newDisabledSeverity);
+
         // Clear localStorage since we're using API data
         localStorage.removeItem("reproductiveHealthAnswers");
         localStorage.removeItem("currentQuestionIndex5");
@@ -743,15 +835,12 @@ const ReproductiveHealth = ({ onComplete }) => {
     }
     return false;
   };
-  
-  
 
   const validateQuestion = () => {
     const question = questions[currentQuestionIndex];
     const mainAnswer = answers[question.name];
     // Additional check for "Other" option
-   
-
+    
     if (isOtherOptionInvalid(question.name, mainAnswer)) {
       return false;
     }
@@ -778,14 +867,13 @@ const ReproductiveHealth = ({ onComplete }) => {
       return;
     }
     if (questions[currentQuestionIndex].name !== "cervical_mucus" && (mainAnswer === null || mainAnswer === "")) {
-      console.log(`Validation Failed: No selection made for ${question.name}`);
       return false;
     } 
     const isMainQuestionValid = mainAnswer !== undefined && mainAnswer !== "";
     if (isOtherOptionInvalid(question.name, mainAnswer)) {
       return false;
     }
-    
+
     let subQuestionsValid = true;
 
     // Handle main question validation when no subquestions are present or main answer is "No"
@@ -805,61 +893,77 @@ const ReproductiveHealth = ({ onComplete }) => {
         for (const subQuestion of question.subQuestions) {
             const subAnswer = answers[subQuestion.name];
             const subUnsure = answers[`${subQuestion.name}_unsure`];
+            // Validate "Other" selection must include input text
+            if (subAnswer === "Other") {
+              const otherInputValue = answers[`${subQuestion.name}_other`];
+              if (!otherInputValue || otherInputValue.trim() === "") {
+                subQuestionsValid = false;
+                break;
+              }
+            }
+
+            if (
+              ["longest_cycle_radio", "shortest_cycle_radio", "average_cycle_radio"].includes(subQuestion.name)
+            ) {
+              if (
+                (subAnswer === undefined || subAnswer === "" || subAnswer === null) &&
+                !subUnsure
+              ) {
+                subQuestionsValid = false;
+                return false;
+              }
+            }
             if (isOtherOptionInvalid(subQuestion.name, subAnswer)) {
               subQuestionsValid = false;
               break;
             }
             
-            // if (subAnswer === "Other" || (Array.isArray(subAnswer) && subAnswer.includes("Other"))) {
-            //   const otherFieldName = `${subQuestion.name}_other`;
-            //   if (!answers[otherFieldName] || answers[otherFieldName].trim() === "") {
-            //     subQuestionsValid = false;
-            //     return false;
-            //   }
-            // }
-            // Check if "Other" selected in main answer, ensure input is provided
-            // if (mainAnswer === "Other" || (Array.isArray(mainAnswer) && mainAnswer.includes("Other"))) {
-            //   const otherFieldName = `${question.name}_other`;
-            //   if (!answers[otherFieldName] || answers[otherFieldName].trim() === "") {
-            //     return false;
-            //   }
-            // }
             // If at least one subquestion is not unsure, set flag to false
             if (!subUnsure) {
                 allSubQuestionsUnsure = false;
             }
-            
-          // const validCervicalMucusNames = [
-          //   "cervical_mucus",
-          //   "pre_spotting_sub",
-          //   "Watery_mucus_sub",
-          //   "egg_white_mucus_sub",
-          //   "after_period_spot_sub"
-          // ];
 
-          // if (validCervicalMucusNames.includes(subQuestion.name)) {
-          //   return true;
-          // }
-
-
-            // Validate number_with_radio_sub questions if not "Unsure" 
             if (subQuestion.type === "number_with_radio_sub") {
               const parsed = Number(subAnswer);
               const subUnsure = answers[`${subQuestion.name}_unsure`];
-              // ⛔ Only validate if NOT unsure and NOT 0
-              if (!subUnsure && (subAnswer === undefined || subAnswer === "" || isNaN(parsed) || parsed <= 0)) {
+            
+              const hasValue = !(subAnswer === undefined || subAnswer === "" || isNaN(parsed));
+              const isZero = parsed === 0;
+            
+              // ✅ Block 1: Validation FAIL — if no input and not unsure, but related field has value
+              const relatedRadioFields = {
+                cervical_mucus_sub: "cervical_mucus",
+                Watery_mucus_sub: "Watery_mucus_colour",
+                egg_white_mucus_sub: "egg_white_mucus_colour",
+                pre_spotting_sub: "pre_spotting_colour",
+                after_period_spot_sub: "after_period_spot_colour",
+                duration_per_cycle_pelvic_pain: "duration_per_cycle_severity_pelvic_pain",
+                duration_per_cycle_pp_not_menstrual: "duration_per_mild_cycle_severity_pp_not_menstrual",
+                cycle_spotting_sub_number: "cycle_spotting_sub",
+                pms_sympton_check: "pms_sympton_severity"
+              };
+            
+              const relatedField = relatedRadioFields[subQuestion.name];
+              const relatedAnswer = answers[relatedField];
+            
+              if (!hasValue && !subUnsure && relatedAnswer) {
+                // ❌ Input missing but severity/colour selected → fail
                 subQuestionsValid = false;
-                break;
+                return false;
               }
             
-              // ✅ Skip further validation (like dependent severity) if duration is 0
-              if (!isNaN(parsed) && parsed === 0) {
-                // Skip: it's intentionally 0, so no severity required
-                continue;
+              // ✅ Block 2: Input is 0 → skip severity/colour
+              if (hasValue && isZero) {
+                return true;
+              }
+            
+              // ✅ Block 3: If no input and not unsure at all → also fail
+              if (!hasValue && !subUnsure) {
+                subQuestionsValid = false;
+                return false;
               }
             }
             
-            // Validate radio questions
             if (subQuestion.type === "radio") {
               const skipValidationMap = {
                 duration_per_cycle_severity_pelvic_pain: "duration_per_cycle_pelvic_pain",
@@ -875,15 +979,16 @@ const ReproductiveHealth = ({ onComplete }) => {
             
               const controllingField = skipValidationMap[subQuestion.name];
               const controllingValue = answers[controllingField];
-              const skip = controllingValue === 0 || controllingValue === "0" || answers[`${controllingField}_unsure`] === true;
-
+              const isDisabled = disabledSeverity?.[subQuestion.name];  // ✅ NEW LINE
+            
+              const skip = isDisabled || controllingValue === 0 || controllingValue === "0";
             
               if (!subAnswer && !skip) {
                 subQuestionsValid = false;
                 break;
               }
             }
-               
+
             // Validate checkbox questions
              if (subQuestion.type === "checkbox") {
                 if (!subAnswer || !Array.isArray(subAnswer) || subAnswer.length === 0) {
@@ -934,29 +1039,34 @@ const ReproductiveHealth = ({ onComplete }) => {
   const handleChange = (value, name) => {
     let updatedAnswers = { ...answers };
     // Handle disabling of color/severity when unsure is selected
-    if (name.endsWith("_unsure") && value === true) {
+    if (name.endsWith("_unsure")) {
       const baseName = name.replace("_unsure", "");
-
-      // These are the corresponding fields to disable/clear
       const relatedDisables = {
-        cervical_mucus: "cervical_mucus_sub",
-        Watery_mucus_sub: "Watery_mucus_colour",
-        egg_white_mucus_sub: "egg_white_mucus_colour",
-        pre_spotting_sub: "pre_spotting_colour",
-        after_period_spot_sub: "after_period_spot_colour",
-        duration_per_cycle_pelvic_pain: "duration_per_cycle_severity_pelvic_pain",
-        duration_per_cycle_pp_not_menstrual: "duration_per_mild_cycle_severity_pp_not_menstrual",
-        pms_sympton_check: "pms_sympton_severity",
-        cycle_spotting_sub_number: "cycle_spotting_sub",
-        intercourse_during_fertile_sub: null, // Optional: for completeness
+        duration_per_cycle_pp_not_menstrual: ["duration_per_mild_cycle_severity_pp_not_menstrual"],
+        cervical_mucus: ["cervical_mucus_sub"],
+        Watery_mucus_sub: ["Watery_mucus_colour", "Watery_mucus_colour_other"],
+        egg_white_mucus_sub: ["egg_white_mucus_colour", "egg_white_mucus_colour_other"],
+        pre_spotting_sub: ["pre_spotting_colour", "pre_spotting_colour_other"],
+        after_period_spot_sub: ["after_period_spot_colour"],
+        pms_sympton_check: ["pms_sympton_severity"],
+        cycle_spotting_sub_number: ["cycle_spotting_sub"]
       };
 
-      const relatedField = relatedDisables[baseName];
-      if (relatedField) {
-        updatedAnswers[relatedField] = "";
-        setDisabledSeverity((prev) => ({ ...prev, [relatedField]: true }));
+      const relatedFields = relatedDisables[baseName];
+      if (Array.isArray(relatedFields)) {
+        relatedFields.forEach((field) => {
+          // enable field when unsure is checked
+          setDisabledSeverity((prev) => ({ ...prev, [field]: false }));
+        });
       }
-    }
+
+      updatedAnswers[name] = value;
+
+      // If unsure is selected, clear the base field
+      if (value === true) {
+        updatedAnswers[baseName] = "";
+      }
+    } 
 
     if (
       name === "duration_per_cycle_pelvic_pain" ||
@@ -1009,6 +1119,8 @@ const ReproductiveHealth = ({ onComplete }) => {
       const relatedColourField = dischargeMap[name];
       if (value === 0 || value === "0") {
         updatedAnswers[relatedColourField] = "";
+        // clear the corresponding *_other field if it exists
+        updatedAnswers[`${relatedColourField}_other`] = "";
         setDisabledSeverity((prev) => ({ ...prev, [relatedColourField]: true }));
       } else {
         setDisabledSeverity((prev) => ({ ...prev, [relatedColourField]: false }));
@@ -1070,10 +1182,28 @@ const ReproductiveHealth = ({ onComplete }) => {
         updatedAnswers[name] = value;
       }
     } 
-    if (name && name.includes("_unsure")) {
-      updatedAnswers[name] = value;
-      if (value) {
-        updatedAnswers[name.replace("_unsure", "")] = "";
+    // If unsure checkbox is selected, re-enable severity/colour field
+    if (name.endsWith("_unsure") && value === true) {
+      const baseField = name.replace("_unsure", "");
+
+      const reverseDischargeMap = {
+        cervical_mucus: "cervical_mucus_sub",
+        Watery_mucus_sub: "Watery_mucus_colour",
+        egg_white_mucus_sub: "egg_white_mucus_colour",
+        pre_spotting_sub: "pre_spotting_colour",
+        after_period_spot_sub: "after_period_spot_colour",
+        cycle_spotting_sub_number: "cycle_spotting_sub",
+        duration_per_cycle_pelvic_pain: "duration_per_cycle_severity_pelvic_pain",
+        duration_per_cycle_pp_not_menstrual: "duration_per_mild_cycle_severity_pp_not_menstrual",
+        pms_sympton_check: "pms_sympton_severity",
+      };
+
+      const relatedField = reverseDischargeMap[baseField];
+      if (relatedField) {
+        setDisabledSeverity((prev) => ({
+          ...prev,
+          [relatedField]: false,  // ✅ Re-enable related field
+        }));
       }
     } else {
       updatedAnswers[name] = value;
@@ -1120,7 +1250,11 @@ const ReproductiveHealth = ({ onComplete }) => {
       return;
     }
     try {
+      localStorage.setItem("reproductiveHealthAnswers", JSON.stringify(answers));
       const reproductiveHealthAnswers = JSON.parse(localStorage.getItem("reproductiveHealthAnswers")) || {};
+      const formatDuration = (value) => {
+        return value === "" || value === null || value === undefined ? null : String(value);
+      };
       const requestData = {
         birthControl: reproductiveHealthAnswers.relaxation_techniques === "Yes",
         hormonalBirthControl: reproductiveHealthAnswers.how_often_hormonal_bc || "N/A",
@@ -1128,89 +1262,99 @@ const ReproductiveHealth = ({ onComplete }) => {
         currentlyPregnant: reproductiveHealthAnswers.isPregnant === "Yes",
         tryingToConceive: reproductiveHealthAnswers.is_trying_to_conceive === "Yes",
         difficultyTryingToConceive: reproductiveHealthAnswers.is_difficulty_to_conceive === "Yes",
-        familyMemberWithReproductiveConcerns: 
-          reproductiveHealthAnswers.is_family_health_concern === "Yes"
-            ? "Yes"
-            : reproductiveHealthAnswers.is_family_health_concern || "No",
-        howLongTryingToConceive: reproductiveHealthAnswers.is_trying_to_conceive === "Yes" ? (reproductiveHealthAnswers.is_trying_to_conceive_time || "N/A") : "N/A",
+        familyMemberWithReproductiveConcerns: reproductiveHealthAnswers.is_family_health_concern === "Yes"
+          ? "Yes"
+          : reproductiveHealthAnswers.is_family_health_concern || "No",
+        howLongTryingToConceive: reproductiveHealthAnswers.is_trying_to_conceive === "Yes"
+          ? (reproductiveHealthAnswers.is_trying_to_conceive_time || "N/A")
+          : "N/A",
         methodToConceive: reproductiveHealthAnswers?.methods_trying_to_conceive || [],
         otherMethodsConceive: reproductiveHealthAnswers?.methods_trying_to_conceive_other || "",
         chartingToConceive: reproductiveHealthAnswers.is_charting_cycles || [],
         otherChartingCycle: reproductiveHealthAnswers?.is_charting_cycles_other || "",
         utilizingFertilityAwareness: reproductiveHealthAnswers.current_therapy === "Yes",
         methodFertilityAwareness: reproductiveHealthAnswers.charting_method || "N/A",
-        intercouseDays: reproductiveHealthAnswers.intercourse_during_fertile_sub || "N/A",
+        intercouseDays: formatDuration(reproductiveHealthAnswers.intercourse_during_fertile_sub),
         intercouseEachCycle: reproductiveHealthAnswers.is_frequent_intercourse_cycle || "N/A",
         menstrualPainDuringPeriod: reproductiveHealthAnswers.is_menstrual_pain || [],
         menstralBleedingPelvicPain: {
-          duration: String(reproductiveHealthAnswers.duration_per_cycle_pelvic_pain || "0"),
+          duration: formatDuration(reproductiveHealthAnswers.duration_per_cycle_pelvic_pain),
           colour: reproductiveHealthAnswers.duration_per_cycle_severity_pelvic_pain || "N/A"
         },
         experiencePelvicPain: reproductiveHealthAnswers.is_lower_back_pain === "Yes",
         duringCirclePelvicPain: {
-          duration: String(reproductiveHealthAnswers.duration_per_cycle_pp_not_menstrual || "0"),
+          duration: formatDuration(reproductiveHealthAnswers.duration_per_cycle_pp_not_menstrual),
           colour: reproductiveHealthAnswers.duration_per_mild_cycle_severity_pp_not_menstrual || "N/A"
         },
         doYouPmsSymptoms: reproductiveHealthAnswers.is_pms_symptom === "Yes",
         pmsSymptoms: reproductiveHealthAnswers.pms_sympton || [],
         pms: {
-          duration: String(reproductiveHealthAnswers.pms_sympton_check || "0"),
+          duration: formatDuration(reproductiveHealthAnswers.pms_sympton_check),
           colour: reproductiveHealthAnswers.pms_sympton_severity || "N/A"
         },
-        longestCycleLenght: String(reproductiveHealthAnswers.longest_cycle_radio || "0"),
-        shortestCycleLenght: String(reproductiveHealthAnswers.shortest_cycle_radio || "0"),
-        averageCycleLenght: String(reproductiveHealthAnswers.average_cycle_radio || "0"),
+        longestCycleLenght: formatDuration(reproductiveHealthAnswers.longest_cycle_radio),
+        shortestCycleLenght: formatDuration(reproductiveHealthAnswers.shortest_cycle_radio),
+        averageCycleLenght: formatDuration(reproductiveHealthAnswers.average_cycle_radio),
         midCycleSpotting: reproductiveHealthAnswers.mid_cycle_spotting === "Yes",
         midCycleSpottingFrequency: reproductiveHealthAnswers.mid_cycle_spotting === "Yes" ? {
           frequency: reproductiveHealthAnswers.cycle_spotting_sub_frq || "None",
-          duration: String(reproductiveHealthAnswers.cycle_spotting_sub_number || "0"),
+          duration: formatDuration(reproductiveHealthAnswers.cycle_spotting_sub_number),
           colour: reproductiveHealthAnswers.cycle_spotting_sub || "None"
         } : {
           frequency: "None",
-          duration: "0",
+          duration: null,
           colour: "None"
         },
         menstralCycleFrequency: reproductiveHealthAnswers.menstralCycleFrequency || "Unknown",
         menstralCycleDuration: reproductiveHealthAnswers.menstralCycleDuration || "Unknown",
         menstralCycleColour: reproductiveHealthAnswers.menstralCycleColour || "Unknown",
         cycleDischargeCreamy: {
-          duration: String(reproductiveHealthAnswers.cervical_mucus || "0"),
+          duration: formatDuration(reproductiveHealthAnswers.cervical_mucus),
           colour: reproductiveHealthAnswers.cervical_mucus_sub || "N/A"
         },
         otherMucusSub: reproductiveHealthAnswers.cervical_mucus_sub_other || "",
         cycleDischargeWatery: {
-          duration: String(reproductiveHealthAnswers.Watery_mucus_sub || "0"),
+          duration: formatDuration(reproductiveHealthAnswers.Watery_mucus_sub),
           colour: reproductiveHealthAnswers.Watery_mucus_colour === "Other"
             ? reproductiveHealthAnswers.Watery_mucus_colour_other
             : (reproductiveHealthAnswers.Watery_mucus_colour || "N/A")
         },
         otherWateryMucus: reproductiveHealthAnswers.Watery_mucus_colour_other || "",
         cycleDischargeEggWhite: {
-          duration: String(reproductiveHealthAnswers.egg_white_mucus_sub || "0"),
+          duration: formatDuration(reproductiveHealthAnswers.egg_white_mucus_sub),
           colour: reproductiveHealthAnswers.egg_white_mucus_colour === "Other"
             ? reproductiveHealthAnswers.egg_white_mucus_colour_other
             : (reproductiveHealthAnswers.egg_white_mucus_colour || "N/A")
         },
         otherWhiteMucus: reproductiveHealthAnswers.egg_white_mucus_colour_other || "",
         cycleDischargePrePeriod: {
-          duration: String(reproductiveHealthAnswers.pre_spotting_sub || "0"),
+          duration: formatDuration(reproductiveHealthAnswers.pre_spotting_sub),
           colour: reproductiveHealthAnswers.pre_spotting_colour === "Other"
             ? reproductiveHealthAnswers.pre_spotting_colour_other
             : (reproductiveHealthAnswers.pre_spotting_colour || "N/A")
         },
         otherSpottingColour: reproductiveHealthAnswers.pre_spotting_colour_other || "",
         cycleDischargeMenstralBleeding: {
-          duration: String(reproductiveHealthAnswers.menstrual_bleeding_sub+ ", " +reproductiveHealthAnswers.days_light_bleeding+ ", " +reproductiveHealthAnswers.days_moderate_bleeding+ ", " +reproductiveHealthAnswers.days_heavy_bleeding+ ", " +reproductiveHealthAnswers.days_very_heavy_bleeding || "N/A"),
+          duration: reproductiveHealthAnswers.menstrual_bleeding_sub !== undefined
+            ? String(
+                reproductiveHealthAnswers.menstrual_bleeding_sub + ", " +
+                reproductiveHealthAnswers.days_light_bleeding + ", " +
+                reproductiveHealthAnswers.days_moderate_bleeding + ", " +
+                reproductiveHealthAnswers.days_heavy_bleeding + ", " +
+                reproductiveHealthAnswers.days_very_heavy_bleeding
+              )
+            : "N/A",
           colour: reproductiveHealthAnswers.menstrual_bleeding_sub_colour || "N/A",
           clots: reproductiveHealthAnswers.menstrual_bleeding_sub_clots || "N/A"
         },
         cycleDischargeAfterPeriodSpotting: {
-          duration: String(reproductiveHealthAnswers.after_period_spot_sub || "0"),
+          duration: formatDuration(reproductiveHealthAnswers.after_period_spot_sub),
           colour: reproductiveHealthAnswers.after_period_spot_colour || "N/A"
         },
         chartBase64: reproductiveHealthAnswers.charting_method || "",
         currentTherapy: reproductiveHealthAnswers.current_therapy === "Yes"
       };
+      
       const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
       const token = userInfo.obj?.token || "";
   
@@ -1272,7 +1416,7 @@ const ReproductiveHealth = ({ onComplete }) => {
         {subQuestion.type === "inputNumber" && (
           <InputNumber
             name={subQuestion.name}
-            value={answers[subQuestion.name] || 0}
+            value={answers[`${subQuestion.name}_unsure`] ? null : (answers[subQuestion.name] ?? "")}
             onChange={(value) => handleChange(value, subQuestion.name)}
             className="input_questtionnaire"
            // disabled={answers[subQuestion.name] === "Unsure" || answers[subQuestion.name] === "None"}
@@ -1290,7 +1434,7 @@ const ReproductiveHealth = ({ onComplete }) => {
                     max={subQuestion.name === "shortest_cycle_radio" || subQuestion.name === "average_cycle_radio" ? answers.longest_cycle_radio : undefined}
                     min={subQuestion.name === "average_cycle_radio" ? answers.shortest_cycle_radio : 0}
                     name={`${subQuestion.name}_menstrual_bleeding`}
-                    value={answers[subQuestion.name] || 0} // Default to 0 instead of undefined
+                    value={answers[`${subQuestion.name}_unsure`] ? null : (answers[subQuestion.name] ?? "")} // Default to 0 instead of undefined
                     onChange={(value) => handleChange(value, subQuestion.name)}
                     disabled={answers[`${subQuestion.name}_unsure`]}
                     className="input_questionnaire"
@@ -1441,7 +1585,7 @@ const ReproductiveHealth = ({ onComplete }) => {
            name={subQuestion.name}
            className="radioGroup"
            onChange={(e) => handleChange(e.target.value, subQuestion.name)}
-           value={answers[subQuestion.name]}
+           value={disabledSeverity[subQuestion.name] ? undefined : answers[subQuestion.name]}
            disabled={disabledSeverity[subQuestion.name]}
            style={{ width: "100%" }}
          >
@@ -1459,7 +1603,7 @@ const ReproductiveHealth = ({ onComplete }) => {
                  >
                   <span style={{ verticalAlign: 'text-bottom' }}>{option}</span>
                  </Radio>
-                 {option === "Other" && answers[subQuestion.name]?.includes("Other") && (
+                 {option === "Other" && answers[subQuestion.name] === "Other" && !disabledSeverity[subQuestion.name] && (
                    <Input
                      className="input_questionnaire"
 

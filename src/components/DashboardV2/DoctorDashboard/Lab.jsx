@@ -8,6 +8,8 @@ import {
   Modal,
   Button,
   Input,
+  Row,
+  Col,
 } from "antd";
 import {
   FilePdfOutlined,
@@ -32,6 +34,15 @@ import moment from "moment";
 const { Dragger } = Upload;
 const { Text, Link } = Typography;
 
+// Add responsive breakpoints
+const breakpoints = {
+  xs: 480,
+  sm: 576,
+  md: 768,
+  lg: 992,
+  xl: 1200,
+};
+
 const LabsAndRequisitions = () => {
   const [files, setFiles] = useState([]);
   const dispatch = useDispatch();
@@ -51,9 +62,19 @@ const LabsAndRequisitions = () => {
   const [isNewRequisitionVisible, setIsNewRequisitionVisible] = useState(false);
   const [newRequisitionFile, setNewRequisitionFile] = useState(null);
   const [newRequisitionName, setNewRequisitionName] = useState("");
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const navigate = useNavigate();
   const documoData = useSelector((state) => state.doctor.documoData);
   const documoLoading = useSelector((state) => state.doctor.documoLoading);
+
+  // Add window resize listener
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const isMobile = windowWidth <= breakpoints.sm;
 
   console.log({ bloodWorkFile1, bloodWorkFile2, documoData, documoLoading });
   const openModal = (modalType) => {
@@ -415,9 +436,150 @@ const LabsAndRequisitions = () => {
         <p>Please select a patient to view their labs and requisitions.</p>
       </Modal>
 
+      <div className="p-6 mt-4" style={{ padding: "24px" }}>
+        <Typography.Title level={4} style={{ marginBottom: "30px" }}>
+          LABS AND REQUISITIONS
+        </Typography.Title>
+
+        <Row gutter={[24, 24]}>
+          <Col xs={24} md={16}>
+            <div style={{ marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <Text type="secondary">
+                Last updated:{" "}
+                {(files || []).length > 0
+                  ? moment(files[files.length - 1].date).format("MMMM DD, YYYY")
+                  : "N/A"}
+              </Text>
+            </div>
+
+            <Button
+              type="primary"
+              style={{
+                marginBottom: "16px",
+                background: "#00ADEF",
+                width: "100%",
+                maxWidth: "200px",
+              }}
+              onClick={() => openModal("newLabResult")}
+            >
+              + New Lab Result
+            </Button>
+
+            <Card style={{ border: "1px solid #C2E6F8" }}>
+              <List
+                dataSource={files || []}
+                renderItem={(file) => (
+                  <List.Item>
+                    <Row align="middle" style={{ width: "100%" }}>
+                      <Col xs={24} md={1}>
+                        <div style={{ width: "3px", height: "40px", backgroundColor: "red" }} />
+                      </Col>
+                      <Col xs={24} md={6}>
+                        <Text strong>{file.name}</Text>
+                      </Col>
+                      <Col xs={24} md={6}>
+                        <Text>{moment(file.date).format("MMMM DD, YYYY")}</Text>
+                      </Col>
+                      <Col xs={24} md={9} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        {getFileIcon(file?.filename || file?.name)}
+                        <Link
+                          style={{ color: "#1890ff" }}
+                          onClick={() => handleDownload(file.id, file?.filename || file?.name)}
+                        >
+                          {file.title}
+                        </Link>
+                      </Col>
+                      <Col xs={24} md={2} style={{ textAlign: "right" }}>
+                        <DeleteOutlined
+                          style={{ color: "red", cursor: "pointer" }}
+                          onClick={() => handleDelete(file.id)}
+                        />
+                      </Col>
+                    </Row>
+                  </List.Item>
+                )}
+              />
+            </Card>
+          </Col>
+
+          <Col xs={24} md={8}>
+            <div style={{ marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <Text type="secondary" style={{ fontStyle: "italic", fontSize: "14px" }}>
+                (max 2)
+              </Text>
+            </div>
+
+            <Button
+              type="primary"
+              style={{
+                marginBottom: "16px",
+                background: "#00ADEF",
+                width: "100%",
+                maxWidth: "200px",
+              }}
+              onClick={() => {
+                if ((bloodWorkFile2 || []).length >= 2) {
+                  message.error("You can only upload a maximum of 2 files.");
+                  return;
+                }
+                openModal("newRequisition");
+              }}
+            >
+              + Add Requisition
+            </Button>
+
+            <Card style={{ border: "1px solid #C2E6F8" }}>
+              <List
+                dataSource={bloodWorkFile2 || []}
+                renderItem={(file, index) => (
+                  <List.Item>
+                    <div style={{ width: "100%" }}>
+                      <Text strong style={{ display: "block", marginBottom: "16px" }}>
+                        {index === 0 ? "Day 1 Requisition" : "Day 2 Requisition"}
+                      </Text>
+                      <Row align="middle" gutter={[16, 16]}>
+                        <Col xs={24} md={1}>
+                          <div style={{ width: "3px", height: "40px", backgroundColor: "red" }} />
+                        </Col>
+                        <Col xs={24} md={6}>
+                          <Text strong>{file.fileTitle || file.filename || "Requisition.pdf"}</Text>
+                        </Col>
+                        <Col xs={24} md={6}>
+                          <Text>{moment(file.createdOn).format("MMMM DD, YYYY")}</Text>
+                        </Col>
+                        <Col xs={24} md={9} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                          {getFileIcon(file?.filename)}
+                          <Link
+                            style={{ color: "#1890ff" }}
+                            onClick={() => handleDownload(file.fileRef, file.filename)}
+                          >
+                            {file.fileTitle || file.filename || "Requisition.pdf"}
+                          </Link>
+                        </Col>
+                        <Col xs={24} md={2} style={{ textAlign: "right" }}>
+                          <DeleteOutlined
+                            style={{ color: "red", cursor: "pointer" }}
+                            onClick={() => handleDelete(file.fileRef)}
+                          />
+                        </Col>
+                      </Row>
+                    </div>
+                  </List.Item>
+                )}
+              />
+            </Card>
+          </Col>
+        </Row>
+      </div>
+
       <Modal
         title={
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <div style={{ 
+            display: "flex", 
+            alignItems: "center", 
+            gap: "10px",
+            fontSize: isMobile ? '16px' : '20px'
+          }}>
             <LeftOutlined
               onClick={() => closeModal("newLabResult")}
               style={{ cursor: "pointer" }}
@@ -427,6 +589,8 @@ const LabsAndRequisitions = () => {
         }
         open={isNewLabResultVisible}
         onCancel={() => closeModal("newLabResult")}
+        width={isMobile ? '100%' : 520}
+        style={{ top: isMobile ? 0 : 100 }}
         footer={[
           <Button key="cancel" onClick={() => closeModal("newLabResult")}>
             Cancel
@@ -468,7 +632,7 @@ const LabsAndRequisitions = () => {
             setNewLabResultFile(file);
             return false;
           }}
-          fileList={newLabResultFile ? [newLabResultFile] : []}
+          style={{ padding: isMobile ? '12px' : '24px' }}
         >
           <p className="ant-upload-drag-icon">
             <UploadOutlined />
@@ -486,7 +650,12 @@ const LabsAndRequisitions = () => {
 
       <Modal
         title={
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <div style={{ 
+            display: "flex", 
+            alignItems: "center", 
+            gap: "10px",
+            fontSize: isMobile ? '16px' : '20px'
+          }}>
             <LeftOutlined
               onClick={() => closeModal("newRequisition")}
               style={{ cursor: "pointer" }}
@@ -496,6 +665,8 @@ const LabsAndRequisitions = () => {
         }
         open={isNewRequisitionVisible}
         onCancel={() => closeModal("newRequisition")}
+        width={isMobile ? '100%' : 520}
+        style={{ top: isMobile ? 0 : 100 }}
         footer={[
           <Button key="cancel" onClick={() => closeModal("newRequisition")}>
             Cancel
@@ -537,7 +708,7 @@ const LabsAndRequisitions = () => {
             setNewRequisitionFile(file);
             return false;
           }}
-          fileList={newRequisitionFile ? [newRequisitionFile] : []}
+          style={{ padding: isMobile ? '12px' : '24px' }}
         >
           <p className="ant-upload-drag-icon">
             <UploadOutlined />
@@ -552,282 +723,6 @@ const LabsAndRequisitions = () => {
           </div>
         )}
       </Modal>
-
-      <div className="p-6 mt-4" style={{ padding: "0 1%" }}>
-        <p style={{ fontWeight: "bold", marginBottom: "30px" }}>
-          LABS AND REQUISITIONS
-        </p>
-
-        <div
-          className="labCard"
-          style={{
-            display: "flex",
-            gap: 20,
-            flexDirection: window.innerWidth <= 768 ? "column" : "row",
-          }}
-        >
-          <div className="childCard" style={{ flex: 2 }}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                flexDirection: window.innerWidth <= 480 ? "column" : "row",
-                gap: window.innerWidth <= 480 ? "10px" : "0",
-              }}
-            >
-              
-              <Text
-                type="secondary"
-                style={{
-                  textAlign: window.innerWidth <= 480 ? "center" : "right",
-                }}
-              >
-                Last updated:{" "}
-                {(files || []).length > 0
-                  ? moment(files[files.length - 1].date).format("MMMM DD, YYYY")
-                  : "N/A"}
-              </Text>
-            </div>
-
-            <Button
-              type="primary"
-              style={{
-                marginTop: 10,
-                marginBottom: 10,
-                background: "#00ADEF",
-              }}
-              onClick={() => openModal("newLabResult")}
-            >
-              + New Lab Result
-            </Button>
-
-            <Card style={{ border: "1px solid #C2E6F8" }} className="mt-1">
-              <List
-                dataSource={files || []}
-                renderItem={(file) => (
-                  <List.Item
-                    style={{
-                      borderBottom: "1px solid #f0f0f0",
-                      padding: "12px 16px",
-                      flexDirection:
-                        window.innerWidth <= 480 ? "column" : "row",
-                      gap: window.innerWidth <= 480 ? "10px" : "0",
-                    }}
-                  >
-                    <div
-                      className="listCard"
-                      style={{
-                        display: "flex",
-                        alignItems:
-                          window.innerWidth <= 480 ? "flex-start" : "center",
-                        gap: 15,
-                        width: "100%",
-                        flexDirection:
-                          window.innerWidth <= 480 ? "column" : "row",
-                      }}
-                    >
-                      <div
-                        className="listCardSideBorder"
-                        style={{
-                          width: window.innerWidth <= 480 ? "100%" : "3px",
-                          height: window.innerWidth <= 480 ? "3px" : "40px",
-                          backgroundColor: "red",
-                          flexShrink: 0,
-                        }}
-                      ></div>
-
-                      <div
-                        className="listCardContent"
-                        style={{
-                          flex: "0 0 200px",
-                          width: window.innerWidth <= 480 ? "100%" : "auto",
-                        }}
-                      >
-                        <Text style={{ fontWeight: 500 }}>{file.name}</Text>
-                        <br />
-                      </div>
-                      <div
-                        className="listCardContent"
-                        style={{
-                          flex: "0 0 200px",
-                          width: window.innerWidth <= 480 ? "100%" : "auto",
-                        }}
-                      >
-                        <Text style={{ fontWeight: 500 }}>
-                          {file.date
-                            ? moment(file.date).format("MMMM DD, YYYY")
-                            : "No date available"}
-                        </Text>
-                        <br />
-                      </div>
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 8,
-                          flex: "1",
-                          width: window.innerWidth <= 480 ? "100%" : "auto",
-                        }}
-                      >
-                        {getFileIcon(file?.filename || file?.name)}
-                        <Link
-                          style={{ color: "#1890ff" }}
-                          onClick={() =>
-                            handleDownload(
-                              file.id,
-                              file?.filename || file?.name
-                            )
-                          }
-                        >
-                          {file.title}
-                        </Link>
-                      </div>
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: 10,
-                          width: window.innerWidth <= 480 ? "100%" : "auto",
-                          justifyContent:
-                            window.innerWidth <= 480
-                              ? "flex-end"
-                              : "flex-start",
-                          flexShrink: 0,
-                        }}
-                      >
-                        <DeleteOutlined
-                          style={{ color: "red", cursor: "pointer" }}
-                          onClick={() => handleDelete(file.id)}
-                        />
-                      </div>
-                    </div>
-                  </List.Item>
-                )}
-              />
-            </Card>
-          </div>
-
-          <div className="childCard" style={{ flex: 1 }}>
-
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                flexDirection: window.innerWidth <= 480 ? "column" : "row",
-                gap: window.innerWidth <= 480 ? "10px" : "0",
-              }}
-            >
-            
-              <Text
-                type="secondary"
-                style={{ fontStyle: "italic", fontSize: "14px" }}
-              >
-                (max 2)
-              </Text>
-            </div>
-
-            <Button
-              type="primary"
-              style={{
-                marginTop: 10,
-                marginBottom: 10,
-                background: "#00ADEF",
-              }}
-              onClick={() => {
-                if ((bloodWorkFile2 || []).length >= 2) {
-                  message.error("You can only upload a maximum of 2 files.");
-                  return;
-                }
-                openModal("newRequisition");
-              }}            >
-              + Add Requisition
-            </Button>
-            <Card
-              className="bloodWorkFileStyle mt-1"
-              style={{
-                border: "1px solid #C2E6F8",
-              }}
-            >
-              <List
-                dataSource={bloodWorkFile2 || []}
-                renderItem={(file, index) => (
-                  <List.Item>
-                    <div className="labCard" style={{ width: "100%" }}>
-                      <Text strong>
-                        {index === 0 ? "Day 1 Requisition" : "Day 2 Requisition"}
-                      </Text>
-                      <div style={{ display: "flex", alignItems: "center", gap: 15, width: "100%" }}>
-                        <div
-                          className="listCardSideBorder"
-                          style={{
-                            width: "3px",
-                            height: "40px",
-                            backgroundColor: "red",
-                            flexShrink: 0,
-                          }}
-                        ></div>
-                        <div
-                          className="listCardContent"
-                          style={{
-                            flex: "0 0 200px",
-                            width: window.innerWidth <= 480 ? "100%" : "auto",
-                          }}
-                        >
-                          <Text style={{ fontWeight: 500 }}>{file.fileTitle || file.filename || "Requisition.pdf"}</Text>
-                          <br />
-                        </div>
-                        <div
-                          className="listCardContent"
-                          style={{
-                            flex: "0 0 200px",
-                            width: window.innerWidth <= 480 ? "100%" : "auto",
-                          }}
-                        >
-                          <Text style={{ fontWeight: 500 }}>
-                            {moment(file.createdOn).format("MMMM DD, YYYY")}
-                          </Text>
-                          <br />
-                        </div>
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 8,
-                            flex: "1",
-                            width: window.innerWidth <= 480 ? "100%" : "auto",
-                          }}
-                        >
-                          {getFileIcon(file?.filename)}
-                          <Link
-                            style={{ color: "#1890ff" }}
-                            onClick={() => handleDownload(file.fileRef, file.filename)}
-                          >
-                            {file.fileTitle || file.filename || "Requisition.pdf"}
-                          </Link>
-                        </div>
-                        <div
-                          style={{
-                            display: "flex",
-                            gap: 10,
-                            flexShrink: 0,
-                          }}
-                        >
-                          <DeleteOutlined
-                            style={{ color: "red", cursor: "pointer" }}
-                            onClick={() => handleDelete(file.fileRef)}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </List.Item>
-                )}
-              
-              />
-            </Card>
-          </div>
-        </div>
-      </div>
 
       <Modal
         title="LAB RESULTS"

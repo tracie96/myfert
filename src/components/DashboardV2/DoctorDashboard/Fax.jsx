@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, Table, Typography, Button, message } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import moment from 'moment';
@@ -11,10 +11,19 @@ const Fax = () => {
   const dispatch = useDispatch();
   const documoData = useSelector((state) => state.doctor.documoData);
   const documoLoading = useSelector((state) => state.doctor.documoLoading);
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 5,
+    total: 0
+  });
 
   useEffect(() => {
     dispatch(fetchDocumo());
   }, [dispatch]);
+
+  const handleTableChange = (newPagination, filters, sorter) => {
+    setPagination(newPagination);
+  };
 
   const handleDownload = async (messageNumber) => {
     try {
@@ -93,7 +102,14 @@ const Fax = () => {
           dataSource={tableData}
           loading={documoLoading}
           rowKey="messageNumber"
-          pagination={{ pageSize: 5 }}
+          onChange={handleTableChange}
+          pagination={{
+            position: ['bottomRight'],
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+            total: tableData.length,
+            showSizeChanger: true
+          }}
           scroll={{ x: true }}
         />
       </Card>

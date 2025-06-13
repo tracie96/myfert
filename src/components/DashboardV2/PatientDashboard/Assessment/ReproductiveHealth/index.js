@@ -866,11 +866,20 @@ const ReproductiveHealth = ({ onComplete }) => {
     }
     if (
       questions[currentQuestionIndex].name === "relaxation_techniques" &&
-      answers["relaxation_techniques"] === "Yes" &&
-      (!answers["how_often_hormonal_bc"] || !answers["how_often_non_hormonal_bc"])
+      answers["relaxation_techniques"] === "Yes"
     ) {
-      return;
+      const hormonal = answers["how_often_hormonal_bc"];
+      const nonHormonal = answers["how_often_non_hormonal_bc"];
+    
+      // ❌ Fail if both are missing
+      if (!hormonal && !nonHormonal) {
+        return false;
+      }
+    
+      // ✅ Pass if either is filled
+      return true;
     }
+    
     if (
       questions[currentQuestionIndex].name === "current_therapy" &&
       answers["current_therapy"] === "Yes" &&
@@ -944,7 +953,7 @@ const ReproductiveHealth = ({ onComplete }) => {
             
               // ✅ Block 1: Validation FAIL — if no input and not unsure, but related field has value
               const relatedRadioFields = {
-                cervical_mucus_sub: "cervical_mucus",
+                cervical_mucus: "cervical_mucus_sub",
                 Watery_mucus_sub: "Watery_mucus_colour",
                 egg_white_mucus_sub: "egg_white_mucus_colour",
                 pre_spotting_sub: "pre_spotting_colour",

@@ -905,7 +905,7 @@ export default function PatDash() {
                 backgroundColor: "#335CAD",
                 borderRadius: "12px 12px 0 0",
                 height: "61px",
-                display: "flex",
+                display: "none",
                 alignItems: "center",
                 justifyContent: "left",
               }}
@@ -931,6 +931,7 @@ export default function PatDash() {
                 backgroundColor: "#fff",
                 borderColor: "#C2E6F8",
                 borderStyle: "solid",
+                display: "none",
               }}
             >
               <p>You have no upcoming bloodwork.</p>
@@ -943,7 +944,7 @@ export default function PatDash() {
                 backgroundColor: "#335CAD",
                 borderRadius: "12px 12px 0 0",
                 height: "61px",
-                display: "flex",
+                display: "none",
                 alignItems: "center",
                 justifyContent: "left",
               }}
@@ -965,6 +966,7 @@ export default function PatDash() {
                 padding: "16px 24px",
                 borderRadius: 12,
                 borderWidth: "1px",
+                display: "none",
                 marginTop: -10,
                 backgroundColor: "#fff",
                 borderColor: "#C2E6F8",

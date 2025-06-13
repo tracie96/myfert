@@ -356,7 +356,7 @@ const LabsAndRequisitions = () => {
       return;
     }
 
-    if (bloodWorkFile2?.length >= 2) {
+    if ((bloodWorkFile2 || []).length >= 2) {
       message.error("You can only upload a maximum of 2 files.");
       return;
     }
@@ -584,7 +584,7 @@ const LabsAndRequisitions = () => {
                 }}
               >
                 Last updated:{" "}
-                {files.length > 0
+                {(files || []).length > 0
                   ? moment(files[files.length - 1].date).format("MMMM DD, YYYY")
                   : "N/A"}
               </Text>
@@ -604,7 +604,7 @@ const LabsAndRequisitions = () => {
 
             <Card style={{ border: "1px solid #C2E6F8" }} className="mt-1">
               <List
-                dataSource={files}
+                dataSource={files || []}
                 renderItem={(file) => (
                   <List.Item
                     style={{
@@ -735,7 +735,7 @@ const LabsAndRequisitions = () => {
                 background: "#00ADEF",
               }}
               onClick={() => {
-                if (bloodWorkFile2?.length >= 2) {
+                if ((bloodWorkFile2 || []).length >= 2) {
                   message.error("You can only upload a maximum of 2 files.");
                   return;
                 }
@@ -750,7 +750,7 @@ const LabsAndRequisitions = () => {
               }}
             >
               <List
-                dataSource={bloodWorkFile2}
+                dataSource={bloodWorkFile2 || []}
                 renderItem={(file, index) => (
                   <List.Item>
                     <div className="labCard" style={{ width: "100%" }}>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState }  from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Dropdown, Menu } from "antd";
+import { Dropdown, Menu, Avatar } from "antd";
 import {
   UserOutlined,
   DownOutlined,
@@ -11,8 +11,6 @@ import {
 import { NavLink } from "react-router-dom";
 import { useMediaQuery } from "react-responsive";
 import { getUserProfile } from "../redux/AuthController";
-
-const defaultIconImage = "img/undraw_profile.svg";
 
 const UserDropdown = ({ userAuth, setShowModal }) => {
   const profileUser = useSelector((state) => state.profile.userData);
@@ -71,14 +69,13 @@ const UserDropdown = ({ userAuth, setShowModal }) => {
         onClick={(e) => e.preventDefault()}
         style={{ display: "flex", alignItems: "center"}}
       >
-        <img src={displayUser || defaultIconImage} alt={userAuth.obj.firstName} style={{ width: 42, height: 32, borderRadius: "50%", marginRight: 8 }} />
-        {/* <Avatar
-          src={displayUser?.profile || userAuth.obj.profile || defaultIconImage}
+        <Avatar
+          src={displayUser}
           alt={userAuth.obj.firstName}
           icon={<UserOutlined />}
-          size="small"
+          size={42}
           style={{ marginRight: 8 }}
-        /> */}
+        />
         {isMobile?"":
         <span style={{ marginRight: 8, color: "#595959", fontSize: "14px" }}>
           {displayUser?.firstName || userAuth.obj.firstName} {displayUser?.lastName || userAuth.obj.lastName}

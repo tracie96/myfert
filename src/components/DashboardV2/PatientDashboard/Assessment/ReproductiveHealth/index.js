@@ -957,7 +957,13 @@ const ReproductiveHealth = ({ onComplete }) => {
             
               const relatedField = relatedRadioFields[subQuestion.name];
               const relatedAnswer = answers[relatedField];
-            
+              console.log(hasValue, parsed, relatedAnswer);
+              
+              if (hasValue && parsed > 0 && (!relatedAnswer || relatedAnswer === "" || relatedAnswer === "N/A")) {
+                subQuestionsValid = false;
+                return false;
+              }
+              
               if (!hasValue && !subUnsure && relatedAnswer) {
                 // ❌ Input missing but severity/colour selected → fail
                 subQuestionsValid = false;

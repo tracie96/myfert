@@ -107,7 +107,7 @@ const questions = [
     question: "Which techniques do you use? (Check all that apply)",
     type: "checkbox",
     name: "special_nutritional_program",
-    options: ["Meditation", "Breathing", "Tai Chi", "Yoga", "Prayer", "Other"],
+    options: ["Meditation", "Breathing", "Tai Chi", "Yoga", "Prayer", "N/A"],
   },
   {
     question: "Have you ever sought counseling?",

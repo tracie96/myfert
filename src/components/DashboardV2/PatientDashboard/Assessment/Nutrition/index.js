@@ -280,19 +280,19 @@ const questions = [
         question: "If yes, check amount:",
         type: "radio",
         name: "coffee_amount",
-        options: ["1", "2-4", "More than 4", "none"],
+        options: ["1", "2-4", "More than 4", "N/A"],
         label: "Coffee (cups per day)",
       },
       {
         type: "radio",
         name: "tea_amount",
-        options: ["1", "2-4", "More than 4", "None"],
+        options: ["1", "2-4", "More than 4", "N/A"],
         label: "Tea (cups per day)",
       },
       {
         type: "radio",
         name: "soda_amount",
-        options: ["1", "2-4", "More than 4", "None"],
+        options: ["1", "2-4", "More than 4", "N/A"],
         label: "Caffeinated sodas—regular or diet (cans per day)",
       },
     ],
@@ -314,7 +314,7 @@ const questions = [
     question: "When you drink caffeine do you feel:",
     type: "checkbox",
     name: "sensitive_food_caffeine_feel",
-    options: ["Irritable or weird", "Aches or pains", "Other"],
+    options: ["Irritable or weird", "Aches or pains", "N/A"],
     subQuestions: [
       {
         question: "Other",

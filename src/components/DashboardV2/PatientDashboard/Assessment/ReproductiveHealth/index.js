@@ -691,7 +691,7 @@ const ReproductiveHealth = ({ onComplete }) => {
         cycle_spotting_sub_number: mapDuration(patientReproductiveInfo?.midCycleSpottingFrequency?.duration),
         cycle_spotting_sub_number_unsure: mapUnsure(patientReproductiveInfo?.midCycleSpottingFrequency?.duration),
         cycle_spotting_sub: patientReproductiveInfo.midCycleSpottingFrequency?.colour || "",
-        cycle_spotting_sub_number_unsure: patientReproductiveInfo?.midCycleSpottingFrequency?.duration === "0" ? "0" : "",
+        // cycle_spotting_sub_number_unsure: patientReproductiveInfo?.midCycleSpottingFrequency?.duration === "0" ? "0" : "",
         cycle_spotting_sub_frq: patientReproductiveInfo.midCycleSpottingFrequency?.frequency || "",
       
         // Cervical mucus
@@ -1387,7 +1387,7 @@ const ReproductiveHealth = ({ onComplete }) => {
   
       if (response.ok) {
         const result = await response.json();
-        console.log("API response:", result);
+        console.log("API response:", result, setisDisabled);
         message.success("Form submitted successfully!");
         // Clear localStorage after successful submission
         localStorage.removeItem("reproductiveHealthAnswers");

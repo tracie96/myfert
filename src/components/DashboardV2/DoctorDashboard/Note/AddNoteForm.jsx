@@ -7,8 +7,47 @@ const { Option } = Select;
 const AddNoteForm = ({ onClose, onSubmit, isLoading }) => {
   const [form] = Form.useForm();
 
+  const validateFields = (values) => {
+    const requiredFields = [
+      'appointmentType',
+      'subjective',
+      'objective',
+      'assessment',
+      'patientPlan',
+      'personalNote'
+    ];
+    
+    const missingFields = requiredFields.filter(field => !values[field]);
+    return missingFields;
+  };
+
   const handleSubmit = async (values, isDraft) => {
     try {
+      if (!isDraft) {
+        // Only validate all fields for final submission
+        const missingFields = validateFields(values);
+        if (missingFields.length > 0) {
+          message.error('Please fill in all required fields before submitting');
+          return;
+        }
+      } else {
+        // For drafts, set empty strings for any unfilled fields
+        const requiredFields = [
+          'appointmentType',
+          'subjective',
+          'objective',
+          'assessment',
+          'patientPlan',
+          'personalNote'
+        ];
+        
+        requiredFields.forEach(field => {
+          if (!values[field]) {
+            values[field] = field === 'appointmentType' ? 1 : ''; // Default appointmentType to 1 if not selected
+          }
+        });
+      }
+
       await onSubmit({
         ...values,
         isDraft
@@ -31,7 +70,6 @@ const AddNoteForm = ({ onClose, onSubmit, isLoading }) => {
       <Form.Item
         name="appointmentType"
         label="Appointment Type"
-        rules={[{ required: true, message: 'Please select appointment type' }]}
       >
         <Select placeholder="Select appointment type">
           <Option value={1}>Follow-Up</Option>
@@ -43,7 +81,6 @@ const AddNoteForm = ({ onClose, onSubmit, isLoading }) => {
       <Form.Item
         name="subjective"
         label="Subjective"
-        rules={[{ required: true, message: 'Please enter subjective notes' }]}
       >
         <TextArea 
           rows={4} 
@@ -54,7 +91,6 @@ const AddNoteForm = ({ onClose, onSubmit, isLoading }) => {
       <Form.Item
         name="objective"
         label="Objective"
-        rules={[{ required: true, message: 'Please enter objective findings' }]}
       >
         <TextArea 
           rows={4} 
@@ -65,7 +101,6 @@ const AddNoteForm = ({ onClose, onSubmit, isLoading }) => {
       <Form.Item
         name="assessment"
         label="Assessment"
-        rules={[{ required: true, message: 'Please enter assessment' }]}
       >
         <TextArea 
           rows={4} 
@@ -76,7 +111,6 @@ const AddNoteForm = ({ onClose, onSubmit, isLoading }) => {
       <Form.Item
         name="patientPlan"
         label="Plan (Visible to Patient)"
-        rules={[{ required: true, message: 'Please enter treatment plan' }]}
         extra="This section will be visible to the patient after submission"
       >
         <TextArea 
@@ -88,7 +122,6 @@ const AddNoteForm = ({ onClose, onSubmit, isLoading }) => {
       <Form.Item
         name="personalNote"
         label="Personal Notes"
-        rules={[{ required: true, message: 'Please enter personal notes' }]}
       >
         <TextArea 
           rows={4} 
@@ -103,9 +136,8 @@ const AddNoteForm = ({ onClose, onSubmit, isLoading }) => {
           </Button>
 
           <Button onClick={() => {
-            form.validateFields()
-              .then(values => handleSubmit(values, true))
-              .catch(err => console.error('Validation failed:', err));
+            const values = form.getFieldsValue();
+            handleSubmit(values, true);
           }}>
             Save as Draft
           </Button>

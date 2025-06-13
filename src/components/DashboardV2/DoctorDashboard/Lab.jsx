@@ -576,18 +576,7 @@ const LabsAndRequisitions = () => {
                 gap: window.innerWidth <= 480 ? "10px" : "0",
               }}
             >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  cursor: "pointer",
-                }}
-                onClick={() => openModal("editLabResult")}
-              >
-                <EditOutlined style={{ fontSize: "16px", color: "#1890ff" }} />
-                <Text strong>Edit Lab Result</Text>
-              </div>
+              
               <Text
                 type="secondary"
                 style={{
@@ -729,18 +718,7 @@ const LabsAndRequisitions = () => {
                 gap: window.innerWidth <= 480 ? "10px" : "0",
               }}
             >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  cursor: "pointer",
-                }}
-                onClick={() => openModal("editRequisition")}
-              >
-                <EditOutlined style={{ fontSize: "16px", color: "#1890ff" }} />
-                <Text strong> Edit Requisition</Text>
-              </div>
+            
               <Text
                 type="secondary"
                 style={{ fontStyle: "italic", fontSize: "14px" }}
@@ -771,27 +749,15 @@ const LabsAndRequisitions = () => {
                 border: "1px solid #C2E6F8",
               }}
             >
-              {bloodWorkFile2 && bloodWorkFile2.length > 0 ? (
-                bloodWorkFile2.map((file, index) => (
-                  <Card key={index} className="mt-1" style={{ border: "none", boxShadow: "none" }}>
-                    <Text strong>
-                      {index === 0 ? "Day 1 Requisition" : "Day 2 Requisition"}
-                    </Text>
-                    <List.Item
-                      style={{
-                        borderBottom: "1px solid #f0f0f0",
-                        padding: "12px 16px",
-                      }}
-                    >
-                      <div
-                        className="labCard"
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 15,
-                          width: "100%",
-                        }}
-                      >
+              <List
+                dataSource={bloodWorkFile2}
+                renderItem={(file, index) => (
+                  <List.Item>
+                    <div className="labCard" style={{ width: "100%" }}>
+                      <Text strong>
+                        {index === 0 ? "Day 1 Requisition" : "Day 2 Requisition"}
+                      </Text>
+                      <div style={{ display: "flex", alignItems: "center", gap: 15, width: "100%" }}>
                         <div
                           className="listCardSideBorder"
                           style={{
@@ -801,24 +767,41 @@ const LabsAndRequisitions = () => {
                             flexShrink: 0,
                           }}
                         ></div>
-
+                        <div
+                          className="listCardContent"
+                          style={{
+                            flex: "0 0 200px",
+                            width: window.innerWidth <= 480 ? "100%" : "auto",
+                          }}
+                        >
+                          <Text style={{ fontWeight: 500 }}>{file.fileTitle || file.filename || "Requisition.pdf"}</Text>
+                          <br />
+                        </div>
+                        <div
+                          className="listCardContent"
+                          style={{
+                            flex: "0 0 200px",
+                            width: window.innerWidth <= 480 ? "100%" : "auto",
+                          }}
+                        >
+                          <Text style={{ fontWeight: 500 }}>
+                            {moment(file.createdOn).format("MMMM DD, YYYY")}
+                          </Text>
+                          <br />
+                        </div>
                         <div
                           style={{
                             display: "flex",
                             alignItems: "center",
                             gap: 8,
                             flex: "1",
+                            width: window.innerWidth <= 480 ? "100%" : "auto",
                           }}
                         >
                           {getFileIcon(file?.filename)}
                           <Link
                             style={{ color: "#1890ff" }}
-                            onClick={() =>
-                              handleDownload(
-                                file.fileRef,
-                                file.filename
-                              )
-                            }
+                            onClick={() => handleDownload(file.fileRef, file.filename)}
                           >
                             {file.fileTitle || file.filename || "Requisition.pdf"}
                           </Link>
@@ -836,25 +819,11 @@ const LabsAndRequisitions = () => {
                           />
                         </div>
                       </div>
-                    </List.Item>
-                  </Card>
-                ))
-              ) : (
-                <div style={{ 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                  padding: '40px 20px',
-                  textAlign: 'center'
-                }}>
-                  <FileOutlined style={{ fontSize: '48px', color: '#C2E6F8', marginBottom: '16px' }} />
-                  <Text style={{ color: '#666' }}>No requisitions available</Text>
-                  <Text type="secondary" style={{ fontSize: '14px', marginTop: '8px' }}>
-                    Click "+ Add Requisition" to upload a new requisition
-                  </Text>
-                </div>
-              )}
+                    </div>
+                  </List.Item>
+                )}
+              
+              />
             </Card>
           </div>
         </div>

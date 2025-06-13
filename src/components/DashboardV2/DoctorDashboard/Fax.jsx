@@ -38,9 +38,9 @@ const Fax = () => {
 
   const columns = [
     {
-      title: 'Message ID',
-      dataIndex: 'messageId',
-      key: 'messageId',
+      title: 'Message Number',
+      dataIndex: 'messageNumber',
+      key: 'messageNumber',
       ellipsis: true,
     },
     {
@@ -50,27 +50,14 @@ const Fax = () => {
       width: 100,
     },
     {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status) => (
-        <Text style={{ 
-          color: status === 'success' ? '#52c41a' : '#ff4d4f',
-          textTransform: 'capitalize'
-        }}>
-          {status}
-        </Text>
-      ),
+      title: 'Patient Name',
+      dataIndex: 'patientName',
+      key: 'patientName',
     },
     {
-      title: 'Classification',
-      dataIndex: 'classificationLabel',
-      key: 'classificationLabel',
-      render: (label) => (
-        <Text style={{ textTransform: 'capitalize' }}>
-          {label}
-        </Text>
-      ),
+      title: 'Patient Reference',
+      dataIndex: 'patientRef',
+      key: 'patientRef',
     },
     {
       title: 'Received At',
@@ -85,7 +72,7 @@ const Fax = () => {
         <Button
           type="link"
           icon={<DownloadOutlined />}
-          onClick={() => handleDownload(record.messageId)}
+          onClick={() => handleDownload(record.messageNumber)}
         >
         </Button>
       ),
@@ -105,7 +92,7 @@ const Fax = () => {
           columns={columns}
           dataSource={tableData}
           loading={documoLoading}
-          rowKey="messageId"
+          rowKey="messageNumber"
           pagination={{ pageSize: 5 }}
           scroll={{ x: true }}
         />

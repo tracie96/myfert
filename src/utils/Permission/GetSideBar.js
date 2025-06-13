@@ -63,6 +63,8 @@ export const GetSideBar = () => {
         return "9";
       case "/patient/services":
         return "6";
+      case "/patient/supplements":
+        return "11";
       case "/patient/notes":
         return "10"
      
@@ -148,6 +150,11 @@ export const GetSideBar = () => {
       <Menu.Item key="10" icon={<FaNotesMedical style={{ color: "#00ADEF" }} />}>
         <NavLink to="/patient/notes" style={{ textDecoration: "none" }}>
           <span>NOTES</span>
+        </NavLink>
+      </Menu.Item>
+      <Menu.Item key="11" icon={<FaPills style={{ color: "#00ADEF" }} />}>
+        <NavLink to="/patient/supplements" style={{ textDecoration: "none" }}>
+          <span>SUPPLEMENTS</span>
         </NavLink>
       </Menu.Item>
 

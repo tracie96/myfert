@@ -1,0 +1,102 @@
+.medication-header {
+  max-width: 100%;
+}
+
+.medication-header-container {
+  display: flex;
+  gap: 1.25rem;
+}
+
+.medication-header-left {
+  width: 45%;
+  margin-left: 0;
+}
+
+.medication-header-content {
+  display: flex;
+  flex-direction: column;
+  color: #335CAD;
+  font-weight: bold;
+  margin-top: 13px;
+  flex-grow: 1;
+}
+
+.medication-header-title {
+  color: #335CAD;
+  font-size: 1rem;
+  letter-spacing: 0.8px;
+}
+
+.medication-header-description {
+  color: black;
+  font-size: 0.875rem;
+  font-weight: normal;
+  align-self: stretch;
+  margin-top: 50px;
+}
+
+.medication-header-subtitle {
+  color: #335CAD;
+  font-size: 15px;
+  margin-top: 60px;
+}
+
+.medication-header-right {
+  width: 55%;
+  margin-left: 1.25rem;
+}
+
+.medication-header-image-container {
+  display: flex;
+  flex-direction: column;
+  font-style: italic;
+  font-size: 13px;
+  color: black;
+  font-weight: normal;
+  text-align: right;
+  flex-grow: 1;
+  max-width: 100%;
+}
+
+.medication-header-image {
+  aspect-ratio: 2.14;
+  object-fit: contain;
+  width: 419px;
+  max-width: 100%;
+}
+
+.medication-header-timestamp {
+  color: black;
+  margin-top: 37px;
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  .medication-header {
+    margin-right: 3px;
+  }
+  
+  .medication-header-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .medication-header-left,
+  .medication-header-right {
+    width: 100%;
+    margin-left: 0;
+  }
+  
+  .medication-header-content,
+  .medication-header-image-container {
+    margin-top: 2.5rem;
+  }
+  
+  .medication-header-description {
+    margin-top: 2.5rem;
+  }
+  
+  .medication-header-subtitle {
+    margin-top: 2.5rem;
+  }
+} 

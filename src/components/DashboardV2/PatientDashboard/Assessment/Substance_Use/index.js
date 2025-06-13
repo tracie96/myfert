@@ -41,7 +41,7 @@ const questions = [
         question: "What type?",
         type: "radio",
         name: "smoke_type",
-        options: ["Cigarettes", "Smokeless", "Pipe", "Cigar", "E-cig"],
+        options: ["Cigarettes", "Smokeless", "Pipe", "Cigar", "E-cig", "Other"],
       },
     ],
   },

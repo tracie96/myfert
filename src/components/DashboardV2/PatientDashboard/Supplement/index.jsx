@@ -3,33 +3,32 @@ import { Typography, Row, Col, Table } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import Lab from "../../../../assets/images/meds.svg";
 import Capsule from "../../../../assets/images/capsule.png";
-import { getPatientMed } from "../../../redux/patientSlice";
+import { getPatientSupplements } from "../../../redux/patientSlice";
 
 const { Title, Text } = Typography;
 
-
-const MedScreen = () => {
+const SupplementScreen = () => {
     const userAuth = JSON.parse(localStorage.getItem("patient") || "{}");
     const dispatch = useDispatch();
 
-    const med = useSelector((state) => state.patient.medication); // Get medications from Redux store
+    const supplements = useSelector((state) => state.patient.supplements); 
     useEffect(() => {
-        dispatch(getPatientMed(userAuth.userRef));
-        console.log('Medications from Redux:', med);
-    }, [userAuth.userRef, dispatch, med]);
+        dispatch(getPatientSupplements(userAuth.userRef));
+    }, [dispatch, userAuth.userRef]);
 
+    console.log('Supplements from Redux:', supplements);
 
     return (
         <Row gutter={[16, 16]} style={{ padding: "20px" }}>
             <Col xs={24} md={18}>
                 <Row gutter={[16, 16]} align="middle">
                     <Col xs={24} md={16}>
-                        <Title level={4} style={{ color: "#335CAD" }}>MEDICATION & PRESCRIPTION</Title>
+                        <Title level={4} style={{ color: "#335CAD" }}>SUPPLEMENTS & VITAMINS</Title>
                         <p style={{ color: '#000' }}>
-                            You can print the e-prescription and present it to your pharmacy to obtain your medication.
+                            Here you can find all your prescribed supplements and vitamins.
                         </p>
                         <p style={{ marginTop: 10, color: "#000" }}>
-                            If you have any questions or concerns about your medications, please contact your assigned clinician for assistance.
+                            If you have any questions or concerns about your supplements, please contact your assigned clinician for assistance.
                         </p>
                         <br />
                         <Text>Thanks!</Text>
@@ -42,10 +41,6 @@ const MedScreen = () => {
 
                 <br />
                 <div style={{ borderRadius: 5, marginTop: 30 }}>
-                    {/* Debug output for Redux data */}
-                    <div style={{ marginBottom: 16, color: 'red', fontSize: 12 }}>
-                        {/* Redux medications: {JSON.stringify(med)} */}
-                    </div>
                     <div
                         style={{
                             padding: "16px 24px",
@@ -62,21 +57,23 @@ const MedScreen = () => {
                           columns={[
                             {
                               title: "Name",
-                              dataIndex: "drugName",
+                              dataIndex: "supplementName",
                               key: "name",
                               render: text => (
                                 <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
                                   <img src={Capsule} alt="pill" style={{ width: 24, height: 24, marginRight: 6 }} />
-                                  <b>{text || 'Unknown Medication'}</b>
+                                  <b>{text || 'Unknown Supplement'}</b>
                                 </span>
                               )
                             },
                             { title: "Dose", dataIndex: "dose", key: "dose", render: text => text || 'N/A' },
+                            { title: "Metric", dataIndex: "metric", key: "metric", render: text => text || 'N/A' },
                             { title: "Amount", dataIndex: "amount", key: "amount", render: text => text || 'N/A' },
                             { title: "Route", dataIndex: "route", key: "route", render: text => text || 'N/A' },
                             { title: "Frequency", dataIndex: "frequency", key: "frequency", render: text => text || 'N/A' },
+                            { title: "Doctor", dataIndex: "doctorName", key: "doctorName", render: text => text || 'N/A' },
                           ]}
-                          dataSource={med}
+                          dataSource={supplements}
                           rowKey={(record, idx) => idx}
                           pagination={false}
                           style={{ background: 'transparent' }}
@@ -97,12 +94,13 @@ const MedScreen = () => {
                         justifyContent: "flex-start"
                     }}
                 >
-                    <Title level={5} style={{ marginBottom: 16, fontWeight: 700 }}>Current Prescription</Title>
-                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                        <img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4c4.svg" alt="PDF" style={{ width: 32, height: 32 }} />
-                        <a href="/path/to/E-prescription.pdf" target="_blank" rel="noopener noreferrer" style={{ color: "#1890ff", fontWeight: 500 }}>
-                            E-prescription.pdf
-                        </a>
+                    <Title level={5} style={{ marginBottom: 16, fontWeight: 700 }}>Notes</Title>
+                    <div style={{ color: "#666" }}>
+                        {supplements?.length > 0 && supplements[0]?.notes ? (
+                            <p>{supplements[0].notes}</p>
+                        ) : (
+                            <p>No additional notes available for your supplements.</p>
+                        )}
                     </div>
                 </div>
             </Col>
@@ -110,4 +108,4 @@ const MedScreen = () => {
     );
 };
 
-export default MedScreen;
+export default SupplementScreen;

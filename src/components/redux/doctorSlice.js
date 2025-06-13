@@ -738,6 +738,48 @@ export const downloadDocumo = createAsyncThunk(
   }
 );
 
+export const getPatientSupplements = createAsyncThunk(
+  'doctor/getPatientSupplements',
+  async (patientId, { rejectWithValue, getState, dispatch }) => {
+    const user = getState()?.authentication?.userAuth;
+    try {
+      const response = await axios.get(`${baseUrl}Doctor/GetPatientSupplements/${patientId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user?.obj?.token}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+export const addPatientSupplement = createAsyncThunk(
+  "doctor/addPatientSupplement",
+  async ({ supplementName, dose, metric, amount, amountExtra, route, frequency, notes, patientRef }, { rejectWithValue, getState, dispatch }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+
+    try {
+      const response = await axios.post(
+        `${baseUrl}Doctor/AddPatientSupplements`,
+        { supplementName, dose, metric, amount, amountExtra, route, frequency, notes, patientRef },
+        config
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(handleApiError(error?.response?.data, dispatch, user));
+    }
+  }
+);
+
 const doctorSlices = createSlice({
   name: "doctor",
   initialState: {
@@ -761,7 +803,10 @@ const doctorSlices = createSlice({
     deleteNoteError: null,
     documoData: [],
     documoLoading: false,
-    documoError: null
+    documoError: null,
+    supplements: [],
+    bloodWorkFile1: null,
+    bloodWorkFile2: null,
   },
   extraReducers: (builder) => {
     builder.addCase(patientList.pending, (state, action) => {
@@ -1083,6 +1128,38 @@ const doctorSlices = createSlice({
         state.documoLoading = false;
         state.documoError = action.payload;
       });
+
+    // Get Patient Supplements
+    builder.addCase(getPatientSupplements.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+    builder.addCase(getPatientSupplements.fulfilled, (state, action) => {
+      state.loading = false;
+      state.supplements = action.payload;
+    });
+    builder.addCase(getPatientSupplements.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
+
+    // Add Patient Supplement
+    builder.addCase(addPatientSupplement.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+    builder.addCase(addPatientSupplement.fulfilled, (state, action) => {
+      state.loading = false;
+      if (state.supplements) {
+        state.supplements.push(action.payload);
+      } else {
+        state.supplements = [action.payload];
+      }
+    });
+    builder.addCase(addPatientSupplement.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
   },
 });
 

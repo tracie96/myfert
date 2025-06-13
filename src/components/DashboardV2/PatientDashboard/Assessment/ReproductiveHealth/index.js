@@ -625,6 +625,7 @@ const ReproductiveHealth = ({ onComplete }) => {
     
     if (savedAnswers) {
       setAnswers(JSON.parse(savedAnswers));
+      
       if (savedIndex) {
         setCurrentQuestionIndex(parseInt(savedIndex, 10));
       }
@@ -690,11 +691,13 @@ const ReproductiveHealth = ({ onComplete }) => {
         cycle_spotting_sub_number: mapDuration(patientReproductiveInfo?.midCycleSpottingFrequency?.duration),
         cycle_spotting_sub_number_unsure: mapUnsure(patientReproductiveInfo?.midCycleSpottingFrequency?.duration),
         cycle_spotting_sub: patientReproductiveInfo.midCycleSpottingFrequency?.colour || "",
+        cycle_spotting_sub_number_unsure: patientReproductiveInfo?.midCycleSpottingFrequency?.duration === "0" ? "0" : "",
         cycle_spotting_sub_frq: patientReproductiveInfo.midCycleSpottingFrequency?.frequency || "",
       
         // Cervical mucus
         cervical_mucus: mapDuration(patientReproductiveInfo?.cycleDischargeCreamy?.duration),
         cervical_mucus_unsure: mapUnsure(patientReproductiveInfo?.cycleDischargeCreamy?.duration),
+     
         cervical_mucus_sub: patientReproductiveInfo.cycleDischargeCreamy?.colour || "",
         cervical_mucus_sub_other: patientReproductiveInfo.otherMucusSub || "",
       
@@ -726,7 +729,16 @@ const ReproductiveHealth = ({ onComplete }) => {
         setAnswers((prev) => ({
           ...prev,
           ...mappedAnswers,
+          cervical_mucus_sub: "",
+          cervical_mucus_sub_other: "",
+          Watery_mucus_colour: "",
+          Watery_mucus_colour_other: "",
+          egg_white_mucus_colour: "",
+          egg_white_mucus_colour_other: "",
+          pre_spotting_colour: "",
+          pre_spotting_colour_other: "",
         }));
+
         //  Add this after setAnswers(...) inside the if (patientReproductiveInfo) block
         const newDisabledSeverity = {};
 
@@ -1250,11 +1262,13 @@ const ReproductiveHealth = ({ onComplete }) => {
       return;
     }
     try {
+
       localStorage.setItem("reproductiveHealthAnswers", JSON.stringify(answers));
       const reproductiveHealthAnswers = JSON.parse(localStorage.getItem("reproductiveHealthAnswers")) || {};
       const formatDuration = (value) => {
         return value === "" || value === null || value === undefined ? null : String(value);
       };
+
       const requestData = {
         birthControl: reproductiveHealthAnswers.relaxation_techniques === "Yes",
         hormonalBirthControl: reproductiveHealthAnswers.how_often_hormonal_bc || "N/A",
@@ -1417,6 +1431,7 @@ const ReproductiveHealth = ({ onComplete }) => {
           <InputNumber
             name={subQuestion.name}
             value={answers[`${subQuestion.name}_unsure`] ? null : (answers[subQuestion.name] ?? "")}
+
             onChange={(value) => handleChange(value, subQuestion.name)}
             className="input_questtionnaire"
            // disabled={answers[subQuestion.name] === "Unsure" || answers[subQuestion.name] === "None"}
@@ -1435,6 +1450,7 @@ const ReproductiveHealth = ({ onComplete }) => {
                     min={subQuestion.name === "average_cycle_radio" ? answers.shortest_cycle_radio : 0}
                     name={`${subQuestion.name}_menstrual_bleeding`}
                     value={answers[`${subQuestion.name}_unsure`] ? null : (answers[subQuestion.name] ?? "")} // Default to 0 instead of undefined
+
                     onChange={(value) => handleChange(value, subQuestion.name)}
                     disabled={answers[`${subQuestion.name}_unsure`]}
                     className="input_questionnaire"

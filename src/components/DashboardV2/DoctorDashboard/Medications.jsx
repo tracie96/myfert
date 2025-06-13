@@ -384,11 +384,12 @@ const MedicationTable = () => {
         okText="Add"
         width={500}
       >
-        <div style={{ padding: "20px 0" }}>
-          <div style={{ marginBottom: "20px" }}>
-            <div style={{ fontWeight: "bold", marginBottom: "8px" }}>
-              Supplement Name
-            </div>
+        <Form form={supplementForm} layout="vertical">
+          <Form.Item
+            label="Supplement Name"
+            name="supplementName"
+            rules={[{ required: true, message: "Please enter supplement name" }]}
+          >
             <Input
               style={{
                 width: "100%",
@@ -397,106 +398,113 @@ const MedicationTable = () => {
                 border: "1px solid #d9d9d9",
               }}
             />
-          </div>
+          </Form.Item>
 
-          <div style={{ marginBottom: "20px" }}>
-            <div style={{ fontWeight: "bold", marginBottom: "8px" }}>Dose</div>
-            <div style={{ display: "flex", gap: "10px" }}>
+          <div style={{ display: "flex", gap: "10px" }}>
+            <Form.Item
+              label="Dose"
+              name="dose"
+              rules={[{ required: true, message: "Please enter dose" }]}
+              style={{ flex: 3 }}
+            >
               <Input
                 placeholder="Enter"
                 style={{
-                  flex: 3,
                   height: "40px",
                   borderRadius: "8px",
                   border: "1px solid #d9d9d9",
                 }}
               />
-              <Select
-                defaultValue="mg"
-                style={{
-                  flex: 1,
-                  height: "40px",
-                  borderRadius: "8px",
-                }}
-              >
+            </Form.Item>
+
+            <Form.Item
+              label="Metric"
+              name="metric"
+              rules={[{ required: true, message: "Please select metric" }]}
+              style={{ flex: 1 }}
+            >
+              <Select style={{ height: "40px", borderRadius: "8px" }}>
                 <Select.Option value="mg">mg</Select.Option>
                 <Select.Option value="g">g</Select.Option>
                 <Select.Option value="ml">ml</Select.Option>
               </Select>
-            </div>
+            </Form.Item>
           </div>
 
-          <div style={{ marginBottom: "20px" }}>
-            <div style={{ fontWeight: "bold", marginBottom: "8px" }}>
-              Amount
-            </div>
-            <div style={{ display: "flex", gap: "10px" }}>
+          <div style={{ display: "flex", gap: "10px" }}>
+            <Form.Item
+              label="Amount"
+              name="amount"
+              rules={[{ required: true, message: "Please enter amount" }]}
+              style={{ flex: 1 }}
+            >
               <Input
                 placeholder="Enter"
                 style={{
-                  flex: 1,
                   height: "40px",
                   borderRadius: "8px",
                   border: "1px solid #d9d9d9",
                 }}
               />
+            </Form.Item>
+
+            <Form.Item
+              label="Amount Extra"
+              name="amountExtra"
+              rules={[{ required: true, message: "Please select amount type" }]}
+              style={{ flex: 3 }}
+            >
               <Select
                 placeholder="Select"
-                style={{
-                  flex: 3,
-                  height: "40px",
-                  borderRadius: "8px",
-                }}
+                style={{ height: "40px", borderRadius: "8px" }}
               >
                 <Select.Option value="tablets">tablets</Select.Option>
                 <Select.Option value="capsules">capsules</Select.Option>
                 <Select.Option value="drops">drops</Select.Option>
               </Select>
-            </div>
+            </Form.Item>
           </div>
-          <div className="flex flex-row gap-4">
-            <div style={{ marginBottom: "20px", flex: 1 }}>
-              <div style={{ fontWeight: "bold", marginBottom: "8px" }}>
-                Route
-              </div>
+
+          <div style={{ display: "flex", gap: "10px" }}>
+            <Form.Item
+              label="Route"
+              name="route"
+              rules={[{ required: true, message: "Please select route" }]}
+              style={{ flex: 1 }}
+            >
               <Select
                 placeholder="Select"
-                className="w-full select-supplement"
-                style={{
-                  width: "100%",
-                  height: "40px",
-                  borderRadius: "8px",
-                }}
+                style={{ height: "40px", borderRadius: "8px" }}
               >
                 <Select.Option value="oral">Oral</Select.Option>
                 <Select.Option value="topical">Topical</Select.Option>
                 <Select.Option value="injection">Injection</Select.Option>
               </Select>
-            </div>
+            </Form.Item>
 
-            <div style={{ marginBottom: "20px", flex: 1 }}>
-              <div style={{ fontWeight: "bold", marginBottom: "8px" }}>
-                Frequency
-              </div>
+            <Form.Item
+              label="Frequency"
+              name="frequency"
+              rules={[{ required: true, message: "Please select frequency" }]}
+              style={{ flex: 1 }}
+            >
               <Select
                 placeholder="Select"
-                className="w-full select-supplement"
-                style={{
-                  width: "100%",
-                  height: "40px",
-                  borderRadius: "8px",
-                }}
+                style={{ height: "40px", borderRadius: "8px" }}
               >
                 <Select.Option value="daily">Daily</Select.Option>
                 <Select.Option value="twice_daily">Twice Daily</Select.Option>
                 <Select.Option value="weekly">Weekly</Select.Option>
                 <Select.Option value="monthly">Monthly</Select.Option>
               </Select>
-            </div>
+            </Form.Item>
           </div>
 
-          <div style={{ marginBottom: "20px" }}>
-            <div style={{ fontWeight: "bold", marginBottom: "8px" }}>Notes</div>
+          <Form.Item
+            label="Notes"
+            name="notes"
+            rules={[{ required: true, message: "Please enter notes" }]}
+          >
             <Input.TextArea
               rows={4}
               style={{
@@ -505,8 +513,8 @@ const MedicationTable = () => {
                 border: "1px solid #d9d9d9",
               }}
             />
-          </div>
-        </div>
+          </Form.Item>
+        </Form>
       </Modal>
     </div>
   );

@@ -58,7 +58,8 @@ const LabsAndRequisitions = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isNewLabResultVisible, setIsNewLabResultVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
-  const [isEditRequisitionModalVisible, setIsEditRequisitionModalVisible] = useState(false);
+  const [isEditRequisitionModalVisible, setIsEditRequisitionModalVisible] =
+    useState(false);
   const [newLabResultFile, setNewLabResultFile] = useState(null);
   const [newLabResultName, setNewLabResultName] = useState("");
   const [isNewRequisitionVisible, setIsNewRequisitionVisible] = useState(false);
@@ -70,26 +71,33 @@ const LabsAndRequisitions = () => {
   const documoLoading = useSelector((state) => state.doctor.documoLoading);
 
   // Filter documoData for current patient
-  const filteredDocumoData = documoData?.filter(doc => doc.patientRef === patient.userRef) || [];
+  const filteredDocumoData =
+    documoData?.filter((doc) => doc.patientRef === patient.userRef) || [];
 
   // Add window resize listener
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   // Add useEffect to fetch Documo data
   useEffect(() => {
     if (patient.userRef) {
       dispatch(fetchDocumo());
-      console.log('Fetching Documo data for patient:', patient.userRef);
+      console.log("Fetching Documo data for patient:", patient.userRef);
     }
   }, [dispatch, patient.userRef]);
 
   const isMobile = windowWidth <= breakpoints.sm;
 
-  console.log({ bloodWorkFile1, bloodWorkFile2, documoData, documoLoading, filteredDocumoData });
+  console.log({
+    bloodWorkFile1,
+    bloodWorkFile2,
+    documoData,
+    documoLoading,
+    filteredDocumoData,
+  });
   const openModal = (modalType) => {
     setIsModalVisible(false);
     setIsNewLabResultVisible(false);
@@ -188,7 +196,6 @@ const LabsAndRequisitions = () => {
           name: file.filename,
           date: file.createdOn,
           title: file.fileTitle,
-
         }))
       );
     } else if (status === "failed") {
@@ -295,12 +302,14 @@ const LabsAndRequisitions = () => {
   };
 
   const handleDelete = async (fileId) => {
-    console.log(fileId,'fila')
+    console.log(fileId, "fila");
     try {
       await dispatch(deletePatientBloodWork(fileId)).unwrap();
       // Update both files and bloodWorkFile2 states
       setFiles((prevFiles) => prevFiles.filter((file) => file.id !== fileId));
-      setBloodWorkFile2((prevFiles) => prevFiles.filter((file) => file.fileRef !== fileId));
+      setBloodWorkFile2((prevFiles) =>
+        prevFiles.filter((file) => file.fileRef !== fileId)
+      );
       message.success("File deleted successfully.");
     } catch (error) {
       message.error("Failed to delete file.");
@@ -432,20 +441,20 @@ const LabsAndRequisitions = () => {
   const handleDownloadDocumo = async (messageNumber) => {
     try {
       const response = await dispatch(downloadDocumo(messageNumber)).unwrap();
-      const blob = new Blob([response], { type: 'application/pdf' });
+      const blob = new Blob([response], { type: "application/pdf" });
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
-      link.setAttribute('download', `documo_${messageNumber}.pdf`);
+      link.setAttribute("download", `documo_${messageNumber}.pdf`);
       document.body.appendChild(link);
       link.click();
-    
+
       link.parentNode.removeChild(link);
       window.URL.revokeObjectURL(url);
-      message.success('Document downloaded successfully');
+      message.success("Document downloaded successfully");
     } catch (error) {
-      message.error('Failed to download document');
-      console.error('Download error:', error);
+      message.error("Failed to download document");
+      console.error("Download error:", error);
     }
   };
 
@@ -469,85 +478,7 @@ const LabsAndRequisitions = () => {
       >
         <p>Please select a patient to view their labs and requisitions.</p>
       </Modal>
-      <Typography.Title level={4} style={{ marginBottom: "30px" }}>
-      FAX DOCUMENTS
-        </Typography.Title>
-      <Card style={{ border: "1px solid #C2E6F8" }}>
-              <Typography.Title level={5} style={{ marginBottom: "16px" }}>
-            
-                {documoLoading && <Text type="secondary"> (Loading...)</Text>}
-              </Typography.Title>
-              
-              {documoLoading ? (
-                <div style={{ textAlign: 'center', padding: '20px' }}>
-                  Loading Documo data...
-                </div>
-              ) : filteredDocumoData.length > 0 ? (
-                <List
-                  dataSource={filteredDocumoData}
-                  renderItem={(doc) => (
-                    <List.Item>
-                      <Row align="middle" style={{ width: "100%" }}>
-                        <Col xs={24} md={1}>
-                          <div style={{ width: "3px", height: "40px", backgroundColor: "#00ADEF" }} />
-                        </Col>
-                        <Col xs={24} md={4}>
-                          <Text strong>Patient Name</Text>
-                          <div>
-                            <Text>{doc.patientName}</Text>
-                          </div>
-                        </Col>
-                        <Col xs={24} md={4}>
-                          <Text strong>Date Received</Text>
-                          <div>
-                            <Text>{moment(doc.faxReceivedAt).format("MMMM DD, YYYY")}</Text>
-                          </div>
-                        </Col>
-                        <Col xs={24} md={4}>
-                          <Text strong>Message Number</Text>
-                          <div>
-                            <Text>{doc.messageNumber}</Text>
-                          </div>
-                        </Col>
-                        <Col xs={24} md={4}>
-                          <Text strong>Pages</Text>
-                          <div>
-                            <Text>{doc.pageCount}</Text>
-                          </div>
-                        </Col>
-                        <Col xs={24} md={4}>
-                          <Text strong>Patient Ref</Text>
-                          <div>
-                            <Text>{doc.patientRef}</Text>
-                          </div>
-                        </Col>
-                        <Col xs={24} md={3} style={{ textAlign: "right" }}>
-                          <Button
-                            type="link"
-                            icon={<DownloadOutlined />}
-                            onClick={() => handleDownloadDocumo(doc.messageNumber)}
-                          >
-                            Download
-                          </Button>
-                        </Col>
-                      </Row>
-                    </List.Item>
-                  )}
-                />
-              ) : (
-                <div style={{ textAlign: 'center', padding: '20px' }}>
-                  <Text type="secondary">
-                    {patient.userRef ? 'No fax documents found for this patient' : 'Please select a patient to view their fax documents'}
-                  </Text>
-                  <div style={{ marginTop: '10px' }}>
-                    <Text type="secondary" style={{ fontSize: '12px' }}>
-                      Debug info: Patient userRef: {patient.userRef || 'none'}, 
-                      Documo data count: {documoData?.length || 0}
-                    </Text>
-                  </div>
-                </div>
-              )}
-            </Card>
+  
 
       <div className="p-6 mt-4" style={{ padding: "24px" }}>
         <Typography.Title level={4} style={{ marginBottom: "30px" }}>
@@ -556,7 +487,14 @@ const LabsAndRequisitions = () => {
 
         <Row gutter={[24, 24]}>
           <Col xs={24}>
-            <div style={{ marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div
+              style={{
+                marginBottom: "16px",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
               <Text type="secondary">
                 Last updated:{" "}
                 {(files || []).length > 0
@@ -582,49 +520,51 @@ const LabsAndRequisitions = () => {
               <List
                 dataSource={files || []}
                 renderItem={(file) => (
-                  <List.Item>
-                    <Row align="middle" style={{ width: "100%" }}>
-                      <Col xs={24} md={1}>
-                        <div style={{ width: "3px", height: "40px", backgroundColor: "red" }} />
-                      </Col>
-                      <Col xs={24} md={5}>
-                        <Text strong>File Name</Text>
-                        <div>
-                          <Text>{file.name}</Text>
-                        </div>
-                      </Col>
-                      <Col xs={24} md={5}>
-                        <Text strong>Date</Text>
-                        <div>
-                          <Text>{moment(file.date).format("MMMM DD, YYYY")}</Text>
-                        </div>
-                      </Col>
-                      <Col xs={24} md={10}>
-                        <Text strong>Document</Text>
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                          {getFileIcon(file?.filename || file?.name)}
-                          <Link
-                            style={{ color: "#1890ff" }}
-                            onClick={() => handleDownload(file.id, file?.filename || file?.name)}
-                          >
-                            {file.title}
-                          </Link>
-                        </div>
-                      </Col>
-                      <Col xs={24} md={3} style={{ textAlign: "right" }}>
-                        <DeleteOutlined
-                          style={{ color: "red", cursor: "pointer", fontSize: "18px" }}
-                          onClick={() => handleDelete(file.id)}
-                        />
-                      </Col>
-                    </Row>
+                  <List.Item style={{ padding: '16px 0' }}>
+                    <div style={{ display: "flex", alignItems: "center", width: "100%", gap: "16px" }}>
+                      <div style={{ width: "3px", height: "40px", backgroundColor: "red", flexShrink: 0 }} />
+                      <div style={{ flex: "1" }}>
+                        <Text>
+                          {isMobile 
+                            ? file.name.split(' ').slice(0, 6).join(' ') + (file.name.split(' ').length > 6 ? '...' : '')
+                            : file.name
+                          }
+                        </Text>
+                      </div>
+                      <div style={{ flex: "1" }}>
+                        <Text>{moment(file.date).format("MMMM DD, YYYY")}</Text>
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", flex: "1" }}>
+                        {getFileIcon(file?.filename || file?.name)}
+                        <Link
+                          style={{ color: "#1890ff" }}
+                          onClick={() => handleDownload(file.id, file?.filename || file?.name)}
+                        >
+                          {file.title}
+                        </Link>
+                      </div>
+                      <DeleteOutlined
+                        style={{ color: "red", cursor: "pointer", flexShrink: 0 }}
+                        onClick={() => handleDelete(file.id)}
+                      />
+                    </div>
                   </List.Item>
                 )}
               />
             </Card>
 
-            <div style={{ marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <Text type="secondary" style={{ fontStyle: "italic", fontSize: "14px" }}>
+            <div
+              style={{
+                marginBottom: "16px",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <Text
+                type="secondary"
+                style={{ fontStyle: "italic", fontSize: "14px" }}
+              >
                 (max 2 requisitions)
               </Text>
               <Button
@@ -652,66 +592,165 @@ const LabsAndRequisitions = () => {
               <List
                 dataSource={bloodWorkFile2 || []}
                 renderItem={(file, index) => (
-                  <List.Item>
-                    <Row align="middle" style={{ width: "100%" }}>
-                      <Col xs={24} md={1}>
-                        <div style={{ width: "3px", height: "40px", backgroundColor: "red" }} />
-                      </Col>
-                      <Col xs={24} md={4}>
-                        <Text strong>Type</Text>
-                        <div>
-                          <Text>{index === 0 ? "Day 1 Requisition" : "Day 2 Requisition"}</Text>
-                        </div>
-                      </Col>
-                      <Col xs={24} md={5}>
-                        <Text strong>File Name</Text>
-                        <div>
-                          <Text>{file.fileTitle || file.filename || "Requisition.pdf"}</Text>
-                        </div>
-                      </Col>
-                      <Col xs={24} md={5}>
-                        <Text strong>Date</Text>
-                        <div>
-                          <Text>{moment(file.createdOn).format("MMMM DD, YYYY")}</Text>
-                        </div>
-                      </Col>
-                      <Col xs={24} md={6}>
-                        <Text strong>Document</Text>
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                          {getFileIcon(file?.filename)}
-                          <Link
-                            style={{ color: "#1890ff" }}
-                            onClick={() => handleDownload(file.fileRef, file.filename)}
-                          >
-                            {file.fileTitle || file.filename || "Requisition.pdf"}
-                          </Link>
-                        </div>
-                      </Col>
-                      <Col xs={24} md={3} style={{ textAlign: "right" }}>
-                        <DeleteOutlined
-                          style={{ color: "red", cursor: "pointer", fontSize: "18px" }}
-                          onClick={() => handleDelete(file.fileRef)}
-                        />
-                      </Col>
-                    </Row>
+                  <List.Item style={{ padding: '16px 0' }}>
+                    <div style={{ display: "flex", alignItems: "center", width: "100%", gap: "16px" }}>
+                      <div style={{ width: "3px", height: "40px", backgroundColor: "red", flexShrink: 0 }} />
+                      <div style={{ flex: "1" }}>
+                        <Text>{index === 0 ? "Day 1 " : "Day 2 "}</Text>
+                      </div>
+                      {/* <div style={{ flex: "1" }}>
+                        <Text>{file.fileTitle || file.filename || "Requisition.pdf"}</Text>
+                      </div> */}
+                      <div style={{ flex: "1" }}>
+                        <Text>{moment(file.createdOn).format("MMMM DD, YYYY")}</Text>
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", flex: "1" }}>
+                        {getFileIcon(file?.filename)}
+                        <Link
+                          style={{ color: "#1890ff" }}
+                          onClick={() => handleDownload(file.fileRef, file.filename)}
+                        >
+                          new
+                        </Link>
+                      </div>
+                      <DeleteOutlined
+                        style={{ color: "red", cursor: "pointer", flexShrink: 0 }}
+                        onClick={() => handleDelete(file.fileRef)}
+                      />
+                    </div>
                   </List.Item>
                 )}
               />
             </Card>
+            <Typography.Title level={4} style={{ marginBottom: "30px" }}>
+        FAX DOCUMENTS
+      </Typography.Title>
+      <Card style={{ border: "1px solid #C2E6F8" }}>
+        <Typography.Title level={5} style={{ marginBottom: "16px" }}>
+          {documoLoading && <Text type="secondary"> (Loading...)</Text>}
+        </Typography.Title>
 
-       
+        {documoLoading ? (
+          <div style={{ textAlign: "center", padding: "20px" }}>
+            Loading Documo data...
+          </div>
+        ) : filteredDocumoData.length > 0 ? (
+          <List
+            dataSource={filteredDocumoData}
+            renderItem={(doc) => (
+              <List.Item style={{ padding: '16px 0' }}>
+                <div style={{ display: "flex", alignItems: "flex-start", width: "100%", gap: "16px" }}>
+                  <div style={{ width: "3px", height: "100%", minHeight: isMobile ? "300px" : "40px", backgroundColor: "#00ADEF", flexShrink: 0 }} />
+                  {isMobile ? (
+                    <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "16px" }}>
+                      <div>
+                        <Text type="secondary">Patient Name</Text>
+                        <div>
+                          <Text>{doc.patientName}</Text>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <Text type="secondary">Date Received</Text>
+                        <div>
+                          <Text>{moment(doc.faxReceivedAt).format("MMMM DD, YYYY")}</Text>
+                        </div>
+                      </div>
+
+                      <div>
+                        <Text type="secondary">Message Number</Text>
+                        <div>
+                          <Text>{doc.messageNumber}</Text>
+                        </div>
+                      </div>
+
+                      <div>
+                        <Text type="secondary">Pages</Text>
+                        <div>
+                          <Text>{doc.pageCount}</Text>
+                        </div>
+                      </div>
+
+                      <div>
+                        <Text type="secondary">Patient Ref</Text>
+                        <div>
+                          <Text>{doc.patientRef}</Text>
+                        </div>
+                      </div>
+
+                      <Button
+                        type="link"
+                        style={{ padding: 0, height: 'auto', color: '#1890ff' }}
+                        onClick={() => handleDownloadDocumo(doc.messageNumber)}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <DownloadOutlined />
+                          <span>Download</span>
+                        </div>
+                      </Button>
+                    </div>
+                  ) : (
+                    <div style={{ display: "flex", alignItems: "center", flex: 1, gap: "16px" }}>
+                      <div style={{ flex: "1" }}>
+                        <Text>{doc.patientName}</Text>
+                      </div>
+                      <div style={{ flex: "1" }}>
+                        <Text>{moment(doc.faxReceivedAt).format("MMM DD, YYYY")}</Text>
+                      </div>
+                      <div style={{ flex: "1" }}>
+                        <Text>{doc.messageNumber}</Text>
+                      </div>
+                      <div style={{ flex: "0 0 50px" }}>
+                        <Text>{doc.pageCount}</Text>
+                      </div>
+                      <div style={{ flex: "1" }}>
+                        <Text>{doc.patientRef}</Text>
+                      </div>
+                      <Button
+                        type="link"
+                        style={{ flexShrink: 0 }}
+                        onClick={() => handleDownloadDocumo(doc.messageNumber)}
+                      >
+                        Download
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </List.Item>
+            )}
+          />
+        ) : (
+          <div style={{ textAlign: "center", padding: "20px" }}>
+            <Text type="secondary">
+              {patient.userRef
+                ? "No fax documents found for this patient"
+                : "Please select a patient to view their fax documents"}
+            </Text>
+            <div style={{ marginTop: "10px" }}>
+              <Text type="secondary" style={{ fontSize: "12px" }}>
+                Debug info: Patient userRef: {patient.userRef || "none"}, Documo
+                data count: {documoData?.length || 0}
+              </Text>
+            </div>
+          </div>
+        )}
+      </Card>
           </Col>
+
+          
         </Row>
       </div>
 
       <Modal
         title={
-          <div style={{ 
-            display: "flex", 
-            alignItems: "center", 
-            gap: "10px",
-            fontSize: isMobile ? '16px' : '20px'
-          }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              fontSize: isMobile ? "16px" : "20px",
+            }}
+          >
             <LeftOutlined
               onClick={() => closeModal("newLabResult")}
               style={{ cursor: "pointer" }}
@@ -721,7 +760,7 @@ const LabsAndRequisitions = () => {
         }
         open={isNewLabResultVisible}
         onCancel={() => closeModal("newLabResult")}
-        width={isMobile ? '100%' : 520}
+        width={isMobile ? "100%" : 520}
         style={{ top: isMobile ? 0 : 100 }}
         footer={[
           <Button key="cancel" onClick={() => closeModal("newLabResult")}>
@@ -764,7 +803,7 @@ const LabsAndRequisitions = () => {
             setNewLabResultFile(file);
             return false;
           }}
-          style={{ padding: isMobile ? '12px' : '24px' }}
+          style={{ padding: isMobile ? "12px" : "24px" }}
         >
           <p className="ant-upload-drag-icon">
             <UploadOutlined />
@@ -782,12 +821,14 @@ const LabsAndRequisitions = () => {
 
       <Modal
         title={
-          <div style={{ 
-            display: "flex", 
-            alignItems: "center", 
-            gap: "10px",
-            fontSize: isMobile ? '16px' : '20px'
-          }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              fontSize: isMobile ? "16px" : "20px",
+            }}
+          >
             <LeftOutlined
               onClick={() => closeModal("newRequisition")}
               style={{ cursor: "pointer" }}
@@ -797,7 +838,7 @@ const LabsAndRequisitions = () => {
         }
         open={isNewRequisitionVisible}
         onCancel={() => closeModal("newRequisition")}
-        width={isMobile ? '100%' : 520}
+        width={isMobile ? "100%" : 520}
         style={{ top: isMobile ? 0 : 100 }}
         footer={[
           <Button key="cancel" onClick={() => closeModal("newRequisition")}>
@@ -840,7 +881,7 @@ const LabsAndRequisitions = () => {
             setNewRequisitionFile(file);
             return false;
           }}
-          style={{ padding: isMobile ? '12px' : '24px' }}
+          style={{ padding: isMobile ? "12px" : "24px" }}
         >
           <p className="ant-upload-drag-icon">
             <UploadOutlined />
@@ -950,9 +991,7 @@ const LabsAndRequisitions = () => {
                 <Text>{moment(file.createdOn).format("MMMM DD, YYYY")}</Text>
                 {getFileIcon(file?.filename)}
                 <Link
-                  onClick={() =>
-                    handleDownload(file.fileRef, file.filename)
-                  }
+                  onClick={() => handleDownload(file.fileRef, file.filename)}
                 >
                   {file.fileTitle || file.filename || "Requisition.pdf"}
                 </Link>

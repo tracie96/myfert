@@ -100,11 +100,40 @@ const MedicationTable = () => {
   const handleAddSupplement = () => {
     supplementForm.validateFields().then(async (values) => {
       try {
+        // Check if all required fields are filled
+        const requiredFields = [
+          'SupplementName',
+          'Dose',
+          'Metric',
+          'Amount',
+          'AmountExtra',
+          'Route',
+          'Frequency',
+          'Notes'
+        ];
+
+        const missingFields = requiredFields.filter(field => !values[field]);
+        
+        if (missingFields.length > 0) {
+          message.error(`Please fill in all required fields: ${missingFields.join(', ')}`);
+          return;
+        }
+
+        // Convert PascalCase to camelCase for API
+        const payload = {
+          supplementName: values.SupplementName,
+          dose: values.Dose,
+          metric: values.Metric,
+          amount: values.Amount,
+          amountExtra: values.AmountExtra,
+          route: values.Route,
+          frequency: values.Frequency,
+          notes: values.Notes,
+          patientRef: patient.userRef
+        };
+
         await dispatch(
-          addPatientSupplement({
-            ...values,
-            patientRef: patient.userRef,
-          })
+          addPatientSupplement(payload)
         ).unwrap();
 
         message.success("Supplement added successfully!");
@@ -112,6 +141,7 @@ const MedicationTable = () => {
         setIsAddSupplementModalVisible(false);
         supplementForm.resetFields();
       } catch (error) {
+        console.error('Error details:', error);
         message.error("Failed to add supplement.");
       }
     });
@@ -384,136 +414,155 @@ const MedicationTable = () => {
         okText="Add"
         width={500}
       >
-        <Form form={supplementForm} layout="vertical">
-          <Form.Item
-            label="Supplement Name"
-            name="supplementName"
-            rules={[{ required: true, message: "Please enter supplement name" }]}
-          >
-            <Input
-              style={{
-                width: "100%",
-                height: "40px",
-                borderRadius: "8px",
-                border: "1px solid #d9d9d9",
-              }}
-            />
-          </Form.Item>
+        <Form 
+          form={supplementForm} 
+          layout="vertical"
+          initialValues={{
+            Metric: 'mg',
+            AmountExtra: 'tablets',
+            Route: 'oral',
+            Frequency: 'daily'
+          }}
+        >
+          <div style={{ padding: "20px 0" }}>
+            <div style={{ marginBottom: "20px" }}>
+              <div style={{ fontWeight: "bold", marginBottom: "8px" }}>
+                Supplement Name
+              </div>
+              <Form.Item name="SupplementName" noStyle rules={[{ required: true, message: 'Please enter supplement name' }]}>
+                <Input
+                  style={{
+                    width: "100%",
+                    height: "40px",
+                    borderRadius: "8px",
+                    border: "1px solid #d9d9d9",
+                  }}
+                />
+              </Form.Item>
+            </div>
 
-          <div style={{ display: "flex", gap: "10px" }}>
-            <Form.Item
-              label="Dose"
-              name="dose"
-              rules={[{ required: true, message: "Please enter dose" }]}
-              style={{ flex: 3 }}
-            >
-              <Input
-                placeholder="Enter"
-                style={{
-                  height: "40px",
-                  borderRadius: "8px",
-                  border: "1px solid #d9d9d9",
-                }}
-              />
-            </Form.Item>
+            <div style={{ marginBottom: "20px" }}>
+              <div style={{ fontWeight: "bold", marginBottom: "8px" }}>Dose</div>
+              <div style={{ display: "flex", gap: "10px" }}>
+                <Form.Item name="Dose" noStyle rules={[{ required: true, message: 'Please enter dose' }]}>
+                  <Input
+                    placeholder="Enter"
+                    style={{
+                      flex: 3,
+                      height: "40px",
+                      borderRadius: "8px",
+                      border: "1px solid #d9d9d9",
+                    }}
+                  />
+                </Form.Item>
+                <Form.Item name="Metric" noStyle rules={[{ required: true, message: 'Please select metric' }]}>
+                  <Select
+                    placeholder="Select"
+                    style={{
+                      flex: 1,
+                      height: "40px",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    <Select.Option value="mg">mg</Select.Option>
+                    <Select.Option value="g">g</Select.Option>
+                    <Select.Option value="ml">ml</Select.Option>
+                  </Select>
+                </Form.Item>
+              </div>
+            </div>
 
-            <Form.Item
-              label="Metric"
-              name="metric"
-              rules={[{ required: true, message: "Please select metric" }]}
-              style={{ flex: 1 }}
-            >
-              <Select style={{ height: "40px", borderRadius: "8px" }}>
-                <Select.Option value="mg">mg</Select.Option>
-                <Select.Option value="g">g</Select.Option>
-                <Select.Option value="ml">ml</Select.Option>
-              </Select>
-            </Form.Item>
+            <div style={{ marginBottom: "20px" }}>
+              <div style={{ fontWeight: "bold", marginBottom: "8px" }}>
+                Amount
+              </div>
+              <div style={{ display: "flex", gap: "10px" }}>
+                <Form.Item name="Amount" noStyle rules={[{ required: true, message: 'Please enter amount' }]}>
+                  <Input
+                    placeholder="Enter"
+                    style={{
+                      flex: 1,
+                      height: "40px",
+                      borderRadius: "8px",
+                      border: "1px solid #d9d9d9",
+                    }}
+                  />
+                </Form.Item>
+                <Form.Item name="AmountExtra" noStyle rules={[{ required: true, message: 'Please select amount type' }]}>
+                  <Select
+                    placeholder="Select"
+                    style={{
+                      flex: 3,
+                      height: "40px",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    <Select.Option value="tablets">tablets</Select.Option>
+                    <Select.Option value="capsules">capsules</Select.Option>
+                    <Select.Option value="drops">drops</Select.Option>
+                  </Select>
+                </Form.Item>
+              </div>
+            </div>
+            <div className="flex flex-row gap-4">
+              <div style={{ marginBottom: "20px", flex: 1 }}>
+                <div style={{ fontWeight: "bold", marginBottom: "8px" }}>
+                  Route
+                </div>
+                <Form.Item name="Route" noStyle rules={[{ required: true, message: 'Please select route' }]}>
+                  <Select
+                    placeholder="Select"
+                    className="w-full select-supplement"
+                    style={{
+                      width: "100%",
+                      height: "40px",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    <Select.Option value="oral">Oral</Select.Option>
+                    <Select.Option value="topical">Topical</Select.Option>
+                    <Select.Option value="injection">Injection</Select.Option>
+                  </Select>
+                </Form.Item>
+              </div>
+
+              <div style={{ marginBottom: "20px", flex: 1 }}>
+                <div style={{ fontWeight: "bold", marginBottom: "8px" }}>
+                  Frequency
+                </div>
+                <Form.Item name="Frequency" noStyle rules={[{ required: true, message: 'Please select frequency' }]}>
+                  <Select
+                    placeholder="Select"
+                    className="w-full select-supplement"
+                    style={{
+                      width: "100%",
+                      height: "40px",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    <Select.Option value="daily">Daily</Select.Option>
+                    <Select.Option value="twice_daily">Twice Daily</Select.Option>
+                    <Select.Option value="weekly">Weekly</Select.Option>
+                    <Select.Option value="monthly">Monthly</Select.Option>
+                  </Select>
+                </Form.Item>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: "20px" }}>
+              <div style={{ fontWeight: "bold", marginBottom: "8px" }}>Notes</div>
+              <Form.Item name="Notes" noStyle rules={[{ required: true, message: 'Please enter notes' }]}>
+                <Input.TextArea
+                  rows={4}
+                  style={{
+                    width: "100%",
+                    borderRadius: "8px",
+                    border: "1px solid #d9d9d9",
+                  }}
+                />
+              </Form.Item>
+            </div>
           </div>
-
-          <div style={{ display: "flex", gap: "10px" }}>
-            <Form.Item
-              label="Amount"
-              name="amount"
-              rules={[{ required: true, message: "Please enter amount" }]}
-              style={{ flex: 1 }}
-            >
-              <Input
-                placeholder="Enter"
-                style={{
-                  height: "40px",
-                  borderRadius: "8px",
-                  border: "1px solid #d9d9d9",
-                }}
-              />
-            </Form.Item>
-
-            <Form.Item
-              label="Amount Extra"
-              name="amountExtra"
-              rules={[{ required: true, message: "Please select amount type" }]}
-              style={{ flex: 3 }}
-            >
-              <Select
-                placeholder="Select"
-                style={{ height: "40px", borderRadius: "8px" }}
-              >
-                <Select.Option value="tablets">tablets</Select.Option>
-                <Select.Option value="capsules">capsules</Select.Option>
-                <Select.Option value="drops">drops</Select.Option>
-              </Select>
-            </Form.Item>
-          </div>
-
-          <div style={{ display: "flex", gap: "10px" }}>
-            <Form.Item
-              label="Route"
-              name="route"
-              rules={[{ required: true, message: "Please select route" }]}
-              style={{ flex: 1 }}
-            >
-              <Select
-                placeholder="Select"
-                style={{ height: "40px", borderRadius: "8px" }}
-              >
-                <Select.Option value="oral">Oral</Select.Option>
-                <Select.Option value="topical">Topical</Select.Option>
-                <Select.Option value="injection">Injection</Select.Option>
-              </Select>
-            </Form.Item>
-
-            <Form.Item
-              label="Frequency"
-              name="frequency"
-              rules={[{ required: true, message: "Please select frequency" }]}
-              style={{ flex: 1 }}
-            >
-              <Select
-                placeholder="Select"
-                style={{ height: "40px", borderRadius: "8px" }}
-              >
-                <Select.Option value="daily">Daily</Select.Option>
-                <Select.Option value="twice_daily">Twice Daily</Select.Option>
-                <Select.Option value="weekly">Weekly</Select.Option>
-                <Select.Option value="monthly">Monthly</Select.Option>
-              </Select>
-            </Form.Item>
-          </div>
-
-          <Form.Item
-            label="Notes"
-            name="notes"
-            rules={[{ required: true, message: "Please enter notes" }]}
-          >
-            <Input.TextArea
-              rows={4}
-              style={{
-                width: "100%",
-                borderRadius: "8px",
-                border: "1px solid #d9d9d9",
-              }}
-            />
-          </Form.Item>
         </Form>
       </Modal>
     </div>

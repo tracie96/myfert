@@ -957,14 +957,14 @@ const ReproductiveHealth = ({ onComplete }) => {
             
               const relatedField = relatedRadioFields[subQuestion.name];
               const relatedAnswer = answers[relatedField];
-              console.log(hasValue, parsed, relatedAnswer);
 
-              if (hasValue && parsed > 0 && (!relatedAnswer || relatedAnswer === "" || relatedAnswer === "N/A")) {
+              if (!relatedField) return true;
+              if (hasValue && parsed > 0 && (!relatedAnswer || relatedAnswer === "" || relatedAnswer === "N/A" || relatedAnswer === "None")) {
                 subQuestionsValid = false;
                 return false;
               }
               // ✅ Validation: If unsure is selected but severity/colour not selected → fail
-              if (subUnsure && (!relatedAnswer || relatedAnswer === "" || relatedAnswer === "N/A")) {
+              if (subUnsure && (!relatedAnswer || relatedAnswer === "" || relatedAnswer === "N/A" || relatedAnswer === "None")) {
                 subQuestionsValid = false;
                 return false;
               }

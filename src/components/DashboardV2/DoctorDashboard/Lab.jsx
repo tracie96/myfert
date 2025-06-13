@@ -469,76 +469,12 @@ const LabsAndRequisitions = () => {
       >
         <p>Please select a patient to view their labs and requisitions.</p>
       </Modal>
-
-      <div className="p-6 mt-4" style={{ padding: "24px" }}>
-        <Typography.Title level={4} style={{ marginBottom: "30px" }}>
-          LABS AND REQUISITIONS
+      <Typography.Title level={4} style={{ marginBottom: "30px" }}>
+      FAX DOCUMENTS
         </Typography.Title>
-
-        <Row gutter={[24, 24]}>
-          <Col xs={24} md={16}>
-            <div style={{ marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <Text type="secondary">
-                Last updated:{" "}
-                {(files || []).length > 0
-                  ? moment(files[files.length - 1].date).format("MMMM DD, YYYY")
-                  : "N/A"}
-              </Text>
-            </div>
-
-            <Button
-              type="primary"
-              style={{
-                marginBottom: "16px",
-                background: "#00ADEF",
-                width: "100%",
-                maxWidth: "200px",
-              }}
-              onClick={() => openModal("newLabResult")}
-            >
-              + New Lab Result
-            </Button>
-
-            <Card style={{ border: "1px solid #C2E6F8", marginBottom: "24px" }}>
-              <List
-                dataSource={files || []}
-                renderItem={(file) => (
-                  <List.Item>
-                    <Row align="middle" style={{ width: "100%" }}>
-                      <Col xs={24} md={1}>
-                        <div style={{ width: "3px", height: "40px", backgroundColor: "red" }} />
-                      </Col>
-                      <Col xs={24} md={6}>
-                        <Text strong>{file.name}</Text>
-                      </Col>
-                      <Col xs={24} md={6}>
-                        <Text>{moment(file.date).format("MMMM DD, YYYY")}</Text>
-                      </Col>
-                      <Col xs={24} md={9} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                        {getFileIcon(file?.filename || file?.name)}
-                        <Link
-                          style={{ color: "#1890ff" }}
-                          onClick={() => handleDownload(file.id, file?.filename || file?.name)}
-                        >
-                          {file.title}
-                        </Link>
-                      </Col>
-                      <Col xs={24} md={2} style={{ textAlign: "right" }}>
-                        <DeleteOutlined
-                          style={{ color: "red", cursor: "pointer" }}
-                          onClick={() => handleDelete(file.id)}
-                        />
-                      </Col>
-                    </Row>
-                  </List.Item>
-                )}
-              />
-            </Card>
-
-            {/* New Documo section */}
-            <Card style={{ border: "1px solid #C2E6F8" }}>
+      <Card style={{ border: "1px solid #C2E6F8" }}>
               <Typography.Title level={5} style={{ marginBottom: "16px" }}>
-                Fax Documents
+            
                 {documoLoading && <Text type="secondary"> (Loading...)</Text>}
               </Typography.Title>
               
@@ -555,22 +491,44 @@ const LabsAndRequisitions = () => {
                         <Col xs={24} md={1}>
                           <div style={{ width: "3px", height: "40px", backgroundColor: "#00ADEF" }} />
                         </Col>
-                        <Col xs={24} md={6}>
-                          <Text strong>{doc.patientName}</Text>
+                        <Col xs={24} md={4}>
+                          <Text strong>Patient Name</Text>
+                          <div>
+                            <Text>{doc.patientName}</Text>
+                          </div>
                         </Col>
-                        <Col xs={24} md={6}>
-                          <Text>{moment(doc.faxReceivedAt).format("MMMM DD, YYYY")}</Text>
+                        <Col xs={24} md={4}>
+                          <Text strong>Date Received</Text>
+                          <div>
+                            <Text>{moment(doc.faxReceivedAt).format("MMMM DD, YYYY")}</Text>
+                          </div>
                         </Col>
-                        <Col xs={24} md={9} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                          <FilePdfOutlined style={{ color: "red", fontSize: 24 }} />
-                          <Text>Pages: {doc.pageCount}</Text>
+                        <Col xs={24} md={4}>
+                          <Text strong>Message Number</Text>
+                          <div>
+                            <Text>{doc.messageNumber}</Text>
+                          </div>
                         </Col>
-                        <Col xs={24} md={2} style={{ textAlign: "right" }}>
+                        <Col xs={24} md={4}>
+                          <Text strong>Pages</Text>
+                          <div>
+                            <Text>{doc.pageCount}</Text>
+                          </div>
+                        </Col>
+                        <Col xs={24} md={4}>
+                          <Text strong>Patient Ref</Text>
+                          <div>
+                            <Text>{doc.patientRef}</Text>
+                          </div>
+                        </Col>
+                        <Col xs={24} md={3} style={{ textAlign: "right" }}>
                           <Button
                             type="link"
                             icon={<DownloadOutlined />}
                             onClick={() => handleDownloadDocumo(doc.messageNumber)}
-                          />
+                          >
+                            Download
+                          </Button>
                         </Col>
                       </Row>
                     </List.Item>
@@ -590,54 +548,136 @@ const LabsAndRequisitions = () => {
                 </div>
               )}
             </Card>
-          </Col>
 
-          <Col xs={24} md={8}>
+      <div className="p-6 mt-4" style={{ padding: "24px" }}>
+        <Typography.Title level={4} style={{ marginBottom: "30px" }}>
+          LABS AND REQUISITIONS
+        </Typography.Title>
+
+        <Row gutter={[24, 24]}>
+          <Col xs={24}>
             <div style={{ marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <Text type="secondary" style={{ fontStyle: "italic", fontSize: "14px" }}>
-                (max 2)
+              <Text type="secondary">
+                Last updated:{" "}
+                {(files || []).length > 0
+                  ? moment(files[files.length - 1].date).format("MMMM DD, YYYY")
+                  : "N/A"}
               </Text>
+              <Button
+                type="primary"
+                style={{
+                  background: "#00ADEF",
+                  maxWidth: "200px",
+                }}
+                onClick={() => openModal("newLabResult")}
+              >
+                + New Lab Result
+              </Button>
             </div>
 
-            <Button
-              type="primary"
-              style={{
-                marginBottom: "16px",
-                background: "#00ADEF",
-                width: "100%",
-                maxWidth: "200px",
-              }}
-              onClick={() => {
-                if ((bloodWorkFile2 || []).length >= 2) {
-                  message.error("You can only upload a maximum of 2 files.");
-                  return;
-                }
-                openModal("newRequisition");
-              }}
-            >
-              + Add Requisition
-            </Button>
+            <Card style={{ border: "1px solid #C2E6F8", marginBottom: "24px" }}>
+              <Typography.Title level={5} style={{ marginBottom: "16px" }}>
+                Lab Results
+              </Typography.Title>
+              <List
+                dataSource={files || []}
+                renderItem={(file) => (
+                  <List.Item>
+                    <Row align="middle" style={{ width: "100%" }}>
+                      <Col xs={24} md={1}>
+                        <div style={{ width: "3px", height: "40px", backgroundColor: "red" }} />
+                      </Col>
+                      <Col xs={24} md={5}>
+                        <Text strong>File Name</Text>
+                        <div>
+                          <Text>{file.name}</Text>
+                        </div>
+                      </Col>
+                      <Col xs={24} md={5}>
+                        <Text strong>Date</Text>
+                        <div>
+                          <Text>{moment(file.date).format("MMMM DD, YYYY")}</Text>
+                        </div>
+                      </Col>
+                      <Col xs={24} md={10}>
+                        <Text strong>Document</Text>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                          {getFileIcon(file?.filename || file?.name)}
+                          <Link
+                            style={{ color: "#1890ff" }}
+                            onClick={() => handleDownload(file.id, file?.filename || file?.name)}
+                          >
+                            {file.title}
+                          </Link>
+                        </div>
+                      </Col>
+                      <Col xs={24} md={3} style={{ textAlign: "right" }}>
+                        <DeleteOutlined
+                          style={{ color: "red", cursor: "pointer", fontSize: "18px" }}
+                          onClick={() => handleDelete(file.id)}
+                        />
+                      </Col>
+                    </Row>
+                  </List.Item>
+                )}
+              />
+            </Card>
 
-            <Card style={{ border: "1px solid #C2E6F8" }}>
+            <div style={{ marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <Text type="secondary" style={{ fontStyle: "italic", fontSize: "14px" }}>
+                (max 2 requisitions)
+              </Text>
+              <Button
+                type="primary"
+                style={{
+                  background: "#00ADEF",
+                  maxWidth: "200px",
+                }}
+                onClick={() => {
+                  if ((bloodWorkFile2 || []).length >= 2) {
+                    message.error("You can only upload a maximum of 2 files.");
+                    return;
+                  }
+                  openModal("newRequisition");
+                }}
+              >
+                + Add Requisition
+              </Button>
+            </div>
+
+            <Card style={{ border: "1px solid #C2E6F8", marginBottom: "24px" }}>
+              <Typography.Title level={5} style={{ marginBottom: "16px" }}>
+                Requisitions
+              </Typography.Title>
               <List
                 dataSource={bloodWorkFile2 || []}
                 renderItem={(file, index) => (
                   <List.Item>
-                    <div style={{ width: "100%" }}>
-                      <Text strong style={{ display: "block", marginBottom: "16px" }}>
-                        {index === 0 ? "Day 1 Requisition" : "Day 2 Requisition"}
-                      </Text>
-                      <Row align="middle" gutter={[16, 16]}>
-                        <Col xs={24} md={1}>
-                          <div style={{ width: "3px", height: "40px", backgroundColor: "red" }} />
-                        </Col>
-                        <Col xs={24} md={6}>
-                          <Text strong>{file.fileTitle || file.filename || "Requisition.pdf"}</Text>
-                        </Col>
-                        <Col xs={24} md={6}>
+                    <Row align="middle" style={{ width: "100%" }}>
+                      <Col xs={24} md={1}>
+                        <div style={{ width: "3px", height: "40px", backgroundColor: "red" }} />
+                      </Col>
+                      <Col xs={24} md={4}>
+                        <Text strong>Type</Text>
+                        <div>
+                          <Text>{index === 0 ? "Day 1 Requisition" : "Day 2 Requisition"}</Text>
+                        </div>
+                      </Col>
+                      <Col xs={24} md={5}>
+                        <Text strong>File Name</Text>
+                        <div>
+                          <Text>{file.fileTitle || file.filename || "Requisition.pdf"}</Text>
+                        </div>
+                      </Col>
+                      <Col xs={24} md={5}>
+                        <Text strong>Date</Text>
+                        <div>
                           <Text>{moment(file.createdOn).format("MMMM DD, YYYY")}</Text>
-                        </Col>
-                        <Col xs={24} md={9} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        </div>
+                      </Col>
+                      <Col xs={24} md={6}>
+                        <Text strong>Document</Text>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                           {getFileIcon(file?.filename)}
                           <Link
                             style={{ color: "#1890ff" }}
@@ -645,19 +685,21 @@ const LabsAndRequisitions = () => {
                           >
                             {file.fileTitle || file.filename || "Requisition.pdf"}
                           </Link>
-                        </Col>
-                        <Col xs={24} md={2} style={{ textAlign: "right" }}>
-                          <DeleteOutlined
-                            style={{ color: "red", cursor: "pointer" }}
-                            onClick={() => handleDelete(file.fileRef)}
-                          />
-                        </Col>
-                      </Row>
-                    </div>
+                        </div>
+                      </Col>
+                      <Col xs={24} md={3} style={{ textAlign: "right" }}>
+                        <DeleteOutlined
+                          style={{ color: "red", cursor: "pointer", fontSize: "18px" }}
+                          onClick={() => handleDelete(file.fileRef)}
+                        />
+                      </Col>
+                    </Row>
                   </List.Item>
                 )}
               />
             </Card>
+
+       
           </Col>
         </Row>
       </div>

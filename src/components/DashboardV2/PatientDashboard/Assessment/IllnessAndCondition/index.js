@@ -498,8 +498,18 @@ const IllnessAndCondition = ({ onComplete }) => {
 
   useEffect(() => {
     const mapApiResponseToFormState = (apiData) => {
-      console.log('Starting mapApiResponseToFormState with apiData:', apiData);
       const formAnswers = {};
+      if (apiData.respiratoryOther) {
+        formAnswers["healthConditions_Respiratory_others"] = apiData.respiratoryOther;
+        formAnswers["healthConditions_Urinary_Genital_others"] = apiData.urinaryOther;
+        formAnswers["healthConditions_Endocrine_Metabolic_others"] = apiData.endocrineOther;
+        formAnswers["healthConditions_Inflammatory_Immune_others"] = apiData.inflammatoryOther;
+        formAnswers["healthConditions_Musculoskeletal_others"] = apiData.muscuSkeletalOther;
+        formAnswers["healthConditions_Skin_others"] = apiData.skinOther;
+        formAnswers["healthConditions_Cardiovascular_others"] = apiData.cardiovascularOther;
+        formAnswers["healthConditions_Neurologic_Emotional_others"] = apiData.neurologicOther;
+        formAnswers["healthConditions_Cancer_others"] = apiData.cancerOther;
+      }
 
       if (apiData.gastroIntestinal && apiData.gastroIntestinal.length > 0) {
         for (const item of apiData.gastroIntestinal) {
@@ -752,8 +762,16 @@ const IllnessAndCondition = ({ onComplete }) => {
       cardiovascular: getCategoryQuestions("Cardiovascular"),
       neurologic: getCategoryQuestions("Neurologic/Emotional"),
       cancer: getCategoryQuestions("Cancer"),
-
       // Rest of the structure remains unchanged
+      respiratoryOther: answers.healthConditions_Respiratory_others || "",
+      urinaryOther: answers.healthConditions_Urinary_Genital_others || "",
+      endocrineOther: answers.healthConditions_Endocrine_Metabolic_others || "",
+      inflammatoryOther: answers.healthConditions_Inflammatory_Immune_others || "",
+      muscuSkeletalOther: answers.healthConditions_Musculoskeletal_others || "",
+      cardiovascularOther: answers.healthConditions_Cardiovascular_others || "",
+      skinOther: answers.healthConditions_Skin_others || "",
+      neurologicOther: answers.healthConditions_Neurologic_Emotional_others || "",
+      cancerOther: answers.healthConditions_Cancer_others || "",
       diagnosticBoneDensity: {
         date: answers.boneDensity_na ? "" : answers.boneDensity || "",
         value: answers.boneDensity_na ? "" : answers.boneDensity_Comments || "",

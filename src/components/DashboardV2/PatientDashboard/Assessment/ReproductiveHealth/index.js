@@ -640,7 +640,7 @@ const ReproductiveHealth = ({ onComplete }) => {
         return null;
       };
       const mapDuration = (val) => (val === "0" || val === 0 ? 0 : val || "");
-      const mapUnsure = (val) => val === "";
+      const mapUnsure = (val) => val === "" || val === null || val === undefined;
       const mapColour = (val, validOptions) => validOptions.includes(val) ? val : "Other";
       const mapOther = (val, mainVal, validOptions) => validOptions.includes(mainVal) ? "" : (val || "");
 

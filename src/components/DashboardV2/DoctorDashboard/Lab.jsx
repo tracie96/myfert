@@ -19,6 +19,7 @@ import {
   UploadOutlined,
   FileImageOutlined,
   FileOutlined,
+  DownloadOutlined,
 } from "@ant-design/icons";
 import Header from "./Components/Header";
 import { useNavigate } from "react-router-dom";
@@ -29,6 +30,7 @@ import {
   downloadBloodWork,
   addPatientDocuments,
   fetchDocumo,
+  downloadDocumo,
 } from "../../redux/doctorSlice";
 import moment from "moment";
 const { Dragger } = Upload;
@@ -67,6 +69,9 @@ const LabsAndRequisitions = () => {
   const documoData = useSelector((state) => state.doctor.documoData);
   const documoLoading = useSelector((state) => state.doctor.documoLoading);
 
+  // Filter documoData for current patient
+  const filteredDocumoData = documoData?.filter(doc => doc.patientRef === patient.userRef) || [];
+
   // Add window resize listener
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
@@ -74,9 +79,17 @@ const LabsAndRequisitions = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Add useEffect to fetch Documo data
+  useEffect(() => {
+    if (patient.userRef) {
+      dispatch(fetchDocumo());
+      console.log('Fetching Documo data for patient:', patient.userRef);
+    }
+  }, [dispatch, patient.userRef]);
+
   const isMobile = windowWidth <= breakpoints.sm;
 
-  console.log({ bloodWorkFile1, bloodWorkFile2, documoData, documoLoading });
+  console.log({ bloodWorkFile1, bloodWorkFile2, documoData, documoLoading, filteredDocumoData });
   const openModal = (modalType) => {
     setIsModalVisible(false);
     setIsNewLabResultVisible(false);
@@ -415,6 +428,27 @@ const LabsAndRequisitions = () => {
     };
   };
 
+  // Add handleDownloadDocumo function
+  const handleDownloadDocumo = async (messageNumber) => {
+    try {
+      const response = await dispatch(downloadDocumo(messageNumber)).unwrap();
+      const blob = new Blob([response], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `documo_${messageNumber}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+    
+      link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      message.success('Document downloaded successfully');
+    } catch (error) {
+      message.error('Failed to download document');
+      console.error('Download error:', error);
+    }
+  };
+
   return (
     <>
       {patient ? (
@@ -465,7 +499,7 @@ const LabsAndRequisitions = () => {
               + New Lab Result
             </Button>
 
-            <Card style={{ border: "1px solid #C2E6F8" }}>
+            <Card style={{ border: "1px solid #C2E6F8", marginBottom: "24px" }}>
               <List
                 dataSource={files || []}
                 renderItem={(file) => (
@@ -499,6 +533,62 @@ const LabsAndRequisitions = () => {
                   </List.Item>
                 )}
               />
+            </Card>
+
+            {/* New Documo section */}
+            <Card style={{ border: "1px solid #C2E6F8" }}>
+              <Typography.Title level={5} style={{ marginBottom: "16px" }}>
+                Fax Documents
+                {documoLoading && <Text type="secondary"> (Loading...)</Text>}
+              </Typography.Title>
+              
+              {documoLoading ? (
+                <div style={{ textAlign: 'center', padding: '20px' }}>
+                  Loading Documo data...
+                </div>
+              ) : filteredDocumoData.length > 0 ? (
+                <List
+                  dataSource={filteredDocumoData}
+                  renderItem={(doc) => (
+                    <List.Item>
+                      <Row align="middle" style={{ width: "100%" }}>
+                        <Col xs={24} md={1}>
+                          <div style={{ width: "3px", height: "40px", backgroundColor: "#00ADEF" }} />
+                        </Col>
+                        <Col xs={24} md={6}>
+                          <Text strong>{doc.patientName}</Text>
+                        </Col>
+                        <Col xs={24} md={6}>
+                          <Text>{moment(doc.faxReceivedAt).format("MMMM DD, YYYY")}</Text>
+                        </Col>
+                        <Col xs={24} md={9} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                          <FilePdfOutlined style={{ color: "red", fontSize: 24 }} />
+                          <Text>Pages: {doc.pageCount}</Text>
+                        </Col>
+                        <Col xs={24} md={2} style={{ textAlign: "right" }}>
+                          <Button
+                            type="link"
+                            icon={<DownloadOutlined />}
+                            onClick={() => handleDownloadDocumo(doc.messageNumber)}
+                          />
+                        </Col>
+                      </Row>
+                    </List.Item>
+                  )}
+                />
+              ) : (
+                <div style={{ textAlign: 'center', padding: '20px' }}>
+                  <Text type="secondary">
+                    {patient.userRef ? 'No fax documents found for this patient' : 'Please select a patient to view their fax documents'}
+                  </Text>
+                  <div style={{ marginTop: '10px' }}>
+                    <Text type="secondary" style={{ fontSize: '12px' }}>
+                      Debug info: Patient userRef: {patient.userRef || 'none'}, 
+                      Documo data count: {documoData?.length || 0}
+                    </Text>
+                  </div>
+                </div>
+              )}
             </Card>
           </Col>
 

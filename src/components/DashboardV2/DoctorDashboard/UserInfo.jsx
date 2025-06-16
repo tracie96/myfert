@@ -1341,33 +1341,28 @@ function SwitchContent({
                   })}
 
                   {Object.entries(illness || {}).map(([category, data]) => {
-                    if (['gastroIntestinal', 'respiratory', 'urinary', 'endocrine', 'inflammatory', 
-                         'musculoskeletal', 'skin', 'cardiovascular', 'neurologic', 'cancer'].includes(category)) {
-                      return null;
-                    }
-
-                
-
-                    // if (typeof data === 'object' && data !== null && !Array.isArray(data)) {
-                    //   return (
-                    //     <Descriptions.Item
-                    //       label={displayName}
-                    //       key={category}
-                    //     >
-                    //       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    //         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    //           <Tag color="default">
-                    //             {(!data.date && !data.value && !data.otherName) ? 'Answer not provided' : 
-                    //               `${data.date ? `Date: ${data.date}` : 'Date: N/A'}${data.value ? `, Value: ${data.value}` : ''}${data.otherName ? `, Name: ${data.otherName}` : ''}`
-                    //             }
-                    //           </Tag>
-                    //         </div>
-                    //       </div>
-                    //     </Descriptions.Item>
-                    //   );
-                    // }
+                  // Skip categories that were handled above
+                  if (
+                    ['gastroIntestinal', 'respiratory', 'urinary', 'endocrine', 'inflammatory',
+                    'musculoskeletal', 'skin', 'cardiovascular', 'neurologic', 'cancer'].includes(category)
+                  ) {
                     return null;
-                  })}
+                  }
+
+                 // ✅ Handle string fields like "respiratoryOther"
+                  if (typeof data === 'string') {
+                    return (
+                      <Descriptions.Item
+                        label={category.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                        key={category}
+                      >
+                        <Tag> {data}</Tag>
+                      </Descriptions.Item>
+                    );
+                  }
+
+                })}
+
                 </Descriptions>
               </Col>
 
@@ -1410,14 +1405,14 @@ function SwitchContent({
                         </Descriptions.Item>
                       );
                     }
-                    return (
-                      <Descriptions.Item
-                        label={category.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-                        key={category}
-                      >
-                       <Tag color="cyan">Answer not provided</Tag>
-                      </Descriptions.Item>
-                    );
+                    // return (
+                    //   <Descriptions.Item
+                    //     label={category.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                    //     key={category}
+                    //   >
+                    //    <Tag color="cyan">Answer not provided</Tag>
+                    //   </Descriptions.Item>
+                    // );
                   })}
 
                   {/* Handle addNew array separately */}
@@ -1684,24 +1679,13 @@ function SwitchContent({
                 <Descriptions.Item label="Mid Cycle Spotting Colour">
                   {reproductiveInfo?.midCycleSpottingFrequency?.colour || 'N/A'}
                 </Descriptions.Item>
-                <Descriptions.Item label="Other Charting Cycle">
+                {/* <Descriptions.Item label="Other Charting Cycle">
                   {reproductiveInfo?.otherChartingCycle || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Other Methods Conceive">
                   {reproductiveInfo?.otherMethodsConceive || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Other Mucus Sub">
-                  {reproductiveInfo?.otherMucusSub || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Other Spotting Colour">
-                  {reproductiveInfo?.otherSpottingColour || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Other Watery Mucus">
-                  {reproductiveInfo?.otherWateryMucus || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Other White Mucus">
-                  {reproductiveInfo?.otherWhiteMucus || "N/A"}
-                </Descriptions.Item>
+                </Descriptions.Item> */}
+               
 
                 <>
                   {/* <Descriptions.Item label="Utilizing Fertility Awareness">
@@ -1819,7 +1803,7 @@ function SwitchContent({
                 <Descriptions.Item label="Cycle Discharge Pre Period Colour">
                   {reproductiveInfo?.cycleDischargePrePeriod?.colour || 'N/A'}
                 </Descriptions.Item>
-                <Descriptions.Item label="Cycle Discharge Menstral Bleeding Duration">
+                {/* <Descriptions.Item label="Cycle Discharge Menstral Bleeding Duration">
                   {reproductiveInfo?.cycleDischargeMenstralBleeding?.duration || 'N/A'}
                 </Descriptions.Item>
                 <Descriptions.Item label="Cycle Discharge Menstral Bleeding Colour">
@@ -1827,12 +1811,24 @@ function SwitchContent({
                 </Descriptions.Item>
                 <Descriptions.Item label="Cycle Discharge Menstral Bleeding Clots">
                   {reproductiveInfo?.cycleDischargeMenstralBleeding?.clots ? "Yes" : "No"}
-                </Descriptions.Item>
+                </Descriptions.Item> */}
                 <Descriptions.Item label="Cycle Discharge After Period Spotting Duration">
                   {reproductiveInfo?.cycleDischargeAfterPeriodSpotting?.duration || 'N/A'}
                 </Descriptions.Item>
                 <Descriptions.Item label="Cycle Discharge After Period Color">
                   {reproductiveInfo?.cycleDischargeAfterPeriodSpotting?.colour || 'N/A'}
+                </Descriptions.Item>
+                <Descriptions.Item label="Other Mucus Sub">
+                  {reproductiveInfo?.otherMucusSub || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Other Spotting Colour">
+                  {reproductiveInfo?.otherSpottingColour || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Other Watery Mucus">
+                  {reproductiveInfo?.otherWateryMucus || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Other White Mucus">
+                  {reproductiveInfo?.otherWhiteMucus || "N/A"}
                 </Descriptions.Item>
 
 

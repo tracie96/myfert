@@ -1351,21 +1351,21 @@ const ReproductiveHealth = ({ onComplete }) => {
         cycleDischargeWatery: {
           duration: formatDuration(reproductiveHealthAnswers.Watery_mucus_sub),
           colour: reproductiveHealthAnswers.Watery_mucus_colour === "Other"
-            ? reproductiveHealthAnswers.Watery_mucus_colour_other
+            ? "other"
             : (reproductiveHealthAnswers.Watery_mucus_colour || "N/A")
         },
         otherWateryMucus: reproductiveHealthAnswers.Watery_mucus_colour_other || "",
         cycleDischargeEggWhite: {
           duration: formatDuration(reproductiveHealthAnswers.egg_white_mucus_sub),
           colour: reproductiveHealthAnswers.egg_white_mucus_colour === "Other"
-            ? reproductiveHealthAnswers.egg_white_mucus_colour_other
+            ? "other"
             : (reproductiveHealthAnswers.egg_white_mucus_colour || "N/A")
         },
         otherWhiteMucus: reproductiveHealthAnswers.egg_white_mucus_colour_other || "",
         cycleDischargePrePeriod: {
           duration: formatDuration(reproductiveHealthAnswers.pre_spotting_sub),
           colour: reproductiveHealthAnswers.pre_spotting_colour === "Other"
-            ? reproductiveHealthAnswers.pre_spotting_colour_other
+            ? "other"
             : (reproductiveHealthAnswers.pre_spotting_colour || "N/A")
         },
         otherSpottingColour: reproductiveHealthAnswers.pre_spotting_colour_other || "",

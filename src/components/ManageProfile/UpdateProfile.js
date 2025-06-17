@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import editIcon from "../../assets/images/edit_icon.png";
 import Spinner from "react-bootstrap/Spinner";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useMediaQuery } from "react-responsive";
@@ -18,6 +18,23 @@ const UpdateProfile = () => {
   const [loading, setLoading] = useState(true);
   const [uploadedFileUrl, setUploadedFileUrl] = useState(null);
   const isMobile = useMediaQuery({ maxWidth: 767 });
+  const userAuth = useSelector((state) => state?.authentication?.userAuth);
+
+  const provinces = [
+    { value: "AB", label: "Alberta (AB)" },
+    { value: "BC", label: "British Columbia (BC)" },
+    { value: "MB", label: "Manitoba (MB)" },
+    { value: "NB", label: "New Brunswick (NB)" },
+    { value: "NL", label: "Newfoundland and Labrador (NL)" },
+    { value: "NS", label: "Nova Scotia (NS)" },
+    { value: "NT", label: "Northwest Territories (NT)" },
+    { value: "NU", label: "Nunavut (NU)" },
+    { value: "ON", label: "Ontario (ON)" },
+    { value: "PE", label: "Prince Edward Island (PE)" },
+    { value: "QC", label: "Quebec (QC)" },
+    { value: "SK", label: "Saskatchewan (SK)" },
+    { value: "YT", label: "Yukon (YT)" }
+  ];
 
   const validateUpdateProfile = Yup.object().shape({
     email: Yup.string(),
@@ -45,6 +62,12 @@ const UpdateProfile = () => {
       availabilityTo: "",
       latitude: 53.520611,
       longitude: -113.4627,
+      fertilityScreening: false,
+      fertilityScreeningDelivery: "",
+      ongoingFertilityCare: false,
+      ongoingFertilityCareDelivery: "",
+      pregnancyCare: false,
+      pregnancyCareDelivery: ""
     },
     validationSchema: validateUpdateProfile,
     onSubmit: async (values) => {
@@ -78,19 +101,30 @@ const UpdateProfile = () => {
     try {
       const resultAction = await dispatch(getUserProfile());
       const response = resultAction.payload;
+      console.log('API Response:', response);
 
-      setFieldValue("firstName", response.firstname || "");
-      setFieldValue("lastName", response.lastName || "");
-      setFieldValue("email", response.email || "");
-      setFieldValue("address", response.address || "");
-      setFieldValue("phoneNumber", response.phoneNumber || "");
-      setFieldValue("picture", response.picture || "");
-      setFieldValue("DOB", response.dob || "");
+      // Check if response is nested in an obj property
+      const userData = response?.obj || response;
+
+      setFieldValue("firstName", userData?.firstname || "");
+      setFieldValue("lastName", userData?.lastName || "");
+      setFieldValue("email", userData?.email || "");
+      setFieldValue("address", userData?.address || "");
+      setFieldValue("phoneNumber", userData?.phoneNumber || "");
+      setFieldValue("picture", userData?.picture || "");
+      setFieldValue("DOB", userData?.dob || "");
+      setFieldValue("practiceLocation", userData?.practiceLocation || "");
+      setFieldValue("fertilityScreening", userData?.fertilityScreening || false);
+      setFieldValue("fertilityScreeningDelivery", userData?.fertilityScreeningDelivery || "");
+      setFieldValue("ongoingFertilityCare", userData?.ongoingFertilityCare || false);
+      setFieldValue("ongoingFertilityCareDelivery", userData?.ongoingFertilityCareDelivery || "");
+      setFieldValue("pregnancyCare", userData?.pregnancyCare || false);
+      setFieldValue("pregnancyCareDelivery", userData?.pregnancyCareDelivery || "");
 
       // If there's an existing profile image URL, set it
-      setUploadedFileUrl(response.profile || null);
+      setUploadedFileUrl(userData?.profile || null);
     } catch (error) {
-      console.error(error);
+      console.error('Profile fetch error:', error);
     } finally {
       setLoading(false);
     }
@@ -155,7 +189,7 @@ const UpdateProfile = () => {
           <div className="card-body">
             <div className="text-center mt-4">
               {uploadedFileUrl ? (
-                <div>
+                <div className="position-relative d-inline-block">
                   <img
                     src={uploadedFileUrl}
                     className="rounded-circle"
@@ -163,45 +197,63 @@ const UpdateProfile = () => {
                     height={200}
                     alt="Uploaded"
                   />
+                  <Upload {...uploadProps} showUploadList={false}>
+                    <img
+                      src={editIcon}
+                      alt="edit"
+                      style={{
+                        position: "absolute",
+                        bottom: "10px",
+                        right: "10px",
+                        width: "30px",
+                        cursor: "pointer",
+                      }}
+                    />
+                  </Upload>
                 </div>
               ) : (
-                <div>
-                  {values.picture && ( <Avatar
+                <div className="position-relative d-inline-block">
+                  {values.picture ? (
+                    <Avatar
                       shape="circle"
                       size={200}
                       icon={<img
                         src={values.picture}
                         alt="edit"
                         style={{
-                          cursor: "pointer",
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover'
                         }}
                       />}
-                    />)}
-                  {!values.picture &&
+                    />
+                  ) : (
                     <Avatar
                       shape="circle"
                       size={200}
-                      icon={<UserAddOutlined />}
-                    />}
-
+                      icon={<UserAddOutlined style={{ fontSize: '80px' }} />}
+                    />
+                  )}
+                  <Upload {...uploadProps} showUploadList={false}>
+                    <img
+                      src={editIcon}
+                      alt="edit"
+                      style={{
+                        position: "absolute",
+                        bottom: "10px",
+                        right: "10px",
+                        width: "30px",
+                        cursor: "pointer",
+                      }}
+                    />
+                  </Upload>
                 </div>
               )}
-              <Upload {...uploadProps} showUploadList={false}>
-                <img
-                  src={editIcon}
-                  alt="edit"
-                  style={{
-                    position: "absolute",
-                    top: isMobile ? "55%" : "55%",
-                    left: "63%",
-                    width: isMobile ? "15%" : "12%",
-                    cursor: "pointer",
-                  }}
-                />
-              </Upload>
-              {values.picture ? ' ' : <div className="my-3 d-md-flex justify-content-md-center">
-                {values.firstName} {values.lastName}
-              </div>}
+              {values.firstName && values.lastName && (
+                <h4 className="mt-3 mb-0">
+                  {values.firstName} {values.lastName}
+                </h4>
+              )}
             </div>
           </div>
         </div>
@@ -308,7 +360,153 @@ const UpdateProfile = () => {
                   </div>
                 </div>
               </div>
+              {userAuth?.obj?.role !== "Patient" && (
+                <div className="row">
+                  <div className="col-md-12">
+                    <div className="form-group">
+                      <label>Address</label>
+                      <input
+                        className="form-control"
+                        name="address"
+                        type="text"
+                        value={values.address === "undefined undefined undefined undefined" ? "" : values.address}
+                        onChange={handleChange("address")}
+                        onBlur={handleBlur("address")}
+                      />
+                    </div>
+                  </div>
+                  <div className="col-md-12">
+                    <div className="form-group">
+                      <label>Practice Location</label>
+                      <select
+                        className="form-control"
+                        name="practiceLocation"
+                        value={values.practiceLocation}
+                        onChange={handleChange("practiceLocation")}
+                        onBlur={handleBlur("practiceLocation")}
+                      >
+                        <option value="">Select Province</option>
+                        {provinces.map((province) => (
+                          <option key={province.value} value={province.value}>
+                            {province.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                  <div className="col-md-12">
+                    <div className="form-group">
+                      <label className="required">Care Types</label>
+                      <style>
+                        {`
+                                .form-check-input:focus {
+                                  outline: none;
+                                  box-shadow: none;
+                                }
+                              `}
+                      </style>
+                      <div>
+                        <div className="mb-3">
+                          <div className="form-check">
+                            <input
+                              type="checkbox"
+                              className="form-check-input"
+                              id="fertilityScreening"
+                              checked={values.fertilityScreening}
+                              onChange={(e) => setFieldValue("fertilityScreening", e.target.checked)}
+                            />
+                            <label className="form-check-label" htmlFor="fertilityScreening">
+                              Fertility Screening
+                            </label>
+                          </div>
+                          {values.fertilityScreening && (
+                            <div className="mt-2 ml-4">
+                              <label className="required">Delivery Type</label>
+                              <select
+                                className="form-control"
+                                name="fertilityScreeningDelivery"
+                                value={values.fertilityScreeningDelivery}
+                                onChange={handleChange("fertilityScreeningDelivery")}
+                                onBlur={handleBlur("fertilityScreeningDelivery")}
+                              >
+                                <option value="">Select Delivery Type</option>
+                                <option value="virtual">Virtual</option>
+                                <option value="in-person">In-Person</option>
+                                <option value="both">Both</option>
+                              </select>
+                            </div>
+                          )}
+                        </div>
 
+                        <div className="mb-3">
+                          <div className="form-check">
+                            <input
+                              type="checkbox"
+                              className="form-check-input"
+                              id="ongoingFertilityCare"
+                              checked={values.ongoingFertilityCare}
+                              onChange={(e) => setFieldValue("ongoingFertilityCare", e.target.checked)}
+                            />
+                            <label className="form-check-label" htmlFor="ongoingFertilityCare">
+                              Ongoing Fertility Care
+                            </label>
+                          </div>
+                          {values.ongoingFertilityCare && (
+                            <div className="mt-2 ml-4">
+                              <label className="required">Delivery Type</label>
+                              <select
+                                className="form-control"
+                                name="ongoingFertilityCareDelivery"
+                                value={values.ongoingFertilityCareDelivery}
+                                onChange={handleChange("ongoingFertilityCareDelivery")}
+                                onBlur={handleBlur("ongoingFertilityCareDelivery")}
+                              >
+                                <option value="">Select Delivery Type</option>
+                                <option value="virtual">Virtual</option>
+                                <option value="in-person">In-Person</option>
+                                <option value="both">Both</option>
+                              </select>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="mb-3">
+                          <div className="form-check">
+                            <input
+                              type="checkbox"
+                              className="form-check-input"
+                              id="pregnancyCare"
+                              checked={values.pregnancyCare}
+                              onChange={(e) => setFieldValue("pregnancyCare", e.target.checked)}
+                            />
+                            <label className="form-check-label" htmlFor="pregnancyCare">
+                              Pregnancy Care
+                            </label>
+                          </div>
+                          {values.pregnancyCare && (
+                            <div className="mt-2 ml-4">
+                              <label className="required">Delivery Type</label>
+                              <select
+                                className="form-control"
+                                name="pregnancyCareDelivery"
+                                value={values.pregnancyCareDelivery}
+                                onChange={handleChange("pregnancyCareDelivery")}
+                                onBlur={handleBlur("pregnancyCareDelivery")}
+                              >
+                                <option value="">Select Delivery Type</option>
+                                <option value="virtual">Virtual</option>
+                                <option value="in-person">In-Person</option>
+                                <option value="both">Both</option>
+                              </select>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-md-12"></div>
+                </div>
+              )}
               <div className="row">
                 <div className="text-end">
                   <button

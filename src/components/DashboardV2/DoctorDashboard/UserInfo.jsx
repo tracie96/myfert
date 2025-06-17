@@ -1349,7 +1349,7 @@ function SwitchContent({
                     return null;
                   }
 
-                 // ✅ Handle string fields like "respiratoryOther"
+                  // Handle string fields like "respiratoryOther"
                   if (typeof data === 'string') {
                     return (
                       <Descriptions.Item
@@ -1360,7 +1360,8 @@ function SwitchContent({
                       </Descriptions.Item>
                     );
                   }
-
+                  
+                  return null; // Add explicit return for any other case
                 })}
 
                 </Descriptions>
@@ -1370,9 +1371,6 @@ function SwitchContent({
                 <Descriptions column={1} bordered>  
                   {Object.entries(illness || {}).map(([category, data]) => {
                     // Only handle diagnostic, surgery, and injury categories
-                    // if (!category.startsWith('diagnostic') && !category.startsWith('surgery') && !category.startsWith('injuries') || category.startsWith('addNew')) {
-                    //   return null;
-                    // }
                     if ((data && !data.date) || (category === "gastroIntestinal")) {
                       return null;
                     }
@@ -1405,14 +1403,7 @@ function SwitchContent({
                         </Descriptions.Item>
                       );
                     }
-                    // return (
-                    //   <Descriptions.Item
-                    //     label={category.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-                    //     key={category}
-                    //   >
-                    //    <Tag color="cyan">Answer not provided</Tag>
-                    //   </Descriptions.Item>
-                    // );
+                    return null; // Add explicit return for any other case
                   })}
 
                   {/* Handle addNew array separately */}

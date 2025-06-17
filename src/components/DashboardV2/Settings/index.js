@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import { Layout, Tabs, Typography, Card } from "antd";
-import { Row, Col } from 'antd';
-import fertilityImage from "../../../assets/images/auth/fertilityImage.svg";
 
 const { Content } = Layout;
 const { TabPane } = Tabs;

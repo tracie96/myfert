@@ -23,6 +23,8 @@ function Navbar() {
   const { userAuth } = useSelector((state) => state.authentication);
   const profileUser = useSelector((state) => state.profile.userData);
   const [displayUser, setDisplayUser] = useState(profileUser);
+
+
   useEffect(() => {
     if (profileUser) {
       setDisplayUser(profileUser);
@@ -49,7 +51,6 @@ function Navbar() {
     await fetchNotificationsList();
     setUpdate(true);
   };
-
   const handleCloseModal = () => {
     setShowModal(false);
   };

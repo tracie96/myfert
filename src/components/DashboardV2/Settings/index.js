@@ -8,7 +8,7 @@ const { TabPane } = Tabs;
 const { Text, Title } = Typography;
 
 const SettingsPage = () => {
-  const [activeTab, setActiveTab] = useState("1");
+  const [activeTab, setActiveTab] = useState("2");
 
   const handleTabChange = (key) => {
     setActiveTab(key);
@@ -49,7 +49,7 @@ const SettingsPage = () => {
           </TabPane> */}
           <TabPane tab="Collection Notice" key="2">
             <Content className="my-3">
-              <Text style={{ color: "#000000", fontStyle: "italic" }}>
+              <Text style={{ color: "#000000" }}>
               <p className="font-bold"><b>Notice of Collection of Health Information</b></p>
               <div class="notice-container">
                   <p>

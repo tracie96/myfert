@@ -359,22 +359,23 @@ const UpdateProfile = () => {
                     )}
                   </div>
                 </div>
-              </div>
-              {userAuth?.obj?.role !== "Patient" && (
-                <div className="row">
-                  <div className="col-md-12">
+                <div className="col-md-12">
                     <div className="form-group">
                       <label>Address</label>
                       <input
                         className="form-control"
                         name="address"
                         type="text"
-                        value={values.address === "undefined undefined undefined undefined" ? "" : values.address}
+                        value={values.address === "undefined undefined undefined undefined undefined" ? "" : values.address}
                         onChange={handleChange("address")}
                         onBlur={handleBlur("address")}
                       />
                     </div>
                   </div>
+              </div>
+              {userAuth?.obj?.role !== "Patient" && (
+                <div className="row">
+                 
                   <div className="col-md-12">
                     <div className="form-group">
                       <label>Practice Location</label>

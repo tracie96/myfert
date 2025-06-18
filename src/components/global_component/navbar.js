@@ -1,56 +1,60 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import CustomModal from "./CustomModal";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutAction } from "../redux/AuthController";
 import { useNavigate } from "react-router-dom";
 import NotificationPanel from "./Notifiation/NotificationPanel";
 import { getNotifications } from "../redux/globalSlice";
-import { Col } from "react-bootstrap";
 import UserDropdown from "./menu";
 import { useMediaQuery } from "react-responsive";
 
 function Navbar() {
   const [showModal, setShowModal] = useState(false);
-  const [isLogout, setLogout] = useState(true);
-  console.log({isLogout})
-  const [isNotifications, setNotifications] = useState(null);
-  const [isUpdate, setUpdate] = useState(false);
-  const [unReadCount, setUnReadCount] = useState(0);
-  console.log(unReadCount)
   const navigate = useNavigate();
   const isMobile = useMediaQuery({ maxWidth: 767 });
-  console.log(isUpdate, setLogout);
+  const dispatch = useDispatch();
   const { userAuth } = useSelector((state) => state.authentication);
   const profileUser = useSelector((state) => state.profile.userData);
+  const { notifications } = useSelector((state) => state.globalSlice);
   const [displayUser, setDisplayUser] = useState(profileUser);
-
-
+  const [showNotifications, setShowNotifications] = useState(false);
+  // Fetch notifications periodically
   useEffect(() => {
-    if (profileUser) {
-      setDisplayUser(profileUser);
-    }
-  }, [profileUser]);
-
-  const dispatch = useDispatch();
-  const fetchNotificationsList = useCallback(async () => {
-    try {
-      const response = await dispatch(getNotifications());
-      if (getNotifications.fulfilled.match(response)) {
-        setNotifications(response?.payload);
-        setUnReadCount(response.payload?.unReadCount);
+    const fetchNotifications = async () => {
+      try {
+        await dispatch(getNotifications()).unwrap();
+      } catch (error) {
+        console.error("Error fetching notifications:", error);
       }
-      setUpdate(true);
-    } catch (error) {
-      console.error("Error fetching notifications:", error);
-    } finally {
-      setUpdate(false);
-    }
-  }, [dispatch, setUnReadCount]);
+    };
 
-  const handleNotificationPanel = async () => {
-    await fetchNotificationsList();
-    setUpdate(true);
+    // Initial fetch
+    fetchNotifications();
+
+    // Set up interval for periodic fetching (every 30 seconds)
+    const intervalId = setInterval(fetchNotifications, 30000);
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(intervalId);
+  }, [dispatch]);
+
+  // Handle notification panel toggle
+  const handleNotificationPanel = () => {
+    setShowNotifications(!showNotifications);
   };
+
+  // Close notifications when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showNotifications && !event.target.closest('.notification-dropdown')) {
+        setShowNotifications(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [showNotifications]);
+
   const handleCloseModal = () => {
     setShowModal(false);
   };
@@ -64,179 +68,178 @@ function Navbar() {
         console.error("Logout error:", error);
       });
   };
+
+  const navStyles = {
+    container: {
+      display: 'flex',
+      alignItems: 'center',
+      padding: '12px 16px',
+      backgroundColor: '#fff',
+      gap: '16px',
+      borderBottom: '1px solid #e3e6f0',
+      marginBottom: '1.5rem',
+      minHeight: '60px'
+    },
+    menuButton: {
+      width: '32px',
+      height: '32px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 0,
+      color: '#01acee',
+      background: 'none',
+      border: 'none',
+      cursor: 'pointer',
+      fontSize: '18px'
+    },
+    welcomeText: {
+      color: '#333',
+      fontSize: '14px',
+      fontWeight: 400,
+      margin: 0,
+      flex: 1,
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis'
+    },
+    notificationArea: {
+      position: 'relative',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '16px'
+    },
+    bellButton: {
+      width: '32px',
+      height: '32px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 0,
+      background: 'none',
+      border: 'none',
+      cursor: 'pointer',
+      position: 'relative'
+    },
+    bellIcon: {
+      fontSize: '18px',
+      color: '#01acee'
+    },
+    badge: {
+      position: 'absolute',
+      right: '-4px',
+      top: '-4px',
+      backgroundColor: '#dc3545',
+      color: '#fff',
+      borderRadius: '50%',
+      minWidth: '18px',
+      height: '18px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontSize: '11px',
+      fontWeight: 600,
+      padding: '0 4px',
+      zIndex: 1
+    },
+    dropdownMenu: {
+      position: 'absolute',
+      right: '-16px',
+      top: '100%',
+      width: isMobile ? 'calc(100vw - 32px)' : '320px',
+      maxWidth: '400px',
+      marginTop: '0.5rem',
+      backgroundColor: '#fff',
+      borderRadius: '8px',
+      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+      display: showNotifications ? 'block' : 'none',
+      zIndex: 1000,
+      overflow: 'hidden',
+      border: '1px solid rgba(0, 0, 0, 0.1)'
+    },
+    dropdownHeader: {
+      padding: '10px 16px',
+      backgroundColor: '#fff',
+      borderBottom: '1px solid #eee',
+      fontSize: '14px',
+      fontWeight: 600,
+      color: '#01acee',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between'
+    },
+    notificationList: {
+      maxHeight: isMobile ? 'calc(100vh - 250px)' : '400px',
+      overflowY: 'auto',
+      WebkitOverflowScrolling: 'touch',
+      padding: '0'
+    },
+    noNotifications: {
+      padding: '12px 16px',
+      textAlign: 'center',
+      color: '#666',
+      fontSize: '13px',
+      backgroundColor: '#f9f9f9'
+    }
+  };
+
+  useEffect(() => {
+    if (profileUser) {
+      setDisplayUser(profileUser);
+    }
+  }, [profileUser]);
+
+  console.log(notifications,'notifications')
   return (
     <>
-      <nav className="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top mt-3">
-        <form className="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
-          <div className="input-group">
-            {userAuth && (
-              <span type="text" style={{ color: "#fff" }}>
-                {userAuth.obj.companyName ? (
-                  <>
-                    <b>{userAuth.obj.companyName}</b>
-                  </>
-                ) : (
-                  <>
-                    Welcome,{" "}
-                    <b>
-                    {displayUser?.firstName || userAuth.obj.firstName} {displayUser?.lastName || userAuth.obj.lastName}
-                    </b>
-                  </>
-                )}
-              </span>
-            )}
+      <div style={navStyles.container}>
+        {/* Menu Button */}
+       
 
+        {/* Welcome Text */}
+        {userAuth && (
+          <div style={navStyles.welcomeText}>
+            Welcome, <b>{userAuth.obj.companyName || `${displayUser?.firstName || userAuth.obj.firstName} ${displayUser?.lastName || userAuth.obj.lastName}`}</b>
           </div>
+        )}
 
-        </form>
-
-        {isMobile ? <div className="input-group">
-          {userAuth && (
-            <span type="text" style={{ color: "#00ADEF", fontSize: '12px', margin: "0% 30%" }}>
-              {userAuth.obj.companyName ? (
-                <>
-                  <b>{userAuth.obj.companyName}</b>
-                </>
-              ) : (
-                <>
-                  Welcome,{" "}
-                  <b>
-                  {displayUser?.firstName || userAuth.obj.firstName} {displayUser?.lastName || userAuth.obj.lastName}
-                  </b>
-                </>
+        {/* Notification Area */}
+        <div style={navStyles.notificationArea}>
+          <div className="notification-dropdown">
+            <button style={navStyles.bellButton} onClick={handleNotificationPanel}>
+              <i className="fas fa-bell fa-fw" style={navStyles.bellIcon}></i>
+              {notifications?.unReadCount > 0 && (
+                <span style={navStyles.badge}>
+                  {notifications.unReadCount > 99 ? '99+' : notifications.unReadCount}
+                </span>
               )}
-            </span>
-          )}
-        </div> : ''}
-        {/* Topbar Navbar */}
-        <ul className="navbar-nav ml-auto">
-          <li className="nav-item dropdown no-arrow mx-1">
-            <div
-              className="dropdown dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
-              aria-labelledby="alertsDropdown"
-            >
-              <Col md={12} className="dropdown-header">
-                Notification Center
-              </Col>
-
-              <Col md={12} style={{ maxHeight: "300px", overflowY: "auto" }}>
-                {isNotifications && isNotifications.getRecord?.length > 0 ? (
+            </button>
+            <div style={navStyles.dropdownMenu}>
+              <div style={navStyles.dropdownHeader}>
+                Notification Center ({notifications?.unReadCount || 0})
+              </div>
+              <div style={navStyles.notificationList}>
+                {notifications?.getRecord?.length > 0 ? (
                   <NotificationPanel
-                    key={JSON.stringify(isNotifications)}
-                    notifications={isNotifications}
-                    handleNotificationPanel={handleNotificationPanel}
-                    setUnReadCount={setUnReadCount}
+                    notifications={notifications}
                   />
                 ) : (
-                  <>
-                    <span className="dropdown-item text-center small text-gray-500">
-                      No notifications
-                    </span>
-                  </>
+                  <div style={navStyles.noNotifications}>
+                    No notifications available
+                  </div>
                 )}
-              </Col>
+              </div>
             </div>
-          </li>
-
-          {/* Nav Item - Messages */}
-          <li className="nav-item dropdown no-arrow mx-1">
-            <div
-              className="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
-              aria-labelledby="messagesDropdown"
-            >
-              <h6 className="dropdown-header">Message Center</h6>
-              <a className="dropdown-item d-flex align-items-center" href="##">
-                <div className="dropdown-list-image mr-3">
-                  <img
-                    className="rounded-circle"
-                    src="img/undraw_profile_1.svg"
-                    alt="..."
-                  />
-                  <div className="status-indicator bg-success"></div>
-                </div>
-                <div className="font-weight-bold">
-                  <div className="text-truncate">
-                    Hi there! I am wondering if you can help me with a problem
-                    I've been having.
-                  </div>
-                  <div className="small text-gray-500">Emily Fowler · 58m</div>
-                </div>
-              </a>
-              <a className="dropdown-item d-flex align-items-center" href="##">
-                <div className="dropdown-list-image mr-3">
-                  <img
-                    className="rounded-circle"
-                    src="img/undraw_profile_2.svg"
-                    alt="..."
-                  />
-                  <div className="status-indicator"></div>
-                </div>
-                <div>
-                  <div className="text-truncate">
-                    I have the photos that you ordered last month, how would you
-                    like them sent to you?
-                  </div>
-                  <div className="small text-gray-500">Jae Chun · 1d</div>
-                </div>
-              </a>
-              <a className="dropdown-item d-flex align-items-center" href="##">
-                <div className="dropdown-list-image mr-3">
-                  <img
-                    className="rounded-circle"
-                    src="img/undraw_profile_3.svg"
-                    alt="..."
-                  />
-                  <div className="status-indicator bg-warning"></div>
-                </div>
-                <div>
-                  <div className="text-truncate">
-                    Last month's report looks great, I am very happy with the
-                    progress so far, keep up the good work!
-                  </div>
-                  <div className="small text-gray-500">Morgan Alvarez · 2d</div>
-                </div>
-              </a>
-              <a className="dropdown-item d-flex align-items-center" href="##">
-                <div className="dropdown-list-image mr-3">
-                  <img
-                    className="rounded-circle"
-                    src="https://source.unsplash.com/Mv9hjnEUHR4/60x60"
-                    alt="..."
-                  />
-                  <div className="status-indicator bg-success"></div>
-                </div>
-                <div>
-                  <div className="text-truncate">
-                    Am I a good boy? The reason I ask is because someone told me
-                    that people say this to all dogs, even if they aren't
-                    good...
-                  </div>
-                  <div className="small text-gray-500">
-                    Chicken the Dog · 2w
-                  </div>
-                </div>
-              </a>
-              <a
-                className="dropdown-item text-center small text-gray-500"
-                href="##"
-              >
-                Read More Messages
-              </a>
-            </div>
-          </li>
-
-          <div className="topbar-divider d-none d-sm-block"></div>
-
+          </div>
           <UserDropdown userAuth={userAuth} setShowModal={setShowModal} />
-        </ul>
-      </nav>
+        </div>
+      </div>
 
       <CustomModal
         show={showModal}
         onHide={handleCloseModal}
         size="md"
         classes="logout-modal"
-        
         body={
           <div style={{
             padding: '12px 32px 16px 32px',

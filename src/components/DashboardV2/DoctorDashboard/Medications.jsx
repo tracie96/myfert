@@ -44,7 +44,6 @@ const MedicationTable = () => {
     useState(false);
   const [medications, setMedications] = useState([]);
   const [supplements, setSupplements] = useState([]);
-  const [precriptions, setPrecriptions] = useState([]);
   const [activeTab, setActiveTab] = useState("medications");
 
   const [form] = Form.useForm();
@@ -281,67 +280,67 @@ const MedicationTable = () => {
     //     ),
     // },
   ];
-  const precriptionsColumns = [
-    {
-      title: "Name",
-      dataIndex: "supplementName",
-      key: "name",
-      render: (text) => <strong>{text}</strong>,
-    },
-    {
-      title: "Dose",
-      dataIndex: "dose",
-      key: "dose",
-    },
-    {
-      title: "Metric",
-      dataIndex: "metric",
-      key: "metric",
-    },
-    {
-      title: "Amount",
-      dataIndex: "amount",
-      key: "amount",
-    },
-    {
-      title: "Route",
-      dataIndex: "route",
-      key: "route",
-    },
-    {
-      title: "Frequency",
-      dataIndex: "frequency",
-      key: "frequency",
-    },
-    {
-      title: "Notes",
-      dataIndex: "notes",
-      key: "notes",
-    },
-    // {
-    //     title: "Actions",
-    //     key: "actions",
-    //     render: (_, record) => (
-    //         <>
-    //             <Button
-    //                 type="link"
-    //                 icon={<EditOutlined />}
-    //                 onClick={() => console.log("Edit", record)}
-    //             >
-    //                 Edit
-    //             </Button>
-    //             <Button
-    //                 type="link"
-    //                 danger
-    //                 icon={<DeleteOutlined />}
-    //                 onClick={() => handleDelete(record.key)}
-    //             >
-    //                 Delete
-    //             </Button>
-    //         </>
-    //     ),
-    // },
-  ];
+  // const precriptionsColumns = [
+  //   {
+  //     title: "Name",
+  //     dataIndex: "supplementName",
+  //     key: "name",
+  //     render: (text) => <strong>{text}</strong>,
+  //   },
+  //   {
+  //     title: "Dose",
+  //     dataIndex: "dose",
+  //     key: "dose",
+  //   },
+  //   {
+  //     title: "Metric",
+  //     dataIndex: "metric",
+  //     key: "metric",
+  //   },
+  //   {
+  //     title: "Amount",
+  //     dataIndex: "amount",
+  //     key: "amount",
+  //   },
+  //   {
+  //     title: "Route",
+  //     dataIndex: "route",
+  //     key: "route",
+  //   },
+  //   {
+  //     title: "Frequency",
+  //     dataIndex: "frequency",
+  //     key: "frequency",
+  //   },
+  //   {
+  //     title: "Notes",
+  //     dataIndex: "notes",
+  //     key: "notes",
+  //   },
+  //   // {
+  //   //     title: "Actions",
+  //   //     key: "actions",
+  //   //     render: (_, record) => (
+  //   //         <>
+  //   //             <Button
+  //   //                 type="link"
+  //   //                 icon={<EditOutlined />}
+  //   //                 onClick={() => console.log("Edit", record)}
+  //   //             >
+  //   //                 Edit
+  //   //             </Button>
+  //   //             <Button
+  //   //                 type="link"
+  //   //                 danger
+  //   //                 icon={<DeleteOutlined />}
+  //   //                 onClick={() => handleDelete(record.key)}
+  //   //             >
+  //   //                 Delete
+  //   //             </Button>
+  //   //         </>
+  //   //     ),
+  //   // },
+  // ];
 
   const items = [
     {

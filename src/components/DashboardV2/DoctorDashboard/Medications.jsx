@@ -9,11 +9,15 @@ import {
   message,
   Select,
   Tabs,
+  Upload,
 } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import Header from "./Components/Header";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { UploadOutlined } from "@ant-design/icons";
+import { addPatientDocuments } from "../../redux/doctorSlice";
+
 import {
   addPatientMed,
   getPatientMed,
@@ -23,7 +27,7 @@ import {
 } from "../../redux/doctorSlice";
 
 const { Text } = Typography;
-
+const { Dragger } = Upload;
 const MedicationTable = () => {
   const patient = JSON.parse(localStorage.getItem("patient")) || {
     userRef: "",
@@ -33,10 +37,14 @@ const MedicationTable = () => {
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const [isUploadModalVisible, setIsUploadModalVisible] = useState(false);
+  const [newLabResultFile, setNewLabResultFile] = useState(null);
+  const [newLabResultName, setNewLabResultName] = useState("");
   const [isAddSupplementModalVisible, setIsAddSupplementModalVisible] =
     useState(false);
   const [medications, setMedications] = useState([]);
   const [supplements, setSupplements] = useState([]);
+  const [precriptions, setPrecriptions] = useState([]);
   const [activeTab, setActiveTab] = useState("medications");
 
   const [form] = Form.useForm();
@@ -75,6 +83,9 @@ const MedicationTable = () => {
 
   const showAddSupplementModal = () => {
     setIsAddSupplementModalVisible(true);
+  };
+  const showAddPrecriptionModal = () => {
+   // setIsAddPrecriptionModalVisible(true);
   };
 
   const handleAdd = () => {
@@ -270,6 +281,67 @@ const MedicationTable = () => {
     //     ),
     // },
   ];
+  const precriptionsColumns = [
+    {
+      title: "Name",
+      dataIndex: "supplementName",
+      key: "name",
+      render: (text) => <strong>{text}</strong>,
+    },
+    {
+      title: "Dose",
+      dataIndex: "dose",
+      key: "dose",
+    },
+    {
+      title: "Metric",
+      dataIndex: "metric",
+      key: "metric",
+    },
+    {
+      title: "Amount",
+      dataIndex: "amount",
+      key: "amount",
+    },
+    {
+      title: "Route",
+      dataIndex: "route",
+      key: "route",
+    },
+    {
+      title: "Frequency",
+      dataIndex: "frequency",
+      key: "frequency",
+    },
+    {
+      title: "Notes",
+      dataIndex: "notes",
+      key: "notes",
+    },
+    // {
+    //     title: "Actions",
+    //     key: "actions",
+    //     render: (_, record) => (
+    //         <>
+    //             <Button
+    //                 type="link"
+    //                 icon={<EditOutlined />}
+    //                 onClick={() => console.log("Edit", record)}
+    //             >
+    //                 Edit
+    //             </Button>
+    //             <Button
+    //                 type="link"
+    //                 danger
+    //                 icon={<DeleteOutlined />}
+    //                 onClick={() => handleDelete(record.key)}
+    //             >
+    //                 Delete
+    //             </Button>
+    //         </>
+    //     ),
+    // },
+  ];
 
   const items = [
     {
@@ -321,6 +393,38 @@ const MedicationTable = () => {
             columns={supplementColumns}
             pagination={false}
           />
+        </>
+      ),
+    },
+    {
+      key: "Precriptions",
+      label: "Precriptions",
+      children: (
+        <>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              marginBottom: "20px",
+              cursor: "pointer",
+            }}
+            onClick={showAddPrecriptionModal}
+          > 
+            <Button
+              type="primary"
+              style={{ background: "#00ADEF", maxWidth: "200px" }}
+              onClick={() => setIsUploadModalVisible(true)}
+            >
+              + Add New Prescription
+            </Button>
+
+          </div>
+          {/* <Table
+            dataSource={precriptions}
+            columns={precriptionsColumns}
+            pagination={false}
+          /> */}
         </>
       ),
     },
@@ -565,6 +669,89 @@ const MedicationTable = () => {
           </div>
         </Form>
       </Modal>
+      <Modal
+        title="Upload New Prescription"
+        visible={isUploadModalVisible}
+        onCancel={() => {
+          setIsUploadModalVisible(false);
+          setNewLabResultFile(null);
+          setNewLabResultName("");
+        }}
+        onOk={async () => {
+          if (!newLabResultFile || !newLabResultName.trim()) {
+            message.error("Please select a file and enter a name.");
+            return;
+          }
+
+          const reader = new FileReader();
+          reader.readAsDataURL(newLabResultFile);
+          reader.onload = async () => {
+            const base64String = reader.result.split(",")[1];
+            const payload = {
+              patientRef: patient.userRef,
+              bloodWork: [
+                {
+                  base64: base64String,
+                  filename: newLabResultFile.name,
+                  fileTitle: newLabResultName.trim(),
+                  fileType: 3,
+                },
+              ],
+            };
+
+            try {
+              await dispatch(addPatientDocuments(payload)).unwrap();
+              message.success("Lab result uploaded successfully!");
+              setIsUploadModalVisible(false);
+              setNewLabResultFile(null);
+              setNewLabResultName("");
+            } catch (error) {
+              message.error("Upload failed.");
+            }
+          };
+        }}
+        okText="Upload"
+      >
+        <Input
+          placeholder="Enter lab result name"
+          style={{ marginBottom: "15px" }}
+          value={newLabResultName}
+          onChange={(e) => setNewLabResultName(e.target.value)}
+        />
+        <Text strong>Upload File</Text>
+        <Dragger
+          name="file"
+          multiple={false}
+          showUploadList={false}
+          beforeUpload={(file) => {
+            const allowedTypes = [
+              "application/pdf",
+              "image/jpeg",
+              "image/jpg",
+              "image/png",
+            ];
+            if (!allowedTypes.includes(file.type)) {
+              message.error("Only PDF, JPG, and PNG files are allowed.");
+              return Upload.LIST_IGNORE;
+            }
+            setNewLabResultFile(file);
+            return false;
+          }}
+        >
+          <p className="ant-upload-drag-icon">
+            <UploadOutlined />
+          </p>
+          <p className="ant-upload-text">Drag and drop file</p>
+          <p className="ant-upload-hint">- OR -</p>
+          <Button icon={<UploadOutlined />}>Browse Files</Button>
+        </Dragger>
+        {newLabResultFile && (
+          <div style={{ marginTop: "10px" }}>
+            <Text>Selected File: {newLabResultFile.name}</Text>
+          </div>
+        )}
+      </Modal>
+
     </div>
   );
 };

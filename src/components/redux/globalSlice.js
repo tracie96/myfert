@@ -104,12 +104,12 @@ export const markNotiAsRead = createAsyncThunk(
     const users = getState()?.authentication?.userAuth;
     const config = {
       headers: {
-        Authorization: `Bearer ${users?.token}`,
+        Authorization: `Bearer ${users?.obj?.token}`,
       },
     };
 
     try {
-      const url = `${baseUrl}Notification/MarkAsRead`;
+      const url = `${baseUrl}Notification/MarkAsRead/${id}`;
       const response = await axios.put(url, payload, config);
       const responseBack = getResponse(response, dispatch, users);
       return responseBack;

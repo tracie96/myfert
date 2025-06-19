@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import CustomModal from "./CustomModal";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutAction } from "../redux/AuthController";
@@ -7,57 +7,61 @@ import NotificationPanel from "./Notifiation/NotificationPanel";
 import { getNotifications } from "../redux/globalSlice";
 import UserDropdown from "./menu";
 import { useMediaQuery } from "react-responsive";
+import { BellOutlined } from '@ant-design/icons';
 
 function Navbar() {
   const [showModal, setShowModal] = useState(false);
+  const [isNotifications, setNotifications] = useState(null);
+  const [unReadCount, setUnReadCount] = useState(0);
+  const [showNotifications, setShowNotifications] = useState(false);
   const navigate = useNavigate();
   const isMobile = useMediaQuery({ maxWidth: 767 });
-  const dispatch = useDispatch();
   const { userAuth } = useSelector((state) => state.authentication);
   const profileUser = useSelector((state) => state.profile.userData);
-  const { notifications } = useSelector((state) => state.globalSlice);
   const [displayUser, setDisplayUser] = useState(profileUser);
-  const [showNotifications, setShowNotifications] = useState(false);
-  // Fetch notifications periodically
+
   useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        await dispatch(getNotifications()).unwrap();
-      } catch (error) {
-        console.error("Error fetching notifications:", error);
+    if (profileUser) {
+      setDisplayUser(profileUser);
+    }
+  }, [profileUser]);
+
+  const dispatch = useDispatch();
+  
+  const fetchNotificationsList = useCallback(async () => {
+    try {
+      const response = await dispatch(getNotifications());
+      if (getNotifications.fulfilled.match(response)) {
+        setNotifications(response?.payload);
+        setUnReadCount(response.payload?.unReadCount || 0);
       }
-    };
-
-    // Initial fetch
-    fetchNotifications();
-
-    // Set up interval for periodic fetching (every 30 seconds)
-    const intervalId = setInterval(fetchNotifications, 30000);
-
-    // Cleanup interval on component unmount
-    return () => clearInterval(intervalId);
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    } finally {
+    }
   }, [dispatch]);
 
-  // Handle notification panel toggle
-  const handleNotificationPanel = () => {
-    setShowNotifications(!showNotifications);
-  };
-
-  // Close notifications when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (showNotifications && !event.target.closest('.notification-dropdown')) {
-        setShowNotifications(false);
-      }
-    };
+    // Fetch notifications on component mount
+    fetchNotificationsList();
+    
+    // Set up interval to fetch notifications every 30 seconds
+    const interval = setInterval(fetchNotificationsList, 30000);
+    
+    return () => clearInterval(interval);
+  }, [fetchNotificationsList]);
 
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
-  }, [showNotifications]);
+  const handleNotificationPanel = async () => {
+    setShowNotifications(!showNotifications);
+    if (!showNotifications) {
+      await fetchNotificationsList();
+    }
+  };
 
   const handleCloseModal = () => {
     setShowModal(false);
   };
+
   const handleLogout = () => {
     dispatch(logoutAction())
       .unwrap()
@@ -69,240 +73,157 @@ function Navbar() {
       });
   };
 
-  const navStyles = {
-    container: {
-      display: 'flex',
-      alignItems: 'center',
-      padding: '12px 16px',
-      backgroundColor: '#fff',
-      gap: '16px',
-      borderBottom: '1px solid #e3e6f0',
-      marginBottom: '1.5rem',
-      minHeight: '60px'
-    },
-    menuButton: {
-      width: '32px',
-      height: '32px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: 0,
-      color: '#01acee',
-      background: 'none',
-      border: 'none',
-      cursor: 'pointer',
-      fontSize: '18px'
-    },
-    welcomeText: {
-      color: '#333',
-      fontSize: '14px',
-      fontWeight: 400,
-      margin: 0,
-      flex: 1,
-      whiteSpace: 'nowrap',
-      overflow: 'hidden',
-      textOverflow: 'ellipsis'
-    },
-    notificationArea: {
-      position: 'relative',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '16px'
-    },
-    bellButton: {
-      width: '32px',
-      height: '32px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: 0,
-      background: 'none',
-      border: 'none',
-      cursor: 'pointer',
-      position: 'relative'
-    },
-    bellIcon: {
-      fontSize: '18px',
-      color: '#01acee'
-    },
-    badge: {
-      position: 'absolute',
-      right: '-4px',
-      top: '-4px',
-      backgroundColor: '#dc3545',
-      color: '#fff',
-      borderRadius: '50%',
-      minWidth: '18px',
-      height: '18px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontSize: '11px',
-      fontWeight: 600,
-      padding: '0 4px',
-      zIndex: 1
-    },
-    dropdownMenu: {
-      position: 'absolute',
-      right: '-16px',
-      top: '100%',
-      width: isMobile ? 'calc(100vw - 32px)' : '320px',
-      maxWidth: '400px',
-      marginTop: '0.5rem',
-      backgroundColor: '#fff',
-      borderRadius: '8px',
-      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-      display: showNotifications ? 'block' : 'none',
-      zIndex: 1000,
-      overflow: 'hidden',
-      border: '1px solid rgba(0, 0, 0, 0.1)'
-    },
-    dropdownHeader: {
-      padding: '10px 16px',
-      backgroundColor: '#fff',
-      borderBottom: '1px solid #eee',
-      fontSize: '14px',
-      fontWeight: 600,
-      color: '#01acee',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between'
-    },
-    notificationList: {
-      maxHeight: isMobile ? 'calc(100vh - 250px)' : '400px',
-      overflowY: 'auto',
-      WebkitOverflowScrolling: 'touch',
-      padding: '0'
-    },
-    noNotifications: {
-      padding: '12px 16px',
-      textAlign: 'center',
-      color: '#666',
-      fontSize: '13px',
-      backgroundColor: '#f9f9f9'
-    }
-  };
-
-  useEffect(() => {
-    if (profileUser) {
-      setDisplayUser(profileUser);
-    }
-  }, [profileUser]);
-
-  console.log(notifications,'notifications')
   return (
     <>
-      <div style={navStyles.container}>
-        {/* Menu Button */}
-       
-
-        {/* Welcome Text */}
-        {userAuth && (
-          <div style={navStyles.welcomeText}>
-            Welcome, <b>{userAuth.obj.companyName || `${displayUser?.firstName || userAuth.obj.firstName} ${displayUser?.lastName || userAuth.obj.lastName}`}</b>
+      <nav className="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top mt-3">
+        <form className="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+          <div className="input-group">
+            {userAuth && (
+              <span type="text" style={{ color: "#fff" }}>
+                {userAuth.obj.companyName ? (
+                  <>
+                    <b>{userAuth.obj.companyName}</b>
+                  </>
+                ) : (
+                  <>
+                    Welcome,{" "}
+                    <b>
+                      {displayUser?.firstName || userAuth.obj.firstName} {displayUser?.lastName || userAuth.obj.lastName}
+                    </b>
+                  </>
+                )}
+              </span>
+            )}
           </div>
-        )}
+        </form>
 
-        {/* Notification Area */}
-        <div style={navStyles.notificationArea}>
-          <div className="notification-dropdown">
-            <button style={navStyles.bellButton} onClick={handleNotificationPanel}>
-              <i className="fas fa-bell fa-fw" style={navStyles.bellIcon}></i>
-              {notifications?.unReadCount > 0 && (
-                <span style={navStyles.badge}>
-                  {notifications.unReadCount > 99 ? '99+' : notifications.unReadCount}
+        {isMobile ? (
+          <div className="input-group">
+            {userAuth && (
+              <span type="text" style={{ color: "#fff", fontSize: '12px', margin: "0% 30%" }}>
+                {userAuth.obj.companyName ? (
+                  <>
+                    <b>{userAuth.obj.companyName}</b>
+                  </>
+                ) : (
+                  <>
+                    Welcome,{" "}
+                    <b>
+                      {displayUser?.firstName || userAuth.obj.firstName} {displayUser?.lastName || userAuth.obj.lastName}
+                    </b>
+                  </>
+                )}
+              </span>
+            )}
+          </div>
+        ) : null}
+
+        <ul className="navbar-nav ml-auto">
+          <li className="nav-item dropdown no-arrow mx-1">
+            <div 
+              className="nav-link dropdown-toggle" 
+              style={{ cursor: 'pointer', position: 'relative' }}
+              onClick={handleNotificationPanel}
+            >
+              <BellOutlined style={{ fontSize: '20px' }} />
+              {unReadCount > 0 && (
+                <span className="badge badge-danger badge-counter" style={{
+                  position: 'absolute',
+                  top: '25px',
+                  backgroundColor: '#dc3545',
+                  color: 'white',
+                  borderRadius: '50%',
+                  padding: '0.25em 0.4em',
+                  fontSize: '75%',
+                  fontWeight: 700,
+                  lineHeight: 1,
+                  textAlign: 'center',
+                  whiteSpace: 'nowrap',
+                  verticalAlign: 'baseline'
+                }}>
+                  {unReadCount > 99 ? '99+' : unReadCount}
                 </span>
               )}
-            </button>
-            <div style={navStyles.dropdownMenu}>
-              <div style={navStyles.dropdownHeader}>
-                Notification Center ({notifications?.unReadCount || 0})
-              </div>
-              <div style={navStyles.notificationList}>
-                {notifications?.getRecord?.length > 0 ? (
-                  <NotificationPanel
-                    notifications={notifications}
-                  />
-                ) : (
-                  <div style={navStyles.noNotifications}>
-                    No notifications available
-                  </div>
-                )}
-              </div>
             </div>
-          </div>
+            
+            {showNotifications && (
+              <div
+                className="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in show"
+                style={{
+                  position: 'absolute',
+                  right: '0',
+                  top: '100%',
+                  zIndex: 1000,
+                  minWidth: '300px',
+                  maxHeight: '400px',
+                  overflowY: 'auto',
+                  marginTop: '0.5rem'
+                }}
+              >
+                <h6 className="dropdown-header" style={{
+                  background: '#00ADEF',
+                  color: 'white',
+                  padding: '12px 16px',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  borderTopLeftRadius: '4px',
+                  borderTopRightRadius: '4px',
+                  margin: 0
+                }}>
+                  Notification Center
+                </h6>
+                <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                  {isNotifications && isNotifications.getRecord?.length > 0 ? (
+                    <NotificationPanel
+                      key={JSON.stringify(isNotifications)}
+                      notifications={isNotifications}
+                      handleNotificationPanel={handleNotificationPanel}
+                      setUnReadCount={setUnReadCount}
+                      onNotificationUpdate={fetchNotificationsList}
+                    />
+                  ) : (
+                    <div className="dropdown-item text-center small text-gray-500" style={{ padding: '16px' }}>
+                      No notifications
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </li>
+
+          <div className="topbar-divider d-none d-sm-block"></div>
           <UserDropdown userAuth={userAuth} setShowModal={setShowModal} />
-        </div>
-      </div>
+        </ul>
+      </nav>
 
       <CustomModal
         show={showModal}
         onHide={handleCloseModal}
         size="md"
-        classes="logout-modal"
+        classes="bg-primary py-2 text-white"
+        title={  "Ready to Leave?"}
         body={
-          <div style={{
-            padding: '12px 32px 16px 32px',
-            color: '#222',
-            fontSize: '1.1rem',
-            lineHeight: 1.6,
-            textAlign: 'center',
-          }}>
-            Select <span style={{ color: '#335cad', fontWeight: 600, background: '#e6eaf2', padding: '2px 8px', borderRadius: 6 }}>
-              "Logout"
-            </span> if you are ready to end your current session.
-          </div>
+          <>
+            Select "Logout" below if you are ready to end your current session.
+          </>
         }
         footer={
-          <div style={{
-            display: 'flex',
-            justifyContent: 'flex-end',
-            gap: 16,
-            padding: '20px 32px 28px 32px',
-            background: '#f8fafc',
-            borderBottomLeftRadius: 16,
-            borderBottomRightRadius: 16,
-            borderTop: '1px solid #e6eaf2',
-          }}>
+          <>
             <button
-              style={{
-                minWidth: 110,
-                padding: '10px 0',
-                borderRadius: 8,
-                fontWeight: 600,
-                fontSize: '1rem',
-                border: 'none',
-                background: '#e6eaf2',
-                color: '#335cad',
-                transition: 'background 0.2s',
-                cursor: 'pointer',
-              }}
-              onMouseOver={e => (e.currentTarget.style.background = '#d0d8e8')}
-              onMouseOut={e => (e.currentTarget.style.background = '#e6eaf2')}
+              className="btn btn-secondary"
+              type="button"
               onClick={handleCloseModal}
             >
               Cancel
             </button>
             <button
-              style={{
-                minWidth: 110,
-                padding: '10px 0',
-                borderRadius: 8,
-                fontWeight: 600,
-                fontSize: '1rem',
-                border: 'none',
-                background: '#335cad',
-                color: '#fff',
-                transition: 'background 0.2s',
-                cursor: 'pointer',
-              }}
-              onMouseOver={e => (e.currentTarget.style.background = '#274080')}
-              onMouseOut={e => (e.currentTarget.style.background = '#335cad')}
+              className="btn btn-primary"
               onClick={handleLogout}
+              style={{ background: "#01ACEE" }}
             >
               Logout
             </button>
-          </div>
+          </>
         }
       />
     </>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Table,
   Button,
@@ -10,13 +10,15 @@ import {
   Select,
   Tabs,
   Upload,
+  List,
+  Card,
 } from "antd";
-import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { PlusOutlined, EditOutlined, DeleteOutlined, FileOutlined, FilePdfOutlined, FileImageOutlined } from "@ant-design/icons";
 import Header from "./Components/Header";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { UploadOutlined } from "@ant-design/icons";
-import { addPatientDocuments } from "../../redux/doctorSlice";
+import { addPatientDocuments, getPatientBloodWork, downloadBloodWork } from "../../redux/doctorSlice";
 
 import {
   addPatientMed,
@@ -25,8 +27,8 @@ import {
   getPatientSupplements,
   deletePatientBloodWork,
 } from "../../redux/doctorSlice";
-
-const { Text } = Typography;
+import moment from "moment";
+const { Text, Link } = Typography;
 const { Dragger } = Upload;
 const MedicationTable = () => {
   const patient = JSON.parse(localStorage.getItem("patient")) || {
@@ -34,17 +36,27 @@ const MedicationTable = () => {
   };
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  // const breakpoints = {
+  //   xs: 480,
+  //   sm: 576,
+  //   md: 768,
+  //   lg: 992,
+  //   xl: 1200,
+  // };
+
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isUploadModalVisible, setIsUploadModalVisible] = useState(false);
   const [newLabResultFile, setNewLabResultFile] = useState(null);
   const [newLabResultName, setNewLabResultName] = useState("");
+  const [prescriptionFiles, setPrescriptionFiles] = useState([]);
+  //const [isNewLabResultVisible, setIsNewLabResultVisible] = useState(false);
+  //const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [isAddSupplementModalVisible, setIsAddSupplementModalVisible] =
     useState(false);
   const [medications, setMedications] = useState([]);
   const [supplements, setSupplements] = useState([]);
-  const [precriptions, setPrecriptions] = useState([]);
   const [activeTab, setActiveTab] = useState("medications");
 
   const [form] = Form.useForm();
@@ -52,6 +64,50 @@ const MedicationTable = () => {
   const med = useSelector((state) => state.doctor.medications);
   const supplementsList = useSelector((state) => state.doctor.supplements);
 
+
+  const getFileIcon = (filename) => {
+    console.log(filename, "lll");
+
+    if (!filename)
+      return <FileOutlined style={{ color: "#1890ff", fontSize: 24 }} />;
+    const extension = filename.split(".").pop().toLowerCase();
+    switch (extension) {
+      case "pdf":
+        return <FilePdfOutlined style={{ color: "red", fontSize: 24 }} />;
+      case "png":
+      case "jpg":
+      case "jpeg":
+        return <FileImageOutlined style={{ color: "#52c41a", fontSize: 24 }} />;
+      default:
+        return <FileOutlined style={{ color: "#1890ff", fontSize: 24 }} />;
+    }
+  };
+  const openModal = (modalType) => {
+    setIsModalVisible(modalType === "patientSelect");
+    //setIsNewLabResultVisible(modalType === "newLabResult");
+  };
+
+  const handleDownload = async (fileRef, filename) => {
+    try {
+      const resultAction = await dispatch(downloadBloodWork(fileRef));
+      if (downloadBloodWork.fulfilled.match(resultAction)) {
+        const mimeType = getFileType(filename);
+        const blob = new Blob([resultAction.payload], { type: mimeType });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename || `${fileRef}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      } else {
+        message.error("Failed to download file.");
+      }
+    } catch (error) {
+      message.error("Download error.");
+    }
+  };
   useEffect(() => {
     if (!patient.userRef) {
       setIsModalVisible(true);
@@ -85,8 +141,33 @@ const MedicationTable = () => {
     setIsAddSupplementModalVisible(true);
   };
   const showAddPrecriptionModal = () => {
-   // setIsAddPrecriptionModalVisible(true);
+    // setIsAddPrecriptionModalVisible(true);
   };
+
+  const fetchPatientBloodWork = useCallback(
+    async () => {
+      if (!patient.userRef) {
+        console.log("Opening patient select modal");
+        openModal("patientSelect");
+        return;
+      }
+
+      console.log("Fetching prescription files (fileType 3)...");
+      const resultAction = await dispatch(
+        getPatientBloodWork({ patientId: patient.userRef, fileType: 3 })
+      );
+
+      if (getPatientBloodWork.fulfilled.match(resultAction)) {
+        setPrescriptionFiles(resultAction.payload);
+      } else {
+        message.error("Failed to fetch prescription files.");
+      }
+    },
+    [patient.userRef, dispatch]
+  );
+  useEffect(() => {
+    fetchPatientBloodWork();
+  }, [dispatch, patient.userRef, fetchPatientBloodWork]);
 
   const handleAdd = () => {
     form.validateFields().then(async (values) => {
@@ -107,7 +188,21 @@ const MedicationTable = () => {
       }
     });
   };
-
+  const getFileType = (filename) => {
+    if (!filename) return "application/pdf"; // default to PDF
+    const extension = filename.split(".").pop().toLowerCase();
+    switch (extension) {
+      case "pdf":
+        return "application/pdf";
+      case "png":
+        return "image/png";
+      case "jpg":
+      case "jpeg":
+        return "image/jpeg";
+      default:
+        return "application/pdf";
+    }
+  };
   const handleAddSupplement = () => {
     supplementForm.validateFields().then(async (values) => {
       try {
@@ -124,7 +219,7 @@ const MedicationTable = () => {
         ];
 
         const missingFields = requiredFields.filter(field => !values[field]);
-        
+
         if (missingFields.length > 0) {
           message.error(`Please fill in all required fields: ${missingFields.join(', ')}`);
           return;
@@ -167,7 +262,7 @@ const MedicationTable = () => {
       message.error("Failed to delete medication.");
     }
   };
-
+  //const isMobile = windowWidth <= breakpoints.sm;
   const medicationColumns = [
     {
       title: "Name",
@@ -221,67 +316,6 @@ const MedicationTable = () => {
   ];
 
   const supplementColumns = [
-    {
-      title: "Name",
-      dataIndex: "supplementName",
-      key: "name",
-      render: (text) => <strong>{text}</strong>,
-    },
-    {
-      title: "Dose",
-      dataIndex: "dose",
-      key: "dose",
-    },
-    {
-      title: "Metric",
-      dataIndex: "metric",
-      key: "metric",
-    },
-    {
-      title: "Amount",
-      dataIndex: "amount",
-      key: "amount",
-    },
-    {
-      title: "Route",
-      dataIndex: "route",
-      key: "route",
-    },
-    {
-      title: "Frequency",
-      dataIndex: "frequency",
-      key: "frequency",
-    },
-    {
-      title: "Notes",
-      dataIndex: "notes",
-      key: "notes",
-    },
-    // {
-    //     title: "Actions",
-    //     key: "actions",
-    //     render: (_, record) => (
-    //         <>
-    //             <Button
-    //                 type="link"
-    //                 icon={<EditOutlined />}
-    //                 onClick={() => console.log("Edit", record)}
-    //             >
-    //                 Edit
-    //             </Button>
-    //             <Button
-    //                 type="link"
-    //                 danger
-    //                 icon={<DeleteOutlined />}
-    //                 onClick={() => handleDelete(record.key)}
-    //             >
-    //                 Delete
-    //             </Button>
-    //         </>
-    //     ),
-    // },
-  ];
-  const precriptionsColumns = [
     {
       title: "Name",
       dataIndex: "supplementName",
@@ -397,8 +431,8 @@ const MedicationTable = () => {
       ),
     },
     {
-      key: "Precriptions",
-      label: "Precriptions",
+      key: "Prescriptions",
+      label: "Prescriptions",
       children: (
         <>
           <div
@@ -410,7 +444,7 @@ const MedicationTable = () => {
               cursor: "pointer",
             }}
             onClick={showAddPrecriptionModal}
-          > 
+          >
             <Button
               type="primary"
               style={{ background: "#00ADEF", maxWidth: "200px" }}
@@ -420,11 +454,46 @@ const MedicationTable = () => {
             </Button>
 
           </div>
-          {/* <Table
-            dataSource={precriptions}
-            columns={precriptionsColumns}
-            pagination={false}
-          /> */}
+          <Card style={{ border: "1px solid #C2E6F8", marginBottom: "24px" }}>
+            <Typography.Title level={5} style={{ marginBottom: "16px" }}>
+              Prescriptions
+            </Typography.Title>
+            <List
+              dataSource={prescriptionFiles || []}
+              renderItem={(file) => (
+                <List.Item style={{ padding: '16px 0' }}>
+                  <div style={{ display: "flex", alignItems: "center", width: "100%", gap: "16px" }}>
+                    <div style={{ width: "3px", height: "40px", backgroundColor: "#00ADEF", flexShrink: 0 }} />
+                    <div style={{ flex: "1" }}>
+                      <Text>{file.fileTitle || file.filename}</Text>
+                    </div>
+                    <div style={{ flex: "1" }}>
+                      <Text>{moment(file.createdOn).format("MMMM DD, YYYY")}</Text>
+                    </div>
+                    <div style={{ flex: "1", display: "flex", alignItems: "center", gap: 8 }}>
+                      {getFileIcon(file.filename)}
+                      <Link onClick={() => handleDownload(file.fileRef, file.filename)} style={{ color: "#1890ff" }}>
+                        Download
+                      </Link>
+                    </div>
+                    <Link
+                      style={{ color: "#1890ff" }}
+                      onClick={() => handleDownload(file.fileRef, file.filename)}
+                    >
+                      Send By Fax
+                    </Link>
+
+                    {/* <DeleteOutlined
+                      style={{ color: "red", cursor: "pointer" }}
+                      onClick={() => handleDelete(file.fileRef)}
+                    /> */}
+                  </div>
+                </List.Item>
+              )}
+            />
+          </Card>
+
+
         </>
       ),
     },
@@ -518,8 +587,8 @@ const MedicationTable = () => {
         okText="Add"
         width={500}
       >
-        <Form 
-          form={supplementForm} 
+        <Form
+          form={supplementForm}
           layout="vertical"
           initialValues={{
             Metric: 'mg',
@@ -701,7 +770,8 @@ const MedicationTable = () => {
 
             try {
               await dispatch(addPatientDocuments(payload)).unwrap();
-              message.success("Lab result uploaded successfully!");
+              await fetchPatientBloodWork();
+              message.success("Prescription File uploaded successfully!");
               setIsUploadModalVisible(false);
               setNewLabResultFile(null);
               setNewLabResultName("");
@@ -713,7 +783,7 @@ const MedicationTable = () => {
         okText="Upload"
       >
         <Input
-          placeholder="Enter lab result name"
+          placeholder="Enter Prescription name"
           style={{ marginBottom: "15px" }}
           value={newLabResultName}
           onChange={(e) => setNewLabResultName(e.target.value)}

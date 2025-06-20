@@ -51,31 +51,63 @@
 .search-container {
   padding: 15px;
   border-bottom: 1px solid #e6e6e6;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .search-input {
-  margin-bottom: 10px;
+  border-radius: 20px;
+  padding: 8px 12px;
+}
+
+.search-input input {
+  font-size: 14px;
+}
+
+.search-input .ant-input-prefix {
+  margin-right: 8px;
+  color: #666;
+}
+
+.search-input .ant-input-clear-icon {
+  color: #999;
+}
+
+.search-input .ant-input-clear-icon:hover {
+  color: #666;
 }
 
 .filter-buttons {
   display: flex;
   gap: 10px;
+  background: #f8f9fa;
+  padding: 4px;
+  border-radius: 25px;
+  border: 1px solid #e6e6e6;
 }
 
 .filter-btn {
   flex: 1;
-  padding: 8px;
-  border: 1px solid #e6e6e6;
-  background: white;
-  border-radius: 4px;
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 20px;
   cursor: pointer;
   transition: all 0.2s;
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+.filter-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
 }
 
 .filter-btn.active {
-  background: #00ADEF;
-  color: white;
-  border-color: #00ADEF;
+  background: white;
+  color: #333;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .users-list {
@@ -283,4 +315,26 @@
 
 .text-muted {
   color: #718096;
+}
+
+.no-results {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+}
+
+.no-results:before {
+  content: '🔍';
+  display: block;
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+/* Highlight matching text */
+.user-name mark,
+.user-details mark {
+  background-color: rgba(0, 173, 239, 0.2);
+  padding: 0 2px;
+  border-radius: 2px;
 } 

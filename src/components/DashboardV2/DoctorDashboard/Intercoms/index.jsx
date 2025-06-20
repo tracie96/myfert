@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Input, Avatar } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import { 
@@ -8,13 +8,14 @@ import {
   sendMessage,
   addMessage 
 } from '../../../redux/doctorSlice';
-import { UserOutlined } from '@ant-design/icons';
+import { UserOutlined, SearchOutlined } from '@ant-design/icons';
 import './styles.css';
 
 const Intercom = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [message, setMessage] = useState('');
   const [activeTab, setActiveTab] = useState('patient');
+  const [searchQuery, setSearchQuery] = useState('');
   const dispatch = useDispatch();
 
   // Get patient list and loading state from redux store
@@ -121,6 +122,7 @@ const Intercom = () => {
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     setSelectedUser(null);
+    setSearchQuery(''); // Clear search when switching tabs
   };
 
   const renderMessages = () => {
@@ -157,31 +159,43 @@ const Intercom = () => {
     });
   };
 
-  const getCurrentUsers = () => {
-    if (activeTab === 'patient') {
-      return patients?.map(patient => ({
-        id: patient.userRef,
-        name: `${patient.firstname} ${patient.lastname}`,
-        avatar: patient.picture,
-        email: patient.email,
-        phone: patient.phoneNumber
-      })) || [];
-    } else {
-      const providersList = providers?.getRecord || providers || [];
-      console.log('Raw providers list:', providersList);
-      return providersList.map(provider => {
-        console.log('Mapping provider:', provider);
-        const mappedProvider = {
-          id: provider.userRef || provider.id,  // Try userRef first, then fall back to id
-          name: `${provider.firstname || ''} ${provider.lastname || ''}`.trim() || 'Unknown Provider',
-          avatar: provider.profilePicture || provider.picture,  // Try both picture field names
-          email: provider.email,
-          role: provider.role || provider.userType
-        };
-        console.log('Mapped provider:', mappedProvider);
-        return mappedProvider;
-      }) || [];
-    }
+  // Move getCurrentUsers into useMemo to avoid the dependency issue
+  const filteredUsers = useMemo(() => {
+    const getCurrentUsers = () => {
+      if (activeTab === 'patient') {
+        return patients?.map(patient => ({
+          id: patient.userRef,
+          name: `${patient.firstname} ${patient.lastname}`,
+          avatar: patient.picture,
+          email: patient.email,
+          phone: patient.phoneNumber
+        })) || [];
+      } else {
+        const providersList = providers?.getRecord || providers || [];
+        return providersList.map(provider => {
+          return {
+            id: provider.userRef || provider.id,
+            name: `${provider.firstname || ''} ${provider.lastname || ''}`.trim() || 'Unknown Provider',
+            avatar: provider.profilePicture || provider.picture,
+            email: provider.email,
+            role: provider.role || provider.userType
+          };
+        }) || [];
+      }
+    };
+
+    const users = getCurrentUsers();
+    if (!searchQuery.trim()) return users;
+
+    const query = searchQuery.toLowerCase();
+    return users.filter(user => 
+      user.name.toLowerCase().includes(query) || 
+      (user.email && user.email.toLowerCase().includes(query))
+    );
+  }, [searchQuery, patients, providers, activeTab]);
+
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value);
   };
 
   return (
@@ -196,20 +210,29 @@ const Intercom = () => {
         
         <div className="search-container">
           <Input
-            prefix={<i className="fas fa-search"></i>}
-            placeholder="Search"
+            prefix={<SearchOutlined />}
+            placeholder={`Search ${activeTab === 'patient' ? 'patients' : 'providers'}...`}
             className="search-input"
+            value={searchQuery}
+            onChange={handleSearch}
+            allowClear
           />
           <div className="filter-buttons">
             <button 
               className={`filter-btn ${activeTab === 'patient' ? 'active' : ''}`}
-              onClick={() => handleTabChange('patient')}
+              onClick={() => {
+                handleTabChange('patient');
+                setSearchQuery(''); // Clear search when switching tabs
+              }}
             >
               Patient
             </button>
             <button 
               className={`filter-btn ${activeTab === 'provider' ? 'active' : ''}`}
-              onClick={() => handleTabChange('provider')}
+              onClick={() => {
+                handleTabChange('provider');
+                setSearchQuery(''); // Clear search when switching tabs
+              }}
             >
               Provider
             </button>
@@ -219,40 +242,46 @@ const Intercom = () => {
         <div className="users-list">
           {isLoading ? (
             <div className="loading-state">Loading {activeTab === 'patient' ? 'patients' : 'providers'}...</div>
-          ) : getCurrentUsers().map((user) => (
-            <div
-              key={user.id}
-              className={`user-item ${selectedUser?.id === user.id ? 'selected' : ''}`}
-              onClick={() => handleUserSelect(user)}
-            >
-              <div className="user-avatar">
-                <Avatar 
-                  size={40}
-                  src={user.avatar}
-                  icon={!user.avatar && <UserOutlined />}
-                  style={{ 
-                    backgroundColor: !user.avatar ? '#00ADEF' : 'transparent',
-                    color: !user.avatar ? '#fff' : undefined
-                  }}
-                >
-                  {!user.avatar && user.name.charAt(0).toUpperCase()}
-                </Avatar>
-              </div>
-              <div className="user-info">
-                <div className="user-name-container">
-                  <span className="user-name">{user.name}</span>
-                  {user.role && (
-                    <small className="user-role">{user.role}</small>
+          ) : filteredUsers.length > 0 ? (
+            filteredUsers.map((user) => (
+              <div
+                key={user.id}
+                className={`user-item ${selectedUser?.id === user.id ? 'selected' : ''}`}
+                onClick={() => handleUserSelect(user)}
+              >
+                <div className="user-avatar">
+                  <Avatar 
+                    size={40}
+                    src={user.avatar}
+                    icon={!user.avatar && <UserOutlined />}
+                    style={{ 
+                      backgroundColor: !user.avatar ? '#00ADEF' : 'transparent',
+                      color: !user.avatar ? '#fff' : undefined
+                    }}
+                  >
+                    {!user.avatar && user.name.charAt(0).toUpperCase()}
+                  </Avatar>
+                </div>
+                <div className="user-info">
+                  <div className="user-name-container">
+                    <span className="user-name">{user.name}</span>
+                    {user.role && (
+                      <small className="user-role">{user.role}</small>
+                    )}
+                  </div>
+                  {user.email && (
+                    <div className="user-details">
+                      <small className="text-muted">{user.email}</small>
+                    </div>
                   )}
                 </div>
-                {user.email && (
-                  <div className="user-details">
-                    <small className="text-muted">{user.email}</small>
-                  </div>
-                )}
               </div>
+            ))
+          ) : (
+            <div className="no-results">
+              No {activeTab === 'patient' ? 'patients' : 'providers'} found matching "{searchQuery}"
             </div>
-          ))}
+          )}
         </div>
       </div>
 

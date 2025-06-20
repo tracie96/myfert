@@ -90,7 +90,7 @@ export const GetSideBar = () => {
       case "/doctor/fax":
         return "8";
       case "/doctor/intercom":
-        return "7";
+        return "9";
       default:
         return "1";
     }
@@ -207,7 +207,7 @@ export const GetSideBar = () => {
           <span>FAX</span>
         </NavLink>
       </Menu.Item>
-      <Menu.Item key="7" icon={<FaStickyNote style={{ color: "#00ADEF" }} />}>
+      <Menu.Item key="9" icon={<FaStickyNote style={{ color: "#00ADEF" }} />}>
         <NavLink to="/doctor/intercom" style={{ textDecoration: "none" }}>
           <span>INTERCOM</span>
         </NavLink>

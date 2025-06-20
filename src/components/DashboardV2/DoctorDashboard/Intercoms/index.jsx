@@ -1,66 +1,114 @@
 import React, { useState, useEffect } from 'react';
-import { Input, Spin } from 'antd';
-import axios from 'axios';
+import { Input, Avatar } from 'antd';
+import { useSelector, useDispatch } from 'react-redux';
+import { 
+  patientList as fetchPatientList, 
+  fetchCareGivers, 
+  getMessages, 
+  sendMessage,
+  addMessage 
+} from '../../../redux/doctorSlice';
+import { UserOutlined } from '@ant-design/icons';
 import './styles.css';
 
 const Intercom = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [message, setMessage] = useState('');
   const [activeTab, setActiveTab] = useState('patient');
-  const [providers, setProviders] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
-  // Mock data for messages
-  const mockMessages = [
-    {
-      id: 1,
-      sender: 'doctor',
-      text: 'Hello!',
-      timestamp: new Date().toISOString(),
-    },
-    {
-      id: 2,
-      sender: 'patient',
-      text: 'I have questions on how to book an appointment.',
-      timestamp: new Date().toISOString(),
-    }
-  ];
-
-  const patients = [
-    { id: 1, name: 'Jan Smith', avatar: '/path/to/avatar1' },
-    { id: 2, name: 'Crisia Tabacaru', avatar: '/path/to/avatar2' },
-    { id: 3, name: 'Bob Teller', avatar: '/path/to/avatar3' },
-    { id: 4, name: 'Claire Holmes', avatar: '/path/to/avatar4' },
-    { id: 5, name: 'Stacey Dimock', avatar: '/path/to/avatar5' },
-    { id: 6, name: 'Esther Flin', avatar: '/path/to/avatar6' },
-  ];
+  // Get patient list and loading state from redux store
+  const patients = useSelector((state) => state.doctor.patientList || []);
+  const providers = useSelector((state) => state.doctor.careGivers || []);
+  const isLoading = useSelector((state) => state.doctor.loading);
+  const messages = useSelector((state) => state.doctor.messages?.chats);
+  const chatRef = useSelector((state) => state.doctor.messages?.chatReference);
+  const chatLoading = useSelector((state) => state.doctor.chatLoading);
+  const chatError = useSelector((state) => state.doctor.chatError);
 
   useEffect(() => {
-    if (activeTab === 'provider') {
-      fetchProviders();
-    }
-  }, [activeTab]);
+    // Fetch patient list when component mounts or tab changes
+    const loadUsers = async () => {
+      try {
+        const params = {
+          page: 1,
+          size: 100
+        };
+        
+        if (activeTab === 'patient') {
+          const response = await dispatch(fetchPatientList(params));
+          if (!fetchPatientList.fulfilled.match(response)) {
+            console.error('Failed to fetch patient list:', response.error);
+          }
+        } else {
+          const response = await dispatch(fetchCareGivers(params));
+          if (!fetchCareGivers.fulfilled.match(response)) {
+            console.error('Failed to fetch providers list:', response.error);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching users list:', error);
+      }
+    };
 
-  const fetchProviders = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get('https://myfertilitydevapi-prod.azurewebsites.net/api/Chat/GetCareGiverList/1/100');
-      setProviders(response.data.data || []);
-    } catch (error) {
-      console.error('Error fetching providers:', error);
-    } finally {
-      setLoading(false);
+    loadUsers();
+  }, [dispatch, activeTab]);
+
+  // Load messages when a user is selected
+  useEffect(() => {
+    if (selectedUser?.id) {
+      console.log('Fetching messages for user:', selectedUser.id);
+      dispatch(getMessages(selectedUser.id))
+        .then(response => {
+          console.log('Messages response:', response);
+        })
+        .catch(error => {
+          console.error('Error fetching messages:', error);
+        });
     }
-  };
+  }, [dispatch, selectedUser]);
 
   const handleUserSelect = (user) => {
+    console.log('Selected user:', user);
     setSelectedUser(user);
   };
 
-  const handleSendMessage = () => {
-    if (message.trim()) {
-      // Implement message sending logic here
-      setMessage('');
+  const handleSendMessage = async () => {
+    if (message.trim() && selectedUser?.id && chatRef) {
+      console.log('Sending message:', {
+        userRef: selectedUser.id,
+        chat: message.trim(),
+        chatRef: chatRef
+      });
+      try {
+        // Optimistically add the message to the UI
+        const newMessage = {
+          chat: message.trim(),
+          isUser: false, // We are sending it
+          createdOn: new Date().toISOString()
+        };
+        
+        // Update local state immediately
+        if (messages) {
+          dispatch(addMessage({
+            chatReference: chatRef,
+            newMessage
+          }));
+        }
+
+        const trimmedMessage = message.trim();
+        setMessage(''); // Clear input immediately for better UX
+
+        const response = await dispatch(sendMessage({
+          userRef: selectedUser.id,
+          chat: trimmedMessage,
+          chatRef: chatRef
+        }));
+        console.log('Send message response:', response);
+      } catch (error) {
+        console.error('Error sending message:', error);
+        // Could add error handling here to remove the optimistically added message
+      }
     }
   };
 
@@ -76,20 +124,64 @@ const Intercom = () => {
   };
 
   const renderMessages = () => {
-    return mockMessages.map((msg) => (
-      <div 
-        key={msg.id} 
-        className={`message-bubble ${msg.sender === 'doctor' ? 'sent' : 'received'}`}
-      >
-        <div className="message-content">
-          {msg.text}
+    if (chatLoading) {
+      return <div className="loading-messages">Loading messages...</div>;
+    }
+
+    if (chatError) {
+      return <div className="error-messages">Error loading messages: {chatError.message}</div>;
+    }
+
+    if (!messages || messages.length === 0) {
+      return <div className="no-messages">No messages yet</div>;
+    }
+
+    return messages.map((msg, index) => {
+      // For messages we send, isUser will be false
+      // For messages we receive, isUser will be true
+      const isSentByMe = !msg.isUser;
+      
+      return (
+        <div 
+          key={index} 
+          className={`message-bubble ${isSentByMe ? 'sent' : 'received'}`}
+        >
+          <div className="message-content">
+            {msg.chat}
+            <div className="message-timestamp">
+              {new Date(msg.createdOn).toLocaleTimeString()}
+            </div>
+          </div>
         </div>
-      </div>
-    ));
+      );
+    });
   };
 
   const getCurrentUsers = () => {
-    return activeTab === 'patient' ? patients : providers;
+    if (activeTab === 'patient') {
+      return patients?.map(patient => ({
+        id: patient.userRef,
+        name: `${patient.firstname} ${patient.lastname}`,
+        avatar: patient.picture,
+        email: patient.email,
+        phone: patient.phoneNumber
+      })) || [];
+    } else {
+      const providersList = providers?.getRecord || providers || [];
+      console.log('Raw providers list:', providersList);
+      return providersList.map(provider => {
+        console.log('Mapping provider:', provider);
+        const mappedProvider = {
+          id: provider.userRef || provider.id,  // Try userRef first, then fall back to id
+          name: `${provider.firstname || ''} ${provider.lastname || ''}`.trim() || 'Unknown Provider',
+          avatar: provider.profilePicture || provider.picture,  // Try both picture field names
+          email: provider.email,
+          role: provider.role || provider.userType
+        };
+        console.log('Mapped provider:', mappedProvider);
+        return mappedProvider;
+      }) || [];
+    }
   };
 
   return (
@@ -125,31 +217,42 @@ const Intercom = () => {
         </div>
 
         <div className="users-list">
-          {loading ? (
-            <div className="loading-container">
-              <Spin />
-            </div>
-          ) : (
-            getCurrentUsers().map((user) => (
-              <div
-                key={user.id}
-                className={`user-item ${selectedUser?.id === user.id ? 'selected' : ''}`}
-                onClick={() => handleUserSelect(user)}
-              >
-                <div className="user-avatar">
-                  <img 
-                    src={user.avatar || user.profileImage || '/default-avatar.png'} 
-                    alt={user.name || user.firstName + ' ' + user.lastName} 
-                  />
-                </div>
-                <div className="user-info">
-                  <span className="user-name">
-                    {user.name || `${user.firstName} ${user.lastName}`}
-                  </span>
-                </div>
+          {isLoading ? (
+            <div className="loading-state">Loading {activeTab === 'patient' ? 'patients' : 'providers'}...</div>
+          ) : getCurrentUsers().map((user) => (
+            <div
+              key={user.id}
+              className={`user-item ${selectedUser?.id === user.id ? 'selected' : ''}`}
+              onClick={() => handleUserSelect(user)}
+            >
+              <div className="user-avatar">
+                <Avatar 
+                  size={40}
+                  src={user.avatar}
+                  icon={!user.avatar && <UserOutlined />}
+                  style={{ 
+                    backgroundColor: !user.avatar ? '#00ADEF' : 'transparent',
+                    color: !user.avatar ? '#fff' : undefined
+                  }}
+                >
+                  {!user.avatar && user.name.charAt(0).toUpperCase()}
+                </Avatar>
               </div>
-            ))
-          )}
+              <div className="user-info">
+                <div className="user-name-container">
+                  <span className="user-name">{user.name}</span>
+                  {user.role && (
+                    <small className="user-role">{user.role}</small>
+                  )}
+                </div>
+                {user.email && (
+                  <div className="user-details">
+                    <small className="text-muted">{user.email}</small>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -158,14 +261,25 @@ const Intercom = () => {
           <>
             <div className="chat-header">
               <div className="selected-user">
-                <img 
-                  src={selectedUser.avatar || selectedUser.profileImage || '/default-avatar.png'} 
-                  alt={selectedUser.name || selectedUser.firstName + ' ' + selectedUser.lastName} 
-                  className="user-avatar" 
-                />
-                <span className="user-name">
-                  {selectedUser.name || `${selectedUser.firstName} ${selectedUser.lastName}`}
-                </span>
+                <Avatar 
+                  size={40}
+                  src={selectedUser.avatar}
+                  icon={!selectedUser.avatar && <UserOutlined />}
+                  style={{ 
+                    backgroundColor: !selectedUser.avatar ? '#00ADEF' : 'transparent',
+                    color: !selectedUser.avatar ? '#fff' : undefined
+                  }}
+                >
+                  {!selectedUser.avatar && selectedUser.name.charAt(0).toUpperCase()}
+                </Avatar>
+                <div className="selected-user-info">
+                  <span className="user-name">{selectedUser.name}</span>
+                  {selectedUser.role ? (
+                    <small className="text-muted">{selectedUser.role}</small>
+                  ) : (
+                    selectedUser.email && <small className="text-muted">{selectedUser.email}</small>
+                  )}
+                </div>
               </div>
             </div>
             <div className="chat-messages">
@@ -181,7 +295,7 @@ const Intercom = () => {
                   <button 
                     className="send-button"
                     onClick={handleSendMessage}
-                    disabled={!message.trim()}
+                    disabled={!message.trim() || chatLoading}
                   >
                     <i className="fas fa-paper-plane"></i>
                   </button>

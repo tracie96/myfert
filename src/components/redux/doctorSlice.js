@@ -18,6 +18,7 @@ export const patientList = createAsyncThunk(
         `${baseUrl}Doctor/GetPatient/${page}/${size}`,
         config,
       );
+      console.log(response, 'responsessss');
       return response;
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, user);
@@ -25,7 +26,29 @@ export const patientList = createAsyncThunk(
   },
 );
 
-
+export const fetchCareGivers = createAsyncThunk(
+  "doctor/fetchCareGivers",
+  async ({ page, size }, { rejectWithValue, getState }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+    try {
+      const response = await axios.get(
+        `${baseUrl}Chat/GetCareGiverList/${page}/${size}`,
+        config,
+      );
+      console.log('Care givers API response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Care givers API error:', error);
+      return rejectWithValue(error?.response?.data);
+    }
+  }
+);
 
 export const getPatientBloodWork = createAsyncThunk(
   "doctor/getBloodWork",
@@ -48,7 +71,6 @@ export const getPatientBloodWork = createAsyncThunk(
     }
   }
 );
-
 
 export const downloadBloodWork = createAsyncThunk(
   "doctor/downloadBloodWork",
@@ -93,7 +115,6 @@ export const deletePatientBloodWork = createAsyncThunk(
     }
   }
 );
-
 
 export const addPatientBloodWork = createAsyncThunk(
   "doctor/addPatientBloodWork",
@@ -189,7 +210,6 @@ export const addPatientMed = createAsyncThunk(
     }
   }
 );
-
 
 export const submitAvailability = createAsyncThunk(
   "availability/submitAvailability",
@@ -780,6 +800,53 @@ export const addPatientSupplement = createAsyncThunk(
   }
 );
 
+export const getMessages = createAsyncThunk(
+  "doctor/getMessages",
+  async (userRef, { rejectWithValue, getState }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        accept: "text/plain",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+
+    try {
+      const response = await axios.get(
+        `${baseUrl}Chat/GetMessages/${userRef}`,
+        config
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error?.response?.data);
+    }
+  }
+);
+
+export const sendMessage = createAsyncThunk(
+  "doctor/sendMessage",
+  async ({ userRef, chat, chatRef }, { rejectWithValue, getState }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+
+    try {
+      const response = await axios.post(
+        `${baseUrl}Chat/SendMessage`,
+        { userRef, chat, chatRef },
+        config
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error?.response?.data);
+    }
+  }
+);
+
 const doctorSlices = createSlice({
   name: "doctor",
   initialState: {
@@ -788,6 +855,8 @@ const doctorSlices = createSlice({
     appStatus: null,
     appStatusCode: null,
     serverErr: null,
+    patientList: [],
+    careGivers: [],
     upcomingPatientAppointment: [],
     doctorAvailability: {},
     bloodWork: [],
@@ -807,12 +876,23 @@ const doctorSlices = createSlice({
     supplements: [],
     bloodWorkFile1: null,
     bloodWorkFile2: null,
+    messages: null,
+    chatRef: null,
+    chatLoading: false,
+    chatError: null,
+  },
+  reducers: {
+    // Add a reducer for optimistic message updates
+    addMessage: (state, action) => {
+      if (state.messages?.chats) {
+        state.messages.chats.push(action.payload.newMessage);
+      }
+    }
   },
   extraReducers: (builder) => {
     builder.addCase(patientList.pending, (state, action) => {
       state.loading = true;
       state.appStatusCode = undefined;
-      state.profileAppErr = undefined;
       state.profileAppErr = undefined;
       state.profileServerErr = undefined;
     });
@@ -822,6 +902,7 @@ const doctorSlices = createSlice({
       state.appStatusCode = undefined;
       state.profileAppErr = undefined;
       state.profileServerErr = undefined;
+      state.patientList = action.payload?.data || [];
     });
     builder.addCase(patientList.rejected, (state, action) => {
       state.appErr = action?.payload?.message;
@@ -829,6 +910,7 @@ const doctorSlices = createSlice({
       state.serverErr = undefined;
       state.appStatus = action?.payload?.status;
       state.appStatusCode = action?.payload?.statusCode;
+      state.patientList = [];
     });
     builder.addCase(cancelPatientAppointment.pending, (state, action) => {
       state.loading = true;
@@ -1113,22 +1195,6 @@ const doctorSlices = createSlice({
         state.documoError = action.payload;
       });
 
-    builder
-      .addCase(downloadDocumo.pending, (state) => {
-        // Don't modify documoData during download
-        state.documoLoading = true;
-        state.documoError = null;
-      })
-      .addCase(downloadDocumo.fulfilled, (state, action) => {
-        // Don't modify documoData after successful download
-        state.documoLoading = false;
-        state.documoError = null;
-      })
-      .addCase(downloadDocumo.rejected, (state, action) => {
-        state.documoLoading = false;
-        state.documoError = action.payload;
-      });
-
     // Get Patient Supplements
     builder.addCase(getPatientSupplements.pending, (state) => {
       state.loading = true;
@@ -1160,7 +1226,56 @@ const doctorSlices = createSlice({
       state.loading = false;
       state.error = action.payload;
     });
+
+    // Add Care Givers
+    builder.addCase(fetchCareGivers.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+    builder.addCase(fetchCareGivers.fulfilled, (state, action) => {
+      console.log('Care givers reducer payload:', action.payload);
+      state.loading = false;
+      state.careGivers = action.payload || [];
+    });
+    builder.addCase(fetchCareGivers.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+      state.careGivers = [];
+    });
+
+    // Get Messages
+    builder.addCase(getMessages.pending, (state) => {
+      state.chatLoading = true;
+      state.chatError = null;
+    });
+    builder.addCase(getMessages.fulfilled, (state, action) => {
+      state.chatLoading = false;
+      state.messages = action.payload;
+      state.chatRef = action.payload.chatReference;
+      state.chatError = null;
+    });
+    builder.addCase(getMessages.rejected, (state, action) => {
+      state.chatLoading = false;
+      state.chatError = action.payload;
+    });
+
+    // Send Message
+    builder.addCase(sendMessage.pending, (state) => {
+      state.chatLoading = true;
+      state.chatError = null;
+    });
+    builder.addCase(sendMessage.fulfilled, (state, action) => {
+      state.chatLoading = false;
+      state.chatError = null;
+      // Message already added optimistically, no need to add again
+    });
+    builder.addCase(sendMessage.rejected, (state, action) => {
+      state.chatLoading = false;
+      state.chatError = action.payload;
+      // Could add logic here to remove the optimistically added message
+    });
   },
 });
 
+export const { addMessage } = doctorSlices.actions;
 export default doctorSlices.reducer;

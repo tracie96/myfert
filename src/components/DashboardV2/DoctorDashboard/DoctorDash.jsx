@@ -275,7 +275,7 @@ export default function DoctorDash() {
 
                 <Table
                     columns={columns}
-                    dataSource={filteredData.slice(
+                    dataSource={filteredData?.slice(
                         (pagination.current - 1) * pagination.pageSize,
                         pagination.current * pagination.pageSize
                       )}

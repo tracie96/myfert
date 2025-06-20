@@ -53,21 +53,27 @@
   border-bottom: 1px solid #e6e6e6;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 .search-input {
-  border-radius: 20px;
-  padding: 8px 12px;
+  border-radius: 8px;
+  background: #f8f9fa;
+  padding: 4px 8px;
 }
 
 .search-input input {
   font-size: 14px;
+  background: transparent;
+}
+
+.search-input input::placeholder {
+  color: #999;
 }
 
 .search-input .ant-input-prefix {
   margin-right: 8px;
-  color: #666;
+  color: #999;
 }
 
 .search-input .ant-input-clear-icon {
@@ -80,34 +86,35 @@
 
 .filter-buttons {
   display: flex;
-  gap: 10px;
-  background: #f8f9fa;
-  padding: 4px;
-  border-radius: 25px;
-  border: 1px solid #e6e6e6;
+  gap: 8px;
+  padding: 0 4px;
 }
 
 .filter-btn {
   flex: 1;
   padding: 8px 16px;
-  border: none;
-  background: transparent;
-  border-radius: 20px;
+  border: 1px solid #e6e6e6;
+  background: white;
+  border-radius: 50px;
   cursor: pointer;
   transition: all 0.2s;
   font-size: 14px;
   color: #666;
   font-weight: 500;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .filter-btn:hover {
-  background: rgba(0, 0, 0, 0.05);
+  background: #f8f9fa;
 }
 
 .filter-btn.active {
   background: white;
+  border-color: #e6e6e6;
   color: #333;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .users-list {

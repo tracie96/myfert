@@ -210,12 +210,13 @@ const Intercom = () => {
         
         <div className="search-container">
           <Input
-            prefix={<SearchOutlined />}
-            placeholder={`Search ${activeTab === 'patient' ? 'patients' : 'providers'}...`}
+            prefix={<SearchOutlined style={{ fontSize: '16px' }} />}
+            placeholder="Search"
             className="search-input"
             value={searchQuery}
             onChange={handleSearch}
             allowClear
+            bordered={false}
           />
           <div className="filter-buttons">
             <button 

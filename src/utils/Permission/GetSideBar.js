@@ -89,6 +89,8 @@ export const GetSideBar = () => {
         return "6";
       case "/doctor/fax":
         return "8";
+      case "/doctor/intercom":
+        return "7";
       default:
         return "1";
     }
@@ -205,7 +207,12 @@ export const GetSideBar = () => {
           <span>FAX</span>
         </NavLink>
       </Menu.Item>
-      <Menu.Item 
+      <Menu.Item key="7" icon={<FaStickyNote style={{ color: "#00ADEF" }} />}>
+        <NavLink to="/doctor/intercom" style={{ textDecoration: "none" }}>
+          <span>INTERCOM</span>
+        </NavLink>
+      </Menu.Item>
+        <Menu.Item 
         key="7" 
         icon={<FaSignOutAlt style={{ color: "#00ADEF" }} />}
         onClick={() => setShowLogoutModal(true)}

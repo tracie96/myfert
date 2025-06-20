@@ -96,6 +96,7 @@ import Note from "../DashboardV2/DoctorDashboard/Note";
 import PatientNote from "../DashboardV2/PatientDashboard/Note";
 import Fax from "../DashboardV2/DoctorDashboard/Fax";
 import SupplementScreen from "../DashboardV2/PatientDashboard/Supplement";
+import Intercom from "../DashboardV2/DoctorDashboard/Intercoms";
 
 //#endregion
 
@@ -242,7 +243,7 @@ const getRouter = createBrowserRouter(
         <Route path="doctor/appointments" element={<AppointmentList />} />
         <Route path="doctor/labs" element={<LabsAndRequisitions />} />
         <Route path="doctor/fax" element={<Fax />} />
-
+        <Route path="doctor/intercom" element={<Intercom />} />
         <Route path="doctor/meds" element={<MedicationTable />} />
         
         <Route path="doctor/notes" element={<Note />} />

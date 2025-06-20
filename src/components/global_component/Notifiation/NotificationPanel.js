@@ -58,7 +58,7 @@ const NotificationPanel = ({
           userIdsArray.forEach((item) => {
             if (item === userAuth.id) {
               setMessages((prevMessages) => [...prevMessages, message]);
-              toast.info(message.description);
+              // toast.info(message.description);
               setUnReadCount((prevCount) => prevCount + 1);
               // Fetch latest notifications when new message arrives
               onNotificationUpdate();

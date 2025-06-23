@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Input, Avatar } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import { 
@@ -6,17 +6,19 @@ import {
   fetchCareGivers, 
   getMessages, 
   sendMessage,
-  addMessage 
 } from '../../../redux/doctorSlice';
-import { UserOutlined, SearchOutlined } from '@ant-design/icons';
+import { UserOutlined, SearchOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import './styles.css';
+import { FaRegPaperPlane } from 'react-icons/fa';
 
 const Intercom = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [message, setMessage] = useState('');
   const [activeTab, setActiveTab] = useState('patient');
   const [searchQuery, setSearchQuery] = useState('');
+  const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
   const dispatch = useDispatch();
+  const messagesEndRef = useRef(null);
 
   // Get patient list and loading state from redux store
   const patients = useSelector((state) => state.doctor.patientList || []);
@@ -26,6 +28,16 @@ const Intercom = () => {
   const chatRef = useSelector((state) => state.doctor.messages?.chatReference);
   const chatLoading = useSelector((state) => state.doctor.chatLoading);
   const chatError = useSelector((state) => state.doctor.chatError);
+
+  // Add window resize listener
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobileView(window.innerWidth <= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     // Fetch patient list when component mounts or tab changes
@@ -69,9 +81,20 @@ const Intercom = () => {
     }
   }, [dispatch, selectedUser]);
 
+  // Scroll to bottom whenever messages change
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
+
   const handleUserSelect = (user) => {
     console.log('Selected user:', user);
     setSelectedUser(user);
+  };
+
+  const handleBackToList = () => {
+    setSelectedUser(null);
   };
 
   const handleSendMessage = async () => {
@@ -82,33 +105,24 @@ const Intercom = () => {
         chatRef: chatRef
       });
       try {
-        // Optimistically add the message to the UI
-        const newMessage = {
-          chat: message.trim(),
-          isUser: false, // We are sending it
-          createdOn: new Date().toISOString()
-        };
-        
-        // Update local state immediately
-        if (messages) {
-          dispatch(addMessage({
-            chatReference: chatRef,
-            newMessage
-          }));
-        }
-
         const trimmedMessage = message.trim();
         setMessage(''); // Clear input immediately for better UX
 
+        // Send the message
         const response = await dispatch(sendMessage({
           userRef: selectedUser.id,
           chat: trimmedMessage,
           chatRef: chatRef
         }));
-        console.log('Send message response:', response);
+
+        // Immediately fetch new messages to ensure everything is in sync
+        if (sendMessage.fulfilled.match(response)) {
+          await dispatch(getMessages(selectedUser.id));
+        } else {
+          console.error('Failed to send message:', response.error);
+        }
       } catch (error) {
         console.error('Error sending message:', error);
-        // Could add error handling here to remove the optimistically added message
       }
     }
   };
@@ -138,20 +152,25 @@ const Intercom = () => {
       return <div className="no-messages">No messages yet</div>;
     }
 
-    return messages.map((msg, index) => {
-      // For messages we send, isUser will be false
-      // For messages we receive, isUser will be true
-      const isSentByMe = !msg.isUser;
+    // Sort messages by date (oldest to newest)
+    const sortedMessages = [...messages].sort((a, b) => {
+      return new Date(a.createdOn) - new Date(b.createdOn);
+    });
+
+    return sortedMessages.map((msg, index) => {
+      // isUser: true means the message is from us (current user) - show on right
+      // isUser: false means the message is from the other person - show on left
+      const messagePosition = msg.isUser ? 'sent' : 'received';
       
       return (
         <div 
           key={index} 
-          className={`message-bubble ${isSentByMe ? 'sent' : 'received'}`}
+          className={`message-bubble ${messagePosition}`}
         >
           <div className="message-content">
             {msg.chat}
             <div className="message-timestamp">
-              {new Date(msg.createdOn).toLocaleTimeString()}
+              {new Date(msg.createdOn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </div>
           </div>
         </div>
@@ -200,7 +219,7 @@ const Intercom = () => {
 
   return (
     <div className="intercom-container">
-      <div className="messages-sidebar">
+      <div className={`messages-sidebar ${isMobileView && selectedUser ? 'hidden' : ''}`}>
         <div className="messages-header">
           <h2>MESSAGES</h2>
           <button className="new-message-btn">
@@ -223,7 +242,7 @@ const Intercom = () => {
               className={`filter-btn ${activeTab === 'patient' ? 'active' : ''}`}
               onClick={() => {
                 handleTabChange('patient');
-                setSearchQuery(''); // Clear search when switching tabs
+                setSearchQuery('');
               }}
             >
               Patient
@@ -232,7 +251,7 @@ const Intercom = () => {
               className={`filter-btn ${activeTab === 'provider' ? 'active' : ''}`}
               onClick={() => {
                 handleTabChange('provider');
-                setSearchQuery(''); // Clear search when switching tabs
+                setSearchQuery('');
               }}
             >
               Provider
@@ -286,10 +305,15 @@ const Intercom = () => {
         </div>
       </div>
 
-      <div className="chat-window">
+      <div className={`chat-window ${isMobileView && selectedUser ? 'active' : ''}`}>
         {selectedUser ? (
           <>
             <div className="chat-header">
+              {isMobileView && (
+                <button className="back-button" onClick={handleBackToList}>
+                  <ArrowLeftOutlined />
+                </button>
+              )}
               <div className="selected-user">
                 <Avatar 
                   size={40}
@@ -314,6 +338,7 @@ const Intercom = () => {
             </div>
             <div className="chat-messages">
               {renderMessages()}
+              <div ref={messagesEndRef} />
             </div>
             <div className="message-input-container">
               <Input
@@ -327,7 +352,7 @@ const Intercom = () => {
                     onClick={handleSendMessage}
                     disabled={!message.trim() || chatLoading}
                   >
-                    <i className="fas fa-paper-plane"></i>
+                   <FaRegPaperPlane/>
                   </button>
                 }
               />

@@ -465,7 +465,7 @@ const MedicationTable = () => {
                   <div style={{ display: "flex", alignItems: "center", width: "100%", gap: "16px" }}>
                     <div style={{ width: "3px", height: "40px", backgroundColor: "#00ADEF", flexShrink: 0 }} />
                     <div style={{ flex: "1" }}>
-                      <Text>{file.fileTitle || file.filename}</Text>
+                      <Text>{file.filename || file.fileTitle}</Text>
                     </div>
                     <div style={{ flex: "1" }}>
                       <Text>{moment(file.createdOn).format("MMMM DD, YYYY")}</Text>

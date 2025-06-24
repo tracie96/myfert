@@ -847,6 +847,28 @@ export const sendMessage = createAsyncThunk(
   }
 );
 
+export const getChatHeads = createAsyncThunk(
+  "doctor/getChatHeads",
+  async (_, { rejectWithValue, getState }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        "accept": "text/plain",
+        "Authorization": `Bearer ${user?.obj?.token}`,
+      },
+    };
+    try {
+      const response = await axios.get(
+        `${baseUrl}Chat/GetChatsHead`,
+        config
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error?.response?.data);
+    }
+  }
+);
+
 const doctorSlices = createSlice({
   name: "doctor",
   initialState: {
@@ -857,6 +879,7 @@ const doctorSlices = createSlice({
     serverErr: null,
     patientList: [],
     careGivers: [],
+    chatHeads: [],
     upcomingPatientAppointment: [],
     doctorAvailability: {},
     bloodWork: [],
@@ -1273,6 +1296,20 @@ const doctorSlices = createSlice({
       state.chatLoading = false;
       state.chatError = action.payload;
       // Could add logic here to remove the optimistically added message
+    });
+
+    // Get Chat Heads
+    builder.addCase(getChatHeads.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+    builder.addCase(getChatHeads.fulfilled, (state, action) => {
+      state.loading = false;
+      state.chatHeads = action.payload.chats || [];
+    });
+    builder.addCase(getChatHeads.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
     });
   },
 });

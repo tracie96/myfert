@@ -5,16 +5,16 @@ import { useSelector } from "react-redux";
 import { Menu, Button, Drawer, Layout, Modal } from "antd";
 import { useMediaQuery } from "react-responsive";
 // Import React Icons
-import { 
-  FaQrcode, 
-  FaPills, 
-  FaChartPie, 
-  FaFileAlt, 
-  FaFlask, 
-  FaInbox, 
-  FaLink, 
-  FaListOl, 
-  FaBars, 
+import {
+  FaQrcode,
+  FaPills,
+  FaChartPie,
+  FaFileAlt,
+  FaFlask,
+  FaInbox,
+  FaLink,
+  FaListOl,
+  FaBars,
   FaServicestack,
   FaBook,
   FaSignOutAlt,
@@ -56,7 +56,7 @@ export const GetSideBar = () => {
       case "/chart":
         return "3";
       case "/patient/meds":
-          return "5";
+        return "5";
       case "/learn":
         return "8";
       case "/patient/labs":
@@ -67,7 +67,7 @@ export const GetSideBar = () => {
         return "11";
       case "/patient/notes":
         return "10"
-     
+
       default:
         return "1";
     }
@@ -167,7 +167,11 @@ export const GetSideBar = () => {
           </NavLink>
         </Menu.Item>
       )}
-
+      <Menu.Item key="9" icon={<FaStickyNote style={{ color: "#00ADEF" }} />}>
+        <NavLink to="/patient/intercoms" style={{ textDecoration: "none" }}>
+          <span>INTERCOM</span>
+        </NavLink>
+      </Menu.Item>
       <Menu.Item key="8" icon={<FaBook style={{ color: "#00ADEF" }} />}>
         <NavLink to="/learn" style={{ textDecoration: "none" }}>
           <span className="no-underline">LEARN</span>
@@ -212,8 +216,8 @@ export const GetSideBar = () => {
           <span>INTERCOM</span>
         </NavLink>
       </Menu.Item>
-        <Menu.Item 
-        key="7" 
+      <Menu.Item
+        key="7"
         icon={<FaSignOutAlt style={{ color: "#00ADEF" }} />}
         onClick={() => setShowLogoutModal(true)}
       >
@@ -252,7 +256,7 @@ export const GetSideBar = () => {
   if (userAuth.obj.role === "SuperAdmin") {
     return (
       <>
-         <div>
+        <div>
           {isMobile ? (
             <>
               <Button
@@ -277,7 +281,7 @@ export const GetSideBar = () => {
                 onClose={onClose}
                 visible={visible}
                 bodyStyle={{ padding: 0 }}
-                width={250} 
+                width={250}
               >
                 <NavLink
                   className="sidebar-brand d-flex align-items-center justify-content-center"
@@ -328,7 +332,7 @@ export const GetSideBar = () => {
       </>
     );
   }
-   else if (userAuth.obj.role === "Doctor" || userAuth.obj.role === "FertilityEducator") {
+  else if (userAuth.obj.role === "Doctor" || userAuth.obj.role === "FertilityEducator") {
     return (
       <>
         <div>
@@ -473,7 +477,7 @@ export const GetSideBar = () => {
         </div>
       </>
     );
-  } 
+  }
 
   else if (userAuth.obj.role === "Patient") {
     return (
@@ -551,7 +555,7 @@ export const GetSideBar = () => {
         )}
       </div>
     );
-  } 
+  }
   else {
     return (
       <>

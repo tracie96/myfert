@@ -2,26 +2,24 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Input, Avatar, Segmented } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import { 
-  patientList as fetchPatientList, 
   fetchCareGivers, 
   getMessages, 
   sendMessage,
   getChatHeads
 } from '../../../redux/doctorSlice';
 import { UserOutlined, SearchOutlined, ArrowLeftOutlined } from '@ant-design/icons';
-import './styles.css';
+import '../../DoctorDashboard/Intercoms/styles.css';
 import { FaRegPaperPlane } from 'react-icons/fa';
 
-const Intercom = () => {
+const PatientIntercom = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [message, setMessage] = useState('');
-  const [activeTab, setActiveTab] = useState('active');
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState('active');
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
   const dispatch = useDispatch();
   const messagesEndRef = useRef(null);
 
-  const patients = useSelector((state) => state.doctor.patientList || []);
   const providers = useSelector((state) => state.doctor.careGivers || []);
   const chatHeads = useSelector((state) => state.doctor.chatHeads || []);
   const isLoading = useSelector((state) => state.doctor.loading);
@@ -43,33 +41,25 @@ const Intercom = () => {
     // Load chat heads first
     dispatch(getChatHeads());
 
-    const loadUsers = async () => {
+    // Then load all providers for the new message option
+    const loadProviders = async () => {
       try {
         const params = {
           page: 1,
           size: 100
         };
         
-        if (activeTab === 'patient') {
-          const response = await dispatch(fetchPatientList(params));
-          if (!fetchPatientList.fulfilled.match(response)) {
-            console.error('Failed to fetch patient list:', response.error);
-          }
-        } else if (activeTab === 'provider') {
-          const response = await dispatch(fetchCareGivers(params));
-          if (!fetchCareGivers.fulfilled.match(response)) {
-            console.error('Failed to fetch providers list:', response.error);
-          }
+        const response = await dispatch(fetchCareGivers(params));
+        if (!fetchCareGivers.fulfilled.match(response)) {
+          console.error('Failed to fetch providers list:', response.error);
         }
       } catch (error) {
-        console.error('Error fetching users list:', error);
+        console.error('Error fetching providers list:', error);
       }
     };
 
-    if (activeTab !== 'active') {
-      loadUsers();
-    }
-  }, [dispatch, activeTab]);
+    loadProviders();
+  }, [dispatch]);
 
   // Load messages when a user is selected
   useEffect(() => {
@@ -140,12 +130,6 @@ const Intercom = () => {
     }
   };
 
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
-    setSelectedUser(null);
-    setSearchQuery(''); // Clear search when switching tabs
-  };
-
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
   };
@@ -187,26 +171,20 @@ const Intercom = () => {
     });
   };
 
-  // Filter users based on search query and active tab
-  const filteredUsers = useMemo(() => {
+  // Filter providers based on search query
+  const filteredProviders = useMemo(() => {
     let users = [];
     
     if (activeTab === 'active') {
       users = chatHeads;
-    } else if (activeTab === 'patient') {
-      users = patients.map(patient => ({
-        userRef: patient.userRef,
-        username: `${patient.firstname} ${patient.lastname}`,
-        userPicture: patient.picture,
-        userRole: 'Patient'
-      }));
     } else {
+      // Show all providers
       const providersList = providers?.getRecord || providers || [];
       users = providersList.map(provider => ({
         userRef: provider.userRef || provider.id,
         username: `${provider.firstname || ''} ${provider.lastname || ''}`.trim() || 'Unknown Provider',
-        userPicture: provider.profilePicture || provider.picture,
-        userRole: provider.role || provider.userType
+        userRole: provider.role || provider.userType,
+        userPicture: provider.profilePicture || provider.picture
       }));
     }
 
@@ -217,7 +195,7 @@ const Intercom = () => {
       user.username.toLowerCase().includes(query) || 
       user.userRole.toLowerCase().includes(query)
     );
-  }, [searchQuery, activeTab, chatHeads, patients, providers]);
+  }, [searchQuery, activeTab, chatHeads, providers]);
 
   return (
     <div className="intercom-container">
@@ -232,64 +210,61 @@ const Intercom = () => {
         <div className="search-container">
           <Input
             prefix={<SearchOutlined style={{ fontSize: '16px' }} />}
-            placeholder="Search chats"
+            placeholder="Search Providers"
             className="search-input"
             value={searchQuery}
             onChange={handleSearch}
             allowClear
             bordered={false}
           />
-          <div className="filter-buttons">
-            <Segmented
-              value={activeTab}
-              onChange={handleTabChange}
-              options={[
-                {
-                  label: 'Active',
-                  value: 'active'
-                },
-                {
-                  label: 'Patients',
-                  value: 'patient'
-                },
-                {
-                  label: 'Provider',
-                  value: 'provider'
-                }
-              ]}
-              block
-            />
-          </div>
+        </div>
+
+        <div className="filter-buttons">
+          <Segmented
+            value={activeTab}
+            onChange={setActiveTab}
+            options={[
+              {
+                label: 'Active ',
+                value: 'active'
+              },
+              {
+                label: 'Providers',
+                value: 'providers'
+              }
+            ]}
+            block
+          />
         </div>
 
         <div className="users-list">
           {isLoading ? (
-            <div className="loading-state">Loading {activeTab === 'active' ? 'chats' : activeTab === 'patient' ? 'patients' : 'providers'}...</div>
-          ) : filteredUsers.length > 0 ? (
-            filteredUsers.map((user) => (
+            <div className="loading-state">Loading providers...</div>
+          ) : filteredProviders.length > 0 ? (
+            filteredProviders.map((provider) => (
               <div
-                key={user.userRef}
-                className={`user-item ${selectedUser?.userRef === user.userRef ? 'selected' : ''}`}
-                onClick={() => handleUserSelect(user)}
+                key={provider.userRef}
+                className={`user-item ${selectedUser?.userRef === provider.userRef ? 'selected' : ''}`}
+                onClick={() => handleUserSelect(provider)}
               >
                 <div className="user-avatar">
                   <Avatar 
                     size={40}
-                    src={user.userPicture}
-                    icon={!user.userPicture && <UserOutlined />}
+                    src={provider.userPicture}
+                    icon={!provider.userPicture && <UserOutlined />}
                     style={{ 
-                      backgroundColor: !user.userPicture ? '#00ADEF' : 'transparent',
-                      color: !user.userPicture ? '#fff' : undefined
+                      backgroundColor: !provider.userPicture ? '#00ADEF' : 'transparent',
+                      color: !provider.userPicture ? '#fff' : undefined
                     }}
                   >
-                    {!user.userPicture && user.username.charAt(0).toUpperCase()}
+                    {!provider.userPicture && provider.username.charAt(0).toUpperCase()}
                   </Avatar>
                 </div>
                 <div className="user-info">
                   <div className="user-name-container">
-                    <span className="user-name">{user.username}</span>
-                    {user.userRole && (
-                      <small className="user-role">{user.userRole}</small>
+                    <span className="user-name">{provider.username}</span>
+                    {provider.userRole && (
+                      <small className="user-role">{provider.userRole}</small>
                     )}
                   </div>
                 </div>
@@ -297,7 +272,7 @@ const Intercom = () => {
             ))
           ) : (
             <div className="no-results">
-              No {activeTab === 'active' ? 'active chats' : activeTab === 'patient' ? 'patients' : 'providers'} found matching "{searchQuery}"
+              No providers found matching "{searchQuery}"
             </div>
           )}
         </div>
@@ -357,7 +332,7 @@ const Intercom = () => {
         ) : (
           <div className="no-chat-selected">
             <div className="welcome-message">
-              <h3>Select a chat to start messaging</h3>
+              <h3>How can I help?</h3>
             </div>
           </div>
         )}
@@ -366,4 +341,4 @@ const Intercom = () => {
   );
 };
 
-export default Intercom;
+export default PatientIntercom;

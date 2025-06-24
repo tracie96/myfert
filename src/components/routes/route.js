@@ -84,6 +84,7 @@ import NewHormoneChart from "../DashboardV2/PatientDashboard/NewChart";
 import LabScreen from "../DashboardV2/PatientDashboard/Lab";
 import PatientAppointmentList from "../DashboardV2/PatientDashboard/AppontmentList";
 import LabsAndRequisitions from "../DashboardV2/DoctorDashboard/Lab";
+import Chart from "../DashboardV2/DoctorDashboard/Chart";
 import MedicationTable from "../DashboardV2/DoctorDashboard/Medications";
 import MedScreen from "../DashboardV2/PatientDashboard/Meds";
 import MenstrualCycleQuiz from "../DashboardV2/PatientDashboard/Learning/MenstrualCycleQuiz";
@@ -244,8 +245,10 @@ const getRouter = createBrowserRouter(
 
         <Route path="doctor/appointments" element={<AppointmentList />} />
         <Route path="doctor/labs" element={<LabsAndRequisitions />} />
+        <Route path="doctor/chart" element={<Chart />} />
         <Route path="doctor/fax" element={<Fax />} />
         <Route path="doctor/intercom" element={<Intercom />} />
+
         <Route path="doctor/meds" element={<MedicationTable />} />
         
         <Route path="doctor/notes" element={<Note />} />

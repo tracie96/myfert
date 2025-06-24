@@ -81,6 +81,8 @@ export const GetSideBar = () => {
         return "2";
       case "/doctor/appointments":
         return "3";
+        case "/doctor/chart":
+        return "12";
       case "/doctor/labs":
         return "4";
       case "/doctor/meds":
@@ -191,6 +193,11 @@ export const GetSideBar = () => {
           <span>PATIENT LIST</span>
         </NavLink>
       </Menu.Item>
+      <Menu.Item key="12" icon={<FaFlask style={{ color: "#00ADEF" }} />}>
+        <NavLink to="/doctor/chart" style={{ textDecoration: "none" }}>
+          <span>CHART</span>
+        </NavLink>
+      </Menu.Item>
       <Menu.Item key="4" icon={<FaFlask style={{ color: "#00ADEF" }} />}>
         <NavLink to="/doctor/labs" style={{ textDecoration: "none" }}>
           <span>LABS</span>
@@ -216,8 +223,8 @@ export const GetSideBar = () => {
           <span>INTERCOM</span>
         </NavLink>
       </Menu.Item>
-      <Menu.Item
-        key="7"
+        <Menu.Item
+        key="7" 
         icon={<FaSignOutAlt style={{ color: "#00ADEF" }} />}
         onClick={() => setShowLogoutModal(true)}
       >

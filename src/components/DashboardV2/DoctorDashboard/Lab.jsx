@@ -399,8 +399,8 @@ const LabsAndRequisitions = () => {
       return;
     }
 
-    if ((bloodWorkFile2 || []).length >= 2) {
-      message.error("You can only upload a maximum of 2 files.");
+    if ((bloodWorkFile2 || []).length >= 5) {
+      message.error("You can only upload a maximum of 5 files daily.");
       return;
     }
 
@@ -565,7 +565,7 @@ const LabsAndRequisitions = () => {
                 type="secondary"
                 style={{ fontStyle: "italic", fontSize: "14px" }}
               >
-                (max 2 requisitions)
+                (max 5 requisitions)
               </Text>
               <Button
                 type="primary"

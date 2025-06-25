@@ -525,10 +525,10 @@ const LabsAndRequisitions = () => {
                       <div style={{ width: "3px", height: "40px", backgroundColor: "red", flexShrink: 0 }} />
                       <div style={{ flex: "1" }}>
                         <Text>
-                          {isMobile 
-                            ? file.name.split(' ').slice(0, 6).join(' ') + (file.name.split(' ').length > 6 ? '...' : '')
-                            : file.name
-                          }
+                                                      {isMobile 
+                             ? file.name.slice(0, 6) + (file.name.length > 6 ? '...' : '')
+                              : file.name
+                            }
                         </Text>
                       </div>
                       <div style={{ flex: "1" }}>
@@ -540,7 +540,7 @@ const LabsAndRequisitions = () => {
                           style={{ color: "#1890ff" }}
                           onClick={() => handleDownload(file.id, file?.filename || file?.name)}
                         >
-                          {file.title}
+                         {isMobile ? "" : file.title}
                         </Link>
                       </div>
                       <DeleteOutlined
@@ -574,8 +574,8 @@ const LabsAndRequisitions = () => {
                   maxWidth: "200px",
                 }}
                 onClick={() => {
-                  if ((bloodWorkFile2 || []).length >= 2) {
-                    message.error("You can only upload a maximum of 2 files.");
+                  if ((bloodWorkFile2 || []).length >= 5) {
+                    message.error("You can only upload a maximum of 5 files daily.");
                     return;
                   }
                   openModal("newRequisition");
@@ -596,7 +596,7 @@ const LabsAndRequisitions = () => {
                     <div style={{ display: "flex", alignItems: "center", width: "100%", gap: "16px" }}>
                       <div style={{ width: "3px", height: "40px", backgroundColor: "red", flexShrink: 0 }} />
                       <div style={{ flex: "1" }}>
-                        <Text>{index === 0 ? "Day 1 " : "Day 2 "}</Text>
+                        <Text>Requisition {index + 1}</Text>
                       </div>
                       {/* <div style={{ flex: "1" }}>
                         <Text>{file.fileTitle || file.filename || "Requisition.pdf"}</Text>
@@ -606,11 +606,11 @@ const LabsAndRequisitions = () => {
                       </div>
                       <div style={{ display: "flex", alignItems: "center", gap: "8px", flex: "1" }}>
                         {getFileIcon(file?.filename)}
-                        <Link
+                                                  <Link
                           style={{ color: "#1890ff" }}
                           onClick={() => handleDownload(file.fileRef, file.filename)}
                         >
-                          new
+                          {!isMobile ? file.filename : ""}
                         </Link>
                       </div>
                       <DeleteOutlined

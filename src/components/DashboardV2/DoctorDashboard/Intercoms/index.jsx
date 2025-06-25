@@ -15,7 +15,7 @@ import { FaRegPaperPlane } from 'react-icons/fa';
 const Intercom = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [message, setMessage] = useState('');
-  const [activeTab, setActiveTab] = useState('active');
+  const [activeTab, setActiveTab] = useState('day1');
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
   const dispatch = useDispatch();
@@ -29,6 +29,14 @@ const Intercom = () => {
   const chatRef = useSelector((state) => state.doctor.messages?.chatReference);
   const chatLoading = useSelector((state) => state.doctor.chatLoading);
   const chatError = useSelector((state) => state.doctor.chatError);
+
+  // This could come from your data source - number of days/files
+  const numberOfDays = 5; // Example: 5 days
+  
+  const dayOptions = Array.from({ length: numberOfDays }, (_, index) => ({
+    label: `${index + 1}`,
+    value: `day${index + 1}`
+  }));
 
   useEffect(() => {
     const handleResize = () => {
@@ -50,12 +58,12 @@ const Intercom = () => {
           size: 100
         };
         
-        if (activeTab === 'patient') {
+        if (activeTab === 'day2') {
           const response = await dispatch(fetchPatientList(params));
           if (!fetchPatientList.fulfilled.match(response)) {
             console.error('Failed to fetch patient list:', response.error);
           }
-        } else if (activeTab === 'provider') {
+        } else if (activeTab === 'day3') {
           const response = await dispatch(fetchCareGivers(params));
           if (!fetchCareGivers.fulfilled.match(response)) {
             console.error('Failed to fetch providers list:', response.error);
@@ -66,7 +74,7 @@ const Intercom = () => {
       }
     };
 
-    if (activeTab !== 'active') {
+    if (activeTab !== 'day1') {
       loadUsers();
     }
   }, [dispatch, activeTab]);
@@ -187,27 +195,35 @@ const Intercom = () => {
     });
   };
 
-  // Filter users based on search query and active tab
+  // Update the filtering logic to handle day-based tabs
   const filteredUsers = useMemo(() => {
     let users = [];
     
-    if (activeTab === 'active') {
-      users = chatHeads;
-    } else if (activeTab === 'patient') {
-      users = patients.map(patient => ({
-        userRef: patient.userRef,
-        username: `${patient.firstname} ${patient.lastname}`,
-        userPicture: patient.picture,
-        userRole: 'Patient'
-      }));
-    } else {
-      const providersList = providers?.getRecord || providers || [];
-      users = providersList.map(provider => ({
-        userRef: provider.userRef || provider.id,
-        username: `${provider.firstname || ''} ${provider.lastname || ''}`.trim() || 'Unknown Provider',
-        userPicture: provider.profilePicture || provider.picture,
-        userRole: provider.role || provider.userType
-      }));
+    // Example of how to handle different days
+    switch(activeTab) {
+      case 'day1':
+        users = chatHeads;
+        break;
+      case 'day2':
+        users = patients.map(patient => ({
+          userRef: patient.userRef,
+          username: `${patient.firstname} ${patient.lastname}`,
+          userPicture: patient.picture,
+          userRole: 'Patient'
+        }));
+        break;
+      case 'day3':
+        const providersList = providers?.getRecord || providers || [];
+        users = providersList.map(provider => ({
+          userRef: provider.userRef || provider.id,
+          username: `${provider.firstname || ''} ${provider.lastname || ''}`.trim() || 'Unknown Provider',
+          userRole: provider.role || provider.userType,
+          userPicture: provider.profilePicture || provider.picture
+        }));
+        break;
+      // Add more cases for additional days as needed
+      default:
+        users = [];
     }
 
     if (!searchQuery.trim()) return users;
@@ -243,20 +259,7 @@ const Intercom = () => {
             <Segmented
               value={activeTab}
               onChange={handleTabChange}
-              options={[
-                {
-                  label: 'Active',
-                  value: 'active'
-                },
-                {
-                  label: 'Patients',
-                  value: 'patient'
-                },
-                {
-                  label: 'Provider',
-                  value: 'provider'
-                }
-              ]}
+              options={dayOptions}
               block
             />
           </div>
@@ -264,7 +267,7 @@ const Intercom = () => {
 
         <div className="users-list">
           {isLoading ? (
-            <div className="loading-state">Loading {activeTab === 'active' ? 'chats' : activeTab === 'patient' ? 'patients' : 'providers'}...</div>
+            <div className="loading-state">Loading {activeTab === 'day1' ? 'chats' : activeTab === 'day2' ? 'patients' : 'providers'}...</div>
           ) : filteredUsers.length > 0 ? (
             filteredUsers.map((user) => (
               <div
@@ -297,7 +300,7 @@ const Intercom = () => {
             ))
           ) : (
             <div className="no-results">
-              No {activeTab === 'active' ? 'active chats' : activeTab === 'patient' ? 'patients' : 'providers'} found matching "{searchQuery}"
+              No {activeTab === 'day1' ? 'active chats' : activeTab === 'day2' ? 'patients' : 'providers'} found matching "{searchQuery}"
             </div>
           )}
         </div>

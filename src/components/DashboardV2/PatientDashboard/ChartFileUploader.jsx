@@ -40,7 +40,7 @@ const ChartFileUploader = ({
 
   return (
     <div style={{ padding: 16, border: "1px solid #ddd", borderRadius: 8 }}>
-      <h3 style={{color: "#463caf",fontSize: "20px",fontWeight: "600"}}>Upload Chart File</h3>
+      <h3 style={{color: "#463caf",fontSize: "20px",fontWeight: "600"}}>UPLOAD CHART</h3>
 
       <Input
         placeholder="Enter chart title"
@@ -48,8 +48,14 @@ const ChartFileUploader = ({
         value={title}
         onChange={(e) => setTitle(e.target.value)}
       />
-      <Text>If you are using FABM Charting With Read Your Body (RYB), Please Upload The Chart You Are using to monitor your cycle as a  CSV file.</Text>
-      <Text>Please note that any additional</Text>
+      <div style={{ color: '#000' }}>
+        <p style={{ marginBottom: '1em' }}>
+          If you are using FABM Charting With Read Your Body (RYB), Please Upload The Chart You Are using to monitor your cycle as a CSV file.
+        </p>
+        <p>
+          Please note that any additional uploads will replace the previous file.
+        </p>
+      </div>
       <div class="form-group row" style={{marginLeft:"2px"}}>
         <label for="" class="col-sm-2 col-form-label" style={{padding:"10px 0px", color: "rgba(0, 0, 0, 0.88)", fontWeight: "600", fontSize: "14px"}}>FABM Chart</label>
         <div class="col-sm-10">
@@ -67,7 +73,6 @@ const ChartFileUploader = ({
       </Select>
         </div>
       </div>
-      <div><Text strong>Upload File</Text></div>
       <Dragger
         multiple={false}
         showUploadList={false}

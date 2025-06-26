@@ -36,17 +36,17 @@ const PatientIntercom = () => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-  useEffect(() => {
-    // Initial fetch
-    dispatch(getChatHeads());
+  // useEffect(() => {
+  //   // Initial fetch
+  //   dispatch(getChatHeads());
 
-    const interval = setInterval(() => {
-      dispatch(getChatHeads());
-    }, 2000); // 2 seconds
+  //   const interval = setInterval(() => {
+  //     dispatch(getChatHeads());
+  //   }, 2000); // 2 seconds
 
     // Cleanup interval on unmount
-    return () => clearInterval(interval);
-  }, [dispatch]);
+  //   return () => clearInterval(interval);
+  // }, [dispatch]);
 
 
   useEffect(() => {

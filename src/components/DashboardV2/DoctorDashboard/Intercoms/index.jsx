@@ -43,18 +43,18 @@ const Intercom = () => {
   }, []);
 
   // Add polling for chat heads
-  useEffect(() => {
-    // Initial fetch
-    dispatch(getChatHeads());
+  // useEffect(() => {
+  //   // Initial fetch
+  //   dispatch(getChatHeads());
 
-    // Set up polling interval
-    const interval = setInterval(() => {
-      dispatch(getChatHeads());
-    }, 2000); // 2 seconds
+  //   // Set up polling interval
+  //   const interval = setInterval(() => {
+  //     dispatch(getChatHeads());
+  //   }, 2000); // 2 seconds
 
-    // Cleanup interval on unmount
-    return () => clearInterval(interval);
-  }, [dispatch]);
+  //   // Cleanup interval on unmount
+  //   return () => clearInterval(interval);
+  // }, [dispatch]);
 
   useEffect(() => {
     // Load chat heads first

@@ -109,7 +109,7 @@ export const markNotiAsRead = createAsyncThunk(
     };
 
     try {
-      const url = `${baseUrl}Notification/MarkAsRead/${id}`;
+      const url = `${baseUrl}Notification/${id}`;
       const response = await axios.put(url, payload, config);
       const responseBack = getResponse(response, dispatch, users);
       return responseBack;

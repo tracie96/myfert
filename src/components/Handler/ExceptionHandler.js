@@ -1,4 +1,3 @@
-import { message } from "antd";
 import { logoutAction } from "../redux/AuthController";
 import { toast } from "react-toastify";
 
@@ -22,7 +21,6 @@ export const handleApiError = (error, dispatch, data) => {
           toast.error(errorMessage);
         }
         if (errorMessage === "Operation Successful") {
-          message.success("Updated Successfully");
         }
         break;
     }

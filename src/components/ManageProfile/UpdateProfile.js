@@ -266,11 +266,11 @@ const UpdateProfile = () => {
                   </Upload>
                 </div>
               )}
-              {values.firstName && values.lastName && (
+              {/* {values.firstName && values.lastName && (
                 <h4 className="mt-3 mb-0">
                   {values.firstName} {values.lastName}
                 </h4>
-              )}
+              )} */}
               <div className="vertical-tabs mt-4">
                 <div 
                   className={`tab-item ${activeTab === 'profile' ? 'active' : ''}`}

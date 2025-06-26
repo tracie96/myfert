@@ -15,7 +15,7 @@ import { FaRegPaperPlane } from 'react-icons/fa';
 const Intercom = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [message, setMessage] = useState('');
-  const [activeTab, setActiveTab] = useState('day1');
+  const [activeTab, setActiveTab] = useState('active');
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
   const dispatch = useDispatch();
@@ -31,13 +31,8 @@ const Intercom = () => {
   const chatError = useSelector((state) => state.doctor.chatError);
 
   // This could come from your data source - number of days/files
-  const numberOfDays = 5; // Example: 5 days
   
-  const dayOptions = Array.from({ length: numberOfDays }, (_, index) => ({
-    label: `${index + 1}`,
-    value: `day${index + 1}`
-  }));
-
+  
   useEffect(() => {
     const handleResize = () => {
       setIsMobileView(window.innerWidth <= 768);
@@ -58,12 +53,12 @@ const Intercom = () => {
           size: 100
         };
         
-        if (activeTab === 'day2') {
+        if (activeTab === 'patients') {
           const response = await dispatch(fetchPatientList(params));
           if (!fetchPatientList.fulfilled.match(response)) {
             console.error('Failed to fetch patient list:', response.error);
           }
-        } else if (activeTab === 'day3') {
+        } else if (activeTab === 'providers') {
           const response = await dispatch(fetchCareGivers(params));
           if (!fetchCareGivers.fulfilled.match(response)) {
             console.error('Failed to fetch providers list:', response.error);
@@ -74,7 +69,7 @@ const Intercom = () => {
       }
     };
 
-    if (activeTab !== 'day1') {
+    if (activeTab !== 'active') {
       loadUsers();
     }
   }, [dispatch, activeTab]);
@@ -195,16 +190,15 @@ const Intercom = () => {
     });
   };
 
-  // Update the filtering logic to handle day-based tabs
+  // Update the filtering logic to handle different tabs
   const filteredUsers = useMemo(() => {
     let users = [];
     
-    // Example of how to handle different days
     switch(activeTab) {
-      case 'day1':
+      case 'active':
         users = chatHeads;
         break;
-      case 'day2':
+      case 'patients':
         users = patients.map(patient => ({
           userRef: patient.userRef,
           username: `${patient.firstname} ${patient.lastname}`,
@@ -212,7 +206,7 @@ const Intercom = () => {
           userRole: 'Patient'
         }));
         break;
-      case 'day3':
+      case 'providers':
         const providersList = providers?.getRecord || providers || [];
         users = providersList.map(provider => ({
           userRef: provider.userRef || provider.id,
@@ -221,7 +215,6 @@ const Intercom = () => {
           userPicture: provider.profilePicture || provider.picture
         }));
         break;
-      // Add more cases for additional days as needed
       default:
         users = [];
     }
@@ -259,7 +252,11 @@ const Intercom = () => {
             <Segmented
               value={activeTab}
               onChange={handleTabChange}
-              options={dayOptions}
+              options={[
+                { label: 'Active', value: 'active' },
+                { label: 'Patients', value: 'patients' },
+                { label: 'Providers', value: 'providers' }
+              ]}
               block
             />
           </div>
@@ -267,7 +264,7 @@ const Intercom = () => {
 
         <div className="users-list">
           {isLoading ? (
-            <div className="loading-state">Loading {activeTab === 'day1' ? 'chats' : activeTab === 'day2' ? 'patients' : 'providers'}...</div>
+            <div className="loading-state">Loading {activeTab === 'active' ? 'chats' : activeTab === 'patients' ? 'patients' : 'providers'}...</div>
           ) : filteredUsers.length > 0 ? (
             filteredUsers.map((user) => (
               <div
@@ -300,7 +297,7 @@ const Intercom = () => {
             ))
           ) : (
             <div className="no-results">
-              No {activeTab === 'day1' ? 'active chats' : activeTab === 'day2' ? 'patients' : 'providers'} found matching "{searchQuery}"
+              No {activeTab === 'active' ? 'active chats' : activeTab === 'patients' ? 'patients' : 'providers'} found matching "{searchQuery}"
             </div>
           )}
         </div>

@@ -42,6 +42,20 @@ const Intercom = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Add polling for chat heads
+  useEffect(() => {
+    // Initial fetch
+    dispatch(getChatHeads());
+
+    // Set up polling interval
+    const interval = setInterval(() => {
+      dispatch(getChatHeads());
+    }, 2000); // 2 seconds
+
+    // Cleanup interval on unmount
+    return () => clearInterval(interval);
+  }, [dispatch]);
+
   useEffect(() => {
     // Load chat heads first
     dispatch(getChatHeads());
@@ -123,10 +137,8 @@ const Intercom = () => {
           chatRef: chatRef
         }));
 
-        // Immediately fetch new messages to ensure everything is in sync
         if (sendMessage.fulfilled.match(response)) {
           await dispatch(getMessages(userId));
-          // Refresh chat heads to update latest messages
           dispatch(getChatHeads());
         } else {
           console.error('Failed to send message:', response.error);

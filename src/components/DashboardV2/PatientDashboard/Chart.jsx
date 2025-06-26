@@ -59,7 +59,6 @@ const HormoneChart = () => {
     fetchMiraInfo();
   }, [dispatch]);
 
-
   const shadingAreas = useMemo(() => {
     if (!cycleInfo) return [];
 
@@ -250,7 +249,7 @@ const HormoneChart = () => {
           ))}
         </div>
       </div>
-      <div style={{ margin: "30px 0", width:"50%" }}>
+      <div style={{ margin: "30px 0", width: "50%", float: "left" }}>
         <ChartFileUploader
           onUpload={async (fileData) => {
             const payload = {
@@ -259,14 +258,48 @@ const HormoneChart = () => {
             try {
               await dispatch(addDocuments(payload)).unwrap();
               message.success("Chart uploaded successfully");
-             // fetchPatientBloodWork();
             } catch (err) {
               message.error("Failed to upload chart");
             }
           }}
         />
-      </div>
 
+      </div>
+      <div style={{ marginLeft: "5%", float: "left", width: "30%", background: "#f4fdfe", padding: "27px 25px", marginTop: "25px", borderRadius: "12px", color: "rgba(0, 0, 0, 0.88)", fontWeight: "500" }}>
+        <table style={{ width: "100%", lineHeight: "30px" }}>
+          <thead>
+            <tr>
+              <th colSpan={2} style={{ textTransform: "uppercase", paddingBottom: "10px" }}>Cycle Analysis</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>first menstrual cycle:</td>
+              <td>2024-03-01</td>
+            </tr>
+            <tr>
+              <td>Date of ovulation/ peal fertility:</td>
+              <td>2024-03-17</td>
+            </tr>
+            <tr>
+              <td>Length of Lutel Phase:</td>
+              <td>2 days</td>
+            </tr>
+            <tr>
+              <td>Length of Cycle:</td>
+              <td>30 days</td>
+            </tr>
+            <tr>
+              <td>Days 3:</td>
+              <td>xx</td>
+            </tr>
+            <tr>
+              <td>Peak + 7:</td>
+              <td>xx</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 

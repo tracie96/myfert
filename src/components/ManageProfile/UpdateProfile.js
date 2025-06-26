@@ -278,18 +278,22 @@ const UpdateProfile = () => {
                 >
                   Profile
                 </div>
-                <div 
-                  className={`tab-item ${activeTab === 'partner' ? 'active' : ''}`}
-                  onClick={() => setActiveTab('partner')}
-                >
-                  Partner
-                </div>
-                <div 
-                  className={`tab-item ${activeTab === 'pharmacy' ? 'active' : ''}`}
-                  onClick={() => setActiveTab('pharmacy')}
-                >
-                  Pharmacy
-                </div>
+                {userAuth?.obj?.role === "Patient" && (
+                  <>
+                    <div 
+                      className={`tab-item ${activeTab === 'partner' ? 'active' : ''}`}
+                      onClick={() => setActiveTab('partner')}
+                    >
+                      Partner
+                    </div>
+                    <div 
+                      className={`tab-item ${activeTab === 'pharmacy' ? 'active' : ''}`}
+                      onClick={() => setActiveTab('pharmacy')}
+                    >
+                      Pharmacy
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -568,7 +572,7 @@ const UpdateProfile = () => {
                   </div>
                 </div>
               </form>
-            ) : (
+            ) : activeTab === 'pharmacy' && userAuth?.obj?.role === "Patient" ? (
               <div className="pharmacy-form mt-3">
                 <div className="row" style={{ color: "#000" }}>
                   <div className="col-md-12">
@@ -667,7 +671,7 @@ const UpdateProfile = () => {
                   </div>
                 </div>
               </div>
-            )}
+            ) : null}
           </div>
         </div>
       </div>

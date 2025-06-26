@@ -11,12 +11,14 @@ import ReactInputMask from "react-input-mask";
 import { Spin } from "antd";
 import { getUserProfile, updateProfile } from "../redux/AuthController";
 import { updateProfileUser } from '../redux/profileSlice';
+import './UpdateProfile.css';
 
 const UpdateProfile = () => {
   const dispatch = useDispatch();
   const [showSpinner, setShowSpinner] = useState(false);
   const [loading, setLoading] = useState(true);
   const [uploadedFileUrl, setUploadedFileUrl] = useState(null);
+  const [activeTab, setActiveTab] = useState('profile');
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const userAuth = useSelector((state) => state?.authentication?.userAuth);
 
@@ -57,7 +59,7 @@ const UpdateProfile = () => {
       phoneNumber: "",
       address: "",
       DOB: "",
-      picture: "", // Changed to store URL from Cloudinary
+      picture: "",
       availabilityFrom: "",
       availabilityTo: "",
       latitude: 53.520611,
@@ -67,13 +69,16 @@ const UpdateProfile = () => {
       ongoingFertilityCare: false,
       ongoingFertilityCareDelivery: "",
       pregnancyCare: false,
-      pregnancyCareDelivery: ""
+      pregnancyCareDelivery: "",
+      pharmacyName: "",
+      pharmacyAddress: "",
+      pharmacyPhoneNumber: "",
+      pharmacyFaxNumber: ""
     },
     validationSchema: validateUpdateProfile,
     onSubmit: async (values) => {
       try {
         setShowSpinner(true);
-        // Include the Cloudinary URL in the values to be submitted
         const updatedValues = { ...values, profile: uploadedFileUrl };
         dispatch(updateProfileUser(updatedValues));
         const action = dispatch(updateProfile(updatedValues));
@@ -120,6 +125,18 @@ const UpdateProfile = () => {
       setFieldValue("ongoingFertilityCareDelivery", userData?.ongoingFertilityCareDelivery || "");
       setFieldValue("pregnancyCare", userData?.pregnancyCare || false);
       setFieldValue("pregnancyCareDelivery", userData?.pregnancyCareDelivery || "");
+      
+      // Set pharmacy values
+      setFieldValue("pharmacyName", userData?.pharmacyName || "");
+      setFieldValue("pharmacyAddress", userData?.pharmacyAddress || "");
+      setFieldValue("pharmacyPhoneNumber", userData?.pharmacyPhoneNumber || "");
+      setFieldValue("pharmacyFaxNumber", userData?.pharmacyFaxNumber || "");
+
+      // Set pharmacy values
+      setFieldValue("pharmacyName", userData?.pharmacyName || "");
+      setFieldValue("pharmacyAddress", userData?.pharmacyAddress || "");
+      setFieldValue("pharmacyPhoneNumber", userData?.pharmacyPhoneNumber || "");
+      setFieldValue("pharmacyFaxNumber", userData?.pharmacyFaxNumber || "");
 
       // If there's an existing profile image URL, set it
       setUploadedFileUrl(userData?.profile || null);
@@ -254,282 +271,403 @@ const UpdateProfile = () => {
                   {values.firstName} {values.lastName}
                 </h4>
               )}
+              <div className="vertical-tabs mt-4">
+                <div 
+                  className={`tab-item ${activeTab === 'profile' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('profile')}
+                >
+                  Profile
+                </div>
+                <div 
+                  className={`tab-item ${activeTab === 'partner' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('partner')}
+                >
+                  Partner
+                </div>
+                <div 
+                  className={`tab-item ${activeTab === 'pharmacy' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('pharmacy')}
+                >
+                  Pharmacy
+                </div>
+              </div>
             </div>
           </div>
         </div>
         <div className="col-md-8">
           <div className="card-body">
-            <form className="" method="put" onSubmit={handleSubmit}>
-              <div className="row" style={{ color: "#000" }}>
-                <div className="col-md-6">
-                  <div className="form-group">
-                    <label>First Name</label>
-                    <input
-                      className="form-control"
-                      name="firstName"
-                      type="firstName"
-                      autoComplete="on"
-                      value={values.firstName}
-                      onChange={handleChange("firstName")}
-                      onBlur={handleBlur("firstName")}
-                    />
-                    {errors.firstName && (
-                      <small className="text-danger">{errors.firstName}</small>
-                    )}
+            {activeTab === 'profile' ? (
+              <form className="" method="put" onSubmit={handleSubmit}>
+                <div className="row" style={{ color: "#000" }}>
+                  <div className="col-md-6">
+                    <div className="form-group">
+                      <label>First Name</label>
+                      <input
+                        className="form-control"
+                        name="firstName"
+                        type="firstName"
+                        autoComplete="on"
+                        value={values.firstName}
+                        onChange={handleChange("firstName")}
+                        onBlur={handleBlur("firstName")}
+                      />
+                      {errors.firstName && (
+                        <small className="text-danger">{errors.firstName}</small>
+                      )}
+                    </div>
                   </div>
-                </div>
 
-                <div className="col-md-6">
-                  <div className="form-group">
-                    <label>Last Name</label>
-                    <input
-                      className="form-control"
-                      name="lastName"
-                      type="lastName"
-                      autoComplete="on"
-                      value={values.lastName}
-                      onChange={handleChange("lastName")}
-                      onBlur={handleBlur("lastName")}
-                    />
-                    {errors.lastName && (
-                      <small className="text-danger">{errors.lastName}</small>
-                    )}
+                  <div className="col-md-6">
+                    <div className="form-group">
+                      <label>Last Name</label>
+                      <input
+                        className="form-control"
+                        name="lastName"
+                        type="lastName"
+                        autoComplete="on"
+                        value={values.lastName}
+                        onChange={handleChange("lastName")}
+                        onBlur={handleBlur("lastName")}
+                      />
+                      {errors.lastName && (
+                        <small className="text-danger">{errors.lastName}</small>
+                      )}
+                    </div>
                   </div>
-                </div>
 
-                <div className="col-md-12">
-                  <div className="form-group">
-                    <label>Email</label>
-                    <input
-                      className="form-control"
-                      name="email"
-                      type="email"
-                      autoComplete="on"
-                      value={values.email}
-                      readOnly
-                      onBlur={handleBlur("email")}
-                    />
-                    {errors.email && (
-                      <small className="text-danger">{errors.email}</small>
-                    )}
+                  <div className="col-md-12">
+                    <div className="form-group">
+                      <label>Email</label>
+                      <input
+                        className="form-control"
+                        name="email"
+                        type="email"
+                        autoComplete="on"
+                        value={values.email}
+                        readOnly
+                        onBlur={handleBlur("email")}
+                      />
+                      {errors.email && (
+                        <small className="text-danger">{errors.email}</small>
+                      )}
+                    </div>
                   </div>
-                </div>
-                <div className="col-md-12">
-                  <div className="form-group">
-                    <label>Phone Number</label>
-                    <ReactInputMask
-                      mask="+1 (999) 999-9999"
-                      maskChar={null}
-                      value={values.phoneNumber}
-                      onChange={handleChange("phoneNumber")}
-                      onBlur={handleBlur("phoneNumber")}
-                    >
-                      {(inputProps) => (
+                  <div className="col-md-12">
+                    <div className="form-group">
+                      <label>Phone Number</label>
+                      <ReactInputMask
+                        mask="+1 (999) 999-9999"
+                        maskChar={null}
+                        value={values.phoneNumber}
+                        onChange={handleChange("phoneNumber")}
+                        onBlur={handleBlur("phoneNumber")}
+                      >
+                        {(inputProps) => (
+                          <input
+                            {...inputProps}
+                            className="form-control"
+                            name="phoneNumber"
+                            type="text"
+                            autoComplete="off"
+                          />
+                        )}
+                      </ReactInputMask>
+                      {errors.phoneNumber && (
+                        <small className="text-danger">
+                          {errors.phoneNumber}
+                        </small>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="col-md-12">
+                    <div className="form-group">
+                      <label>Date of Birth</label>
+                      <input
+                        className="form-control"
+                        name="DOB"
+                        type="date"
+                        value={values.DOB}
+                        onChange={handleChange("DOB")}
+                        onBlur={handleBlur("DOB")}
+                        max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split('T')[0]}
+                      />
+                      {errors.DOB && (
+                        <small className="text-danger">{errors.DOB}</small>
+                      )}
+                    </div>
+                  </div>
+                  <div className="col-md-12">
+                      <div className="form-group">
+                        <label>Address</label>
                         <input
-                          {...inputProps}
                           className="form-control"
-                          name="phoneNumber"
+                          name="address"
                           type="text"
-                          autoComplete="off"
+                          value={ values.address}
+                          onChange={handleChange("address")}
+                          onBlur={handleBlur("address")}
+                        />
+                      </div>
+                    </div>
+                </div>
+                {userAuth?.obj?.role !== "Patient" && (
+                  <div className="row">
+                   
+                    <div className="col-md-12">
+                      <div className="form-group">
+                        <label>Practice Location</label>
+                        <select
+                          className="form-control"
+                          name="practiceLocation"
+                          value={values.practiceLocation}
+                          onChange={handleChange("practiceLocation")}
+                          onBlur={handleBlur("practiceLocation")}
+                        >
+                          <option value="">Select Province</option>
+                          {provinces.map((province) => (
+                            <option key={province.value} value={province.value}>
+                              {province.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                    <div className="col-md-12">
+                      <div className="form-group">
+                        <label className="required">Care Types</label>
+                        <style>
+                          {`
+                                  .form-check-input:focus {
+                                    outline: none;
+                                    box-shadow: none;
+                                  }
+                                `}
+                        </style>
+                        <div>
+                          <div className="mb-3">
+                            <div className="form-check">
+                              <input
+                                type="checkbox"
+                                className="form-check-input"
+                                id="fertilityScreening"
+                                checked={values.fertilityScreening}
+                                onChange={(e) => setFieldValue("fertilityScreening", e.target.checked)}
+                              />
+                              <label className="form-check-label" htmlFor="fertilityScreening">
+                                Fertility Screening
+                              </label>
+                            </div>
+                            {values.fertilityScreening && (
+                              <div className="mt-2 ml-4">
+                                <label className="required">Delivery Type</label>
+                                <select
+                                  className="form-control"
+                                  name="fertilityScreeningDelivery"
+                                  value={values.fertilityScreeningDelivery}
+                                  onChange={handleChange("fertilityScreeningDelivery")}
+                                  onBlur={handleBlur("fertilityScreeningDelivery")}
+                                >
+                                  <option value="">Select Delivery Type</option>
+                                  <option value="virtual">Virtual</option>
+                                  <option value="in-person">In-Person</option>
+                                  <option value="both">Both</option>
+                                </select>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="mb-3">
+                            <div className="form-check">
+                              <input
+                                type="checkbox"
+                                className="form-check-input"
+                                id="ongoingFertilityCare"
+                                checked={values.ongoingFertilityCare}
+                                onChange={(e) => setFieldValue("ongoingFertilityCare", e.target.checked)}
+                              />
+                              <label className="form-check-label" htmlFor="ongoingFertilityCare">
+                                Ongoing Fertility Care
+                              </label>
+                            </div>
+                            {values.ongoingFertilityCare && (
+                              <div className="mt-2 ml-4">
+                                <label className="required">Delivery Type</label>
+                                <select
+                                  className="form-control"
+                                  name="ongoingFertilityCareDelivery"
+                                  value={values.ongoingFertilityCareDelivery}
+                                  onChange={handleChange("ongoingFertilityCareDelivery")}
+                                  onBlur={handleBlur("ongoingFertilityCareDelivery")}
+                                >
+                                  <option value="">Select Delivery Type</option>
+                                  <option value="virtual">Virtual</option>
+                                  <option value="in-person">In-Person</option>
+                                  <option value="both">Both</option>
+                                </select>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="mb-3">
+                            <div className="form-check">
+                              <input
+                                type="checkbox"
+                                className="form-check-input"
+                                id="pregnancyCare"
+                                checked={values.pregnancyCare}
+                                onChange={(e) => setFieldValue("pregnancyCare", e.target.checked)}
+                              />
+                              <label className="form-check-label" htmlFor="pregnancyCare">
+                                Pregnancy Care
+                              </label>
+                            </div>
+                            {values.pregnancyCare && (
+                              <div className="mt-2 ml-4">
+                                <label className="required">Delivery Type</label>
+                                <select
+                                  className="form-control"
+                                  name="pregnancyCareDelivery"
+                                  value={values.pregnancyCareDelivery}
+                                  onChange={handleChange("pregnancyCareDelivery")}
+                                  onBlur={handleBlur("pregnancyCareDelivery")}
+                                >
+                                  <option value="">Select Delivery Type</option>
+                                  <option value="virtual">Virtual</option>
+                                  <option value="in-person">In-Person</option>
+                                  <option value="both">Both</option>
+                                </select>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-md-12"></div>
+                  </div>
+                )}
+                <div className="row">
+                  <div className="text-end">
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      style={{ background: "#00ADEF", border: 0, color: "#fff" }}
+                      disabled={showSpinner}
+                    >
+                      {showSpinner && (
+                        <Spinner
+                          as="span"
+                          animation="border"
+                          size="sm"
+                          role="status"
+                          aria-hidden="true"
                         />
                       )}
-                    </ReactInputMask>
-                    {errors.phoneNumber && (
-                      <small className="text-danger">
-                        {errors.phoneNumber}
-                      </small>
-                    )}
+                      Update
+                    </button>
                   </div>
                 </div>
-
-                <div className="col-md-12">
-                  <div className="form-group">
-                    <label>Date of Birth</label>
-                    <input
-                      className="form-control"
-                      name="DOB"
-                      type="date"
-                      value={values.DOB}
-                      onChange={handleChange("DOB")}
-                      onBlur={handleBlur("DOB")}
-                      max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split('T')[0]}
-                    />
-                    {errors.DOB && (
-                      <small className="text-danger">{errors.DOB}</small>
-                    )}
+              </form>
+            ) : (
+              <div className="pharmacy-form mt-3">
+                <div className="row" style={{ color: "#000" }}>
+                  <div className="col-md-12">
+                    <div className="form-group">
+                      <label>Pharmacy Name</label>
+                      <input
+                        className="form-control"
+                        name="pharmacyName"
+                        type="text"
+                        value={values.pharmacyName}
+                        onChange={handleChange("pharmacyName")}
+                        onBlur={handleBlur("pharmacyName")}
+                        placeholder="Enter pharmacy name"
+                      />
+                    </div>
                   </div>
-                </div>
-                <div className="col-md-12">
+                  <div className="col-md-12">
                     <div className="form-group">
                       <label>Address</label>
                       <input
                         className="form-control"
-                        name="address"
+                        name="pharmacyAddress"
                         type="text"
-                        value={values.address === "undefined undefined undefined undefined undefined" ? "" : values.address}
-                        onChange={handleChange("address")}
-                        onBlur={handleBlur("address")}
+                        value={values.pharmacyAddress}
+                        onChange={handleChange("pharmacyAddress")}
+                        onBlur={handleBlur("pharmacyAddress")}
+                        placeholder="Enter pharmacy address"
                       />
                     </div>
                   </div>
-              </div>
-              {userAuth?.obj?.role !== "Patient" && (
-                <div className="row">
-                 
                   <div className="col-md-12">
                     <div className="form-group">
-                      <label>Practice Location</label>
-                      <select
-                        className="form-control"
-                        name="practiceLocation"
-                        value={values.practiceLocation}
-                        onChange={handleChange("practiceLocation")}
-                        onBlur={handleBlur("practiceLocation")}
+                      <label>Phone Number</label>
+                      <ReactInputMask
+                        mask="+1 (999) 999-9999"
+                        maskChar={null}
+                        value={values.pharmacyPhoneNumber}
+                        onChange={handleChange("pharmacyPhoneNumber")}
+                        onBlur={handleBlur("pharmacyPhoneNumber")}
                       >
-                        <option value="">Select Province</option>
-                        {provinces.map((province) => (
-                          <option key={province.value} value={province.value}>
-                            {province.label}
-                          </option>
-                        ))}
-                      </select>
+                        {(inputProps) => (
+                          <input
+                            {...inputProps}
+                            className="form-control"
+                            name="pharmacyPhoneNumber"
+                            type="text"
+                            placeholder="Enter pharmacy phone number"
+                            autoComplete="off"
+                          />
+                        )}
+                      </ReactInputMask>
                     </div>
                   </div>
                   <div className="col-md-12">
                     <div className="form-group">
-                      <label className="required">Care Types</label>
-                      <style>
-                        {`
-                                .form-check-input:focus {
-                                  outline: none;
-                                  box-shadow: none;
-                                }
-                              `}
-                      </style>
-                      <div>
-                        <div className="mb-3">
-                          <div className="form-check">
-                            <input
-                              type="checkbox"
-                              className="form-check-input"
-                              id="fertilityScreening"
-                              checked={values.fertilityScreening}
-                              onChange={(e) => setFieldValue("fertilityScreening", e.target.checked)}
-                            />
-                            <label className="form-check-label" htmlFor="fertilityScreening">
-                              Fertility Screening
-                            </label>
-                          </div>
-                          {values.fertilityScreening && (
-                            <div className="mt-2 ml-4">
-                              <label className="required">Delivery Type</label>
-                              <select
-                                className="form-control"
-                                name="fertilityScreeningDelivery"
-                                value={values.fertilityScreeningDelivery}
-                                onChange={handleChange("fertilityScreeningDelivery")}
-                                onBlur={handleBlur("fertilityScreeningDelivery")}
-                              >
-                                <option value="">Select Delivery Type</option>
-                                <option value="virtual">Virtual</option>
-                                <option value="in-person">In-Person</option>
-                                <option value="both">Both</option>
-                              </select>
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="mb-3">
-                          <div className="form-check">
-                            <input
-                              type="checkbox"
-                              className="form-check-input"
-                              id="ongoingFertilityCare"
-                              checked={values.ongoingFertilityCare}
-                              onChange={(e) => setFieldValue("ongoingFertilityCare", e.target.checked)}
-                            />
-                            <label className="form-check-label" htmlFor="ongoingFertilityCare">
-                              Ongoing Fertility Care
-                            </label>
-                          </div>
-                          {values.ongoingFertilityCare && (
-                            <div className="mt-2 ml-4">
-                              <label className="required">Delivery Type</label>
-                              <select
-                                className="form-control"
-                                name="ongoingFertilityCareDelivery"
-                                value={values.ongoingFertilityCareDelivery}
-                                onChange={handleChange("ongoingFertilityCareDelivery")}
-                                onBlur={handleBlur("ongoingFertilityCareDelivery")}
-                              >
-                                <option value="">Select Delivery Type</option>
-                                <option value="virtual">Virtual</option>
-                                <option value="in-person">In-Person</option>
-                                <option value="both">Both</option>
-                              </select>
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="mb-3">
-                          <div className="form-check">
-                            <input
-                              type="checkbox"
-                              className="form-check-input"
-                              id="pregnancyCare"
-                              checked={values.pregnancyCare}
-                              onChange={(e) => setFieldValue("pregnancyCare", e.target.checked)}
-                            />
-                            <label className="form-check-label" htmlFor="pregnancyCare">
-                              Pregnancy Care
-                            </label>
-                          </div>
-                          {values.pregnancyCare && (
-                            <div className="mt-2 ml-4">
-                              <label className="required">Delivery Type</label>
-                              <select
-                                className="form-control"
-                                name="pregnancyCareDelivery"
-                                value={values.pregnancyCareDelivery}
-                                onChange={handleChange("pregnancyCareDelivery")}
-                                onBlur={handleBlur("pregnancyCareDelivery")}
-                              >
-                                <option value="">Select Delivery Type</option>
-                                <option value="virtual">Virtual</option>
-                                <option value="in-person">In-Person</option>
-                                <option value="both">Both</option>
-                              </select>
-                            </div>
-                          )}
-                        </div>
-                      </div>
+                      <label>Fax Number</label>
+                      <ReactInputMask
+                        mask="+1 (999) 999-9999"
+                        maskChar={null}
+                        value={values.pharmacyFaxNumber}
+                        onChange={handleChange("pharmacyFaxNumber")}
+                        onBlur={handleBlur("pharmacyFaxNumber")}
+                      >
+                        {(inputProps) => (
+                          <input
+                            {...inputProps}
+                            className="form-control"
+                            name="pharmacyFaxNumber"
+                            type="text"
+                            placeholder="Enter pharmacy fax number"
+                            autoComplete="off"
+                          />
+                        )}
+                      </ReactInputMask>
                     </div>
                   </div>
-                  <div className="col-md-12"></div>
-                </div>
-              )}
-              <div className="row">
-                <div className="text-end">
-                  <button
-                    type="submit"
-                    className="btn btn-primary"
-                    style={{ background: "#00ADEF", border: 0, color: "#fff" }}
-                    disabled={showSpinner}
-                  >
-                    {showSpinner && (
-                      <Spinner
-                        as="span"
-                        animation="border"
-                        size="sm"
-                        role="status"
-                        aria-hidden="true"
-                      />
-                    )}
-                    Update
-                  </button>
+                  <div className="text-end mt-3">
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      style={{ background: "#00ADEF", border: 0, color: "#fff" }}
+                      onClick={handleSubmit}
+                      disabled={showSpinner}
+                    >
+                      {showSpinner && (
+                        <Spinner
+                          as="span"
+                          animation="border"
+                          size="sm"
+                          role="status"
+                          aria-hidden="true"
+                        />
+                      )}
+                      Update
+                    </button>
+                  </div>
                 </div>
               </div>
-            </form>
+            )}
           </div>
         </div>
       </div>

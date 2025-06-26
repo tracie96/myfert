@@ -10,8 +10,13 @@ import {
   ResponsiveContainer,
   ReferenceArea,
 } from "recharts";
+import {
+  message,
+} from "antd";
 import { useDispatch } from "react-redux";
 import { getMiraInfo } from "../../redux/AuthController";
+import ChartFileUploader from "../PatientDashboard/ChartFileUploader";
+import { addDocuments } from "../../redux/patientSlice";
 
 const HormoneChart = () => {
   const dispatch = useDispatch();
@@ -53,6 +58,7 @@ const HormoneChart = () => {
 
     fetchMiraInfo();
   }, [dispatch]);
+
 
   const shadingAreas = useMemo(() => {
     if (!cycleInfo) return [];
@@ -234,7 +240,7 @@ const HormoneChart = () => {
         </div>
       </div>
 
-    <div style={{ marginTop: "20px", padding: "10px" }}>
+      <div style={{ marginTop: "20px", padding: "10px" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "10px" }}>
           {hormoneData.map((data, index) => (
             <div key={index} style={{ border: "1px solid #eee", padding: "5px" }}>
@@ -244,6 +250,23 @@ const HormoneChart = () => {
           ))}
         </div>
       </div>
+      <div style={{ margin: "30px 0", width:"50%" }}>
+        <ChartFileUploader
+          onUpload={async (fileData) => {
+            const payload = {
+              bloodWork: fileData,
+            };
+            try {
+              await dispatch(addDocuments(payload)).unwrap();
+              message.success("Chart uploaded successfully");
+             // fetchPatientBloodWork();
+            } catch (err) {
+              message.error("Failed to upload chart");
+            }
+          }}
+        />
+      </div>
+
     </div>
   );
 

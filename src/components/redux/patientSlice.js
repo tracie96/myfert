@@ -4,6 +4,33 @@ import { handleApiError, getResponse } from "../Handler/ExceptionHandler";
 import { toast } from "react-toastify";
 import { baseUrl } from "../../utils/envAccess";
 
+export const addDocuments = createAsyncThunk(
+  "patient/addDocument",
+  async ({ patientRef, bloodWork }, { rejectWithValue, getState, dispatch }) => {
+
+    const user = getState()?.authentication?.userAuth; 
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+    try {
+      const response = await axios.post(
+        `${baseUrl}patient/addDocument`, 
+        { ...bloodWork }, 
+        config
+      );
+      console.log("API Response:", response.data); 
+      return response.data;
+
+    } catch (error) {
+      console.error("API Error:", error); 
+      return rejectWithValue(handleApiError(error?.response?.data, dispatch, user)); 
+    }
+  }
+);
+
 export const getDoctorListDropdownForAppointment = createAsyncThunk(
   "patient/getDoctorListDropdownForAppointment",
   async (_, { rejectWithValue, getState, dispatch }) => {

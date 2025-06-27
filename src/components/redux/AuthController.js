@@ -62,6 +62,43 @@ export const getUserProfile = createAsyncThunk(
   },
 );
 
+//`${baseUrl}Doctor/GetGeneralInformation/${id}`,
+//async (id, { getState }) => {
+export const getMiraInfoDoc = createAsyncThunk(
+  "user/getMiraInfo",
+  async (id , { rejectWithValue, getState, dispatch }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        accept: "text/plain",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+
+    try {
+      const response = await axios.post(
+        `${baseUrl}Doctor/GetMiraInfo/${id}`,
+        {},
+        config,
+      );
+
+      const responseData = response.data;
+      console.log(responseData, "responseData");
+
+      if (responseData) {
+        return responseData;
+      }
+
+      return rejectWithValue("No response data");
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || "Failed to fetch Mira Info",
+        dispatch,
+      );
+    }
+  },
+);
+
 export const getMiraInfo = createAsyncThunk(
   "user/getMiraInfo",
   async (_, { rejectWithValue, getState, dispatch }) => {

@@ -17,6 +17,7 @@ const PatientIntercom = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('active');
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
+  const [initialLoad, setInitialLoad] = useState(true);
   const dispatch = useDispatch();
   const messagesEndRef = useRef(null);
 
@@ -77,14 +78,28 @@ const PatientIntercom = () => {
   useEffect(() => {
     if (selectedUser?.userRef || selectedUser?.id) {
       const userId = selectedUser.userRef || selectedUser.id;
+      setInitialLoad(true); // Reset initial load when user changes
       console.log('Fetching messages for user:', userId);
       dispatch(getMessages(userId))
         .then(response => {
           console.log('Messages response:', response);
+          setInitialLoad(false);
         })
         .catch(error => {
           console.error('Error fetching messages:', error);
+          setInitialLoad(false);
         });
+
+      // Set up polling interval for messages
+      const messageInterval = setInterval(() => {
+        dispatch(getMessages(userId))
+          .catch(error => {
+            console.error('Error polling messages:', error);
+          });
+      }, 5000); // Poll every 5 seconds
+
+      // Cleanup interval on unmount or when user changes
+      return () => clearInterval(messageInterval);
     }
   }, [dispatch, selectedUser]);
 
@@ -147,7 +162,7 @@ const PatientIntercom = () => {
   };
 
   const renderMessages = () => {
-    if (chatLoading) {
+    if (initialLoad && chatLoading) {
       return <div className="loading-messages">Loading messages...</div>;
     }
 

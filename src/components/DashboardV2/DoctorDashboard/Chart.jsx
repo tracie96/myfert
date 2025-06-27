@@ -386,7 +386,7 @@ const Chart = () => {
                 </div>
             </div>
 
-            <div style={{ marginTop: "20px", padding: "10px" }}>
+            {/* <div style={{ marginTop: "20px", padding: "10px" }}>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "10px" }}>
                     {hormoneData.map((data, index) => (
                         <div key={index} style={{ border: "1px solid #eee", padding: "5px" }}>
@@ -395,7 +395,7 @@ const Chart = () => {
                         </div>
                     ))}
                 </div>
-            </div>
+            </div> */}
 
 
             <div className="p-6 mt-4" style={{ padding: "24px" }}>

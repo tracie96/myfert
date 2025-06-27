@@ -240,14 +240,14 @@ const HormoneChart = () => {
       </div>
 
       <div style={{ marginTop: "20px", padding: "10px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "10px" }}>
+        {/* <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "10px" }}>
           {hormoneData.map((data, index) => (
             <div key={index} style={{ border: "1px solid #eee", padding: "5px" }}>
               <b>{data.month} {data.day}:</b><br />
               LH={data.lh}, E3G={data.e3g}, PDG={data.pdg}
             </div>
           ))}
-        </div>
+        </div> */}
       </div>
       <div style={{ margin: "30px 0", width: "100%", float: "left" }}>
         <ChartFileUploader

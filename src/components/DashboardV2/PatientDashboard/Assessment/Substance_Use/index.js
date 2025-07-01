@@ -235,28 +235,59 @@ const SubstanceUse = ({ onComplete }) => {
   const validateQuestion = () => {
     const question = questions[currentQuestionIndex];
     const mainAnswer = answers[question.name];
-    const isMainQuestionValid = mainAnswer !== undefined && mainAnswer !== "";
-  
-    // If the main question's answer does not require subquestions, skip their validation
-    if (!question.subQuestions || mainAnswer !== "Yes") {
-      return isMainQuestionValid;
+
+    const isMainValid =
+      mainAnswer !== undefined && mainAnswer !== "" && mainAnswer !== null;
+
+    const isOtherOptionValid = question.options?.includes("Other")
+      ? mainAnswer !== "Other" || !!answers[`${question.name}_other`]
+      : true;
+
+    if (!isMainValid || !isOtherOptionValid) return false;
+
+    // Special validation for "Do you smoke currently?"
+    if (question.name === "smoke_currently" && mainAnswer === "Yes") {
+      const requiredFields = ["packs_per_day", "number_of_years", "smoke_type"];
+      for (const field of requiredFields) {
+        const value = answers[field];
+        if (value === undefined || value === "") {
+          return false;
+        }
+
+        // Handle "Other" option for smoke_type
+        if (
+          field === "smoke_type" &&
+          value === "Other" &&
+          (!answers["smoke_type_other"] || answers["smoke_type_other"].trim() === "")
+        ) {
+          return false;
+        }
+      }
     }
-  
-    // Validate subquestions only if they are required
+
+    // Normal subquestion validation (for all other Yes cases)
+    if (!question.subQuestions || mainAnswer !== "Yes") {
+      return true;
+    }
+
     const areSubQuestionsValid = question.subQuestions.every((sub) => {
       const subAnswer = answers[sub.name];
-      if(subAnswer === 0) {
-        return false; 
-        // If subAnswer is undefined, it's invalid
-      }
+
       if (sub.type === "inputNumber") {
-        return subAnswer !== undefined; // Allow default value of 0 for number inputs
+        return subAnswer !== undefined;
       }
-      return subAnswer !== undefined && subAnswer !== ""; // Non-empty validation for other types
+
+      if (sub.type === "radio" && sub.options?.includes("Other")) {
+        const subOtherAnswer = answers[`${sub.name}_other`];
+        return subAnswer !== undefined && (subAnswer !== "Other" || !!subOtherAnswer);
+      }
+
+      return subAnswer !== undefined && subAnswer !== "";
     });
-  
-    return isMainQuestionValid && areSubQuestionsValid;
+
+    return areSubQuestionsValid;
   };
+  
   
   const handleExit = () => {
     navigate("/assessment");

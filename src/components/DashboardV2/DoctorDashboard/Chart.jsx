@@ -345,7 +345,7 @@ const Chart = () => {
                                 label={{ value: "Day", position: "bottom", offset: 0 }}
                                 tick={{ angle: -45, textAnchor: 'end', fontSize: 12 }}
                             />
-                            <YAxis label={{ value: "Hormone Level", angle: -90, position: "insideLeft" }} />
+                            {/* <YAxis label={{ value: "Hormone Level", angle: -90, position: "insideLeft" }} /> */}
                             <Tooltip labelFormatter={(value) => value} />
                             <Legend verticalAlign="top" />
 
@@ -417,7 +417,7 @@ const Chart = () => {
 
                         <Card style={{ border: "1px solid #C2E6F8", marginBottom: "24px" }}>
                             <Typography.Title level={5} style={{ marginBottom: "16px" }}>
-                                Lab Results
+                                Chart Results
                             </Typography.Title>
                             <List
                                 dataSource={files || []}

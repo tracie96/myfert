@@ -23,6 +23,7 @@ const HormoneChart = () => {
   const [hormoneData, setHormoneData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [cycleInfo, setCycleInfo] = useState(null);
+  const [selectedMonthType, setSelectedMonthType] = useState("current");
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -43,8 +44,8 @@ const HormoneChart = () => {
             month: new Date(hormone.test_time).toLocaleString("default", { month: "long" }),
             test_time: hormone.test_time, // Keep the original test_time
           }));
-          setCycleInfo(resultAction.payload.cycleInfo);
           setHormoneData(parsedHormones);
+
         } else {
           setError(resultAction.payload || "Failed to fetch Mira Info");
         }
@@ -58,7 +59,15 @@ const HormoneChart = () => {
 
     fetchMiraInfo();
   }, [dispatch]);
-
+  const filteredHormoneData = useMemo(() => {
+    const now = new Date();
+    const currentMonth = now.toLocaleString("default", { month: "long" });
+    const pastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1).toLocaleString("default", { month: "long" });
+  
+    const targetMonth = selectedMonthType === "current" ? currentMonth : pastMonth;
+    return hormoneData.filter((item) => item.month === targetMonth);
+  }, [hormoneData, selectedMonthType]);
+  
   const shadingAreas = useMemo(() => {
     if (!cycleInfo) return [];
 
@@ -158,9 +167,10 @@ const HormoneChart = () => {
 
   // Dynamically generate ticks for the X-axis based on available data
   const allMonths = useMemo(() => {
-    const months = [...new Set(hormoneData.map((item) => item.month))];
+    const months = [...new Set(filteredHormoneData.map((item) => item.month))];
     return months;
-  }, [hormoneData]);
+  }, [filteredHormoneData]);
+  
 
   const xAxisTicks = useMemo(() => {
     const ticks = [];
@@ -189,6 +199,39 @@ const HormoneChart = () => {
         {/* Chart Rendering */}
         <div style={{ width: "1800px", height: "500px" }}> {/* Increased chart width */}
           <ResponsiveContainer width="100%" height="100%">
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+          <h3 style={{ margin: 0 }}>Hormone Chart</h3>
+          <div>
+            <button
+              style={{
+                marginRight: 8,
+                padding: "6px 12px",
+                backgroundColor: selectedMonthType === "past" ? "#1890ff" : "#f0f0f0",
+                color: selectedMonthType === "past" ? "#fff" : "#000",
+                border: "1px solid #d9d9d9",
+                borderRadius: 4,
+                cursor: "pointer",
+              }}
+              onClick={() => setSelectedMonthType("past")}
+            >
+              Past Month
+            </button>
+            <button
+              style={{
+                padding: "6px 12px",
+                backgroundColor: selectedMonthType === "current" ? "#1890ff" : "#f0f0f0",
+                color: selectedMonthType === "current" ? "#fff" : "#000",
+                border: "1px solid #d9d9d9",
+                borderRadius: 4,
+                cursor: "pointer",
+              }}
+              onClick={() => setSelectedMonthType("current")}
+            >
+              Current Month
+            </button>
+          </div>
+        </div>
+
             <LineChart data={dataWithXAxis} margin={{ top: 50, right: 30, left: 20, bottom: 50 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis
@@ -198,7 +241,7 @@ const HormoneChart = () => {
                 label={{ value: "Day", position: "bottom", offset: 0 }}
                 tick={{ angle: -45, textAnchor: 'end', fontSize: 12 }}
               />
-              <YAxis label={{ value: "Hormone Level", angle: -90, position: "insideLeft" }} />
+              {/* <YAxis label={{ value: "Hormone Level", angle: -90, position: "insideLeft" }} /> */}
               <Tooltip labelFormatter={(value) => value} />
               <Legend verticalAlign="top" />
 
@@ -240,14 +283,6 @@ const HormoneChart = () => {
       </div>
 
       <div style={{ marginTop: "20px", padding: "10px" }}>
-        {/* <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "10px" }}>
-          {hormoneData.map((data, index) => (
-            <div key={index} style={{ border: "1px solid #eee", padding: "5px" }}>
-              <b>{data.month} {data.day}:</b><br />
-              LH={data.lh}, E3G={data.e3g}, PDG={data.pdg}
-            </div>
-          ))}
-        </div> */}
       </div>
       <div style={{ margin: "30px 0", width: "100%", float: "left" }}>
         <ChartFileUploader

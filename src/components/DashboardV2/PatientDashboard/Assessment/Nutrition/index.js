@@ -629,7 +629,7 @@ const Nutrition = ({ onComplete }) => {
         describe: answers.sensitive_food_caffeine_other || "",
       },
       explainAdverseReactionToCoffee: answers.sensitive_food_caffeine_other || "",
-      reactionToCaffeine: answers.sensitive_food_caffeine_feel || "",
+      reactionToCaffeine: answers.sensitive_food_caffeine_feel != null ? String(answers.sensitive_food_caffeine_feel) : "",
       sensitiveCaffeineOther: answers.sensitive_food_caffeine_feel_other || "",
       specialDietReason:answers.special_diet_reason || "",
       breakfastTime:answers.breakfast_time || "",

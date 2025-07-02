@@ -429,6 +429,54 @@ const StressAndRelationship = ({ onComplete }) => {
   
         return true;
       }
+      case "long_radio": {
+        if (answers[question.name] === undefined) {
+          return false; 
+        }
+      
+        if (answers[question.name] === "Yes") {
+          if (!question.subQuestions) return true; 
+      
+          for (const subQuestion of question.subQuestions) {
+            if (answers[subQuestion.name] === undefined || answers[subQuestion.name] === "") {
+              console.log(
+                `Validation Failed: Sub-question ${subQuestion.name} is not answered.`
+              );
+              return false; 
+            }
+          }
+        }
+      
+        return true; 
+      }
+      
+      case "number_with_radio": {
+        // Check main question subQuestions
+        if (!question.subQuestions || !Array.isArray(question.subQuestions)) {
+          return false;
+        }
+      
+        for (const subQ of question.subQuestions) {
+          if (subQ.type === "number_with_radio_sub") {
+            const val = answers[subQ.name];
+            if (val === undefined || val === null || val === "") {
+              console.warn(`Validation failed: Missing number input for ${subQ.name}`);
+              return false;
+            }
+          }
+      
+          if (subQ.type === "radio") {
+            const val = answers[subQ.name];
+            if (!val || val === "") {
+              console.warn(`Validation failed: Missing radio selection for ${subQ.name}`);
+              return false;
+            }
+          }
+        }
+      
+        return true;
+      }
+      
       case "checkbox_with_select":
         break;
   
@@ -477,26 +525,26 @@ const StressAndRelationship = ({ onComplete }) => {
         return true;
       }
   
-      case "long_radio": {
-        if (answers[question.name] === undefined) {
-          return false; 
-        }
+      // case "long_radio": {
+      //   if (answers[question.name] === undefined) {
+      //     return false; 
+      //   }
   
-        if (answers[question.name] === "Yes") {
-          if (!question.subQuestions) return true; 
+      //   if (answers[question.name] === "Yes") {
+      //     if (!question.subQuestions) return true; 
   
-          for (const subQuestion of question.subQuestions) {
-            if (answers[subQuestion.name] === undefined || answers[subQuestion.name] === "") {
-              console.log(
-                `Validation Failed: Sub-question ${subQuestion.name} is not answered.`
-              );
-              return false; 
-            }
-          }
-        }
+      //     for (const subQuestion of question.subQuestions) {
+      //       if (answers[subQuestion.name] === undefined || answers[subQuestion.name] === "") {
+      //         console.log(
+      //           `Validation Failed: Sub-question ${subQuestion.name} is not answered.`
+      //         );
+      //         return false; 
+      //       }
+      //     }
+      //   }
   
-        return true; 
-      }
+      //   return true; 
+      // }
   
       case "long_textarea":
         return (

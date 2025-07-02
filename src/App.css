@@ -122,6 +122,50 @@ body {
   outline: 0 !important;
 }
 
+
+/* chart Css here */
+.chartHeader{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.chartHeader span{
+  border-radius: 6px;
+  min-width: 100px;
+  text-align: center;
+  font-weight: 600;
+}
+.chartHeader .py-1{
+  padding-bottom: 0.1rem !important;
+  padding-top: 0.1rem !important;
+}
+.chartHeader span:first-child{
+  background: #ccedfe;
+  border: #93d7fa 1px solid;
+  color: #72b7da;
+}
+
+.chartHeader span:nth-child(2){
+  background: #f2bbff;
+  border: #e25bff 1px solid;
+  color: #e25bff;
+}
+.chartHeader span:nth-child(3){
+  background: #e6e3d2;
+  border: #bcb283 1px solid;
+  color: #bcb283;
+}
+.chartHeader span:nth-child(4){
+  background: #f6f1d1;
+  border: #e1ca57 1px solid;
+  color: #e1ca57;
+}
+.chartHeader span:nth-child(5){
+  color: #009003;
+}
+
 hr {
   box-sizing: content-box;
   height: 0;

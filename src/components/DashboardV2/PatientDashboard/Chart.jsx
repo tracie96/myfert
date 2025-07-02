@@ -6,7 +6,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
   ReferenceArea,
 } from "recharts";
@@ -35,10 +34,12 @@ const HormoneChart = () => {
 
         if (getMiraInfo.fulfilled.match(resultAction)) {
           const hormones = resultAction.payload.hormones || [];
+          console.log("hormones--", hormones);
           const parsedHormones = hormones.map((hormone) => ({
             lh: parseFloat(hormone.lh) || 0,
             e3g: parseFloat(hormone.e3g) || 0,
             pdg: parseFloat(hormone.pdg) || 0,
+            fsh: parseFloat(hormone.fsh) || 0,
             day: new Date(hormone.test_time).getDate(),
             month: new Date(hormone.test_time).toLocaleString("default", { month: "long" }),
             test_time: hormone.test_time, // Keep the original test_time
@@ -61,7 +62,6 @@ const HormoneChart = () => {
 
   const shadingAreas = useMemo(() => {
     if (!cycleInfo) return [];
-
     const periodStart = new Date(cycleInfo.period_start).getDate();
     const periodEnd = new Date(cycleInfo.period_end).getDate();
     const fertileStart = new Date(cycleInfo.fertile_window_start).getDate();
@@ -126,35 +126,45 @@ const HormoneChart = () => {
   }, [cycleInfo]);
 
   const chartData = useMemo(() => {
-    // Group hormone data by month
-    const groupedData = hormoneData.reduce((acc, entry) => {
-      if (!acc[entry.month]) {
-        acc[entry.month] = [];
-      }
-      acc[entry.month].push(entry);
-      return acc;
-    }, {});
+    if (!cycleInfo?.period_start || !cycleInfo?.fertile_window_end) return [];
 
-    // Create a combined dataset for all months
-    const combinedData = Object.entries(groupedData).reduce((acc, [month, data]) => {
-      const daysInMonth = new Date(new Date().getFullYear(), new Date(data[0].test_time).getMonth() + 1, 0).getDate(); // Get days in the specific month
-      const monthData = Array.from({ length: daysInMonth }, (_, i) => {
-        const day = i + 1;
-        const existingData = data.find((item) => item.day === day);
-        return {
-          month: month,
-          day: day,
-          lh: existingData?.lh || null,
-          e3g: existingData?.e3g || null,
-          pdg: existingData?.pdg || null,
-          fsh: existingData?.fsg || null,
-        };
-      });
-      return acc.concat(monthData);
-    }, []);
+    const periodStartDate = new Date(cycleInfo.period_start);
+    const fiveDaysBefore = new Date(periodStartDate);
+    fiveDaysBefore.setDate(periodStartDate.getDate() - 5);
+
+    const fertileEndDate = new Date(cycleInfo.fertile_window_end);
+    const fiveDaysAfter = new Date(fertileEndDate);
+    fiveDaysAfter.setDate(fertileEndDate.getDate() + 5);
+
+    const allDates = [];
+    for (let d = new Date(fiveDaysBefore); d <= fiveDaysAfter; d.setDate(d.getDate() + 1)) {
+      allDates.push(new Date(d));
+    }
+
+    const hormoneMap = {};
+    hormoneData.forEach((item) => {
+      const dateStr = new Date(item.test_time).toISOString().split("T")[0];
+      hormoneMap[dateStr] = item;
+    });
+
+    const combinedData = allDates.map((date) => {
+      const dateStr = date.toISOString().split("T")[0];
+      const hormone = hormoneMap[dateStr] || {};
+
+      return {
+        month: date.toLocaleString("default", { month: "long" }),
+        day: date.getDate(),
+        lh: Math.max(0, parseFloat(hormone.lh) || 0),
+        e3g: Math.max(0, parseFloat(hormone.e3g) || 0),
+        pdg: Math.max(0, parseFloat(hormone.pdg) || 0),
+        fsh: Math.max(0, parseFloat(hormone.fsh) || 0),
+        test_time: dateStr,
+      };
+    });
+
 
     return combinedData;
-  }, [hormoneData]);
+  }, [hormoneData, cycleInfo]);
 
   // Dynamically generate ticks for the X-axis based on available data
   const allMonths = useMemo(() => {
@@ -185,59 +195,115 @@ const HormoneChart = () => {
 
   return (
     <div>
-      <div style={{ position: "relative", width: "100%", overflowX: "auto" }}> {/* Enable horizontal scrolling */}
-        {/* Chart Rendering */}
-        <div style={{ width: "1800px", height: "500px" }}> {/* Increased chart width */}
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={dataWithXAxis} margin={{ top: 50, right: 30, left: 20, bottom: 50 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis
-                dataKey="xAxisLabel"
-                ticks={xAxisTicks}
-                interval={0}
-                label={{ value: "Day", position: "bottom", offset: 0 }}
-                tick={{ angle: -45, textAnchor: 'end', fontSize: 12 }}
-              />
-              <YAxis label={{ value: "Hormone Level", angle: -90, position: "insideLeft" }} />
-              <Tooltip labelFormatter={(value) => value} />
-              <Legend verticalAlign="top" />
-
-              {shadingAreas.map((area, index) => {
-                const startDate = new Date(new Date().getFullYear(), new Date(hormoneData.find(item => item.month === area.month)?.test_time).getMonth(), area.start);
-                const endDate = new Date(new Date().getFullYear(), new Date(hormoneData.find(item => item.month === area.month)?.test_time)?.getMonth(), area.end);
-                const startIndex = dataWithXAxis.findIndex(item => new Date(new Date().getFullYear(), new Date(hormoneData.find(data => data.month === item.month).test_time).getMonth(), item.day).getTime() === startDate.getTime());
-                const endIndex = dataWithXAxis.findIndex(item => new Date(new Date().getFullYear(), new Date(hormoneData.find(data => data.month === item.month).test_time).getMonth(), item.day).getTime() === endDate.getTime());
-
-                if (startIndex === -1 || endIndex === -1) {
-                  return null; // Skip if the start or end index is not found
-                }
-
-                return (
-                  <ReferenceArea
-                    key={index}
-                    x1={dataWithXAxis[startIndex].xAxisLabel}
-                    x2={dataWithXAxis[endIndex].xAxisLabel}
-                    stroke="none"
-                    fill={area.type === "period" ? "#ffcccc" : "#ccffcc"}
-                    fillOpacity={0.3}
-                    label={{
-                      value: area.type === "period" ? "Menstruation" : "Fertile Window",
-                      position: "insideTop",
-                      fill: "#666",
-                      fontSize: 12,
-                    }}
-                  />
-                );
-              })}
-
-              {/* Hormone Lines */}
-              <Line type="monotone" dataKey="e3g" stroke="#00bfff" activeDot={{ r: 8 }} connectNulls={true} />
-              <Line type="monotone" dataKey="lh" stroke="#9932cc" connectNulls={true} />
-              <Line type="monotone" dataKey="pdg" stroke="#8b4513" connectNulls={true} />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+      {/* Custom Legend */}
+     
+      <div className="space-x-4 chartHeader">
+        <span className="px-4 py-1 border-2 border-sky-400 text-sky-600 rounded-full text-sm font-medium">E3G</span>
+        <span className="px-4 py-1 border-2 border-fuchsia-500 text-fuchsia-700 bg-fuchsia-100 rounded-full text-sm font-medium">FSH</span>
+        <span className="px-4 py-1 border-2 border-yellow-900 text-yellow-900 bg-yellow-100 rounded-full text-sm font-medium">PdG</span>
+        <span className="px-4 py-1 border-2 border-yellow-500 text-yellow-600 bg-yellow-100 rounded-full text-sm font-medium">LH</span>
+        <span className="px-4 py-1 border-2 text-green-600 text-sm font-medium">
+          Ovulation
+        </span>
       </div>
+
+      <div style={{ width: "100%", height: "500px" }}>
+  <ResponsiveContainer width="100%" height="100%">
+    <LineChart
+      data={dataWithXAxis}
+      margin={{ top: 50, right: 30, left: 20, bottom: 20 }} // add more bottom space for x-axis and phase bar
+    >
+      <CartesianGrid strokeDasharray="3 3" />
+      <XAxis
+        dataKey="xAxisLabel"
+        ticks={xAxisTicks}
+        interval={0}
+       // label={{ value: "Day", position: "bottom", offset: 20 }} // offset for better spacing
+        tick={{ angle: -45, textAnchor: 'end', fontSize: 12 }}
+      />
+      <YAxis
+        label={{ angle: -90, position: "insideLeft" }}
+        domain={[0, 'auto']}
+        ticks={[0, 50, 100, 150, 200, 250, 300]}
+        tick={{ fontSize: 12 }}
+      />
+      <Tooltip labelFormatter={(value) => value} />
+      {/* <Legend verticalAlign="top" /> */}
+      {shadingAreas.map((area, index) => {
+        const startDate = new Date(new Date().getFullYear(), new Date(hormoneData.find(item => item.month === area.month)?.test_time).getMonth(), area.start);
+        const endDate = new Date(new Date().getFullYear(), new Date(hormoneData.find(item => item.month === area.month)?.test_time).getMonth(), area.end);
+
+        const startIndex = dataWithXAxis.findIndex(item =>
+          new Date(new Date().getFullYear(), new Date(hormoneData.find(data => data.month === item.month).test_time).getMonth(), item.day).getTime() === startDate.getTime()
+        );
+
+        const endIndex = dataWithXAxis.findIndex(item =>
+          new Date(new Date().getFullYear(), new Date(hormoneData.find(data => data.month === item.month).test_time).getMonth(), item.day).getTime() === endDate.getTime()
+        );
+
+        if (startIndex === -1 || endIndex === -1) {
+          return null;
+        }
+
+        return (
+          <ReferenceArea
+            key={index}
+            x1={dataWithXAxis[startIndex].xAxisLabel}
+            x2={dataWithXAxis[endIndex].xAxisLabel}
+            stroke="none"
+            fill={area.type === "period" ? "#ffcccc" : "#ccffcc"}
+            fillOpacity={0.3}
+            label={{
+              value: area.type === "period" ? "Menstruation" : "Fertile Window",
+              position: "insideTop",
+              fill: "#666",
+              fontSize: 12,
+            }}
+          />
+        );
+      })}
+
+      <Line type="monotone" dataKey="e3g" stroke="#00bfff" activeDot={{ r: 8 }} connectNulls={true} />
+      <Line type="monotone" dataKey="lh" stroke="#9932cc" connectNulls={true} />
+      <Line type="monotone" dataKey="pdg" stroke="#8b4513" connectNulls={true} />
+      <Line type="monotone" dataKey="fsh" stroke="#f0bfff" connectNulls={true} />
+    </LineChart>
+  </ResponsiveContainer>
+
+  {/* Phase Line below chart but aligned */}
+  <div style={{ marginTop: "10px", padding: "0px 30px 0px 80px" }}>
+    <div style={{ display: "flex", alignItems: "center", position: "relative", height: "30px" }}>
+      <div style={{ flex: "0 0 13.3%", position: "relative" }}>
+        <div style={{ height: "4px", background: "red", borderRadius: "2px" }}></div>
+        <div style={{ position: "absolute", top: "10px", left: 0, width: "100%", textAlign: "center", color: "red", fontSize: "12px" }}>Menstruation</div>
+        <div style={{ position: "absolute", top: "-6px", left: 0, width: "8px", height: "8px", backgroundColor: "red", borderRadius: "50%" }}></div>
+        <div style={{ position: "absolute", top: "-6px", right: 0, width: "8px", height: "8px", backgroundColor: "red", borderRadius: "50%" }}></div>
+      </div>
+
+      <div style={{ flex: "0 0 30%", position: "relative" }}>
+        <div style={{ height: "4px", background: "#999" }}></div>
+        <div style={{ position: "absolute", top: "10px", left: 0, width: "100%", textAlign: "center", fontSize: "12px" }}>Follicular phase</div>
+      </div>
+
+      <div style={{ flex: "0 0 16.6%", position: "relative" }}>
+        <div style={{ height: "4px", background: "green", borderRadius: "2px" }}></div>
+        <div style={{ position: "absolute", top: "10px", left: 0, width: "100%", textAlign: "center", color: "green", fontSize: "12px" }}>Fertile Window</div>
+        <div style={{ position: "absolute", top: "-6px", left: 0, width: "8px", height: "8px", backgroundColor: "green", borderRadius: "50%" }}></div>
+        <div style={{ position: "absolute", top: "-6px", right: 0, width: "8px", height: "8px", backgroundColor: "green", borderRadius: "50%" }}></div>
+      </div>
+
+      <div style={{ flex: "1", position: "relative" }}>
+        <div style={{ height: "4px", background: "#999" }}></div>
+        <div style={{ position: "absolute", top: "10px", left: 0, width: "100%", textAlign: "center", fontSize: "12px" }}>Luteal phase</div>
+        <div style={{ position: "absolute", top: "-6px", right: 0, width: "8px", height: "8px", backgroundColor: "#999", borderRadius: "50%" }}></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+     
+
+
 
       <div style={{ marginTop: "20px", padding: "10px" }}>
         {/* <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "10px" }}>

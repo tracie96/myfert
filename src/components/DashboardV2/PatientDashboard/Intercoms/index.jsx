@@ -9,7 +9,7 @@ import {
 } from '../../../redux/doctorSlice';
 import { UserOutlined, SearchOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import '../../DoctorDashboard/Intercoms/styles.css';
-import { FaRegPaperPlane } from 'react-icons/fa';
+import SendButton from '../../../../assets/images/telegram.png';
 
 const PatientIntercom = () => {
   const [selectedUser, setSelectedUser] = useState(null);
@@ -345,13 +345,13 @@ const PatientIntercom = () => {
                 onKeyPress={handleKeyPress}
                 placeholder="Enter message"
                 suffix={
-                  <button 
-                    className="send-button"
-                    onClick={handleSendMessage}
-                    disabled={!message.trim() || chatLoading}
-                  >
-                   <FaRegPaperPlane/>
-                  </button>
+                  // <button 
+                  //   onClick={handleSendMessage}
+                  //   disabled={!message.trim() || chatLoading}
+                  //   style={{border: 'none', background: '#fff', borderRadius: '50%'}}
+                  // >
+                   <img src={SendButton} alt="send" width={50} height={50} onClick={handleSendMessage}/>
+                  // </button>
                 }
               />
             </div>

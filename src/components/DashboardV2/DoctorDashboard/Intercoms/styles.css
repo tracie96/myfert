@@ -284,9 +284,9 @@
   left: -6px;
   top: 0;
   border: 8px solid transparent;
-  border-right-color: #ffffff;
+  /* border-right-color: #ffffff;
   border-top-color: #ffffff;
-  transform: rotate(-45deg);
+  transform: rotate(-45deg); */
 }
 
 .message-bubble.sent {
@@ -302,9 +302,9 @@
   right: -6px;
   top: 0;
   border: 8px solid transparent;
-  border-left-color: #e1ffc7;
+  /* border-left-color: #e1ffc7;
   border-top-color: #e1ffc7;
-  transform: rotate(45deg);
+  transform: rotate(45deg); */
 }
 
 .message-content {

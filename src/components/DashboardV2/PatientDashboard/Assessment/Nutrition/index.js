@@ -572,6 +572,34 @@ const Nutrition = ({ onComplete }) => {
   };
 
   const handleChange = (value, name) => {
+    // Find the question object by name
+    const question = questions.find(q => q.name === name);
+
+    // Only apply special logic for checkbox type questions
+    if (question && question.type === "checkbox") {
+      // If 'Other' is checked, only keep 'Other'
+      if (value.includes("Other")) {
+        setAnswers({
+          ...answers,
+          [name]: ["Other"],
+        });
+        return;
+      } else {
+        // If 'Other' is not checked, remove it and clear the input
+        const filtered = value.filter(v => v !== "Other");
+        const newAnswers = {
+          ...answers,
+          [name]: filtered,
+        };
+        // Clear the associated input if it exists
+        if (answers[`${name}_other`]) {
+          newAnswers[`${name}_other`] = "";
+        }
+        setAnswers(newAnswers);
+        return;
+      }
+    }
+    // Default behavior for other types
     setAnswers({
       ...answers,
       [name]: value,

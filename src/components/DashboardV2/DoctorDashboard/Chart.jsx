@@ -389,7 +389,7 @@ const Chart = () => {
                 </div>
             </div>
             <div style={{ position: "relative", width: "100%", overflowX: "auto" }}> {/* Enable horizontal scrolling */}
-                {/* Custom Legend */}\
+                {/* Custom Legend */}
                 <div className="space-x-4 chartHeader">
                     <span className="px-4 py-1 border-2 border-sky-400 text-sky-600 rounded-full text-sm font-medium">E3G</span>
                     <span className="px-4 py-1 border-2 border-fuchsia-500 text-fuchsia-700 bg-fuchsia-100 rounded-full text-sm font-medium">FSH</span>

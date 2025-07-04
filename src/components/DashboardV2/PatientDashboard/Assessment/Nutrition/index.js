@@ -575,30 +575,24 @@ const Nutrition = ({ onComplete }) => {
     // Find the question object by name
     const question = questions.find(q => q.name === name);
 
-    // Only apply special logic for checkbox type questions
     if (question && question.type === "checkbox") {
-      // If 'Other' is checked, only keep 'Other'
-      if (value.includes("Other")) {
+      // If it's a checkbox input for "Other" description
+      if (name.endsWith('_other')) {
         setAnswers({
           ...answers,
-          [name]: ["Other"],
+          [name]: value
         });
         return;
-      } else {
-        // If 'Other' is not checked, remove it and clear the input
-        const filtered = value.filter(v => v !== "Other");
-        const newAnswers = {
-          ...answers,
-          [name]: filtered,
-        };
-        // Clear the associated input if it exists
-        if (answers[`${name}_other`]) {
-          newAnswers[`${name}_other`] = "";
-        }
-        setAnswers(newAnswers);
-        return;
       }
+
+      // For checkbox selections
+      setAnswers({
+        ...answers,
+        [name]: value,
+      });
+      return;
     }
+
     // Default behavior for other types
     setAnswers({
       ...answers,
@@ -801,45 +795,39 @@ const Nutrition = ({ onComplete }) => {
           </>
         );
 
-      case "checkbox":
-        return (
-          <Checkbox.Group
-          name={question.name}
-          onChange={(checkedValues) =>
-            handleChange(checkedValues, question.name)
-          }
-          value={answers[question.name] || []}
-          className="checkbox-group"
-        >
-          {question.options.map((option, index) => (
-            <Checkbox key={index} value={option} className="checkbox-item">
-              {option === "Other" ? (
-                <>
-                  {option}
-                  {answers[question.name] &&
-                    answers[question.name].includes("Other") && (
-                      <>
-                        <br />
+        case "checkbox":
+          return (
+            <Checkbox.Group
+              name={question.name}
+              onChange={(checkedValues) => handleChange(checkedValues, question.name)}
+              value={answers[question.name] || []}
+              className="checkbox-group"
+            >
+              <div className="checkbox-rows">
+                {question.options.map((option, idx) => (
+                  <div key={idx} className="checkbox-row">
+                    <div className="checkbox-container">
+                      <Checkbox value={option} className="checkbox-item">
+                        {option}
+                      </Checkbox>
+                      {option === "Other" && answers[question.name]?.includes("Other") && (
                         <Input
-                          className="input_questtionnaire"
+                          className="input_questionnaire other-input"
                           placeholder="Please describe"
                           value={answers[`${question.name}_other`] || ""}
-                          onChange={(e) =>
+                          onChange={e =>
                             handleChange(e.target.value, `${question.name}_other`)
                           }
-                          style={{ marginTop: "10px" }}
                         />
-                      </>
-                    )}
-                </>
-              ) : (
-                option
-              )}
-            </Checkbox>
-          ))}
-        </Checkbox.Group>        
-        );
-      
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Checkbox.Group>
+          );
+          
+          
         case "radiowithselect":
         return (
           <Radio.Group

@@ -5,7 +5,7 @@ import {
     XAxis,
     CartesianGrid,
     Tooltip,
-    Legend,
+    YAxis,
     ResponsiveContainer,
     ReferenceArea,
 } from "recharts";
@@ -49,6 +49,7 @@ const Chart = () => {
     const [cycleInfo, setCycleInfo] = useState(null);
     const [error, setError] = useState(null);
     const [files, setFiles] = useState([]);
+    const [selectedMonthType, setSelectedMonthType] = useState("current");
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     const patient = JSON.parse(localStorage.getItem("patient") || "{}");
     console.log("Patient Reference:", patient);
@@ -81,6 +82,23 @@ const Chart = () => {
     useEffect(() => {
         fetchPatientBloodWork();
     }, [fetchPatientBloodWork]);
+    const filteredHormoneData = useMemo(() => {
+        if (!cycleInfo) return [];
+
+        const startDate = new Date(
+            selectedMonthType === "current" ? cycleInfo.period_start : cycleInfo.previous_period_start
+        );
+        const endDate = new Date(
+            selectedMonthType === "current" ? cycleInfo.fertile_window_end : cycleInfo.previous_fertile_window_end
+        );
+
+        return hormoneData.filter(item => {
+            const itemDate = new Date(item.test_time);
+            return itemDate >= startDate && itemDate <= endDate;
+        });
+    }, [hormoneData, selectedMonthType, cycleInfo]);
+
+
 
     // Add window resize listener
     useEffect(() => {
@@ -200,7 +218,6 @@ const Chart = () => {
 
     const shadingAreas = useMemo(() => {
         if (!cycleInfo) return [];
-
         const periodStart = new Date(cycleInfo.period_start).getDate();
         const periodEnd = new Date(cycleInfo.period_end).getDate();
         const fertileStart = new Date(cycleInfo.fertile_window_start).getDate();
@@ -265,41 +282,50 @@ const Chart = () => {
     }, [cycleInfo]);
 
     const chartData = useMemo(() => {
-        // Group hormone data by month
-        const groupedData = hormoneData.reduce((acc, entry) => {
-            if (!acc[entry.month]) {
-                acc[entry.month] = [];
-            }
-            acc[entry.month].push(entry);
-            return acc;
-        }, {});
+        if (!cycleInfo?.period_start || !cycleInfo?.fertile_window_end) return [];
 
-        // Create a combined dataset for all months
-        const combinedData = Object.entries(groupedData).reduce((acc, [month, data]) => {
-            const daysInMonth = new Date(new Date().getFullYear(), new Date(data[0].test_time).getMonth() + 1, 0).getDate(); // Get days in the specific month
-            const monthData = Array.from({ length: daysInMonth }, (_, i) => {
-                const day = i + 1;
-                const existingData = data.find((item) => item.day === day);
-                return {
-                    month: month,
-                    day: day,
-                    lh: existingData?.lh || null,
-                    e3g: existingData?.e3g || null,
-                    pdg: existingData?.pdg || null,
-                    fsh: existingData?.fsg || null,
-                };
-            });
-            return acc.concat(monthData);
-        }, []);
+        const periodStartDate = new Date(cycleInfo.period_start);
+        const fiveDaysBefore = new Date(periodStartDate);
+        fiveDaysBefore.setDate(periodStartDate.getDate() - 5);
+
+        const fertileEndDate = new Date(cycleInfo.fertile_window_end);
+        const fiveDaysAfter = new Date(fertileEndDate);
+        fiveDaysAfter.setDate(fertileEndDate.getDate() + 5);
+
+        const allDates = [];
+        for (let d = new Date(fiveDaysBefore); d <= fiveDaysAfter; d.setDate(d.getDate() + 1)) {
+            allDates.push(new Date(d));
+        }
+
+        const hormoneMap = {};
+        hormoneData.forEach((item) => {
+            const dateStr = new Date(item.test_time).toISOString().split("T")[0];
+            hormoneMap[dateStr] = item;
+        });
+
+        const combinedData = allDates.map((date) => {
+            const dateStr = date.toISOString().split("T")[0];
+            const hormone = hormoneMap[dateStr] || {};
+
+            return {
+                month: date.toLocaleString("default", { month: "long" }),
+                day: date.getDate(),
+                lh: Math.max(0, parseFloat(hormone.lh) || 0),
+                e3g: Math.max(0, parseFloat(hormone.e3g) || 0),
+                pdg: Math.max(0, parseFloat(hormone.pdg) || 0),
+                fsh: Math.max(0, parseFloat(hormone.fsh) || 0),
+                test_time: dateStr,
+            };
+        });
 
         return combinedData;
-    }, [hormoneData]);
+    }, [hormoneData, cycleInfo]);
 
     // Dynamically generate ticks for the X-axis based on available data
     const allMonths = useMemo(() => {
-        const months = [...new Set(hormoneData.map((item) => item.month))];
+        const months = [...new Set(filteredHormoneData.map((item) => item.month))];
         return months;
-    }, [hormoneData]);
+    }, [filteredHormoneData]);
 
     const xAxisTicks = useMemo(() => {
         const ticks = [];
@@ -331,31 +357,82 @@ const Chart = () => {
                     "Select a patient to view their labs and requisitions"
                 )}
             </div>
+            <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 20 }}>
+                <div>
+                    <button
+                        style={{
+                            marginRight: 8,
+                            padding: "6px 12px",
+                            backgroundColor: selectedMonthType === "past" ? "#1890ff" : "#f0f0f0",
+                            color: selectedMonthType === "past" ? "#fff" : "#000",
+                            border: "1px solid #d9d9d9",
+                            borderRadius: 4,
+                            cursor: "pointer",
+                        }}
+                        onClick={() => setSelectedMonthType("past")}
+                    >
+                        Past Month
+                    </button>
+                    <button
+                        style={{
+                            padding: "6px 12px",
+                            backgroundColor: selectedMonthType === "current" ? "#1890ff" : "#f0f0f0",
+                            color: selectedMonthType === "current" ? "#fff" : "#000",
+                            border: "1px solid #d9d9d9",
+                            borderRadius: 4,
+                            cursor: "pointer",
+                        }}
+                        onClick={() => setSelectedMonthType("current")}
+                    >
+                        Current Month
+                    </button>
+                </div>
+            </div>
             <div style={{ position: "relative", width: "100%", overflowX: "auto" }}> {/* Enable horizontal scrolling */}
-                {/* Chart Rendering */}
+                {/* Custom Legend */}\
+                <div className="space-x-4 chartHeader">
+                    <span className="px-4 py-1 border-2 border-sky-400 text-sky-600 rounded-full text-sm font-medium">E3G</span>
+                    <span className="px-4 py-1 border-2 border-fuchsia-500 text-fuchsia-700 bg-fuchsia-100 rounded-full text-sm font-medium">FSH</span>
+                    <span className="px-4 py-1 border-2 border-yellow-900 text-yellow-900 bg-yellow-100 rounded-full text-sm font-medium">PdG</span>
+                    <span className="px-4 py-1 border-2 border-yellow-500 text-yellow-600 bg-yellow-100 rounded-full text-sm font-medium">LH</span>
+                </div>
                 <div style={{ width: "1800px", height: "500px" }}> {/* Increased chart width */}
+
                     <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={dataWithXAxis} margin={{ top: 50, right: 30, left: 20, bottom: 50 }}>
+                        <LineChart
+                            data={dataWithXAxis}
+                            margin={{ top: 50, right: 30, left: 20, bottom: 20 }} // add more bottom space for x-axis and phase bar
+                        >
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis
                                 dataKey="xAxisLabel"
                                 ticks={xAxisTicks}
                                 interval={0}
-                                label={{ value: "Day", position: "bottom", offset: 0 }}
+                                // label={{ value: "Day", position: "bottom", offset: 20 }} // offset for better spacing
                                 tick={{ angle: -45, textAnchor: 'end', fontSize: 12 }}
                             />
-                            {/* <YAxis label={{ value: "Hormone Level", angle: -90, position: "insideLeft" }} /> */}
+                            <YAxis
+                                label={{ angle: -90, position: "insideLeft" }}
+                                domain={[0, 'auto']}
+                                ticks={[0, 50, 100, 150, 200, 250, 300]}
+                                tick={{ fontSize: 12 }}
+                            />
                             <Tooltip labelFormatter={(value) => value} />
-                            <Legend verticalAlign="top" />
-
+                            {/* <Legend verticalAlign="top" /> */}
                             {shadingAreas.map((area, index) => {
                                 const startDate = new Date(new Date().getFullYear(), new Date(hormoneData.find(item => item.month === area.month)?.test_time).getMonth(), area.start);
-                                const endDate = new Date(new Date().getFullYear(), new Date(hormoneData.find(item => item.month === area.month)?.test_time)?.getMonth(), area.end);
-                                const startIndex = dataWithXAxis.findIndex(item => new Date(new Date().getFullYear(), new Date(hormoneData.find(data => data.month === item.month).test_time).getMonth(), item.day).getTime() === startDate.getTime());
-                                const endIndex = dataWithXAxis.findIndex(item => new Date(new Date().getFullYear(), new Date(hormoneData.find(data => data.month === item.month).test_time).getMonth(), item.day).getTime() === endDate.getTime());
+                                const endDate = new Date(new Date().getFullYear(), new Date(hormoneData.find(item => item.month === area.month)?.test_time).getMonth(), area.end);
+
+                                const startIndex = dataWithXAxis.findIndex(item =>
+                                    new Date(new Date().getFullYear(), new Date(hormoneData.find(data => data.month === item.month).test_time).getMonth(), item.day).getTime() === startDate.getTime()
+                                );
+
+                                const endIndex = dataWithXAxis.findIndex(item =>
+                                    new Date(new Date().getFullYear(), new Date(hormoneData.find(data => data.month === item.month).test_time).getMonth(), item.day).getTime() === endDate.getTime()
+                                );
 
                                 if (startIndex === -1 || endIndex === -1) {
-                                    return null; // Skip if the start or end index is not found
+                                    return null;
                                 }
 
                                 return (
@@ -376,26 +453,14 @@ const Chart = () => {
                                 );
                             })}
 
-                            {/* Hormone Lines */}
                             <Line type="monotone" dataKey="e3g" stroke="#00bfff" activeDot={{ r: 8 }} connectNulls={true} />
                             <Line type="monotone" dataKey="lh" stroke="#9932cc" connectNulls={true} />
                             <Line type="monotone" dataKey="pdg" stroke="#8b4513" connectNulls={true} />
+                            <Line type="monotone" dataKey="fsh" stroke="#f0bfff" connectNulls={true} />
                         </LineChart>
                     </ResponsiveContainer>
                 </div>
             </div>
-
-            {/* <div style={{ marginTop: "20px", padding: "10px" }}>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "10px" }}>
-                    {hormoneData.map((data, index) => (
-                        <div key={index} style={{ border: "1px solid #eee", padding: "5px" }}>
-                            <b>{data.month} {data.day}:</b><br />
-                            LH={data.lh}, E3G={data.e3g}, PDG={data.pdg}
-                        </div>
-                    ))}
-                </div>
-            </div> */}
-
 
             <div className="p-6 mt-4" style={{ padding: "24px" }}>
                 <Typography.Title level={4} style={{ marginBottom: "30px" }}>
@@ -453,7 +518,6 @@ const Chart = () => {
                                 )}
                             />
                         </Card>
-
 
                     </Col>
                 </Row>

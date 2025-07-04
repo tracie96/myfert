@@ -607,8 +607,20 @@ const Nutrition = ({ onComplete }) => {
   };
 
   const transformNutritionData = (answers) => {
+    // Helper function to process checkbox arrays with "Other" values
+    const processCheckboxWithOther = (checkboxArray, otherFieldName) => {
+      if (!checkboxArray || !Array.isArray(checkboxArray)) return [];
+      
+      return checkboxArray.map(item => {
+        if (item === "Other") {
+          return answers[otherFieldName] || "Other";
+        }
+        return item;
+      });
+    };
+
     return {
-      specialDietProgram: answers.special_nutritional_program || [],
+      specialDietProgram: processCheckboxWithOther(answers.special_nutritional_program, "special_nutritional_program_other"),
       sensitiveToFood: {
         yesNo: answers.sensitive_food === "Yes",
         describe: answers.sensitive_food_info || "",
@@ -617,7 +629,7 @@ const Nutrition = ({ onComplete }) => {
         yesNo: answers.aversion_to_certain_food === "Yes",
         describe: answers.aversion_to_certain_food_other || "",
       },
-      adverseList: answers.adversely_react || [],
+      adverseList: processCheckboxWithOther(answers.adversely_react, "adversely_react_other"),
       anyFoodCraving: {
         yesNo: answers.crave_for_foods === "Yes",
         describe: answers.crave_for_foods_other || "",
@@ -632,7 +644,7 @@ const Nutrition = ({ onComplete }) => {
       skippingAMeal: answers.does_skipping_meal_affect_you === "Yes",
       reasonSkipMeal:answers.does_skipping_meal_affect_you === "Yes" ? answers.does_skipping_meal_affect_you_other : "",
       howManyEatOutPerWeek: answers.meals_per_day || "",
-      eatingHabits: answers.actors_applyingto_current_lifestyle || [],
+      eatingHabits: processCheckboxWithOther(answers.actors_applyingto_current_lifestyle, "actors_applyingto_current_lifestyle_other"),
       typicalBreakfast: answers.diet_detail_breakfast || "",
       typicalLunch: answers.diet_detail_lunch || "",
       typicalDinner: answers.diet_detail_dinner || "",
@@ -657,7 +669,10 @@ const Nutrition = ({ onComplete }) => {
         describe: answers.sensitive_food_caffeine_other || "",
       },
       explainAdverseReactionToCoffee: answers.sensitive_food_caffeine_other || "",
-      reactionToCaffeine: answers.sensitive_food_caffeine_feel != null ? String(answers.sensitive_food_caffeine_feel) : "",
+      reactionToCaffeine: (() => {
+        const processed = processCheckboxWithOther(answers.sensitive_food_caffeine_feel, "sensitive_food_caffeine_feel_other");
+        return processed.length > 0 ? processed.join(", ") : "";
+      })(),
       sensitiveCaffeineOther: answers.sensitive_food_caffeine_feel_other || "",
       specialDietReason:answers.special_diet_reason || "",
       breakfastTime:answers.breakfast_time || "",

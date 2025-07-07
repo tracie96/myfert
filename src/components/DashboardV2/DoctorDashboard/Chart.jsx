@@ -358,35 +358,37 @@ const Chart = () => {
                 )}
             </div>
             <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 20 }}>
-                <div>
-                    <button
-                        style={{
-                            marginRight: 8,
-                            padding: "6px 12px",
-                            backgroundColor: selectedMonthType === "past" ? "#1890ff" : "#f0f0f0",
-                            color: selectedMonthType === "past" ? "#fff" : "#000",
-                            border: "1px solid #d9d9d9",
-                            borderRadius: 4,
-                            cursor: "pointer",
-                        }}
-                        onClick={() => setSelectedMonthType("past")}
-                    >
-                        Past Month
-                    </button>
-                    <button
-                        style={{
-                            padding: "6px 12px",
-                            backgroundColor: selectedMonthType === "current" ? "#1890ff" : "#f0f0f0",
-                            color: selectedMonthType === "current" ? "#fff" : "#000",
-                            border: "1px solid #d9d9d9",
-                            borderRadius: 4,
-                            cursor: "pointer",
-                        }}
-                        onClick={() => setSelectedMonthType("current")}
-                    >
-                        Current Month
-                    </button>
-                </div>
+            <div>
+          <button
+            className="btn btn-primary"
+            style={{
+              marginRight: 8,
+              padding: "6px 12px",
+              backgroundColor: selectedMonthType === "past" ? "#1890ff" : "#f0f0f0",
+              color: selectedMonthType === "past" ? "#fff" : "#000",
+              border: "1px solid #d9d9d9",
+              borderRadius: 4,
+              cursor: "pointer",
+            }}
+            onClick={() => setSelectedMonthType("past")}
+          >
+            Past Month
+          </button>
+          <button
+          className="btn btn-primary"
+            style={{
+              padding: "6px 12px",
+              backgroundColor: selectedMonthType === "current" ? "#1890ff" : "#f0f0f0",
+              color: selectedMonthType === "current" ? "#fff" : "#000",
+              border: "1px solid #d9d9d9",
+              borderRadius: 4,
+              cursor: "pointer",
+            }}
+            onClick={() => setSelectedMonthType("current")}
+          >
+            Current Month
+          </button>
+        </div>
             </div>
             <div style={{ position: "relative", width: "100%", overflowX: "auto" }}> {/* Enable horizontal scrolling */}
                 {/* Custom Legend */}

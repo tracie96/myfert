@@ -200,7 +200,7 @@ const HormoneChart = () => {
   const xAxisTicks = useMemo(() => {
     const ticks = [];
     allMonths.forEach((month) => {
-      const daysInMonth = new Date(new Date().getFullYear(), new Date(hormoneData.find(item => item.month === month).test_time).getMonth() + 1, 0).getDate();
+      const daysInMonth = new Date(new Date().getFullYear(), new Date(hormoneData.find(item => item.month === month)?.test_time).getMonth() + 1, 0).getDate();
       for (let i = 1; i <= daysInMonth; i++) {
         ticks.push(`${month} ${i}`);
       }
@@ -286,11 +286,11 @@ const HormoneChart = () => {
               const endDate = new Date(new Date().getFullYear(), new Date(hormoneData.find(item => item.month === area.month)?.test_time).getMonth(), area.end);
 
               const startIndex = dataWithXAxis.findIndex(item =>
-                new Date(new Date().getFullYear(), new Date(hormoneData.find(data => data.month === item.month).test_time).getMonth(), item.day).getTime() === startDate.getTime()
+                new Date(new Date().getFullYear(), new Date(hormoneData.find(data => data.month === item.month)?.test_time).getMonth(), item.day).getTime() === startDate.getTime()
               );
 
               const endIndex = dataWithXAxis.findIndex(item =>
-                new Date(new Date().getFullYear(), new Date(hormoneData.find(data => data.month === item.month).test_time).getMonth(), item.day).getTime() === endDate.getTime()
+                new Date(new Date().getFullYear(), new Date(hormoneData.find(data => data.month === item.month)?.test_time).getMonth(), item.day).getTime() === endDate.getTime()
               );
 
               if (startIndex === -1 || endIndex === -1) {

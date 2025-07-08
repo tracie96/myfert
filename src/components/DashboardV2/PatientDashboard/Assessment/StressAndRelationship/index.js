@@ -292,6 +292,8 @@ const StressAndRelationship = ({ onComplete }) => {
     };
     const formData = {
       // Map boolean values back to "Yes"/"No"
+      duration_per_cycle_pelvic_pain: apiData.durationMenstral || 0,
+      duration_per_cycle_severity_pelvic_pain: apiData.severityMenstral || "",
       do_you_feel_stress: normalizeYesNo(apiData.excessStress),
       can_you_handle_stress: normalizeYesNo(apiData.easyToHandleStress),
       
@@ -332,6 +334,7 @@ const StressAndRelationship = ({ onComplete }) => {
       
       // Map emotional support
       resourcces_for_emotional_support: Array.isArray(apiData.emotionalSupport) ? apiData.emotionalSupport : [],
+      resourcces_for_emotional_support_other: apiData.resourcesEmotionalSupport || "",
       
       // Map spiritual practice
       spiritual_practice: normalizeYesNo(apiData.religiousPractice),
@@ -620,8 +623,10 @@ const StressAndRelationship = ({ onComplete }) => {
         message.error("Authentication failed. Please log in again.");
         return;
       }
-      
       const mappedData = {
+        durationMenstral: `${answers.duration_per_cycle_pelvic_pain || 0}`,
+        severityMenstral: answers.duration_per_cycle_severity_pelvic_pain || "",
+        resourcesEmotionalSupport: answers.resourcces_for_emotional_support_other || "",
         excessStress: answers.do_you_feel_stress === "Yes",
         easyToHandleStress: answers.can_you_handle_stress === "Yes",
         stressFromWork: answers.health_stress_work || 0,

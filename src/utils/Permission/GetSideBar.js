@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import fertilityImage from "../../assets/images/auth/fertilityImage.svg";
-import { useSelector } from "react-redux";
-import { Menu, Button, Drawer, Layout, Modal } from "antd";
+import { useSelector, useDispatch } from "react-redux";
+import { Menu, Button, Drawer, Layout, Modal, Badge } from "antd";
 import { useMediaQuery } from "react-responsive";
+import { getUnreadMessageCount } from "../../components/redux/doctorSlice";
 // Import React Icons
 import {
   FaQrcode,
@@ -22,6 +23,8 @@ import {
 } from "react-icons/fa";
 import { FaNotesMedical } from "react-icons/fa";
 export const GetSideBar = () => {
+  const dispatch = useDispatch();
+  const unreadCount = useSelector((state) => state.doctor.unreadMessageCount);
   const { userAuth } = useSelector((state) => state.authentication);
   const accessDetails = useSelector((state) => state.intake.accessDetails);
   const [visible, setVisible] = useState(false);
@@ -29,6 +32,21 @@ export const GetSideBar = () => {
   const { Sider } = Layout;
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const location = useLocation();
+
+  useEffect(() => {
+    // Fetch unread count when component mounts
+    dispatch(getUnreadMessageCount());
+    
+    // Set up interval to fetch count every minute
+    const interval = setInterval(() => {
+      dispatch(getUnreadMessageCount());
+    }, 60000); // 60000 ms = 1 minute
+    
+    console.log("Current unread count:", unreadCount); 
+    
+    return () => clearInterval(interval);
+  }, [dispatch, unreadCount]);
+
   const showDrawer = () => {
     setVisible(true);
   };
@@ -171,7 +189,15 @@ export const GetSideBar = () => {
       )}
       <Menu.Item key="9" icon={<FaStickyNote style={{ color: "#00ADEF" }} />}>
         <NavLink to="/patient/intercoms" style={{ textDecoration: "none" }}>
-          <span>INTERCOM</span>
+          <Badge 
+            count={unreadCount} 
+            showZero
+            size="small"
+            offset={[5, 0]} 
+            style={{ backgroundColor: '#00ADEF', minWidth: '16px', height: '16px', padding: '0 4px', fontSize: '10px' }}
+          >
+            <span style={{ marginRight: '16px' }}>INTERCOM</span>
+          </Badge>
         </NavLink>
       </Menu.Item>
       <Menu.Item key="8" icon={<FaBook style={{ color: "#00ADEF" }} />}>
@@ -220,11 +246,19 @@ export const GetSideBar = () => {
       </Menu.Item>
       <Menu.Item key="9" icon={<FaStickyNote style={{ color: "#00ADEF" }} />}>
         <NavLink to="/doctor/intercom" style={{ textDecoration: "none" }}>
-          <span>INTERCOM</span>
+          <Badge 
+            count={unreadCount} 
+            showZero
+            size="small"
+            offset={[5, 0]} 
+            style={{ backgroundColor: '#00ADEF', minWidth: '16px', height: '16px', padding: '0 4px', fontSize: '10px' }}
+          >
+            <span style={{ marginRight: '16px' }}>INTERCOM</span>
+          </Badge>
         </NavLink>
       </Menu.Item>
         <Menu.Item
-        key="7" 
+        key="7"
         icon={<FaSignOutAlt style={{ color: "#00ADEF" }} />}
         onClick={() => setShowLogoutModal(true)}
       >

@@ -416,13 +416,14 @@ const StressAndRelationship = ({ onComplete }) => {
     switch (question.type) {
       case "checkbox": {
         if (!answers[question.name] || answers[question.name].length === 0) {
+          message.error("Please select at least one option");
           return false; 
         }
   
         if (answers[question.name].includes("Other")) {
           const otherInputName = `${question.name}_other`;
           if (!answers[otherInputName] || answers[otherInputName] === "") {
-            console.log("Validation Failed: Other is checked, but input field is empty.");
+            message.error("Please specify 'Other' option");
             return false;
           }
         }
@@ -430,24 +431,24 @@ const StressAndRelationship = ({ onComplete }) => {
         return true;
       }
       case "long_radio": {
-        if (answers[question.name] === undefined) {
-          return false; 
+        // Check if answer exists and is either "Yes" or "No"
+        if (!answers[question.name] || !["Yes", "No"].includes(answers[question.name])) {
+          message.error("Please select Yes or No");
+          return false;
         }
       
-        if (answers[question.name] === "Yes") {
-          if (!question.subQuestions) return true; 
-      
+        // If "Yes" is selected and there are subquestions, validate them
+        if (answers[question.name] === "Yes" && question.subQuestions) {
           for (const subQuestion of question.subQuestions) {
-            if (answers[subQuestion.name] === undefined || answers[subQuestion.name] === "") {
-              console.log(
-                `Validation Failed: Sub-question ${subQuestion.name} is not answered.`
-              );
-              return false; 
+            const subAnswer = answers[subQuestion.name];
+            if (subAnswer === undefined || subAnswer.trim() === "") {
+              message.error("Please fill in all required fields");
+              return false;
             }
           }
         }
       
-        return true; 
+        return true;
       }
       
       case "number_with_radio": {
@@ -460,7 +461,7 @@ const StressAndRelationship = ({ onComplete }) => {
           if (subQ.type === "number_with_radio_sub") {
             const val = answers[subQ.name];
             if (val === undefined || val === null || val === "") {
-              console.warn(`Validation failed: Missing number input for ${subQ.name}`);
+              message.error("Please enter a number value");
               return false;
             }
           }
@@ -468,7 +469,7 @@ const StressAndRelationship = ({ onComplete }) => {
           if (subQ.type === "radio") {
             const val = answers[subQ.name];
             if (!val || val === "") {
-              console.warn(`Validation failed: Missing radio selection for ${subQ.name}`);
+              message.error("Please select an option");
               return false;
             }
           }
@@ -485,7 +486,7 @@ const StressAndRelationship = ({ onComplete }) => {
       
         // Check if a value was selected
         if (value === undefined || value === null || value === "") {
-          console.log(`Validation failed: '${question.name}' radio question not answered.`);
+          message.error("Please select an option");
           return false;
         }
       
@@ -499,6 +500,7 @@ const StressAndRelationship = ({ onComplete }) => {
         if (value === "Yes" && requiresFollowUp.includes(question.name)) {
           const inputFieldName = `${question.name}_other`;
           if (!answers[inputFieldName] || answers[inputFieldName].trim() === "") {
+            message.error("Please provide additional information");
             return false;
           }
         }
@@ -509,6 +511,7 @@ const StressAndRelationship = ({ onComplete }) => {
       case "rating_scale": {
         const value = answers[question.name];
         if (value === undefined || value === null || value === 0) {
+          message.error("Please rate on the scale");
           return false;
         }
 
@@ -517,7 +520,7 @@ const StressAndRelationship = ({ onComplete }) => {
           // Check if the textarea input exists and is not empty
           const textareaValue = answers["health_stress_other_input"];
           if (!textareaValue || textareaValue.trim() === "") {
-            message.error("Please specify what 'Other' stress you are rating.");
+            message.error("Please specify what 'Other' stress you are rating");
             return false;
           }
         }
@@ -525,31 +528,19 @@ const StressAndRelationship = ({ onComplete }) => {
         return true;
       }
   
-      // case "long_radio": {
-      //   if (answers[question.name] === undefined) {
-      //     return false; 
-      //   }
-  
-      //   if (answers[question.name] === "Yes") {
-      //     if (!question.subQuestions) return true; 
-  
-      //     for (const subQuestion of question.subQuestions) {
-      //       if (answers[subQuestion.name] === undefined || answers[subQuestion.name] === "") {
-      //         console.log(
-      //           `Validation Failed: Sub-question ${subQuestion.name} is not answered.`
-      //         );
-      //         return false; 
-      //       }
-      //     }
-      //   }
-  
-      //   return true; 
-      // }
-  
-      case "long_textarea":
-        return (
-          answers[question.name] !== undefined && answers[question.name] !== ""
-        );
+      case "long_textarea": {
+        const value = answers[question.name];
+        // Special handling for previous occupation which is optional
+        if (question.name === "previous_occupation") {
+          return true;
+        }
+        
+        if (!value || value.trim() === "") {
+          message.error("Please fill in the required field");
+          return false;
+        }
+        return true;
+      }
   
       default:
         return true;

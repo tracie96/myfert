@@ -46,7 +46,7 @@ export default function DoctorDash() {
     const fetchPatientList = useCallback(async () => {
         setLoading(true);
         const params = {
-            page: 1, // Fetch all data in one go
+            page: 0, // Fetch all data in one go
             size: 500, // Adjust the size accordingly to fetch all the data
             sortColumn: sortConfig.sortField,
             sortDirection: sortConfig.sortOrder,
@@ -221,7 +221,7 @@ export default function DoctorDash() {
                 title: "Clinician",
                 dataIndex: "clinician",
                 key: "clinician",
-                render: () => <p> Clinician Bama Bish</p>,
+                render: (_, record) => <p>{record.createdById === loggedInUserId ? "You" : record.clinician || "Not Assigned"}</p>,
             },
             // {
             //     title: "Action",
@@ -266,7 +266,7 @@ export default function DoctorDash() {
             //     ),
             // },
         ],
-        []
+        [loggedInUserId]
     );
 
     const PatientList = React.memo(

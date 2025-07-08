@@ -181,9 +181,13 @@ const Readiness = ({ onComplete }) => {
   const validateQuestion = () => {
     const question = questions[currentQuestionIndex];
 
-    return (
-      answers[question.name] !== undefined && answers[question.name] !== ""
-    );
+    if (question.type === "rating_scale") {
+      // For rating scale, ensure a value between 1-5 is selected
+      return typeof answers[question.name] === 'number' && answers[question.name] >= 1 && answers[question.name] <= 5;
+    }
+
+    // For other question types, check if answer exists and is not empty
+    return answers[question.name] !== undefined && answers[question.name] !== "";
   };
 
   const handleSave = () => {

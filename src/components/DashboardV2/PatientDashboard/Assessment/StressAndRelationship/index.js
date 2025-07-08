@@ -292,6 +292,8 @@ const StressAndRelationship = ({ onComplete }) => {
     };
     const formData = {
       // Map boolean values back to "Yes"/"No"
+      duration_per_cycle_pelvic_pain: apiData.durationMenstral || 0,
+      duration_per_cycle_severity_pelvic_pain: apiData.severityMenstral || "",
       do_you_feel_stress: normalizeYesNo(apiData.excessStress),
       can_you_handle_stress: normalizeYesNo(apiData.easyToHandleStress),
       
@@ -332,6 +334,7 @@ const StressAndRelationship = ({ onComplete }) => {
       
       // Map emotional support
       resourcces_for_emotional_support: Array.isArray(apiData.emotionalSupport) ? apiData.emotionalSupport : [],
+      resourcces_for_emotional_support_other: apiData.resourcesEmotionalSupport || "",
       
       // Map spiritual practice
       spiritual_practice: normalizeYesNo(apiData.religiousPractice),
@@ -433,6 +436,7 @@ const StressAndRelationship = ({ onComplete }) => {
           const otherValue = answers[`${question.name}_other`];
           if (!otherValue || otherValue.trim() === "") {
            // message.error("Please specify your 'Other' selection.");
+
             return false;
           }
         }
@@ -460,6 +464,7 @@ const StressAndRelationship = ({ onComplete }) => {
               (typeof subValue === "string" && subValue.trim() === "")
             ) {
               console.warn(`Validation failed: '${sub.name}' is required.`);
+
               return false;
             }
           }
@@ -479,7 +484,7 @@ const StressAndRelationship = ({ onComplete }) => {
           if (subQ.type === "number_with_radio_sub") {
             const val = answers[subQ.name];
             if (val === undefined || val === null || val === "") {
-              console.warn(`Validation failed: Missing number input for ${subQ.name}`);
+              message.error("Please enter a number value");
               return false;
             }
           }
@@ -487,7 +492,7 @@ const StressAndRelationship = ({ onComplete }) => {
           if (subQ.type === "radio") {
             const val = answers[subQ.name];
             if (!val || val === "") {
-              console.warn(`Validation failed: Missing radio selection for ${subQ.name}`);
+              message.error("Please select an option");
               return false;
             }
           }
@@ -504,7 +509,7 @@ const StressAndRelationship = ({ onComplete }) => {
       
         // Check if a value was selected
         if (value === undefined || value === null || value === "") {
-          console.log(`Validation failed: '${question.name}' radio question not answered.`);
+          message.error("Please select an option");
           return false;
         }
       
@@ -518,6 +523,7 @@ const StressAndRelationship = ({ onComplete }) => {
         if (value === "Yes" && requiresFollowUp.includes(question.name)) {
           const inputFieldName = `${question.name}_other`;
           if (!answers[inputFieldName] || answers[inputFieldName].trim() === "") {
+            message.error("Please provide additional information");
             return false;
           }
         }
@@ -528,6 +534,7 @@ const StressAndRelationship = ({ onComplete }) => {
       case "rating_scale": {
         const value = answers[question.name];
         if (value === undefined || value === null || value === 0) {
+          message.error("Please rate on the scale");
           return false;
         }
 
@@ -536,7 +543,7 @@ const StressAndRelationship = ({ onComplete }) => {
           // Check if the textarea input exists and is not empty
           const textareaValue = answers["health_stress_other_input"];
           if (!textareaValue || textareaValue.trim() === "") {
-            message.error("Please specify what 'Other' stress you are rating.");
+            message.error("Please specify what 'Other' stress you are rating");
             return false;
           }
         }
@@ -578,7 +585,6 @@ const StressAndRelationship = ({ onComplete }) => {
       
         return true;
       }
-      
   
       default:
         return true;
@@ -649,8 +655,10 @@ const StressAndRelationship = ({ onComplete }) => {
         message.error("Authentication failed. Please log in again.");
         return;
       }
-      
       const mappedData = {
+        durationMenstral: `${answers.duration_per_cycle_pelvic_pain || 0}`,
+        severityMenstral: answers.duration_per_cycle_severity_pelvic_pain || "",
+        resourcesEmotionalSupport: answers.resourcces_for_emotional_support_other || "",
         excessStress: answers.do_you_feel_stress === "Yes",
         easyToHandleStress: answers.can_you_handle_stress === "Yes",
         stressFromWork: answers.health_stress_work || 0,

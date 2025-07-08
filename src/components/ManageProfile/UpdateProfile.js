@@ -348,7 +348,6 @@ const UpdateProfile = () => {
                         type="email"
                         autoComplete="on"
                         value={values.email}
-                        readOnly
                         onBlur={handleBlur("email")}
                       />
                       {errors.email && (

@@ -869,6 +869,28 @@ export const getChatHeads = createAsyncThunk(
   }
 );
 
+export const getUnreadMessageCount = createAsyncThunk(
+  "doctor/getUnreadMessageCount",
+  async (_, { rejectWithValue, getState }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        "accept": "text/plain",
+        "Authorization": `Bearer ${user?.obj?.token}`,
+      },
+    };
+    try {
+      const response = await axios.get(
+        `${baseUrl}Chat/GetUnReadMsgCount`,
+        config
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error?.response?.data);
+    }
+  }
+);
+
 const doctorSlices = createSlice({
   name: "doctor",
   initialState: {
@@ -903,6 +925,7 @@ const doctorSlices = createSlice({
     chatRef: null,
     chatLoading: false,
     chatError: null,
+    unreadMessageCount: 0,
   },
   reducers: {
     // Add a reducer for optimistic message updates
@@ -1218,7 +1241,7 @@ const doctorSlices = createSlice({
         state.documoError = action.payload;
       });
 
-    // Get Patient Supplements
+    // Get Patient Supplemegnts
     builder.addCase(getPatientSupplements.pending, (state) => {
       state.loading = true;
       state.error = null;
@@ -1308,6 +1331,21 @@ const doctorSlices = createSlice({
       state.chatHeads = action.payload.chats || [];
     });
     builder.addCase(getChatHeads.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
+
+    // Get Unread Message Count
+    builder.addCase(getUnreadMessageCount.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+    builder.addCase(getUnreadMessageCount.fulfilled, (state, action) => {
+      state.loading = false;
+      state.unreadMessageCount = action.payload;
+      state.error = null;
+    });
+    builder.addCase(getUnreadMessageCount.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload;
     });

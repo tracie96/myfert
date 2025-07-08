@@ -680,7 +680,7 @@ function SwitchContent({
                     {nutrition.have3MealADay?.yesNo === "True" ? "Yes" : "No"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Have 3 Meals a Day">
-                    {nutrition.have3MealADay.level || "N/A"}
+                    {nutrition.have3MealADay?.level || "N/A"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Skipping a Meal">
                     {nutrition.skippingAMeal ? "Yes" : "No"}

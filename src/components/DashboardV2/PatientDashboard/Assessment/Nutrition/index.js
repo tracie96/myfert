@@ -85,8 +85,8 @@ const questions = [
       "Sulfte–containing foods (wine, dried fruit, salad bars)",
       "Preservatives",
       "Food coloring",
+      "None",
       "Other",
-      "None"
     ],
   },
   {
@@ -344,18 +344,28 @@ const Nutrition = ({ onComplete }) => {
   
     return {
       does_skipping_meal_affect_you_other: info.reasonSkipMeal || "",
-      special_nutritional_program: info.specialDietProgram || [],
+      special_nutritional_program: (() => {
+        const base = info.specialDietProgram || [];
+        const hasOther = info.specialDietOther && info.specialDietOther.trim() !== "";
+        return hasOther && !base.includes("Other") ? [...base, "Other"] : base;
+      })(),
+      special_nutritional_program_other: info.specialDietOther || "",
       special_diet_reason: info.specialDietReason || "",
       sensitive_food: normalizeYesNo(info.sensitiveToFood?.yesNo),
       sensitive_food_other: info.sensitiveToFood?.describe || "",
       sensitive_food_info: info.sensitiveToFood?.describe || "",
       aversion_to_certain_food: normalizeYesNo(info.aversionToFood?.yesNo),
       aversion_to_certain_food_other: info.aversionToFood?.describe || "",
-      adversely_react: info.adverseList || [],
+      adversely_react: (() => {
+        const base = info.adverseList || [];
+        const hasOther = info.adverseReactOther && info.adverseReactOther.trim() !== "";
+        return hasOther && !base.includes("Other") ? [...base, "Other"] : base;
+      })(),
+      adversely_react_other: info.adverseReactOther || "",
       crave_for_foods: normalizeYesNo(info.anyFoodCraving?.yesNo),
       crave_for_foods_other: info.anyFoodCraving?.describe || "",
       eat_3_meals: normalizeYesNo(info.have3MealADay?.yesNo),
-      eat_3_meals_detail: info.have3MealADay?.yesNo === "NO" ? info.have3MealADay.level : "",
+      eat_3_meals_detail: info.have3MealADay?.yesNo === false ? String(info.have3MealADay.level || "") : "",
       meals_per_day: info.howManyEatOutPerWeek || "",
       does_skipping_meal_affect_you: normalizeYesNo(info.skippingAMeal),
       actors_applyingto_current_lifestyle: info.eatingHabits || [],
@@ -601,20 +611,10 @@ const Nutrition = ({ onComplete }) => {
   };
 
   const transformNutritionData = (answers) => {
-    // Helper function to process checkbox arrays with "Other" values
-    const processCheckboxWithOther = (checkboxArray, otherFieldName) => {
-      if (!checkboxArray || !Array.isArray(checkboxArray)) return [];
-      
-      return checkboxArray.map(item => {
-        if (item === "Other") {
-          return answers[otherFieldName] || "Other";
-        }
-        return item;
-      });
-    };
 
     return {
-      specialDietProgram: processCheckboxWithOther(answers.special_nutritional_program, "special_nutritional_program_other"),
+      specialDietProgram: answers.special_nutritional_program || [],
+      specialDietOther: answers.special_nutritional_program_other || "",
       sensitiveToFood: {
         yesNo: answers.sensitive_food === "Yes",
         describe: answers.sensitive_food_info || "",
@@ -623,7 +623,8 @@ const Nutrition = ({ onComplete }) => {
         yesNo: answers.aversion_to_certain_food === "Yes",
         describe: answers.aversion_to_certain_food_other || "",
       },
-      adverseList: processCheckboxWithOther(answers.adversely_react, "adversely_react_other"),
+      adverseList: answers.adversely_react || [],
+      adverseReactOther: answers.adversely_react_other || "",
       anyFoodCraving: {
         yesNo: answers.crave_for_foods === "Yes",
         describe: answers.crave_for_foods_other || "",
@@ -638,7 +639,7 @@ const Nutrition = ({ onComplete }) => {
       skippingAMeal: answers.does_skipping_meal_affect_you === "Yes",
       reasonSkipMeal:answers.does_skipping_meal_affect_you === "Yes" ? answers.does_skipping_meal_affect_you_other : "",
       howManyEatOutPerWeek: answers.meals_per_day || "",
-      eatingHabits: processCheckboxWithOther(answers.actors_applyingto_current_lifestyle, "actors_applyingto_current_lifestyle_other"),
+      eatingHabits: answers.actors_applyingto_current_lifestyle || [],
       typicalBreakfast: answers.diet_detail_breakfast || "",
       typicalLunch: answers.diet_detail_lunch || "",
       typicalDinner: answers.diet_detail_dinner || "",
@@ -664,7 +665,10 @@ const Nutrition = ({ onComplete }) => {
       },
       explainAdverseReactionToCoffee: answers.sensitive_food_caffeine_other || "",
       reactionToCaffeine: (() => {
-        const processed = processCheckboxWithOther(answers.sensitive_food_caffeine_feel, "sensitive_food_caffeine_feel_other");
+        const processed = Array.isArray(answers.sensitive_food_caffeine_feel)
+          ? answers.sensitive_food_caffeine_feel
+          : [answers.sensitive_food_caffeine_feel].filter(Boolean);
+
         return processed.length > 0 ? processed.join(", ") : "";
       })(),
       sensitiveCaffeineOther: answers.sensitive_food_caffeine_feel_other || "",

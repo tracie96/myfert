@@ -48,6 +48,7 @@ const UpdateProfile = () => {
       new Date(new Date().setFullYear(new Date().getFullYear() - 18)),
       "You must be 18 years or older"
     ),
+    partnerDob: Yup.date().nullable(),
   });
 
   const formik = useFormik({
@@ -73,7 +74,13 @@ const UpdateProfile = () => {
       pharmacyName: "",
       pharmacyAddress: "",
       pharmacyPhoneNumber: "",
-      pharmacyFaxNumber: ""
+      pharmacyFaxNumber: "",
+      // Add partner fields
+      partnerFirstname: "",
+      partnerLastname: "",
+      partnerGender: "",
+      partnerPronouns: "",
+      partnerDob: "",
     },
     validationSchema: validateUpdateProfile,
     onSubmit: async (values) => {
@@ -132,11 +139,12 @@ const UpdateProfile = () => {
       setFieldValue("pharmacyPhoneNumber", userData?.pharmacyPhoneNumber || "");
       setFieldValue("pharmacyFaxNumber", userData?.pharmacyFaxNumber || "");
 
-      // Set pharmacy values
-      setFieldValue("pharmacyName", userData?.pharmacyName || "");
-      setFieldValue("pharmacyAddress", userData?.pharmacyAddress || "");
-      setFieldValue("pharmacyPhoneNumber", userData?.pharmacyPhoneNumber || "");
-      setFieldValue("pharmacyFaxNumber", userData?.pharmacyFaxNumber || "");
+      // Set partner values
+      setFieldValue("partnerFirstname", userData?.partnerFirstname || "");
+      setFieldValue("partnerLastname", userData?.partnerLastname || "");
+      setFieldValue("partnerGender", userData?.partnerGender || "");
+      setFieldValue("partnerPronouns", userData?.partnerPronouns || "");
+      setFieldValue("partnerDob", userData?.partnerDob || "");
 
       // If there's an existing profile image URL, set it
       setUploadedFileUrl(userData?.profile || null);
@@ -571,6 +579,110 @@ const UpdateProfile = () => {
                   </div>
                 </div>
               </form>
+            ) : activeTab === 'partner' && userAuth?.obj?.role === "Patient" ? (
+              <div className="partner-form mt-3">
+                <div className="row" style={{ color: "#000" }}>
+                  <div className="col-md-6">
+                    <div className="form-group">
+                      <label>Partner's First Name</label>
+                      <input
+                        className="form-control"
+                        name="partnerFirstname"
+                        type="text"
+                        value={values.partnerFirstname}
+                        onChange={handleChange("partnerFirstname")}
+                        onBlur={handleBlur("partnerFirstname")}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="col-md-6">
+                    <div className="form-group">
+                      <label>Partner's Last Name</label>
+                      <input
+                        className="form-control"
+                        name="partnerLastname"
+                        type="text"
+                        value={values.partnerLastname}
+                        onChange={handleChange("partnerLastname")}
+                        onBlur={handleBlur("partnerLastname")}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="col-md-6">
+                    <div className="form-group">
+                      <label>Partner's Gender</label>
+                      <select
+                        className="form-control"
+                        name="partnerGender"
+                        value={values.partnerGender}
+                        onChange={handleChange("partnerGender")}
+                        onBlur={handleBlur("partnerGender")}
+                      >
+                        <option value="">Select Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="col-md-6">
+                    <div className="form-group">
+                      <label>Partner's Pronouns</label>
+                      <select
+                        className="form-control"
+                        name="partnerPronouns"
+                        value={values.partnerPronouns}
+                        onChange={handleChange("partnerPronouns")}
+                        onBlur={handleBlur("partnerPronouns")}
+                      >
+                        <option value="">Select Pronouns</option>
+                        <option value="He/Him">He/Him</option>
+                        <option value="She/Her">She/Her</option>
+                        <option value="They/Them">They/Them</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="col-md-12">
+                    <div className="form-group">
+                      <label>Partner's Date of Birth</label>
+                      <input
+                        className="form-control"
+                        name="partnerDob"
+                        type="date"
+                        value={values.partnerDob}
+                        onChange={handleChange("partnerDob")}
+                        onBlur={handleBlur("partnerDob")}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="text-end mt-3">
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      style={{ background: "#00ADEF", border: 0, color: "#fff" }}
+                      onClick={handleSubmit}
+                      disabled={showSpinner}
+                    >
+                      {showSpinner && (
+                        <Spinner
+                          as="span"
+                          animation="border"
+                          size="sm"
+                          role="status"
+                          aria-hidden="true"
+                        />
+                      )}
+                      Update
+                    </button>
+                  </div>
+                </div>
+              </div>
             ) : activeTab === 'pharmacy' && userAuth?.obj?.role === "Patient" ? (
               <div className="pharmacy-form mt-3">
                 <div className="row" style={{ color: "#000" }}>

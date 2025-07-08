@@ -145,11 +145,11 @@ const Readiness = ({ onComplete }) => {
       ongoing_support: info.readinessFrequency || 0,
       add_commnets: info.comment || "",
       achieve_your_goals: info.healthAchieve || "",
-      felt_well_last_time: info.healthLastTime || "",
-      health_issue: info.healthChangeTrigger || "",
-      feel_better: info.healthFeelBetter || "",
-      feel_worse: info.healthFeelWorse || "",
-      current_state: info.healthCondition || "",
+      healthLastTime: info.healthLastTime || "",
+      healthChangeTrigger: info.healthChangeTrigger || "",
+      healthFeelBetter: info.healthFeelBetter || "",
+      healthFeelWorse: info.healthFeelWorse || "",
+      healthCondition: info.healthCondition || "",
       healthThinkHappening: info.healthThinkHappening || "",
       healthHappenGetBetter: info.healthHappenGetBetter || ""
     };
@@ -184,22 +184,33 @@ const Readiness = ({ onComplete }) => {
     if (question.type === "rating_scale") {
       // For rating scale, ensure a value between 1-5 is selected
       return typeof answers[question.name] === 'number' && answers[question.name] >= 1 && answers[question.name] <= 5;
+    } else if (question.type === "confidence_scale_with_textarea") {
+      // For confidence scale with textarea, validate both the scale and the text
+      const scaleValid = typeof answers[question.name] === 'number' && answers[question.name] >= 1 && answers[question.name] <= 5;
+      const textValid = answers[`${question.name}_details`] && answers[`${question.name}_details`].trim() !== "";
+      return scaleValid && textValid;
+    } else if (question.type === "long_textarea") {
+      // For long textarea, ensure there is some text and it's not just whitespace
+      return answers[question.name] && answers[question.name].trim() !== "";
     }
 
-    // For other question types, check if answer exists and is not empty
-    return answers[question.name] !== undefined && answers[question.name] !== "";
+    return false;
   };
 
   const handleSave = () => {
     if (!validateQuestion()) {
-      message.error("Please answer the current question before saving.");
+      message.error("Please answer the current question before proceeding.");
       return;
     }
-    localStorage.setItem("currentQuestionIndex10", 0);
-    localStorage.setItem("answers", JSON.stringify(answers));
-    if (currentQuestionIndex < totalQuestions - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    
+    if (currentQuestionIndex >= totalQuestions - 1) {
+      message.info("You're at the last question. Please use the Submit button to complete the assessment.");
+      return;
     }
+    
+    localStorage.setItem("currentQuestionIndex10", currentQuestionIndex + 1);
+    localStorage.setItem("answers", JSON.stringify(answers));
+    setCurrentQuestionIndex(currentQuestionIndex + 1);
   };
   const handlePrevious = () => {
     if (currentQuestionIndex > 0) {

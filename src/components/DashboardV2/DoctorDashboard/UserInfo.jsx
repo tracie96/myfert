@@ -662,6 +662,9 @@ function SwitchContent({
                         )}
                       </div>
                   </Descriptions.Item>
+                  <Descriptions.Item label="Adverse React Other">
+                  {nutrition.adverseReactOther || ""}
+                  </Descriptions.Item>
                   <Descriptions.Item label="Any Food Craving">
                     {nutrition.anyFoodCraving?.yesNo === true
                       ? "Yes"
@@ -674,9 +677,10 @@ function SwitchContent({
                   </Descriptions.Item>
 
                   <Descriptions.Item label="Have 3 Meals a Day">
-                    {nutrition.have3MealADay?.yesNo
-                      ? nutrition.have3MealADay.level
-                      : "No"}
+                    {nutrition.have3MealADay?.yesNo === "True" ? "Yes" : "No"}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Have 3 Meals a Day">
+                    {nutrition.have3MealADay.level || "N/A"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Skipping a Meal">
                     {nutrition.skippingAMeal ? "Yes" : "No"}
@@ -945,6 +949,15 @@ function SwitchContent({
                 </Descriptions.Item>
                 <Descriptions.Item label="Who Do You Live With">
                   {stress.whoDoYouLiveWith || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Duration Menstral">
+                  {stress.durationMenstral   || ""}
+                </Descriptions.Item>
+                <Descriptions.Item label="Severity Menstral">
+                  {stress.severityMenstral || ""}
+                </Descriptions.Item>
+                <Descriptions.Item label="Resources Emotional Support">
+                  {stress.resourcesEmotionalSupport || "N/A"}
                 </Descriptions.Item>
               </Descriptions>
             </Col>

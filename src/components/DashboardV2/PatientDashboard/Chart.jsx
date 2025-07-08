@@ -223,6 +223,7 @@ const HormoneChart = () => {
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 20 }}>
         <div>
           <button
+            className="btn btn-primary"
             style={{
               marginRight: 8,
               padding: "6px 12px",
@@ -237,6 +238,7 @@ const HormoneChart = () => {
             Past Month
           </button>
           <button
+          className="btn btn-primary"
             style={{
               padding: "6px 12px",
               backgroundColor: selectedMonthType === "current" ? "#1890ff" : "#f0f0f0",
@@ -251,7 +253,7 @@ const HormoneChart = () => {
           </button>
         </div>
       </div>
-      {/* Custom Legend */}\
+      {/* Custom Legend */}
       <div className="space-x-4 chartHeader">
         <span className="px-4 py-1 border-2 border-sky-400 text-sky-600 rounded-full text-sm font-medium">E3G</span>
         <span className="px-4 py-1 border-2 border-fuchsia-500 text-fuchsia-700 bg-fuchsia-100 rounded-full text-sm font-medium">FSH</span>

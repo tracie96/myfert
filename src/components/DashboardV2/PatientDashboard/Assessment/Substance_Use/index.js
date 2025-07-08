@@ -308,11 +308,12 @@ const SubstanceUse = ({ onComplete }) => {
       }
     } else if (currentQuestionIndex === 1) {
       // After answering "Have you attempted to quit?"
-      if (answers["smoke_currently"] === "Yes") {
+      if (answers["attempted_to_quit"] === "Yes") {
+        console.log("Attempted to quit:");
         // If currently smoking, skip the "smoked previously" question
-        nextQuestionIndex = 3; // Skip to "Are you regularly exposed to second-hand smoke?"
+        nextQuestionIndex = 2; // Skip to "Are you regularly exposed to second-hand smoke?"
       } else {
-        nextQuestionIndex = 2; // Go to "Have you smoked previously"
+        nextQuestionIndex = 3; // Go to "Have you smoked previously"
       }
     } else if (currentQuestionIndex === 2) {
       // After "Have you smoked previously"

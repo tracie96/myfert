@@ -175,6 +175,7 @@ const SubstanceUse = ({ onComplete }) => {
     };
     return {
       smoke_currently: normalizeYesNo(info.smokePresently),
+      smoke_type_other:info.smokeCurrently || "",
       packs_per_day: info.smokingCurrently?.packsDay || 0,
       number_of_years: info.smokingCurrently?.years || 0,
       smoke_type: info.smokingCurrently?.type || "",
@@ -403,10 +404,11 @@ const SubstanceUse = ({ onComplete }) => {
     
     setAnswers(updatedAnswers);
   };
-
+console.log("answers--", answers);
   const transformAnswers = (answers) => {
     return {
       smokePresently: answers.smoke_currently === "Yes",
+      smokeCurrently :answers.smoke_type_other || "",
       smokingCurrently:
         answers.smoke_currently === "Yes"
           ? {

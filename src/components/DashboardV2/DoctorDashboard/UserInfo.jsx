@@ -821,6 +821,7 @@ function SwitchContent({
                 <Descriptions column={1} bordered>
                   {[
                     { label: "Smoke Presently", value: substance.smokePresently !== null ? (substance.smokePresently ? "Yes" : "No") : "N/A" },
+                    { label: "Smoke Presently Other", value: substance.smokeCurrently || "" },
                     { label: "Smoking Currently", value: substance.smokingCurrently ? `Packs/Day: ${substance.smokingCurrently.packsDay}, Years: ${substance.smokingCurrently.years}, Type: ${substance.smokingCurrently.type}` : "N/A" },
                     { label: "Attempted to Quit", value: substance.attempedToQuit?.yesNo ? "Yes" : "No" },
                     { label: "Describe Quit Attempt", value: substance.attempedToQuit?.describe || "Not Attempted to Quit" },

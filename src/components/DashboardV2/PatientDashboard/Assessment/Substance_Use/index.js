@@ -175,6 +175,7 @@ const SubstanceUse = ({ onComplete }) => {
     };
     return {
       smoke_currently: normalizeYesNo(info.smokePresently),
+      smoke_type_other:info.smokeCurrently || "",
       packs_per_day: info.smokingCurrently?.packsDay || 0,
       number_of_years: info.smokingCurrently?.years || 0,
       smoke_type: info.smokingCurrently?.type || "",
@@ -376,15 +377,38 @@ const SubstanceUse = ({ onComplete }) => {
   };
 
   const handleChange = (value, name) => {
-    setAnswers({
+    const updatedAnswers = {
       ...answers,
       [name]: value,
-    });
+    };
+  
+    // If user answers NO to smoking, clear related fields
+    if (name === "smoke_currently" && value === "No") {
+      const requiredFields = ["packs_per_day", "number_of_years", "smoke_type"];
+      requiredFields.forEach((field) => {
+        updatedAnswers[field] = ""; // Clear the value
+      });
+    }
+    if (name === "attempted_to_quit" && value === "No") {
+      const requiredFields = ["methods_to_stop_smoking"];
+      requiredFields.forEach((field) => {
+        updatedAnswers[field] = ""; // Clear the value
+      });
+    }
+    if (name === "smoked_previously" && value === "No") {
+      const fieldsToClear = ["packs_per_day_previous", "number_of_years_previous"];
+      fieldsToClear.forEach((field) => {
+        updatedAnswers[field] = "";
+      });
+    }
+    
+    setAnswers(updatedAnswers);
   };
-
+console.log("answers--", answers);
   const transformAnswers = (answers) => {
     return {
       smokePresently: answers.smoke_currently === "Yes",
+      smokeCurrently :answers.smoke_type_other || "",
       smokingCurrently:
         answers.smoke_currently === "Yes"
           ? {
@@ -508,24 +532,49 @@ const SubstanceUse = ({ onComplete }) => {
           />
         )}
 
-        {subQuestion.type === "radio" && (
-          <Radio.Group
-            name={subQuestion.question}
-            onChange={(e) => handleChange(e.target.value, subQuestion.name)}
-            value={answers[subQuestion.name]}
-            style={{ width: isMobile ? "100%" : "50%" }}
-          >
-            {subQuestion.options.map((option, idx) => (
-              <Radio
-                key={idx}
-                value={option}
-                style={{ display: "block", marginBottom: "10px" }}
-              >
-                {option}
-              </Radio>
-            ))}
-          </Radio.Group>
+{subQuestion.type === "radio" && (
+  <Radio.Group
+    name={subQuestion.name}
+    onChange={(e) => handleChange(e.target.value, subQuestion.name)}
+    value={answers[subQuestion.name]}
+    style={{ width: isMobile ? "100%" : "50%" }}
+  >
+    {subQuestion.options.map((option, idx) => (
+      <Radio
+        key={idx}
+        value={option}
+        style={{ display: "block", marginBottom: "10px" }}
+      >
+        {option === "Other" ? (
+          <>
+            {option}
+            {answers[subQuestion.name] === "Other" && (
+              <div style={{ marginTop: "10px" }}>
+                <Input
+                  className="input_questtionnaire"
+                  placeholder="Please specify"
+                  value={answers[`${subQuestion.name}_other`] || ""}
+                  onChange={(e) =>
+                    handleChange(e.target.value, `${subQuestion.name}_other`)
+                  }
+                  style={{
+                    height: 50,
+                    borderColor: "#00ADEF",
+                    marginTop: 5,
+                    width: isMobile ? "100%" : "50%",
+                  }}
+                />
+              </div>
+            )}
+          </>
+        ) : (
+          <span style={{ verticalAlign: "text-bottom" }}>{option}</span>
         )}
+      </Radio>
+    ))}
+  </Radio.Group>
+)}
+
       </div>
     ));
   };

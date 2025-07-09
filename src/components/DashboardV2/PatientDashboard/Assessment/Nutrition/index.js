@@ -803,10 +803,18 @@ const Nutrition = ({ onComplete }) => {
           return (
             <Checkbox.Group
               name={question.name}
-              onChange={(checkedValues) => handleChange(checkedValues, question.name)}
+              onChange={(checkedValues) => {
+                // If "None" is selected, remove all others
+                let finalValues = checkedValues.includes("None")
+                  ? ["None"]
+                  : checkedValues.filter((val) => val !== "None");
+
+                handleChange(finalValues, question.name);
+              }}
               value={answers[question.name] || []}
               className="checkbox-group"
             >
+
               <div className="checkbox-rows">
                 {question.options.map((option, idx) => (
                   <div key={idx} className="checkbox-row">

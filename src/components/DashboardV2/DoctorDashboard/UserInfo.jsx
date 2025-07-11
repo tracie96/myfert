@@ -680,7 +680,7 @@ function SwitchContent({
                     {nutrition.have3MealADay?.yesNo === "True" ? "Yes" : "No"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Have 3 Meals a Day">
-                    {nutrition.have3MealADay.level || "N/A"}
+                    {nutrition.have3MealADay?.level || "N/A"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Skipping a Meal">
                     {nutrition.skippingAMeal ? "Yes" : "No"}
@@ -821,6 +821,7 @@ function SwitchContent({
                 <Descriptions column={1} bordered>
                   {[
                     { label: "Smoke Presently", value: substance.smokePresently !== null ? (substance.smokePresently ? "Yes" : "No") : "N/A" },
+                    { label: "Smoke Presently Other", value: substance.smokeCurrently || "" },
                     { label: "Smoking Currently", value: substance.smokingCurrently ? `Packs/Day: ${substance.smokingCurrently.packsDay}, Years: ${substance.smokingCurrently.years}, Type: ${substance.smokingCurrently.type}` : "N/A" },
                     { label: "Attempted to Quit", value: substance.attempedToQuit?.yesNo ? "Yes" : "No" },
                     { label: "Describe Quit Attempt", value: substance.attempedToQuit?.describe || "Not Attempted to Quit" },
@@ -873,37 +874,37 @@ function SwitchContent({
             <Col xs={24} md={12}>
               <Descriptions column={1} bordered>
                 <Descriptions.Item label="Abused">
-                  {stress.abused !== null ? (stress.abused ? "Yes" : "No") : "N/A"}
+                  {stress?.abused !== null ? (stress.abused ? "Yes" : "No") : "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Current Occupation">
-                  {stress.currentOccupation || "N/A"}
+                  {stress?.currentOccupation || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Currently in Therapy">
-                  {stress.currentlyInTherapy ? "Yes" : "No"}
+                  {stress?.currentlyInTherapy ? "Yes" : "No"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Describe Therapy">
-                  {stress.describeTherapy || "N/A"}
+                  {stress?.describeTherapy || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Easy to Handle Stress">
-                  {stress.easyToHandleStress ? "Yes" : "No"}
+                  {stress?.easyToHandleStress ? "Yes" : "No"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Emotional Support">
-                  {stress.emotionalSupport || "N/A"}
+                  {stress?.emotionalSupport || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Excess Stress">
-                  {stress.excessStress ? "Yes" : "No"}
+                  {stress?.excessStress ? "Yes" : "No"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Hobbies/Leisure Activities">
-                  {stress.hobbiesLeisure || "N/A"}
+                  {stress?.hobbiesLeisure || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Stress from Health">
-                  {stress.stressFromHealth || "N/A"}
+                  {stress?.stressFromHealth || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Stress from Social Situations">
-                  {stress.stressFromSocial || "N/A"}
+                  {stress?.stressFromSocial || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Stress from Work">
-                  {stress.stressFromWork || "N/A"}
+                  {stress?.stressFromWork || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Stress From Other">
                   {stress?.stressFromOther || "N/A"}
@@ -918,46 +919,46 @@ function SwitchContent({
             <Col xs={24} md={12}>
               <Descriptions column={1} bordered>
                 <Descriptions.Item label="Marital Status">
-                  {stress.maritalStatus || "N/A"}
+                  {stress?.maritalStatus || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Often Use Relaxation Techniques">
-                  {stress.oftenRelaxationTechniques || "N/A"}
+                  {stress?.oftenRelaxationTechniques || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Previous Occupation">
-                  {stress.previousOccupation || "N/A"}
+                  {stress?.previousOccupation || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Use Relaxation Techniques">
-                  {stress.relaxationTechniques ? "Yes" : "No"}
+                  {stress?.relaxationTechniques ? "Yes" : "No"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Religious Practice">
-                  {stress.religiousPractice ? "Yes" : "No"}
+                  {stress?.religiousPractice ? "Yes" : "No"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Sought Counseling">
-                  {stress.soughtCounselling ? "Yes" : "No"}
+                  {stress?.soughtCounselling ? "Yes" : "No"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Stress from Family">
-                  {stress.stressFromFamily || "N/A"}
+                  {stress?.stressFromFamily || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Stress from Finances">
-                  {stress.stressFromFinances || "N/A"}
+                  {stress?.stressFromFinances || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Type of Relaxation Techniques">
-                  {stress.typeRelaxationTechniques || "N/A"}
+                  {stress?.typeRelaxationTechniques || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Type of Religious Practice">
-                  {stress.typeReligiousPractice || "N/A"}
+                  {stress?.typeReligiousPractice || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Who Do You Live With">
-                  {stress.whoDoYouLiveWith || "N/A"}
+                  {stress?.whoDoYouLiveWith || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Duration Menstral">
-                  {stress.durationMenstral   || ""}
+                  {stress?.durationMenstral   || ""}
                 </Descriptions.Item>
                 <Descriptions.Item label="Severity Menstral">
-                  {stress.severityMenstral || ""}
+                  {stress?.severityMenstral || ""}
                 </Descriptions.Item>
                 <Descriptions.Item label="Resources Emotional Support">
-                  {stress.resourcesEmotionalSupport || "N/A"}
+                  {stress?.resourcesEmotionalSupport || "N/A"}
                 </Descriptions.Item>
               </Descriptions>
             </Col>

@@ -418,34 +418,53 @@ const StressAndRelationship = ({ onComplete }) => {
   
     switch (question.type) {
       case "checkbox": {
-        if (!answers[question.name] || answers[question.name].length === 0) {
-          message.error("Please select at least one option");
-          return false; 
-        }
-  
-        if (answers[question.name].includes("Other")) {
-          const otherInputName = `${question.name}_other`;
-          if (!answers[otherInputName] || answers[otherInputName] === "") {
-            message.error("Please specify 'Other' option");
-            return false;
-          }
-        }
-  
-        return true;
-      }
-      case "long_radio": {
-        // Check if answer exists and is either "Yes" or "No"
-        if (!answers[question.name] || !["Yes", "No"].includes(answers[question.name])) {
-          message.error("Please select Yes or No");
+        const value = answers[question.name];
+      
+        // ✅ Must be an array AND contain at least one non-null, non-empty value
+        if (
+          !Array.isArray(value) ||
+          value.length === 0 ||
+          value.every((v) => v === null || v === undefined || String(v).trim() === "")
+        ) {
+          //console.warn(`❌ Invalid checkbox value for ${question.name}:`, value);
+         // message.error(`Please select at least one option for "${question.question}".`);
           return false;
         }
       
-        // If "Yes" is selected and there are subquestions, validate them
-        if (answers[question.name] === "Yes" && question.subQuestions) {
-          for (const subQuestion of question.subQuestions) {
-            const subAnswer = answers[subQuestion.name];
-            if (subAnswer === undefined || subAnswer.trim() === "") {
-              message.error("Please fill in all required fields");
+        // ✅ Validate "Other" field if selected
+        if (value.includes("Other")) {
+          const otherValue = answers[`${question.name}_other`];
+          if (!otherValue || otherValue.trim() === "") {
+           // message.error("Please specify your 'Other' selection.");
+
+            return false;
+          }
+        }
+      
+        return true;
+      }
+      
+      
+      case "long_radio": {
+        const value = answers[question.name];
+      
+        // Check if main radio question is answered
+        if (!value) {
+          console.warn(`Validation failed: '${question.name}' not answered.`);
+          return false;
+        }
+      
+        // If "Yes", validate all subQuestions
+        if (value === "Yes" && question.subQuestions?.length) {
+          for (const sub of question.subQuestions) {
+            const subValue = answers[sub.name];
+            if (
+              subValue === undefined ||
+              subValue === null ||
+              (typeof subValue === "string" && subValue.trim() === "")
+            ) {
+              console.warn(`Validation failed: '${sub.name}' is required.`);
+
               return false;
             }
           }
@@ -453,6 +472,7 @@ const StressAndRelationship = ({ onComplete }) => {
       
         return true;
       }
+      
       
       case "number_with_radio": {
         // Check main question subQuestions
@@ -531,17 +551,38 @@ const StressAndRelationship = ({ onComplete }) => {
         return true;
       }
   
+      // case "long_radio": {
+      //   if (answers[question.name] === undefined) {
+      //     return false; 
+      //   }
+  
+      //   if (answers[question.name] === "Yes") {
+      //     if (!question.subQuestions) return true; 
+  
+      //     for (const subQuestion of question.subQuestions) {
+      //       if (answers[subQuestion.name] === undefined || answers[subQuestion.name] === "") {
+      //         console.log(
+      //           `Validation Failed: Sub-question ${subQuestion.name} is not answered.`
+      //         );
+      //         return false; 
+      //       }
+      //     }
+      //   }
+  
+      //   return true; 
+      // }
+  
       case "long_textarea": {
         const value = answers[question.name];
-        // Special handling for previous occupation which is optional
-        if (question.name === "previous_occupation") {
-          return true;
-        }
-        
-        if (!value || value.trim() === "") {
-          message.error("Please fill in the required field");
+      
+        if (
+          value === undefined ||
+          value === null ||
+          (typeof value === "string" && value.trim() === "")
+        ) {
           return false;
         }
+      
         return true;
       }
   

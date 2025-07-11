@@ -85,15 +85,10 @@ const Services = () => {
         {/* Left Side */}
         <div style={{ flex: 1, minWidth: 320 }}>
           <p style={{ color: '#335CAD', fontWeight: 600, marginBottom: 12 }}>Book Your Appointment</p>
-          <p style={{ marginBottom: 18 }}>
+          <p style={{ marginBottom: 18,color:"#000" }}>
             To book your appointments, please create a separate account for our booking system.
           </p>
-          <p style={{ marginBottom: 10 }}>
-            Start by booking your <b>Initial Assessments</b>. You can book single appointments or purchase an <b>Intro Package</b> which comes with a free Mira Starter Kit.
-          </p>
-          <p style={{ marginBottom: 24 }}>
-            For follow-up care, you will need a <b>6-Month Access</b> membership and then you can purchase any appointments as needed.
-          </p>
+       
           <button
             style={{
               background: '#3BA9F4',

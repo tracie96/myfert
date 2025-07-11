@@ -85,7 +85,8 @@ export const GetSideBar = () => {
         return "11";
       case "/patient/notes":
         return "10"
-
+      case "/patient/intercoms":
+        return "12"
       default:
         return "1";
     }
@@ -187,7 +188,7 @@ export const GetSideBar = () => {
           </NavLink>
         </Menu.Item>
       )}
-      <Menu.Item key="9" icon={<FaStickyNote style={{ color: "#00ADEF" }} />}>
+      <Menu.Item key="12" icon={<FaStickyNote style={{ color: "#00ADEF" }} />}>
         <NavLink to="/patient/intercoms" style={{ textDecoration: "none" }}>
           <Badge 
             count={unreadCount} 

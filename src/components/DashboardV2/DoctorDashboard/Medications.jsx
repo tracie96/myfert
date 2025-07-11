@@ -13,7 +13,7 @@ import {
   List,
   Card,
 } from "antd";
-import { PlusOutlined, EditOutlined, DeleteOutlined, FileOutlined, FilePdfOutlined, FileImageOutlined } from "@ant-design/icons";
+import { PlusOutlined, FileOutlined, FilePdfOutlined, FileImageOutlined } from "@ant-design/icons";
 import Header from "./Components/Header";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -25,7 +25,6 @@ import {
   getPatientMed,
   addPatientSupplement,
   getPatientSupplements,
-  deletePatientBloodWork,
 } from "../../redux/doctorSlice";
 import moment from "moment";
 const { Text, Link } = Typography;
@@ -253,15 +252,15 @@ const MedicationTable = () => {
     });
   };
 
-  const handleDelete = async (key) => {
-    try {
-      await dispatch(deletePatientBloodWork(patient.userRef)).unwrap();
-      message.success("Medication deleted successfully!");
-      dispatch(getPatientMed(patient.userRef));
-    } catch (error) {
-      message.error("Failed to delete medication.");
-    }
-  };
+  // const handleDelete = async (key) => {
+  //   try {
+  //     await dispatch(deletePatientBloodWork(patient.userRef)).unwrap();
+  //     message.success("Medication deleted successfully!");
+  //     dispatch(getPatientMed(patient.userRef));
+  //   } catch (error) {
+  //     message.error("Failed to delete medication.");
+  //   }
+  // };
   //const isMobile = windowWidth <= breakpoints.sm;
   const medicationColumns = [
     {
@@ -290,29 +289,29 @@ const MedicationTable = () => {
       dataIndex: "frequency",
       key: "frequency",
     },
-    {
-      title: "Actions",
-      key: "actions",
-      render: (_, record) => (
-        <>
-          <Button
-            type="link"
-            icon={<EditOutlined />}
-            onClick={() => console.log("Edit", record)}
-          >
-            Edit
-          </Button>
-          <Button
-            type="link"
-            danger
-            icon={<DeleteOutlined />}
-            onClick={() => handleDelete(record.key)}
-          >
-            Delete
-          </Button>
-        </>
-      ),
-    },
+    // {
+    //   title: "Actions",
+    //   key: "actions",
+    //   render: (_, record) => (
+    //     <>
+    //       <Button
+    //         type="link"
+    //         icon={<EditOutlined />}
+    //         onClick={() => console.log("Edit", record)}
+    //       >
+    //         Edit
+    //       </Button>
+    //       <Button
+    //         type="link"
+    //         danger
+    //         icon={<DeleteOutlined />}
+    //         onClick={() => handleDelete(record.key)}
+    //       >
+    //         Delete
+    //       </Button>
+    //     </>
+    //   ),
+    // },
   ];
 
   const supplementColumns = [

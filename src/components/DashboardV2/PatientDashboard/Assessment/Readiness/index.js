@@ -29,7 +29,6 @@ const questions = [
     question: "Rate on a scale of 5 (very willing), to 1 (not willing):",
     type: "rating_scale",
     title: "In order to improve your health, how willing are you to:",
-
     sub: "Keep a record of everything you eat each day",
     name: "keep_record_meal",
   },
@@ -99,7 +98,6 @@ const questions = [
     type: "long_textarea",
     name: "feel_better"
   },
-  
   {
     title: "What makes you feel worse?",
     type: "long_textarea",
@@ -145,11 +143,11 @@ const Readiness = ({ onComplete }) => {
       ongoing_support: info.readinessFrequency || 0,
       add_commnets: info.comment || "",
       achieve_your_goals: info.healthAchieve || "",
-      healthLastTime: info.healthLastTime || "",
-      healthChangeTrigger: info.healthChangeTrigger || "",
-      healthFeelBetter: info.healthFeelBetter || "",
-      healthFeelWorse: info.healthFeelWorse || "",
-      healthCondition: info.healthCondition || "",
+      felt_well_last_time: info.healthLastTime || "",
+      health_issue: info.healthChangeTrigger || "",
+      feel_better: info.healthFeelBetter || "",
+      feel_worse: info.healthFeelWorse || "",
+      current_state: info.healthCondition || "",
       healthThinkHappening: info.healthThinkHappening || "",
       healthHappenGetBetter: info.healthHappenGetBetter || ""
     };

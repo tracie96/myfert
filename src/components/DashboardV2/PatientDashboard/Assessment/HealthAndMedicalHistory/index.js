@@ -379,6 +379,36 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
         if (value === false) return "No";
         return null;
       };
+
+      const smokeIrritantsOptions = questions.find(
+        (q) => q.name === "smoke_irritants"
+      )?.options || [];
+
+      const workEnvIrritantsOptions = questions.find(
+        (q) => q.name === "work_env_smoke_irritants"
+      )?.options || [];
+
+      let smokeIrritants = lifestyle.environmentEffect || [];
+      let smokeIrritantsOther = "";
+      let workEnvIrritants = lifestyle.environmentExposed || [];
+      let workEnvIrritantsOther = "";
+
+      // Handle smoke irritants
+      const customValue = smokeIrritants.find(value => !smokeIrritantsOptions.includes(value));
+      if (customValue) {
+        smokeIrritantsOther = customValue;
+        smokeIrritants = smokeIrritants.filter(value => value !== customValue);
+        smokeIrritants.push("Other");
+      }
+
+      // Handle work environment irritants
+      const customWorkValue = workEnvIrritants.find(value => !workEnvIrritantsOptions.includes(value));
+      if (customWorkValue) {
+        workEnvIrritantsOther = customWorkValue;
+        workEnvIrritants = workEnvIrritants.filter(value => value !== customWorkValue);
+        workEnvIrritants.push("Other");
+      }
+
       const prefillAnswers = {
         overll_wellbeing: lifestyle.howWellThingsGoingOverall ?? 1,
         overll_wellbeing_na: lifestyle.howWellThingsGoingOverall === 0, 
@@ -421,8 +451,10 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
         do_you_brush_regularly: normalizeYesNo(lifestyle.brushRegularly),
         do_you_floss_regularly: normalizeYesNo(lifestyle.flossRegularly),
   
-        smoke_irritants: lifestyle.environmentEffect || [],
-        work_env_smoke_irritants: lifestyle.environmentExposed || [],
+        smoke_irritants: smokeIrritants,
+        smoke_irritants_other: smokeIrritantsOther,
+        work_env_smoke_irritants: workEnvIrritants,
+        work_env_smoke_irritants_other: workEnvIrritantsOther,
   
         harmful_chemicals: normalizeYesNo(lifestyle.exposedHarmfulChemical),
         harmful_chemical_exposure: lifestyle.whenExposedHarmfulChemical?.chemicalName || "",
@@ -435,7 +467,6 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
         age_of_wheat_food_intro_unsure: lifestyle.ageIntroductionWheat === 0,
         age_of_diary_food_intro_unsure: lifestyle.ageIntroductionDiary === 0,
         fillings_removed_unsure: lifestyle.fillingsAsKid === 0,
-
       };
   
       setAnswers(prefillAnswers);
@@ -728,7 +759,23 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
     const handleChange = (value, name) => {
       const updatedAnswers = { ...answers };
 
-      if (name.endsWith("_unsure")) {
+      if (name === "smoke_irritants" || name === "work_env_smoke_irritants") {
+        // Handle checkbox group changes
+        if (value.includes("Other")) {
+          // Keep the existing "Other" value if it exists
+          updatedAnswers[name] = value;
+          if (!updatedAnswers[`${name}_other`]) {
+            updatedAnswers[`${name}_other`] = "";
+          }
+        } else {
+          // If "Other" is unchecked, clear the other value
+          updatedAnswers[name] = value;
+          updatedAnswers[`${name}_other`] = "";
+        }
+      } else if (name === "smoke_irritants_other" || name === "work_env_smoke_irritants_other") {
+        // Handle the "Other" input field changes
+        updatedAnswers[name] = value;
+      } else if (name.endsWith("_unsure")) {
         const fieldName = name.replace("_unsure", "");
 
         if (value) {
@@ -805,8 +852,22 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
         fillingsAsKid: answers.fillings_removed || 0,
         brushRegularly: answers.do_you_brush_regularly === "Yes",
         flossRegularly: answers.do_you_floss_regularly === "Yes",
-        environmentEffect: answers.smoke_irritants || ["Not answered"],
-        environmentExposed: answers.work_env_smoke_irritants || ["Not answered"],
+        environmentEffect: (() => {
+          let irritants = [...(answers.smoke_irritants || [])];
+          if (irritants.includes("Other") && answers.smoke_irritants_other) {
+            irritants = irritants.filter(item => item !== "Other");
+            irritants.push(answers.smoke_irritants_other);
+          }
+          return irritants;
+        })(),
+        environmentExposed: (() => {
+          let irritants = [...(answers.work_env_smoke_irritants || [])];
+          if (irritants.includes("Other") && answers.work_env_smoke_irritants_other) {
+            irritants = irritants.filter(item => item !== "Other");
+            irritants.push(answers.work_env_smoke_irritants_other);
+          }
+          return irritants;
+        })(),
         exposedHarmfulChemical: answers.harmful_chemicals === "Yes",
         whenExposedHarmfulChemical: {
           chemicalName: answers.harmful_chemical_exposure || "Not answered",
@@ -1319,43 +1380,34 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
   
       case "checkbox":
         return (
-          <Checkbox.Group
-            name={question.name}
-            onChange={(checkedValues) =>
-              handleChange(checkedValues, question.name)
-            }
-            value={answers[question.name] || []}
-            className="checkbox-group"
-          >
-            {question.options.map((option, index) => (
-              <Checkbox key={index} value={option} className="checkbox-item">
-                {option === "Other" ? (
-                  <>
-                    {option}
-                    {answers[question.name] &&
-                      answers[question.name].includes("Other") && (
-                        <>
-                          <br />
-                          <Input
-                            className="input_questtionnaire"
-                            placeholder="Please specify"
-                            value={answers[`${question.name}_other`] || ""}
-                            onChange={(e) =>
-                              handleChange(
-                                e.target.value,
-                                `${question.name}_other`,
-                              )
-                            }
-                          />
-                        </>
-                      )}
-                  </>
-                ) : (
-                  option
-                )}
-              </Checkbox>
-            ))}
-          </Checkbox.Group>
+          <div className="checkbox-group">
+            <Checkbox.Group
+              name={question.name}
+              onChange={(checkedValues) =>
+                handleChange(checkedValues, question.name)
+              }
+              value={answers[question.name] || []}
+            >
+              {question.options.map((option, index) => (
+                <Checkbox key={index} value={option} className="checkbox-item">
+                  {option}
+                </Checkbox>
+              ))}
+            </Checkbox.Group>
+            {answers[question.name]?.includes("Other") && (
+              <div style={{ marginTop: "10px", marginLeft: "24px" }}>
+                <Input
+                  className="input_questtionnaire"
+                  placeholder="Please specify"
+                  value={answers[`${question.name}_other`] || ""}
+                  onChange={(e) =>
+                    handleChange(e.target.value, `${question.name}_other`)
+                  }
+                  style={{ width: isMobile ? "100%" : "50%" }}
+                />
+              </div>
+            )}
+          </div>
         );
       case "long_radio":
         return (

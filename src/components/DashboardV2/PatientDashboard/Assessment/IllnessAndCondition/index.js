@@ -890,7 +890,7 @@ const IllnessAndCondition = ({ onComplete }) => {
     };
 
     const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
-    const token = userInfo.obj.token || "";
+    const token = userInfo?.obj?.token || "";
     fetch(`${baseUrl}Patient/AddIllnessConditions`, {
       method: "POST",
       headers: {

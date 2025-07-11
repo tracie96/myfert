@@ -166,48 +166,8 @@ const SubstanceUse = ({ onComplete }) => {
   const navigate = useNavigate();
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const patientSubstanceInfo = useSelector((state) => state.intake?.patientSubstanceInfo);
+  const hasSubmittedBefore = useSelector((state) => state.intake?.accessDetails?.substanceUse);
 
-  const mapSubstanceInfoToAnswers = (info) => {
-    const normalizeYesNo = (value) => {
-      if (value === true) return "Yes";
-      if (value === false) return "No";
-      return null;
-    };
-    return {
-      smoke_currently: normalizeYesNo(info.smokePresently),
-      smoke_type_other:info.smokeCurrently || "",
-      packs_per_day: info.smokingCurrently?.packsDay || 0,
-      number_of_years: info.smokingCurrently?.years || 0,
-      smoke_type: info.smokingCurrently?.type || "",
-  
-      attempted_to_quit: normalizeYesNo(info.attempedToQuit?.yesNo),
-      methods_to_stop_smoking: info.attempedToQuit?.describe || "",
-  
-      smoked_previously: normalizeYesNo(info.smokedInPast?.type),
-      packs_per_day_previous: info.smokedInPast?.packsDay || 0,
-      number_of_years_previous: info.smokedInPast?.years || 0,
-  
-      exposed_to_second_hand_smoke: normalizeYesNo(info.exposedTo2ndSmoke),
-  
-      exposed_to_smoke: info.howManyAlcoholWeek || "",
-  
-      previous_alcohol_intake: info.previousAlcoholIntake?.yesNo ? "Yes" : "No",
-      previous_packs_per_day: info.previousAlcoholIntake?.describe || "",
-  
-      alcohol_problem: normalizeYesNo(info.problemAlcohol),
-      packs_per_day_when: info.problemAlcoholWhen || "",
-      packs_per_day_expain: info.problemAlcoholExplain || "",
-  
-      considered_help_for_alcohol: normalizeYesNo(info.getHelpForDrinking),
-  
-      using_recreational_drugs: normalizeYesNo(info.currentlyRecreationalDrugs),
-      recreational_drugs_type: info.currentlyRecreationalDrugsType || "",
-  
-      inhaled_drugs: normalizeYesNo(info.everUsedRecreationalDrugs),
-    };
-  };
-
-  
   useEffect(() => {
     dispatch(getSubstancePatient());
   }, [dispatch]);
@@ -221,11 +181,65 @@ const SubstanceUse = ({ onComplete }) => {
       setCurrentQuestionIndex(savedIndex);
       setAnswers(savedAnswers);
     } else if (patientSubstanceInfo && Object.keys(patientSubstanceInfo).length > 0) {
-     // console.log("patientSubstanceInfo",patientSubstanceInfo);
+      const mapSubstanceInfoToAnswers = (info) => {
+        const normalizeYesNo = (value) => {
+          if (value === true) return "Yes";
+          if (value === false) return "No";
+          return null;
+        };
+    
+        // Handle smokedInPast type based on previous submission
+        let smokedInPastValue = null;
+        if (info.smokedInPast) {
+          if (info.smokedInPast.type === null && hasSubmittedBefore) {
+            smokedInPastValue = "No";
+          } else {
+            smokedInPastValue = info.smokedInPast.type ? "Yes" : "No";
+          }
+        }
+
+        // Check if smoke type is a standard option or custom
+        const standardSmokeTypes = ["Cigarettes", "Smokeless", "Pipe", "Cigar", "E-cig"];
+        const smokeType = info.smokingCurrently?.type || "";
+        const isCustomSmokeType = smokeType && !standardSmokeTypes.includes(smokeType);
+    
+        return {
+          smoke_currently: normalizeYesNo(info.smokePresently),
+          smoke_type: isCustomSmokeType ? "Other" : smokeType,
+          smoke_type_other: isCustomSmokeType ? smokeType : "",
+          packs_per_day: info.smokingCurrently?.packsDay || 0,
+          number_of_years: info.smokingCurrently?.years || 0,
+    
+          attempted_to_quit: normalizeYesNo(info.attempedToQuit?.yesNo),
+          methods_to_stop_smoking: info.attempedToQuit?.describe || "",
+    
+          smoked_previously: smokedInPastValue,
+          packs_per_day_previous: info.smokedInPast?.packsDay || 0,
+          number_of_years_previous: info.smokedInPast?.years || 0,
+    
+          exposed_to_second_hand_smoke: normalizeYesNo(info.exposedTo2ndSmoke),
+    
+          exposed_to_smoke: info.howManyAlcoholWeek || "",
+    
+          previous_alcohol_intake: info.previousAlcoholIntake?.yesNo ? "Yes" : "No",
+          previous_packs_per_day: info.previousAlcoholIntake?.describe || "",
+    
+          alcohol_problem: normalizeYesNo(info.problemAlcohol),
+          packs_per_day_when: info.problemAlcoholWhen || "",
+          packs_per_day_expain: info.problemAlcoholExplain || "",
+    
+          considered_help_for_alcohol: normalizeYesNo(info.getHelpForDrinking),
+    
+          using_recreational_drugs: normalizeYesNo(info.currentlyRecreationalDrugs),
+          recreational_drugs_type: info.currentlyRecreationalDrugsType || "",
+    
+          inhaled_drugs: normalizeYesNo(info.everUsedRecreationalDrugs),
+        };
+      };
       const prefilled = mapSubstanceInfoToAnswers(patientSubstanceInfo);
       setAnswers(prefilled);
     }
-  }, [patientSubstanceInfo]);
+  }, [patientSubstanceInfo, hasSubmittedBefore]);
   // ToDo: remove this commented code after testing
   // const validateQuestion = () => {
   //   const question = questions[currentQuestionIndex];
@@ -408,27 +422,26 @@ console.log("answers--", answers);
   const transformAnswers = (answers) => {
     return {
       smokePresently: answers.smoke_currently === "Yes",
-      smokeCurrently :answers.smoke_type_other || "",
+      smokeCurrently: answers.smoke_currently === "Yes" ? (answers.smoke_type === "Other" ? answers.smoke_type_other || "" : "") : "",
       smokingCurrently:
         answers.smoke_currently === "Yes"
           ? {
               packsDay: answers.packs_per_day || 0,
               years: answers.number_of_years || 0,
-              type: answers.smoke_type || "",
+              type: answers.smoke_type === "Other" ? answers.smoke_type_other : answers.smoke_type || "",
             }
           : {},
       attempedToQuit: {
         yesNo: answers.attempted_to_quit === "Yes",
         describe: answers.methods_to_stop_smoking || '',
       },
-      smokedInPast:
-        answers.smoked_previously === "Yes"
-          ? {
-              packsDay: answers.packs_per_day_previous || 0,
-              years: answers.number_of_years_previous || 0,
-              type: answers.smoked_previously || "",
-            }
-          : {},
+      smokedInPast: {
+        type: answers.smoked_previously === "Yes" ? "Yes" : "No",
+        ...(answers.smoked_previously === "Yes" ? {
+          packsDay: answers.packs_per_day_previous || 0,
+          years: answers.number_of_years_previous || 0,
+        } : {})
+      },
       exposedTo2ndSmoke: answers.exposed_to_second_hand_smoke === "Yes",
       howManyAlcoholWeek: answers.exposed_to_smoke || "",
       previousAlcoholIntake: {

@@ -1001,7 +1001,7 @@ const CurrentLifeStyle = ({ onComplete }) => {
       return;
     }
     const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
-    const token = userInfo.obj.token || "";
+    const token = userInfo?.obj?.token || "";
     const transformedData = {
       restedUponAwake: answers["do_you_feel_rested"] === "Yes",
       doYouAllergies: answers["do_you_have_any_allergies"] === "Yes",

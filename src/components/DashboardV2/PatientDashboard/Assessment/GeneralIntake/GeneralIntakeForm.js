@@ -107,6 +107,10 @@ const GeneralIntakeForm = ({ onComplete }) => {
         const howDidYouHearOptions = questions.find(
           (q) => q.name === "how_did_you_hear"
         )?.options || [];
+
+        const geneticBackgroundOptions = questions.find(
+          (q) => q.name === "geneticBackground"
+        )?.options || [];
   
         const mappedAnswers = {
           age: patientGeneralInfo.age || "",
@@ -132,6 +136,15 @@ const GeneralIntakeForm = ({ onComplete }) => {
           mappedAnswers["how_did_you_hear_other"] =
             patientGeneralInfo.howDidHearAbout;
         }
+
+        if (
+          mappedAnswers.geneticBackground &&
+          !geneticBackgroundOptions.includes(mappedAnswers.geneticBackground)
+        ) {
+          mappedAnswers["geneticBackground_other"] = mappedAnswers.geneticBackground;
+          mappedAnswers.geneticBackground = "Other";
+        }
+
         setAnswers(mappedAnswers);
         setCurrentQuestionIndex(0);
         setDataLoadedFromAPI(true);
@@ -247,7 +260,7 @@ const GeneralIntakeForm = ({ onComplete }) => {
     }
   
     const transformedData = {
-      geneticBackground: answers["geneticBackground"] || "",
+      geneticBackground: answers["geneticBackground"] === "Other" ? answers["geneticBackground_other"] : answers["geneticBackground"] || "",
       whereMedicalCare: answers["where_received_medical_care"] || "",
       whenMedicalCare: answers["when_received_medical_care"] || "",
       whomMedicalCare: answers["whom_received_medical_care"] || "",
@@ -256,7 +269,7 @@ const GeneralIntakeForm = ({ onComplete }) => {
       emergencyPhoneHome: answers["emergency_contact"]?.phoneHome || "",
       emergencyPhoneCell: answers["emergency_contact"]?.phoneCell || "",
       emergencyPhoneWork: answers["emergency_contact"]?.phoneType || "",
-      howDidHearAbout: answers["how_did_you_hear"] || "",
+      howDidHearAbout: answers["how_did_you_hear"] === "Other" ? answers["how_did_you_hear_other"] : answers["how_did_you_hear"] || "",
       age:answers["age"] || "",
     };
   

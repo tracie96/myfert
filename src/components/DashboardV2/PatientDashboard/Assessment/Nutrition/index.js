@@ -582,33 +582,55 @@ const Nutrition = ({ onComplete }) => {
   };
 
   const handleChange = (value, name) => {
-    // Find the question object by name
+    const updated = { ...answers, [name]: value };
+  
+    // Clear subquestion if user selects "No" for sensitive_food
+    const clearMap = {
+      sensitive_food: {
+        condition: "No",
+        field: "sensitive_food_info"
+      },
+      aversion_to_certain_food: {
+        condition: "No",
+        field: "aversion_to_certain_food_other"
+      },
+      crave_for_foods: {
+        condition: "No",
+        field: "crave_for_foods_other"
+      },
+      eat_3_meals: {
+        condition: "Yes", 
+        field: "eat_3_meals_detail"
+      },
+      does_skipping_meal_affect_you: {
+        condition: "No",
+        field: "does_skipping_meal_affect_you_other"
+      },
+      sensitive_food_caffeine: {
+        condition: "No",
+        field: "sensitive_food_caffeine_other"
+      }
+    };
+  
+    if (clearMap[name] && value === clearMap[name].condition) {
+      updated[clearMap[name].field] = "";
+    }
+  
+    // Handle checkboxes (preserve your original logic)
     const question = questions.find(q => q.name === name);
-
     if (question && question.type === "checkbox") {
-      // If it's a checkbox input for "Other" description
       if (name.endsWith('_other')) {
-        setAnswers({
-          ...answers,
-          [name]: value
-        });
+        setAnswers({ ...answers, [name]: value });
         return;
       }
-
-      // For checkbox selections
-      setAnswers({
-        ...answers,
-        [name]: value,
-      });
+  
+      setAnswers({ ...answers, [name]: value });
       return;
     }
-
-    // Default behavior for other types
-    setAnswers({
-      ...answers,
-      [name]: value,
-    });
+  
+    setAnswers(updated);
   };
+  
 
   const transformNutritionData = (answers) => {
 

@@ -785,7 +785,31 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
         updatedAnswers[name] = value;
       } else {
         updatedAnswers[name] = value;
+      
+        // 🧼 Clear sub-question values when "No" is selected
+        const clearMap = {
+          birth_complications: "birth_complications_details",
+          allergic_food: "food_avoided",
+          mercury_filings: "mercury_fillings_removed",
+          harmful_chemicals: [
+            "harmful_chemical_exposure",
+            "harmful_chemical_exposure_length",
+            "harmful_chemical_exposure_date"
+          ],
+          pets_or_animal: "where_they_live"
+        };
+      
+        if (clearMap[name] && value === "No") {
+          const fieldsToClear = Array.isArray(clearMap[name])
+            ? clearMap[name]
+            : [clearMap[name]];
+      
+          fieldsToClear.forEach((field) => {
+            updatedAnswers[field] = "";
+          });
+        }
       }
+      
 
       // Handle future date validation
       if (

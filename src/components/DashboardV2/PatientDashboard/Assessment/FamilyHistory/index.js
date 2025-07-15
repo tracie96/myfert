@@ -727,11 +727,61 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
   };
 
   const handleChange = (value, name) => {
-    setAnswers((prevAnswers) => ({
-      ...prevAnswers,
-      [name]: value,
-    }));
-  };
+    setAnswers((prevAnswers) => {
+      const updated = {
+        ...prevAnswers,
+        [name]: value,
+      };
+  
+      // 🧼 Clear dependent sub-field if selecting "No"
+      const clearMap = {
+        pregnancy_problems: {
+          condition: "No",
+          field: "pregnancy_problems_sub",
+        },
+        premenstrual_problems: {
+          condition: "No",
+          field: "premenstrual_problems_describe",
+        },
+        other_premenstrual_problems: {
+          condition: "No",
+          field: "other_hormonal_problems_history",
+        },
+        hormonal_birthcontrol: {
+          condition: "No",
+          field: "hormonal_birthcontrol_often",
+        },
+        other_hormonal_problems: {
+          condition: "No",
+          field: "any_hormonal_problems_bc",
+        },
+        use_of_contraception: {
+          condition: "No",
+          field: "use_of_contraception_sub",
+        },
+        surgical_menopause: {
+          condition: "No",
+          fields: ["surgical_menopause_detail", "age_at_last_period"],
+        },
+        surgical_menopause_detail: {
+          condition: "No",
+          fields: ["surgical_menopause_reason"], 
+        },
+        hormone_replacement_therapy: {
+          condition: "No",
+          fields: ["hormone_replacement_therapy_sub"], 
+        },
+      };
+  
+      if (clearMap[name] && value === clearMap[name].condition) {
+        clearMap[name].fields.forEach((field) => {
+          updated[field] = "";
+        });
+      }
+  
+      return updated;
+    });
+  };  
 
   const handleSubmit = async () => {
     if (!validateQuestion()) {

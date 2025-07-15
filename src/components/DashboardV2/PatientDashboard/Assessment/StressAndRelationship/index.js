@@ -627,11 +627,31 @@ const StressAndRelationship = ({ onComplete }) => {
   };
 
   const handleChange = (value, name) => {
-    setAnswers({
-      ...answers,
-      [name]: value,
-    });
+    const updatedAnswers = { ...answers, [name]: value };
+  
+    // Clear sub-question fields when condition met
+    const clearMap = {
+      relaxation_techniques: {
+        condition: "No",
+        field: "how_often_relaxation"
+      },
+      current_therapy: {
+        condition: "No",
+        field: "therapy_description"
+      },
+      spiritual_practice: {
+        condition: "No",
+        field: "spiritual_practice_desciption"
+      }
+    };
+  
+    if (clearMap[name] && value === clearMap[name].condition) {
+      updatedAnswers[clearMap[name].field] = "";
+    }
+  
+    setAnswers(updatedAnswers);
   };
+
   const handleExit = () => {
     navigate("/assessment");
   };

@@ -667,6 +667,7 @@ const StressAndRelationship = ({ onComplete }) => {
 
     setAnswers(updatedAnswers);
   };
+
   const handleExit = () => {
     navigate("/assessment");
   };

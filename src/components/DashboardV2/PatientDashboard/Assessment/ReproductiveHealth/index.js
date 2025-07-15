@@ -1171,7 +1171,13 @@ const ReproductiveHealth = ({ onComplete }) => {
         setDisabledSeverity((prev) => ({ ...prev, [severityField]: false }));
       }
     }
-
+    if (name === "current_therapy") {
+      updatedAnswers[name] = value;
+      if (value === "No") {
+        updatedAnswers["charting_method"] = ""; // Clear subquestion answer
+      }
+    }
+    
     if (name === "cervical_mucus") {
       if (value === 0 || value === "0") {
         updatedAnswers["cervical_mucus_sub"] = "";

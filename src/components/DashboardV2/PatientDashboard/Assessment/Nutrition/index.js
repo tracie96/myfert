@@ -591,7 +591,6 @@ const Nutrition = ({ onComplete }) => {
     const updatedAnswers = { ...answers };
 
     if (question && question.type === "checkbox") {
-      // If it's a checkbox input for "Other" description
       if (name.endsWith('_other')) {
         updatedAnswers[name] = value;
       } else {
@@ -634,6 +633,7 @@ const Nutrition = ({ onComplete }) => {
 
     setAnswers(updatedAnswers);
   };
+  
 
   const transformNutritionData = (answers) => {
 

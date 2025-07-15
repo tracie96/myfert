@@ -979,21 +979,73 @@ const CurrentLifeStyle = ({ onComplete }) => {
 
   const handleChange = (value, name, field) => {
     setAnswers((prevAnswers) => {
+      const updated = { ...prevAnswers };
+  
       if (field) {
-        return {
-          ...prevAnswers,
-          [name]: {
-            ...prevAnswers[name],
-            [field]: value,
-          },
+        updated[name] = {
+          ...updated[name],
+          [field]: value,
         };
+      } else {
+        updated[name] = value;
+  
+        // Clear `_other` fields for radio + extra input
+        const clearOtherFieldMap = {
+          do_you_use_sleeping_aids: "do_you_use_sleeping_aids_other",
+          problems_limiting_exercise: "problems_limiting_exercise_other",
+          sore_after_exercise: "sore_after_exercise_other",
+        };
+  
+        if (value === "No" && clearOtherFieldMap[name]) {
+          updated[clearOtherFieldMap[name]] = "";
+        }
+  
+        // 🧼 Clear long_radio subquestions when "No" is selected
+        const longRadioSubMap = {
+          cardio_aerobic: [
+            "cardio_aerobic_describe",
+            "cardio_aerobic_number",
+            "cardio_aerobic_time_duration",
+          ],
+          sport_participated_in_strength: [
+            "strength_resistance_describe",
+            "strength_resistance_number",
+            "strength_resistance_time_duration",
+          ],
+          sport_participated_in_flexibility: [
+            "flexibility_stretching_describe",
+            "flexibility_stretching_number",
+            "flexibility_stretching_time_duration",
+          ],
+          sport_participated_in_balance: [
+            "sport_participated_describe",
+            "sport_participated_number",
+            "sport_participated_time_duration",
+          ],
+          sport_participated_in_leisure: [
+            "sports_leisure_describe",
+            "sports_leisure_number",
+            "sports_leisure_time_duration",
+          ],
+          sport_participated_in_others: [
+            "sport_participated_in_describe",
+            "sport_participated_in_number",
+            "sport_participated_in_time_duration",
+          ],
+        };
+  
+        if (value === "No" && longRadioSubMap[name]) {
+          longRadioSubMap[name].forEach((fieldName) => {
+            updated[fieldName] = "";
+          });
+        }
       }
-      return {
-        ...prevAnswers,
-        [name]: value,
-      };
+  
+      return updated;
     });
   };
+  
+  
 
   const handleSubmit = () => {
     if (!validateQuestion()) {

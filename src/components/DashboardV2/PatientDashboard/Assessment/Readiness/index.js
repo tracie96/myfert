@@ -265,7 +265,7 @@ const Readiness = ({ onComplete }) => {
       const token = userInfo.obj.token || "";
       const transformedData = transformReadinessData(answers);
 
-      const response = await handleApiError(
+      await handleApiError(
         fetch(`${baseUrl}Patient/AddReadiness`, {
           method: "POST",
           headers: {

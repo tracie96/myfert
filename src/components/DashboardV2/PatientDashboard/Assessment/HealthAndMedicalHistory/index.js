@@ -757,24 +757,33 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
   };
 
     const handleChange = (value, name) => {
+      // Find the question object by name
+      const question = questions.find(q => q.name === name);
       const updatedAnswers = { ...answers };
 
-      if (name === "smoke_irritants" || name === "work_env_smoke_irritants") {
-        // Handle checkbox group changes
-        if (value.includes("Other")) {
-          // Keep the existing "Other" value if it exists
-          updatedAnswers[name] = value;
-          if (!updatedAnswers[`${name}_other`]) {
-            updatedAnswers[`${name}_other`] = "";
-          }
-        } else {
-          // If "Other" is unchecked, clear the other value
-          updatedAnswers[name] = value;
-          updatedAnswers[`${name}_other`] = "";
-        }
-      } else if (name === "smoke_irritants_other" || name === "work_env_smoke_irritants_other") {
-        // Handle the "Other" input field changes
+      if (question && (question.type === "radio" || question.type === "long_radio")) {
+        // For radio buttons, clear all related fields when selection changes
         updatedAnswers[name] = value;
+        
+        // Clear any _other fields
+        delete updatedAnswers[`${name}_other`];
+        
+        // Clear subquestion answers if they exist
+        if (question.subQuestions) {
+          question.subQuestions.forEach(subQ => {
+            delete updatedAnswers[subQ.name];
+            delete updatedAnswers[`${subQ.name}_other`];
+          });
+        }
+
+        // Special handling for specific questions
+        if (name === "pets_or_animal") {
+          delete updatedAnswers.where_they_live;
+        } else if (name === "harmful_chemicals") {
+          delete updatedAnswers.harmful_chemical_exposure;
+          delete updatedAnswers.harmful_chemical_exposure_length;
+          delete updatedAnswers.harmful_chemical_exposure_date;
+        }
       } else if (name.endsWith("_unsure")) {
         const fieldName = name.replace("_unsure", "");
 

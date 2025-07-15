@@ -842,10 +842,49 @@ const SymptomReview = ({ onComplete }) => {
   };
 
   const handleChange = (value, name) => {
-    setAnswers((prevAnswers) => ({
-      ...prevAnswers,
-      [name]: value,
-    }));
+    // Find the question object by name
+    const question = questions.find(q => q.name === name);
+    const updatedAnswers = { ...answers };
+
+    if (question && (question.type === "radio" || question.type === "long_radio")) {
+      // For radio buttons, clear all related fields when selection changes
+      updatedAnswers[name] = value;
+      
+      // Clear any _other fields
+      delete updatedAnswers[`${name}_other`];
+      
+      // Clear subquestion answers if they exist
+      if (question.subQuestions) {
+        question.subQuestions.forEach(subQ => {
+          delete updatedAnswers[subQ.name];
+          delete updatedAnswers[`${subQ.name}_other`];
+        });
+      }
+
+      // Special handling for specific questions
+      if (name === "side_effects_problems") {
+        delete updatedAnswers.side_effects_details;
+      } else if (name === "antibiotics_usage") {
+        delete updatedAnswers.antibiotics_reason;
+      } else if (name === "antibiotics_usage_teen") {
+        delete updatedAnswers.antibiotics_reason_teen;
+      } else if (name === "antibiotics_usage_adulthood") {
+        delete updatedAnswers.antibiotics_reason_adulthood;
+      } else if (name === "long_term_antibiotics") {
+        delete updatedAnswers.long_term_antibiotics_reason;
+      } else if (name === "oral_steroids_usage_infancy") {
+        delete updatedAnswers.oral_steroids_reason_infancy;
+      } else if (name === "oral_steroids_usage_teen") {
+        delete updatedAnswers.oral_steroids_reason_teen;
+      } else if (name === "oral_steroids_usage_adulthood") {
+        delete updatedAnswers.oral_steroids_reason_adulthood;
+      }
+    } else {
+      // Default behavior for other types
+      updatedAnswers[name] = value;
+    }
+
+    setAnswers(updatedAnswers);
   };
 
   const handleSubmit = async () => {

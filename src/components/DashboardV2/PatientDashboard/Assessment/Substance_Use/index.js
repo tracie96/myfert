@@ -393,26 +393,37 @@ const SubstanceUse = ({ onComplete }) => {
   const handleChange = (value, name) => {
     const updatedAnswers = {
       ...answers,
-      [name]: value,
     };
+
+    // If it's a radio input, delete any existing _other value
+    if (name.endsWith('_other')) {
+      updatedAnswers[name] = value;
+    } else {
+      updatedAnswers[name] = value;
+      // Delete the _other field entirely
+      delete updatedAnswers[`${name}_other`];
+    }
   
     // If user answers NO to smoking, clear related fields
     if (name === "smoke_currently" && value === "No") {
       const requiredFields = ["packs_per_day", "number_of_years", "smoke_type"];
       requiredFields.forEach((field) => {
         updatedAnswers[field] = ""; // Clear the value
+        delete updatedAnswers[`${field}_other`]; // Also clear any _other values
       });
     }
     if (name === "attempted_to_quit" && value === "No") {
       const requiredFields = ["methods_to_stop_smoking"];
       requiredFields.forEach((field) => {
         updatedAnswers[field] = ""; // Clear the value
+        delete updatedAnswers[`${field}_other`]; // Also clear any _other values
       });
     }
     if (name === "smoked_previously" && value === "No") {
       const fieldsToClear = ["packs_per_day_previous", "number_of_years_previous"];
       fieldsToClear.forEach((field) => {
         updatedAnswers[field] = "";
+        delete updatedAnswers[`${field}_other`]; // Also clear any _other values
       });
     }
     

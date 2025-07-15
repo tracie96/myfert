@@ -12,8 +12,9 @@ import {
   Upload,
   List,
   Card,
+  Popconfirm,
 } from "antd";
-import { PlusOutlined, FileOutlined, FilePdfOutlined, FileImageOutlined } from "@ant-design/icons";
+import { PlusOutlined, FileOutlined, FilePdfOutlined, FileImageOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import Header from "./Components/Header";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -23,6 +24,8 @@ import { addPatientDocuments, getPatientBloodWork, downloadBloodWork } from "../
 import {
   addPatientMed,
   getPatientMed,
+  editPatientMed,
+  deletePatientMed,
   addPatientSupplement,
   getPatientSupplements,
 } from "../../redux/doctorSlice";
@@ -57,6 +60,9 @@ const MedicationTable = () => {
   const [medications, setMedications] = useState([]);
   const [supplements, setSupplements] = useState([]);
   const [activeTab, setActiveTab] = useState("medications");
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [editingMedication, setEditingMedication] = useState(null);
+  const [editForm] = Form.useForm();
 
   const [form] = Form.useForm();
   const [supplementForm] = Form.useForm();
@@ -252,15 +258,41 @@ const MedicationTable = () => {
     });
   };
 
-  // const handleDelete = async (key) => {
-  //   try {
-  //     await dispatch(deletePatientBloodWork(patient.userRef)).unwrap();
-  //     message.success("Medication deleted successfully!");
-  //     dispatch(getPatientMed(patient.userRef));
-  //   } catch (error) {
-  //     message.error("Failed to delete medication.");
-  //   }
-  // };
+  const handleEdit = (record) => {
+    setEditingMedication(record);
+    editForm.setFieldsValue(record);
+    setIsEditModalVisible(true);
+  };
+
+  const handleEditSubmit = () => {
+    editForm.validateFields().then(async (values) => {
+      try {
+        await dispatch(
+          editPatientMed({
+            ...values,
+            id: editingMedication.id,
+          })
+        ).unwrap();
+
+        message.success("Medication updated successfully!");
+        dispatch(getPatientMed(patient.userRef));
+        setIsEditModalVisible(false);
+        editForm.resetFields();
+      } catch (error) {
+        message.error("Failed to update medication.");
+      }
+    });
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await dispatch(deletePatientMed(id)).unwrap();
+      message.success("Medication deleted successfully!");
+      dispatch(getPatientMed(patient.userRef));
+    } catch (error) {
+      message.error("Failed to delete medication.");
+    }
+  };
   //const isMobile = windowWidth <= breakpoints.sm;
   const medicationColumns = [
     {
@@ -289,29 +321,35 @@ const MedicationTable = () => {
       dataIndex: "frequency",
       key: "frequency",
     },
-    // {
-    //   title: "Actions",
-    //   key: "actions",
-    //   render: (_, record) => (
-    //     <>
-    //       <Button
-    //         type="link"
-    //         icon={<EditOutlined />}
-    //         onClick={() => console.log("Edit", record)}
-    //       >
-    //         Edit
-    //       </Button>
-    //       <Button
-    //         type="link"
-    //         danger
-    //         icon={<DeleteOutlined />}
-    //         onClick={() => handleDelete(record.key)}
-    //       >
-    //         Delete
-    //       </Button>
-    //     </>
-    //   ),
-    // },
+    {
+      title: "Actions",
+      key: "actions",
+      render: (_, record) => (
+        <>
+          <Button
+            type="link"
+            icon={<EditOutlined />}
+            onClick={() => handleEdit(record)}
+          >
+            Edit
+          </Button>
+          <Popconfirm
+            title="Are you sure you want to delete this medication?"
+            onConfirm={() => handleDelete(record.id)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button
+              type="link"
+              danger
+              icon={<DeleteOutlined />}
+            >
+              Delete
+            </Button>
+          </Popconfirm>
+        </>
+      ),
+    },
   ];
 
   const supplementColumns = [
@@ -819,6 +857,55 @@ const MedicationTable = () => {
             <Text>Selected File: {newLabResultFile.name}</Text>
           </div>
         )}
+      </Modal>
+
+      {/* Modal for editing a medication */}
+      <Modal
+        title="Edit Medication"
+        visible={isEditModalVisible}
+        onOk={handleEditSubmit}
+        onCancel={() => setIsEditModalVisible(false)}
+        okText="Update"
+      >
+        <Form form={editForm} layout="vertical">
+          <Form.Item
+            label="Name"
+            name="drugName"
+            rules={[
+              { required: true, message: "Please enter medication name" },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Dose"
+            name="dose"
+            rules={[{ required: true, message: "Please enter dose" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Amount"
+            name="amount"
+            rules={[{ required: true, message: "Please enter amount" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Route"
+            name="route"
+            rules={[{ required: true, message: "Please enter route" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Frequency"
+            name="frequency"
+            rules={[{ required: true, message: "Please enter frequency" }]}
+          >
+            <Input />
+          </Form.Item>
+        </Form>
       </Modal>
 
     </div>

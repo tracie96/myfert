@@ -211,6 +211,53 @@ export const addPatientMed = createAsyncThunk(
   }
 );
 
+export const editPatientMed = createAsyncThunk(
+  "doctor/editPatientMed",
+  async ({ drugName, dose, amount, route, frequency, id }, { rejectWithValue, getState, dispatch }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+
+    try {
+      const response = await axios.post(
+        `${baseUrl}Doctor/EditPatientMed`,
+        { drugName, dose, amount, route, frequency, id },
+        config
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(handleApiError(error?.response?.data, dispatch, user));
+    }
+  }
+);
+
+export const deletePatientMed = createAsyncThunk(
+  "doctor/deletePatientMed",
+  async (medId, { rejectWithValue, getState, dispatch }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+
+    try {
+      const response = await axios.get(
+        `${baseUrl}Doctor/DeletePatientMed/${medId}`,
+        config
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(handleApiError(error?.response?.data, dispatch, user));
+    }
+  }
+);
+
 export const submitAvailability = createAsyncThunk(
   "availability/submitAvailability",
   async (availabilityData, { rejectWithValue, getState, dispatch }) => {

@@ -247,10 +247,22 @@ const GeneralIntakeForm = ({ onComplete }) => {
   };
 
   const handleChange = (value, name) => {
-    setAnswers({
-      ...answers,
-      [name]: value,
-    });
+    const currentQuestion = questions[currentQuestionIndex];
+    if (currentQuestion.type === 'radio') {
+      // Always remove the _other value when changing selection
+      const newAnswers = {
+        ...answers,
+        [name]: value
+      };
+      // Delete the _other field entirely instead of setting it to empty string
+      delete newAnswers[`${name}_other`];
+      setAnswers(newAnswers);
+    } else {
+      setAnswers({
+        ...answers,
+        [name]: value,
+      });
+    }
   };
 
   const handleSubmit = async () => {

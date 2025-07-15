@@ -627,10 +627,45 @@ const StressAndRelationship = ({ onComplete }) => {
   };
 
   const handleChange = (value, name) => {
-    setAnswers({
-      ...answers,
-      [name]: value,
-    });
+    const question = questions.find(q => q.name === name);
+    const updatedAnswers = { ...answers };
+
+    if (question && (question.type === "radio" || question.type === "long_radio")) {
+      // For radio buttons, clear all related fields when selection changes
+      updatedAnswers[name] = value;
+      
+      // Clear any _other fields
+      delete updatedAnswers[`${name}_other`];
+      
+      // Clear subquestion answers if they exist
+      if (question.subQuestions) {
+        question.subQuestions.forEach(subQ => {
+          delete updatedAnswers[subQ.name];
+          delete updatedAnswers[`${subQ.name}_other`];
+        });
+      }
+
+      // Special handling for specific questions
+      if (name === "relaxation_techniques") {
+        delete updatedAnswers.how_often_relaxation;
+      } else if (name === "current_therapy") {
+        delete updatedAnswers.therapy_description;
+      } else if (name === "spiritual_practice") {
+        delete updatedAnswers.spiritual_practice_desciption;
+      }
+    } else if (question && question.type === "checkbox") {
+      // For checkbox selections
+      updatedAnswers[name] = value;
+      // If "Other" is unchecked, clear its text input
+      if (Array.isArray(value) && !value.includes('Other')) {
+        delete updatedAnswers[`${name}_other`];
+      }
+    } else {
+      // Default behavior for other types
+      updatedAnswers[name] = value;
+    }
+
+    setAnswers(updatedAnswers);
   };
   const handleExit = () => {
     navigate("/assessment");

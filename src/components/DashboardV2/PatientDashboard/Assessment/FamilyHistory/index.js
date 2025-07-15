@@ -727,10 +727,50 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
   };
 
   const handleChange = (value, name) => {
-    setAnswers((prevAnswers) => ({
-      ...prevAnswers,
-      [name]: value,
-    }));
+    // Find the question object by name
+    const question = questions.find(q => q.name === name);
+    const updatedAnswers = { ...answers };
+
+    if (question && (question.type === "radio" || question.type === "long_radio")) {
+      // For radio buttons, clear all related fields when selection changes
+      updatedAnswers[name] = value;
+      
+      // Clear any _other fields
+      delete updatedAnswers[`${name}_other`];
+      
+      // Clear subquestion answers if they exist
+      if (question.subQuestions) {
+        question.subQuestions.forEach(subQ => {
+          delete updatedAnswers[subQ.name];
+          delete updatedAnswers[`${subQ.name}_other`];
+        });
+      }
+
+      // Special handling for specific questions
+      if (name === "use_of_contraception") {
+        delete updatedAnswers.use_of_contraception_sub;
+      } else if (name === "is_menopause") {
+        delete updatedAnswers.age_at_last_period;
+      } else if (name === "surgical_menopause") {
+        delete updatedAnswers.surgical_menopause_detail;
+      } else if (name === "hormone_replacement_therapy") {
+        delete updatedAnswers.hormone_replacement_therapy_sub;
+      } else if (name === "pregnancy_problems") {
+        delete updatedAnswers.pregnancy_problems_sub;
+      } else if (name === "premenstrual_problems") {
+        delete updatedAnswers.premenstrual_problems_describe;
+      } else if (name === "other_premenstrual_problems") {
+        delete updatedAnswers.other_hormonal_problems_history;
+      } else if (name === "hormonal_birthcontrol") {
+        delete updatedAnswers.hormonal_birthcontrol_often;
+      } else if (name === "other_hormonal_problems") {
+        delete updatedAnswers.any_hormonal_problems_bc;
+      }
+    } else {
+      updatedAnswers[name] = value;
+    }
+
+    setAnswers(updatedAnswers);
   };
 
   const handleSubmit = async () => {

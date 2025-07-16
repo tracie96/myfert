@@ -1086,7 +1086,7 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
               <Checkbox
                 key={idx}
                 value={option}
-                style={{ display: "block", marginBottom: "10px" }}
+                style={{ display: "flex", marginBottom: "10px",width: "calc(9% - 10px)" }}
               >
                 {option}
                 {option === "Other" &&

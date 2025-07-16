@@ -397,11 +397,10 @@ const GeneralIntakeForm = ({ onComplete }) => {
                     <span style={{ verticalAlign: 'text-bottom' }}>{option}</span>
                     {answers[question.name] === "Other" && (
                       <>
-                        <br />
                         <Input
                           style={{
                             marginTop: 10,
-                            marginLeft: 50,
+                            marginLeft: 10,
                             borderColor: "#00ADEF",
                             width: "30%",
                           }}

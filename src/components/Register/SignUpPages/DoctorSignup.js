@@ -83,12 +83,20 @@ const DoctorSignup = ({ userRole }) => {
     onChange(info) {
       const { status } = info.file;
 
-      if (status === 'done') {
-        const url = info.file.response.secure_url; 
+      if (status === "done") {
+        const url = info.file.response.secure_url;
         setUploadedFileUrl(url);
-        message.success(`${info.file.name} file uploaded successfully!`);
-      } else if (status === 'error') {
-        message.error(`${info.file.name} file upload failed.`);
+        setFieldValue("picture", url);
+      
+        const originalName = info.file.originFileObj?.name || info.file.name;
+        const nameWithoutExtension = originalName.replace(/\.[^/.]+$/, '');
+      
+        message.success(`${nameWithoutExtension} file uploaded successfully!`);
+      } else if (status === "error") {
+        const originalName = info.file.originFileObj?.name || info.file.name;
+        const nameWithoutExtension = originalName.replace(/\.[^/.]+$/, '');
+      
+        message.error(`${nameWithoutExtension} file upload failed.`);
       }
     },
     onDrop(e) {

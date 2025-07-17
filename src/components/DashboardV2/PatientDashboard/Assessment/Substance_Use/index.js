@@ -403,6 +403,14 @@ const SubstanceUse = ({ onComplete }) => {
       // Delete the _other field entirely
       delete updatedAnswers[`${name}_other`];
     }
+    if (name === "alcohol_problem" && value === "No") {
+      updatedAnswers["packs_per_day_when"] = "";
+      updatedAnswers["packs_per_day_expain"] = "";
+    }
+    if (name === "using_recreational_drugs" && value === "No") {
+      updatedAnswers["recreational_drugs_type"] = "";
+    }
+    
   
     // If user answers NO to smoking, clear related fields
     if (name === "smoke_currently" && value === "No") {
@@ -429,7 +437,7 @@ const SubstanceUse = ({ onComplete }) => {
     
     setAnswers(updatedAnswers);
   };
-console.log("answers--", answers);
+
   const transformAnswers = (answers) => {
     return {
       smokePresently: answers.smoke_currently === "Yes",
@@ -573,7 +581,7 @@ console.log("answers--", answers);
           <>
             {option}
             {answers[subQuestion.name] === "Other" && (
-              <div style={{ marginTop: "10px" }}>
+              <div style={{ marginTop: "10px", display:"contents", alignItems:"baseline" }}>
                 <Input
                   className="input_questtionnaire"
                   placeholder="Please specify"
@@ -586,6 +594,7 @@ console.log("answers--", answers);
                     borderColor: "#00ADEF",
                     marginTop: 5,
                     width: isMobile ? "100%" : "50%",
+                    marginLeft:"5px"
                   }}
                 />
               </div>

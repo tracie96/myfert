@@ -854,7 +854,6 @@ const StressAndRelationship = ({ onComplete }) => {
                     {option}
                     {answers[question.name] === "Other" && (
                       <>
-                        <br />
                         <Input
                           className="input_questtionnaire"
                           placeholder="Please specify"
@@ -1050,8 +1049,8 @@ const StressAndRelationship = ({ onComplete }) => {
                     {answers[question.name] &&
                       answers[question.name].includes("Other") && (
                         <>
-                          <br />
                           <Input
+                            style={{ marginLeft: "5px"}}
                             className="input_questtionnaire"
                             placeholder="Please specify"
                             value={answers[`${question.name}_other`] || ""}

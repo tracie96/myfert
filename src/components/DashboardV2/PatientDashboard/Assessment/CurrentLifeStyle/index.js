@@ -685,6 +685,9 @@ const CurrentLifeStyle = ({ onComplete }) => {
       title: "Severity",
       dataIndex: "severity",
       editable: true,
+      onHeaderCell: () => ({
+        className: "severity-header-cell"
+      }),
       render: (text, record) =>
         isEditing(record) ? (
           <>
@@ -746,6 +749,9 @@ const CurrentLifeStyle = ({ onComplete }) => {
       title: "Success",
       dataIndex: "success",
       editable: true,
+      onHeaderCell: () => ({
+        className: "severity-header-cell"
+      }),
       render: (text, record) =>
         isEditing(record) ? (
           <>

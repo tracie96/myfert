@@ -49,7 +49,6 @@ const MedicationTable = () => {
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
-  const [isUploadModalVisible, setIsUploadModalVisible] = useState(false);
   const [newLabResultFile, setNewLabResultFile] = useState(null);
   const [newLabResultName, setNewLabResultName] = useState("");
   const [prescriptionFiles, setPrescriptionFiles] = useState([]);
@@ -62,6 +61,7 @@ const MedicationTable = () => {
   const [activeTab, setActiveTab] = useState("medications");
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [editingMedication, setEditingMedication] = useState(null);
+  const [isAddPrecriptionModalVisible, setIsAddPrecriptionModalVisible] = useState(false);
   const [editForm] = Form.useForm();
 
   const [form] = Form.useForm();
@@ -146,7 +146,7 @@ const MedicationTable = () => {
     setIsAddSupplementModalVisible(true);
   };
   const showAddPrecriptionModal = () => {
-    // setIsAddPrecriptionModalVisible(true);
+     setIsAddPrecriptionModalVisible(true);
   };
 
   const fetchPatientBloodWork = useCallback(
@@ -482,13 +482,8 @@ const MedicationTable = () => {
             }}
             onClick={showAddPrecriptionModal}
           >
-            <Button
-              type="primary"
-              style={{ background: "#00ADEF", maxWidth: "200px" }}
-              onClick={() => setIsUploadModalVisible(true)}
-            >
-              + Add New Prescription
-            </Button>
+            <PlusOutlined style={{ fontSize: "16px", color: "#1890ff" }} />
+            <Text strong>Add New Prescription</Text>
 
           </div>
           <Card style={{ border: "1px solid #C2E6F8", marginBottom: "24px" }}>
@@ -775,11 +770,12 @@ const MedicationTable = () => {
           </div>
         </Form>
       </Modal>
+      
       <Modal
-        title="Upload New Prescription"
-        visible={isUploadModalVisible}
+        title="Add New Prescription"
+        visible={isAddPrecriptionModalVisible}
         onCancel={() => {
-          setIsUploadModalVisible(false);
+          setIsAddPrecriptionModalVisible(false);
           setNewLabResultFile(null);
           setNewLabResultName("");
         }}
@@ -809,7 +805,7 @@ const MedicationTable = () => {
               await dispatch(addPatientDocuments(payload)).unwrap();
               await fetchPatientBloodWork();
               message.success("Prescription File uploaded successfully!");
-              setIsUploadModalVisible(false);
+              setIsAddPrecriptionModalVisible(false)
               setNewLabResultFile(null);
               setNewLabResultName("");
             } catch (error) {

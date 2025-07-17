@@ -208,7 +208,7 @@ const questions = [
         question: "Severity",
         type: "radio",
         label: "Severity",
-        options: ["Mild", "Moderate", "Severe","None"],
+        options: ["Mild", "Moderate", "Severe"],
         name: "duration_per_cycle_severity_pelvic_pain",
       },
     ],
@@ -299,7 +299,7 @@ const questions = [
         question: "PMS Severity",
         type: "radio",
         label: "Severity",
-        options: ["Mild", "Moderate", "Severe", "None"],
+        options: ["Mild", "Moderate", "Severe"],
         name: "pms_sympton_severity",
       },
     ],
@@ -476,7 +476,7 @@ const questions = [
           question: "Colour",
           type: "radio",
           label: "Colour",
-          options: ["None", "Pink", "Red", "Brown",  "Black","Other"],
+          options: ["Pink", "Red", "Brown",  "Black","Other"],
           name: "pre_spotting_colour",
         },
       ],
@@ -528,7 +528,7 @@ const questions = [
           question: "Colour",
           type: "radio",
           label: "Colour",
-          options: ["None", "Pink", "Red", "Brown",  "Black"],
+          options: ["Pink", "Red", "Brown",  "Black"],
           name: "after_period_spot_colour",
         },
       ],
@@ -1720,12 +1720,12 @@ const ReproductiveHealth = ({ onComplete }) => {
            {subQuestion.options.map((option, idx) => {
   
              return (
-               <div key={idx} style={{ marginBottom: "10px" }}>
+               <div key={idx} style={{ marginBottom: "10px",display:"flex", alignItems:"baseline" }}>
                  <Radio
                    key={idx}
                    value={option}
                    name={option}
-                   style={{ display: "block", marginBottom: "10px" }}
+                   style={{ display: "contents", marginBottom: "10px" }}
                    disabled={isDisabled || disabledSeverity[subQuestion.name]}
 
                  >
@@ -1734,7 +1734,6 @@ const ReproductiveHealth = ({ onComplete }) => {
                  {option === "Other" && answers[subQuestion.name] === "Other" && !disabledSeverity[subQuestion.name] && (
                    <Input
                      className="input_questionnaire"
-
                      placeholder="Please specify"
                      name={`${subQuestion.name}_other`}
                      value={answers[`${subQuestion.name}_other`] || ""}
@@ -1820,7 +1819,6 @@ const ReproductiveHealth = ({ onComplete }) => {
                     {option}
                     {answers[question.name] === "Other" && (
                       <>
-                        <br />
                         <Input
                           className="input_questtionnaire"
                           placeholder="Please specify"
@@ -2113,10 +2111,9 @@ const ReproductiveHealth = ({ onComplete }) => {
                     {answers[question.name] &&
                       answers[question.name].includes("Other") && (
                         <>
-                          <br />
                           <Input
                             className="input_questtionnaire"
-                            style={{ height: 50, borderColor: "#00ADEF" }}
+                            style={{ height: 50, borderColor: "#00ADEF", marginLeft:"7px" }}
                             placeholder="Please specify"
                             value={answers[`${question.name}_other`] || ""}
                             onChange={(e) =>

@@ -1086,7 +1086,7 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
               <Checkbox
                 key={idx}
                 value={option}
-                style={{ display: "block", marginBottom: "10px" }}
+                style={{ display: "flex", marginBottom: "10px",width: "calc(9% - 10px)" }}
               >
                 {option}
                 {option === "Other" &&
@@ -1413,7 +1413,7 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
   
       case "checkbox":
         return (
-          <div className="checkbox-group">
+          <div className="checkbox-group" style={{position:"relative"}}>
             <Checkbox.Group
               name={question.name}
               onChange={(checkedValues) =>
@@ -1428,7 +1428,7 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
               ))}
             </Checkbox.Group>
             {answers[question.name]?.includes("Other") && (
-              <div style={{ marginTop: "10px", marginLeft: "24px" }}>
+              <div style={{ marginTop: "10px", marginLeft: "24px", position:"absolute", width:"100%", bottom:"-7px", left:"54px" }}>
                 <Input
                   className="input_questtionnaire"
                   placeholder="Please specify"

@@ -833,8 +833,8 @@ const Nutrition = ({ onComplete }) => {
               <div className="checkbox-rows">
                 {question.options.map((option, idx) => (
                   <div key={idx} className="checkbox-row">
-                    <div className="checkbox-container">
-                      <Checkbox value={option} className="checkbox-item">
+                    <div className="checkbox-container" style={{flexDirection:"row", alignItems:"baseline"}}>
+                    <Checkbox value={option} className="checkbox-item" style={{ width: "calc(9% - 10px)" }}>
                         {option}
                       </Checkbox>
                       {option === "Other" && answers[question.name]?.includes("Other") && (

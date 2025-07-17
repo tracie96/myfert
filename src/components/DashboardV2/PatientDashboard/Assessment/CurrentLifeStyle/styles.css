@@ -9,6 +9,9 @@
   font-family: "Montserrat", serif !important;
 
 }
+.severity-header-cell {
+  width:150px !important;
+ }
 
 .ant-table-wrapper .ant-table-thead > tr > th {
   background-color: #d9f3f8;
@@ -44,4 +47,6 @@
   .ant-table-wrapper table {
     width: 50%;
   }
+  
+  
 }

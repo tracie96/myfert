@@ -13,7 +13,6 @@ import {
   FaFileAlt,
   FaFlask,
   FaInbox,
-  FaLink,
   FaListOl,
   FaBars,
   FaServicestack,
@@ -119,13 +118,16 @@ export const GetSideBar = () => {
 
   const getSelectedAdminKey = () => {
     switch (location.pathname) {
-      case "/admin":
+      case "/users":
         return "1";
-      case "/preview-link":
+      case "/logs":
         return "2";
-      case "/inbox":
+      case "/statistics":
         return "3";
-
+      case "/ticketing":
+        return "4";
+      case "/assignment":
+        return "5";
       default:
         return "1";
     }
@@ -275,20 +277,31 @@ export const GetSideBar = () => {
       selectedKeys={[getSelectedAdminKey()]}
       mode="inline"
       onClick={onClose}
+      style={{ fontSize: '14px' }}
     >
       <Menu.Item key="1" icon={<FaListOl style={{ color: "#00ADEF" }} />}>
         <NavLink to="/users" style={{ textDecoration: "none" }}>
-          <span>PATIENT LIST</span>
+          <span style={{ whiteSpace: 'normal', lineHeight: '1.2' }}>User Management</span>
         </NavLink>
       </Menu.Item>
-      <Menu.Item key="2" icon={<FaLink style={{ color: "#00ADEF" }} />}>
-        <NavLink to="/preview-link" style={{ textDecoration: "none" }}>
-          <span className="no-underline">PREVIEW LINKS</span>
+      <Menu.Item key="2" icon={<FaFileAlt style={{ color: "#00ADEF" }} />}>
+        <NavLink to="/logs" style={{ textDecoration: "none" }}>
+          <span style={{ whiteSpace: 'normal', lineHeight: '1.2' }}>Logs</span>
         </NavLink>
       </Menu.Item>
-      <Menu.Item key="3" icon={<FaInbox style={{ color: "#00ADEF" }} />}>
-        <NavLink to="/inbox" style={{ textDecoration: "none" }}>
-          <span className="no-underline">INBOX</span>
+      <Menu.Item key="3" icon={<FaChartPie style={{ color: "#00ADEF" }} />}>
+        <NavLink to="/statistics" style={{ textDecoration: "none" }}>
+          <span style={{ whiteSpace: 'normal', lineHeight: '1.2' }}>Statistics</span>
+        </NavLink>
+      </Menu.Item>
+      <Menu.Item key="4" icon={<FaInbox style={{ color: "#00ADEF" }} />}>
+        <NavLink to="/ticketing" style={{ textDecoration: "none" }}>
+          <span style={{ whiteSpace: 'normal', lineHeight: '1.2' }}>Ticketing System</span>
+        </NavLink>
+      </Menu.Item>
+      <Menu.Item key="5" icon={<FaServicestack style={{ color: "#00ADEF" }} />}>
+        <NavLink to="/assignment" style={{ textDecoration: "none" }}>
+          <span style={{ whiteSpace: 'normal', lineHeight: '1.2' }}>Assignment of Care</span>
         </NavLink>
       </Menu.Item>
     </Menu>
@@ -323,7 +336,7 @@ export const GetSideBar = () => {
                 onClose={onClose}
                 visible={visible}
                 bodyStyle={{ padding: 0 }}
-                width={250}
+                width={280}
               >
                 <NavLink
                   className="sidebar-brand d-flex align-items-center justify-content-center"
@@ -352,6 +365,7 @@ export const GetSideBar = () => {
               theme="light"
               className="navbar-nav sidebar sidebar-light accordion"
               id="accordionSidebar"
+              width={280}
             >
               <NavLink
                 className="sidebar-brand d-flex align-items-center justify-content-center"

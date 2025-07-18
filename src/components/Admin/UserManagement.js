@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { MoreOutlined } from "@ant-design/icons";
-import { Input, Menu, Popover, Table } from "antd";
+import { Input, Menu, Popover, Table, Tabs } from "antd";
 import SetUserPassword from "./SetUserPassword";
 import './Admin.css'
 import { useSelector } from "react-redux";
@@ -14,13 +14,22 @@ const UserManagement = () => {
   const [currAccount, setAccount] = useState('');
   const [dataSource, setDataSource] = useState([]);
   const [tableData, setTableData] = useState([]);
-  const [userSearch, setUserSearch] = useState('');
+  const [searchParams, setSearchParams] = useState({
+    account: '',
+    firstName: '',
+    lastName: ''
+  });
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0
+  });
 
   const userAuth = useSelector(
     (state) => state?.authentication?.userAuth
   );
 
-  useEffect( () => {
+  useEffect(() => {
     const list = async () => {
       const config = {
         headers: {
@@ -37,36 +46,51 @@ const UserManagement = () => {
     }
     
     list().then((res) => {
-      setDataSource([ ...res.map( (user) => {
-        return {
-          key: user.userId,
-          account: user.userId,
-          type: 'Patient',
-          menu: <MenuPopover account={user.userId} />
-        }
-      }), {
-        key: 101,
-        account: 101,
-        type: 'Doctor',
-        menu: <MenuPopover account={101} />
-      }])
+      const formattedData = res.map(user => ({
+        key: user.userId || '',
+        account: user.userId || '',
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        role: user.role || 'Patient',
+        activated: user.status || 'Active',
+        acceptingPatients: user.acceptingPatients || 'Yes',
+        menu: <MenuPopover account={user.userId || ''} />
+      }));
+      
+      setDataSource(formattedData);
+      setPagination(prev => ({...prev, total: formattedData.length}));
     });
     
-  }, [userAuth] );
+  }, [userAuth]);
 
-  useEffect( () => {
-    setTableData(dataSource.filter( (record) => {
-      const accountString = `${record.account}`
-      return userSearch === accountString.substring(0, userSearch.length);
-    }));
-  }, [userSearch, dataSource] );
+  useEffect(() => {
+    const filtered = dataSource.filter(record => {
+      if (!record) return false;
+      
+      const accountMatch = record.account ? 
+        record.account.toString().includes(searchParams.account) : 
+        false;
+      
+      const firstNameMatch = record.firstName ? 
+        record.firstName.toLowerCase().includes(searchParams.firstName.toLowerCase()) : 
+        false;
+      
+      const lastNameMatch = record.lastName ? 
+        record.lastName.toLowerCase().includes(searchParams.lastName.toLowerCase()) : 
+        false;
+      
+      return accountMatch && firstNameMatch && lastNameMatch;
+    });
+    
+    setTableData(filtered);
+  }, [searchParams, dataSource]);
 
   const ContentMenu = ({ account }) => {
     return <Menu
       mode="inline"
       items={[
-        {key: 'password', label: "Reset Password", onClick: (e) => {setAccount(account); setOpen('Password'); }},
-        {key: 'switch', label: "Change Email", onClick: (e) => {setAccount(account); setOpen('Email'); }},
+        {key: 'password', label: "Reset Password", onClick: () => {setAccount(account); setOpen('Password'); }},
+        {key: 'switch', label: "Change Email", onClick: () => {setAccount(account); setOpen('Email'); }},
       ]}
     />
   }
@@ -75,26 +99,59 @@ const UserManagement = () => {
     return <Popover placement="rightTop" content={<ContentMenu account={account}/>} trigger='click'><MoreOutlined/></Popover>
   }
 
-  const filterType = [...new Set (tableData.map( (record) => record.type))].map( (field) => {
-    return {
-      text: field,
-      value: field,
-    }
-  })
-  
+  const handleTableChange = (pagination, filters, sorter) => {
+    setPagination(pagination);
+  };
+
   const columns = [
     {
       title: 'Account #',
       dataIndex: 'account',
       key: 'account',
-      sorter: (a, b) => parseInt(a.account) - (parseInt(b.account)),
+      sorter: (a, b) => parseInt(a.account) - parseInt(b.account),
     },
     {
-      title: 'User Type',
-      dataIndex: 'type',
-      key: 'type',
-      filters: filterType,
-      onFilter: (value, record) => record.type.indexOf(value) === 0,
+      title: 'First Name',
+      dataIndex: 'firstName',
+      key: 'firstName',
+      sorter: (a, b) => a.firstName.localeCompare(b.firstName),
+    },
+    {
+      title: 'Last Name',
+      dataIndex: 'lastName',
+      key: 'lastName',
+      sorter: (a, b) => a.lastName.localeCompare(b.lastName),
+    },
+    {
+      title: 'Role',
+      dataIndex: 'role',
+      key: 'role',
+      filters: [
+        { text: 'Patient', value: 'Patient' },
+        { text: 'Doctor', value: 'Doctor' },
+        { text: 'Nurse', value: 'Nurse' }
+      ],
+      onFilter: (value, record) => record.role === value,
+    },
+    {
+      title: 'Activated',
+      dataIndex: 'activated',
+      key: 'activated',
+      filters: [
+        { text: 'Active', value: 'Active' },
+        { text: 'Waiting for Approval', value: 'Waiting for Approval' }
+      ],
+      onFilter: (value, record) => record.activated === value,
+    },
+    {
+      title: 'Accepting Patients?',
+      dataIndex: 'acceptingPatients',
+      key: 'acceptingPatients',
+      filters: [
+        { text: 'Yes', value: 'Yes' },
+        { text: 'No', value: 'No' }
+      ],
+      onFilter: (value, record) => record.acceptingPatients === value,
     },
     {
       title: '',
@@ -103,36 +160,66 @@ const UserManagement = () => {
     },
   ];
 
+  const items = [
+    {
+      label: 'Patients',
+      key: 'patients',
+      children: <Table 
+        dataSource={tableData} 
+        columns={columns}
+        pagination={pagination}
+        onChange={handleTableChange}
+      />
+    },
+    {
+      label: 'Care Providers',
+      key: 'providers',
+      children: <Table 
+        dataSource={tableData} 
+        columns={columns}
+        pagination={pagination}
+        onChange={handleTableChange}
+      />
+    }
+  ];
+
   return (
-  <div style={{
-    margin: '0.5vw'
-  }}>
-    <div style={{display: 'flex', width: '50%'}}>
-      <h3 className="h3-admin-title">Users</h3>
-      <Input
-        placeholder="Search by account #"
-        style={{marginLeft: '2vw'}}
-        value={userSearch}
-        onChange={(e) => setUserSearch(e.target.value)}
+    <div style={{ margin: '2rem' }}>
+      <div style={{ marginBottom: '1rem' }}>
+        <h3 className="h3-admin-title">Users</h3>
+        <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+          <Input
+            placeholder="Search by Account #"
+            value={searchParams.account}
+            onChange={(e) => setSearchParams(prev => ({...prev, account: e.target.value}))}
+          />
+          <Input
+            placeholder="Search by First Name"
+            value={searchParams.firstName}
+            onChange={(e) => setSearchParams(prev => ({...prev, firstName: e.target.value}))}
+          />
+          <Input
+            placeholder="Search by Last Name"
+            value={searchParams.lastName}
+            onChange={(e) => setSearchParams(prev => ({...prev, lastName: e.target.value}))}
+          />
+        </div>
+      </div>
+      
+      <Tabs items={items} />
+      
+      <SetUserPassword 
+        isOpen={isOpen} 
+        setOpen={setOpen}
+        account={currAccount}
+      />
+      <ChangeEmail
+        isOpen={isOpen}
+        setOpen={setOpen}
+        account={currAccount}
       />
     </div>
-    <Table 
-      dataSource={tableData} 
-      columns={columns} 
-      style={{width: '50%'}}
-    />
-    <SetUserPassword 
-      isOpen={isOpen} 
-      setOpen={setOpen}
-      account={currAccount}
-    />
-    <ChangeEmail
-      isOpen={isOpen}
-      setOpen={setOpen}
-      account={currAccount}
-    />
-  </div>
-  )
+  );
 }
 
 export default UserManagement;

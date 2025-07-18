@@ -1,10 +1,32 @@
-import { Navigate } from "react-router-dom";
+import React, { useState } from "react";
+import { NavLink, Navigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
-import { postLogin } from "../redux/AuthController";
-import Spinner from "react-bootstrap/Spinner";
-import { useState } from "react";
+import { postLogin, updateEmail } from "../redux/AuthController";
+import {
+  Button,
+  Input,
+  Form,
+  Row,
+  Col,
+  Divider,
+  Typography,
+  Modal,
+  message,
+} from "antd";
+import fertilityImage from "../../assets/images/auth/fertilityImage.svg";
+import Login_one from "../../assets/images/auth/login_one.png";
+import Login_two from "../../assets/images/auth/login_two.png";
+import Login_three from "../../assets/images/auth/login_three.png";
+import Login_four from "../../assets/images/auth/login_four.png";
+import { useNavigate } from "react-router-dom";
+import "./Login.css";
+import ForgotPassword from "../ForgotPassword/ForgotPassword";
+import EmailInputModal from "../Register/SignUpPages/UpdateEmailModal";
+import EmailVerificationModal from "../Register/SignUpPages/OTPModal";
+
+const { Text } = Typography;
 
 const initialValues = {
   email: "",
@@ -12,28 +34,37 @@ const initialValues = {
 };
 
 const validateLogin = Yup.object().shape({
-  email: Yup.string()
-    // .email("Please enter valid email")
-    .matches(
-      /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$/,
-      "Please enter a valid email",
-    )
-    .required("Please enter email"),
-  password: Yup.string().min(3).required("Please enter password"),
+  email: Yup.string().required("Please enter User Name or Email"),
+  password: Yup.string().min(3, "Password must be at least 3 characters"),
 });
 
-function AdminLogin() {
-  const [showSpinner, setSpinner] = useState(false);
-  console.log(showSpinner);
+function Login() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
+  const [showEmailInputModal, setShowEmailInputModal] = useState(false);
+  const [showEmailVerificationModal, setShowEmailVerificationModal] =
+    useState(false);
+  const [resendEmail, setResendEmail] = useState("");
   const { values, handleBlur, handleChange, handleSubmit, errors } = useFormik({
-    initialValues: initialValues,
+    initialValues,
     validationSchema: validateLogin,
-    onSubmit: (values) => {
-      console.log(values);
+    onSubmit: async (values) => {
       try {
-        dispatch(postLogin(values));
-        setSpinner(true);
+        const resultAction = await dispatch(postLogin(values)).unwrap();
+        if (resultAction?.status) {
+          console.log(resultAction, "result");
+
+          if (resultAction.obj.role === "Patient") {
+            navigate("/patient");
+          } else if (resultAction.obj.role === "SuperAdmin") {
+            navigate("/users");
+          } else if (resultAction.obj.role === "Nurse") {
+            navigate("/nurse");}
+           else if (resultAction.obj.role) {
+            navigate("/doctor");
+          }
+        }
       } catch (error) {
         console.log("login-page api call error: " + error);
       }
@@ -41,130 +72,161 @@ function AdminLogin() {
   });
 
   const data = useSelector((state) => state?.authentication?.userAuth);
-
   const { loading } = useSelector((state) => state?.authentication);
 
-  if (data) {
-    return <Navigate to="/home" />;
+  const handleForgotPassword = () => {
+    setShowForgotPasswordModal(true);
+  };
+
+  const handleCancelForgotPassword = () => {
+    setShowForgotPasswordModal(false);
+  };
+
+  const handleEmailInputSubmit = async (email) => {
+    const session = JSON.parse(localStorage.getItem("userInfo"))?.session;
+
+    if (!session) {
+      message.error("Session not found. Please try again.");
+      return;
+    }
+
+    try {
+      await dispatch(updateEmail({ email, session, newEmail: email })).unwrap();
+      // await dispatch(sendEmailOtp({ email, session })).unwrap();
+
+      setResendEmail(email);
+      setShowEmailInputModal(false);
+      setShowEmailVerificationModal(true);
+      message.success(`Verification code sent to ${email}`);
+    } catch (error) {
+      message.error("Failed to update email or send OTP. Please try again.");
+    }
+  };
+
+  if (data && data.id) {
+    return <Navigate to="/dashboard" />;
   }
 
   return (
-    //style={{ height: "534px" }}
-    <div className="bg-gradient-primary">
-      <div className="container py-5" style={{ minHeight: "100vh" }}>
-        {/* Outer Row */}
-        <div className="row justify-content-center mt-5">
-          <div className="col-xl-10 col-lg-12 col-md-9">
-            <div className="card o-hidden border-0 shadow-lg">
-              <div className="card-body p-0">
-                {/* Nested Row within Card Body */}
-                <div className="row">
-                  <div className="col-lg-6 d-none d-lg-block bg-login-image-admin"></div>
-                  <div className="col-lg-6 pt-lg-5 mt-lg-3">
-                    <div className="p-5">
-                      <div className="text-center">
-                        <h1 className="h4 text-gray-900 mb-4">Welcome Back!</h1>
-                      </div>
-                      <form className="user" onSubmit={handleSubmit}>
-                        <div className="form-group">
-                          <input
-                            type="email"
-                            className="form-control form-control-user"
-                            id="exampleInputEmail"
-                            aria-describedby="emailHelp"
-                            placeholder="Enter Email Address..."
-                            value={values.email}
-                            onBlur={handleBlur("email")}
-                            onChange={handleChange("email")}
-                          />
-                          {errors.email && (
-                            <small className="text-danger">
-                              {errors.email}
-                            </small>
-                          )}
-                        </div>
-                        <div className="form-group">
-                          <input
-                            type="password"
-                            className="form-control form-control-user"
-                            id="exampleInputPassword"
-                            placeholder="Password"
-                            value={values.password}
-                            onBlur={handleBlur("password")}
-                            onChange={handleChange("password")}
-                          />
-                          {errors.password && (
-                            <small className="text-danger">
-                              {errors.password}
-                            </small>
-                          )}
-                        </div>
-                        {/* <div className="form-group">
-                          <div className="custom-control custom-checkbox small">
-                            <input
-                              type="checkbox"
-                              className="custom-control-input"
-                              id="customCheck"
-                            />
-                            <label
-                              className="custom-control-label"
-                              htmlFor="customCheck"
-                            >
-                              Remember Me
-                            </label>
-                          </div>
-                        </div> */}
-                        <button
-                          type="submit"
-                          className="btn btn-primary btn-user btn-block"
-                          disabled={loading}
-                        >
-                          {loading ? (
-                            <span>
-                              <Spinner
-                                as="span"
-                                animation="border"
-                                size="sm"
-                                role="status"
-                                aria-hidden="true"
-                              />
-                              {/* Loading... */}
-                            </span>
-                          ) : (
-                            <span>Login</span>
-                          )}
-                        </button>
-                        {/* <hr />
-                        <button className="btn btn-primary btn-user btn-block">
-                          <i className="fab fa-google fa-fw"></i> Login with
-                          Google
-                        </button>
-                        <button className="btn btn-primary btn-user btn-block">
-                          <i className="fab fa-facebook-f fa-fw"></i> Login with
-                          Facebook
-                        </button> */}
-                      </form>
-                      {/* <hr />
-                      <div className="text-center">
-                        <NavLink className="small" to="/forgot-password">
-                          Forgot Password?
-                        </NavLink>
-                      </div> */}
-                      {/* <div className="text-center">
-                        <NavLink className="small" to="/register">
-                          Create an Account!
-                        </NavLink>
-                      </div> */}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+    <Row className="login-container">
+      <Col xs={24} md={12} className="left-section">
+        <div className="circle-image">
+          <img src={Login_one} alt="Login One" />
         </div>
-      </div>
-    </div>
+        <div className="circle-image">
+          <img src={Login_two} alt="Login Two" />
+        </div>
+        <div className="circle-image">
+          <img src={Login_three} alt="Login Three" />
+        </div>
+        <div className="circle-image">
+          <img src={Login_four} alt="Login Four" />
+        </div>
+      </Col>
+      <Col xs={24} md={12} className="right-section">
+        <img src={fertilityImage} alt="Fertility" className="logo-image" />
+        <div className="form-container">
+          <Form className="user" onFinish={handleSubmit}>
+            <Form.Item
+              validateStatus={errors.email ? "error" : ""}
+              help={errors.email}
+            >
+              <Input
+                type="text"
+                placeholder="Username or Email"
+                value={values.email}
+                onBlur={handleBlur("email")}
+                onChange={handleChange("email")}
+                style={{
+                  height: "41px",
+                  fontSize: "16px",
+                  background: "#E4E5E7",
+                  border: "none",
+                  touchAction: "manipulation",
+                  WebkitAppearance: "none",
+                }}
+              />
+            </Form.Item>
+            <Form.Item
+              validateStatus={errors.password ? "error" : ""}
+              help={errors.password}
+            >
+              <Input.Password
+                placeholder="Password"
+                value={values.password}
+                onBlur={handleBlur("password")}
+                onChange={handleChange("password")}
+                style={{
+                  height: "41px",
+                  background: "#E4E5E7",
+                  border: "none",
+                  textAlign: "center",
+                  display: "flex",
+                  fontSize: "16px",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  touchAction: "manipulation",
+                  WebkitAppearance: "none",
+                }}
+              />
+            </Form.Item>
+            <Form.Item style={{ paddingTop: 50 }}>
+              <Button
+                type="primary"
+                htmlType="submit"
+                block
+                loading={loading}
+                style={{
+                  background: "#01ADF0",
+                  height: "50px",
+                  fontSize: "16px",
+                }}
+              >
+                Sign In
+              </Button>
+            </Form.Item>
+            <Divider className="divider" />
+            <div className="links">
+              <Text
+                onClick={handleForgotPassword}
+                style={{ cursor: "pointer", color: "#01ADF0" }}
+              >
+                Forgot Password?
+              </Text>
+              {/* <Text onClick={handleResendOtp} style={{ cursor: 'pointer', color: '#01ADF0' }}>Resend OTP?</Text> */}
+              <Text className="sign-up-link">
+                Don't have an account? <NavLink to="/patientSignup">Sign Up</NavLink>
+              </Text>
+            </div>
+          </Form>
+        </div>
+      </Col>
+
+      <Modal
+        width={1000}
+        visible={showForgotPasswordModal}
+        onCancel={handleCancelForgotPassword}
+        footer={null}
+      >
+        <ForgotPassword closeModal = {handleCancelForgotPassword}/>
+      </Modal>
+
+      <EmailInputModal
+        visible={showEmailInputModal}
+        onCancel={() => setShowEmailInputModal(false)}
+        onSubmit={handleEmailInputSubmit}
+        title="Enter a new email address"
+        initialEmail={values.email}
+      />
+
+      <EmailVerificationModal
+        visible={showEmailVerificationModal}
+        onCancel={() => setShowEmailVerificationModal(false)}
+        onVerify={() => setShowEmailVerificationModal(false)}
+        email={resendEmail}
+      />
+    </Row>
   );
 }
 
-export default AdminLogin;
+export default Login;

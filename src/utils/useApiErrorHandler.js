@@ -33,7 +33,8 @@ export const useApiErrorHandler = () => {
       return response.json();
     } catch (error) {
       if (!error.response) {
-        message.error('Network error. Please check your connection.');
+        console.log(error?.response)
+        // message.error('Network error. Please check your connection.');
       }
       throw error;
     }

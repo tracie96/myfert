@@ -393,26 +393,26 @@ function SwitchContent({
             {/* First Column */}
             <Col xs={24} md={12}>
               <Descriptions column={1} bordered>
-              <Descriptions.Item label="Age">
-                  {generalInfo.age || "N/A"}
+                <Descriptions.Item label="Age">
+                  {generalInfo.age || "Not Provided"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Genetic Background">
-                  {generalInfo.geneticBackground || "N/A"}
+                  {generalInfo.geneticBackground || "Not Provided"}
                 </Descriptions.Item>
-                <Descriptions.Item label="Where Medical Care">
-                  {generalInfo.whereMedicalCare || "N/A"}
+                <Descriptions.Item label="Location of Medical Care">
+                  {generalInfo.whereMedicalCare || "Not Provided"}
                 </Descriptions.Item>
-                <Descriptions.Item label="When Medical Care">
-                  {generalInfo.whenMedicalCare || "N/A"}
+                <Descriptions.Item label="Last Medical Visit">
+                  {generalInfo.whenMedicalCare || "Not Provided"}
                 </Descriptions.Item>
-                <Descriptions.Item label="Whom Medical Care">
-                  {generalInfo.whomMedicalCare || "N/A"}
+                <Descriptions.Item label="Primary Healthcare Provider">
+                  {generalInfo.whomMedicalCare || "Not Provided"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Emergency Contact">
-                  {generalInfo.emergencyContact || "N/A"}
+                  {generalInfo.emergencyContact || "Not Provided"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Emergency Relationship">
-                  {generalInfo.emergencyRelationship || "N/A"}
+                  {generalInfo.emergencyRelationship || "Not Provided"}
                 </Descriptions.Item>
               </Descriptions>
             </Col>
@@ -425,12 +425,11 @@ function SwitchContent({
                   </Descriptions.Item>
 
                 <Descriptions.Item label="How Did You Hear About Us?">
-                  {generalInfo.howDidHearAbout || "N/A"}
+                  {generalInfo.howDidHearAbout || "Not Provided"}
                 </Descriptions.Item>
               </Descriptions>
             </Col>
           </Row>
-
         </div>
       );
 
@@ -442,32 +441,31 @@ function SwitchContent({
           <Row gutter={16} justify="center">
             <Col xs={24} md={12}>
               <Descriptions column={1} bordered>
-
                 <Descriptions.Item label="Ongoing Health">
                   {currentHealth?.ongoingHealth?.length > 0 ? (
                     currentHealth.ongoingHealth.map((health, index) => (
                       <div key={index} style={{ marginBottom: "8px" }}>
-                        <strong>Problem:</strong> {health.problem || "N/A"} <br />
+                        <strong>Problem:</strong> {health.problem || "Not Provided"} <br />
                         <strong>Severity:</strong>{" "}
                         {health.severity ? (
                           <Tag color={health.severity === "High" ? "red" : health.severity === "Medium" ? "orange" : "green"}>
                             {health.severity}
                           </Tag>
                         ) : (
-                          "N/A"
+                          "Not Provided"
                         )}
                         <br />
-                        <strong>Prior Treatment:</strong> {health.priorTreatment || "N/A"} <br />
+                        <strong>Prior Treatment:</strong> {health.priorTreatment || "Not Provided"} <br />
                         <strong>Success:</strong>{" "}
                         {health.success ? (
                           <Tag color={health.success === "Yes" ? "green" : "green"}>{health.success}</Tag>
                         ) : (
-                          "N/A"
+                          "Not Provided"
                         )}
                       </div>
                     ))
                   ) : (
-                    "N/A"
+                    "Not Provided"
                   )}
                 </Descriptions.Item>
 
@@ -476,18 +474,18 @@ function SwitchContent({
                     currentHealth.allergies.map((allergy, index) => (
                       <div key={index} className="m-2">
                         <strong>Food:</strong>{" "}
-                        <Tag color="magenta">{allergy.food || "N/A"}</Tag> <br />
+                        <Tag color="magenta">{allergy.food || "Not Provided"}</Tag> <br />
                         <strong>Reaction:</strong>{" "}
-                        <Tag color="volcano">{allergy.reaction || "N/A"}</Tag>
+                        <Tag color="volcano">{allergy.reaction || "Not Provided"}</Tag>
                       </div>
                     ))
                   ) : (
-                    "N/A"
+                    "Not Provided"
                   )}
                 </Descriptions.Item>
 
                 <Descriptions.Item label="Sleep Hours">
-                  {currentHealth?.sleepHours || "N/A"}
+                  {currentHealth?.sleepHours || "Not Provided"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Problem Sleeping">
                   {currentHealth?.problemSleeping ? "Yes" : "No"}
@@ -516,7 +514,7 @@ function SwitchContent({
               <Descriptions column={1} bordered>
                 <Descriptions.Item label="Cardio">
                   <div style={{ marginBottom: "4px" }}>
-                    <strong>Type:</strong> <Tag color="blue">{currentHealth?.cardio?.type || "Cardio"}</Tag>
+                    <strong>Type:</strong> <Tag color="blue">{currentHealth?.cardio?.type || "Not Provided"}</Tag>
                   </div>
                   <div style={{ marginBottom: "4px" }}>
                     <strong>Frequency:</strong> {currentHealth?.cardio?.timesWeek || 0} times per week
@@ -527,7 +525,7 @@ function SwitchContent({
                 </Descriptions.Item>
                 <Descriptions.Item label="Strength">
                   <div style={{ marginBottom: "4px" }}>
-                    <strong>Type:</strong> <Tag color="green">{currentHealth?.strenght?.type || "Strength"}</Tag>
+                    <strong>Type:</strong> <Tag color="green">{currentHealth?.strenght?.type || "Not Provided"}</Tag>
                   </div>
                   <div style={{ marginBottom: "4px" }}>
                     <strong>Frequency:</strong> {currentHealth?.strenght?.timesWeek || 0} times per week
@@ -539,7 +537,7 @@ function SwitchContent({
 
                 <Descriptions.Item label="Flexibility">
                   <div style={{ marginBottom: "4px" }}>
-                    <strong>Type:</strong> <Tag color="purple">{currentHealth?.flexibility?.type || "Flexibility"}</Tag>
+                    <strong>Type:</strong> <Tag color="purple">{currentHealth?.flexibility?.type || "Not Provided"}</Tag>
                   </div>
                   <div style={{ marginBottom: "4px" }}>
                     <strong>Frequency:</strong> {currentHealth?.flexibility?.timesWeek || 0} times per week
@@ -551,7 +549,7 @@ function SwitchContent({
 
                 <Descriptions.Item label="Balance">
                   <div style={{ marginBottom: "4px" }}>
-                    <strong>Type:</strong> <Tag color="orange">{currentHealth?.balance?.type || "Balance"}</Tag>
+                    <strong>Type:</strong> <Tag color="orange">{currentHealth?.balance?.type || "Not Provided"}</Tag>
                   </div>
                   <div style={{ marginBottom: "4px" }}>
                     <strong>Frequency:</strong> {currentHealth?.balance?.timesWeek || 0} times per week
@@ -563,7 +561,7 @@ function SwitchContent({
 
                 <Descriptions.Item label="Sport">
                   <div style={{ marginBottom: "4px" }}>
-                    <strong>Type:</strong> <Tag color="red">{currentHealth?.sport?.type || "Sport"}</Tag>
+                    <strong>Type:</strong> <Tag color="red">{currentHealth?.sport?.type || "Not Provided"}</Tag>
                   </div>
                   <div style={{ marginBottom: "4px" }}>
                     <strong>Frequency:</strong> {currentHealth?.sport?.timesWeek || 0} times per week
@@ -575,7 +573,7 @@ function SwitchContent({
 
                 <Descriptions.Item label="Other">
                   <div style={{ marginBottom: "4px" }}>
-                    <strong>Type:</strong> <Tag color="grey">{currentHealth?.other?.type || "Other"}</Tag>
+                    <strong>Type:</strong> <Tag color="grey">{currentHealth?.other?.type || "Not Provided"}</Tag>
                   </div>
                   <div style={{ marginBottom: "4px" }}>
                     <strong>Frequency:</strong> {currentHealth?.other?.timesWeek || 0} times per week
@@ -586,7 +584,7 @@ function SwitchContent({
                 </Descriptions.Item>
 
                 <Descriptions.Item label="Motivated to Exercise">
-                  {currentHealth?.motivatedToExercise || "N/A"}
+                  {currentHealth?.motivatedToExercise || "Not Provided"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Problems That Limit Exercise">
                   {currentHealth?.problemsThatLimitExercise?.yesNo
@@ -614,71 +612,71 @@ function SwitchContent({
             <Col xs={24} md={12}>
               {nutrition && (
                 <Descriptions title="Dietary Information" column={1} bordered>
-                  <Descriptions.Item  label="Special Diet Program">
-                  <div className="inside-table-content">
-                    {nutrition.specialDietProgram && nutrition.specialDietProgram.length > 0 ? (
-                      nutrition.specialDietProgram.map((diet, index) => (
+                  <Descriptions.Item label="Special Diet Program">
+                    <div className="inside-table-content">
+                      {nutrition.specialDietProgram && nutrition.specialDietProgram.length > 0 ? (
+                        nutrition.specialDietProgram.map((diet, index) => (
                           <Tag color="blue" style={{display: 'flex'}} key={index} className="m-1">
                             {diet}
                           </Tag>
-                      ))
-                    ) : (
-                      "N/A"
-                    )}
-                  </div>
+                        ))
+                      ) : (
+                        "Not Provided"
+                      )}
+                    </div>
                   </Descriptions.Item>
                   <Descriptions.Item label="Special Diet Reason">
-                    {nutrition.specialDietReason || "N/A"}
+                    {nutrition.specialDietReason || "Not Provided"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Sensitive to Food">
-                  {nutrition.sensitiveToFood ? "Yes" : "No"}
+                    {nutrition.sensitiveToFood ? "Yes" : "No"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Sensitive to Food Describe">
-                    {nutrition.sensitiveToFood?.describe|| ""}
+                    {nutrition.sensitiveToFood?.describe || ""}
                   </Descriptions.Item>
                   <Descriptions.Item label="Aversion to Food">
                     {nutrition.aversionToFood?.yesNo === true
                       ? "Yes"
                       : nutrition.aversionToFood?.yesNo === false
                         ? "No"
-                        : "N/A"}
+                        : "Not Provided"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Aversion To Food Describe">
-                    {nutrition.aversionToFood?.describe|| ""}
+                    {nutrition.aversionToFood?.describe || ""}
                   </Descriptions.Item>
 
                   <Descriptions.Item label="Adverse List">
-                      <div className="inside-table-content">
-                        {nutrition.adverseList && nutrition.adverseList.length > 0 ? (
-                          nutrition.adverseList.map((adverse, index) => (
-                            <Tag color="red" key={index} className="m-1">
-                              {adverse}
-                            </Tag>
-                          ))
-                        ) : (
-                          "N/A"
-                        )}
-                      </div>
+                    <div className="inside-table-content">
+                      {nutrition.adverseList && nutrition.adverseList.length > 0 ? (
+                        nutrition.adverseList.map((adverse, index) => (
+                          <Tag color="red" key={index} className="m-1">
+                            {adverse}
+                          </Tag>
+                        ))
+                      ) : (
+                        "Not Provided"
+                      )}
+                    </div>
                   </Descriptions.Item>
                   <Descriptions.Item label="Adverse React Other">
-                  {nutrition.adverseReactOther || ""}
+                    {nutrition.adverseReactOther || ""}
                   </Descriptions.Item>
                   <Descriptions.Item label="Any Food Craving">
                     {nutrition.anyFoodCraving?.yesNo === true
                       ? "Yes"
                       : nutrition.anyFoodCraving?.yesNo === false
                         ? "No"
-                        : "N/A"}
+                        : "Not Provided"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Any Food Craving Describe">
-                    {nutrition.anyFoodCraving?.describe|| ""}
+                    {nutrition.anyFoodCraving?.describe || ""}
                   </Descriptions.Item>
 
                   <Descriptions.Item label="Have 3 Meals a Day">
                     {nutrition.have3MealADay?.yesNo === "True" ? "Yes" : "No"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Have 3 Meals a Day">
-                    {nutrition.have3MealADay?.level || "N/A"}
+                    {nutrition.have3MealADay?.level || "Not Provided"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Skipping a Meal">
                     {nutrition.skippingAMeal ? "Yes" : "No"}
@@ -687,7 +685,7 @@ function SwitchContent({
                     {nutrition.reasonSkipMeal || ""}
                   </Descriptions.Item>
                   <Descriptions.Item label="How Many Eat Out Per Week">
-                    {nutrition.howManyEatOutPerWeek || "N/A"}
+                    {nutrition.howManyEatOutPerWeek || "Not Provided"}
                   </Descriptions.Item>
                 </Descriptions>
               )}
@@ -698,50 +696,50 @@ function SwitchContent({
               {nutrition && (
                 <Descriptions title="Eating Habits" column={1} bordered>
                   <Descriptions.Item label="Eating Habits" style={{ width: '100%' }}>
-                      <div className="inside-table-content">
-                        {nutrition?.eatingHabits?.length > 0 ? (
-                          nutrition.eatingHabits.map((habit, index) => (
-                            <Tag color="green" key={index} className="m-1">
-                              {habit || "N/A"}
-                            </Tag>
-                          ))
-                        ) : (
-                          "N/A"
-                        )}
-                      </div>
+                    <div className="inside-table-content">
+                      {nutrition?.eatingHabits?.length > 0 ? (
+                        nutrition.eatingHabits.map((habit, index) => (
+                          <Tag color="green" key={index} className="m-1">
+                            {habit || "Not Provided"}
+                          </Tag>
+                        ))
+                      ) : (
+                        "Not Provided"
+                      )}
+                    </div>
                   </Descriptions.Item>
                   <Descriptions.Item label="Break Fast Time">
-                    {nutrition.breakfastTime || "N/A"}
+                    {nutrition.breakfastTime || "Not Provided"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Typical Breakfast">
-                    {nutrition.typicalBreakfast || "N/A"}
+                    {nutrition.typicalBreakfast || "Not Provided"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Lunch Time">
-                    {nutrition.lunchTime || "N/A"}
+                    {nutrition.lunchTime || "Not Provided"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Typical Lunch">
-                    {nutrition.typicalLunch || "N/A"}
+                    {nutrition.typicalLunch || "Not Provided"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Dinner Time">
-                    {nutrition.dinnerTime || "N/A"}
+                    {nutrition.dinnerTime || "Not Provided"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Typical Dinner">
-                    {nutrition.typicalDinner || "N/A"}
+                    {nutrition.typicalDinner || "Not Provided"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Snacks Time">
-                    {nutrition.snacksTime || "N/A"}
+                    {nutrition.snacksTime || "Not Provided"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Typical Snacks">
-                    {nutrition.typicalSnacks || "N/A"}
+                    {nutrition.typicalSnacks || "Not Provided"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Typical Drink">
-                    {nutrition.typicalFluid || "N/A"}
+                    {nutrition.typicalFluid || "Not Provided"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Number of Fruits/Day">
-                    {nutrition.noTypicalFruits || "N/A"}
+                    {nutrition.noTypicalFruits || "Not Provided"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Number of Typical Vegetables/Day">
-                    {nutrition.noTypicalVegetables || "N/A"}
+                    {nutrition.noTypicalVegetables || "Not Provided"}
                   </Descriptions.Item>
                 </Descriptions>
               )}
@@ -752,53 +750,53 @@ function SwitchContent({
               {nutrition && (
                 <Descriptions title="Additional Dietary Information" column={1} bordered>
                   <Descriptions.Item label="Number of Typical Legumes">
-                    {nutrition.noTypicalLegumes || "N/A"}
+                    {nutrition.noTypicalLegumes || "Not Provided"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Number of Typical Red Meat">
-                    {nutrition.noTypicalRedMeat || "N/A"}
+                    {nutrition.noTypicalRedMeat || "Not Provided"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Number of Typical Fish">
-                    {nutrition.noTypicalFish || "N/A"}
+                    {nutrition.noTypicalFish || "Not Provided"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Number of Typical Dairy">
-                    {nutrition.noTypicalDairy || "N/A"}
+                    {nutrition.noTypicalDairy || "Not Provided"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Number of Typical Nuts">
-                    {nutrition.noTypicalNuts || "N/A"}
+                    {nutrition.noTypicalNuts || "Not Provided"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Number of Typical Fats">
-                    {nutrition.noTypicalFats || "N/A"}
+                    {nutrition.noTypicalFats || "Not Provided"}
                   </Descriptions.Item> 
                   <Descriptions.Item label="Number Typical Can Soda">
-                    {nutrition.noTypicalCanSoda || "N/A"}
+                    {nutrition.noTypicalCanSoda || "Not Provided"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Number Typical Sweets">
-                    {nutrition.noTypicalSweets || "N/A"}
+                    {nutrition.noTypicalSweets || "Not Provided"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Caffeinated Beverages">
                     {nutrition.caffeinatedBeverages ? "Yes" : "No"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Coffee Cups">
-                    {nutrition.coffeeCups}
+                    {nutrition.coffeeCups || "Not Provided"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Tea Cups">
-                    {nutrition.teaCups }
+                    {nutrition.teaCups || "Not Provided"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Soda Cups">
-                    {nutrition.sodaCups}
+                    {nutrition.sodaCups || "Not Provided"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Adverse Reaction To Coffee">
                     {nutrition.adverseReactionToCoffee?.yesNo === true
                       ? "Yes"
                       : nutrition.adverseReactionToCoffee?.yesNo === false
                         ? "No"
-                        : "N/A"}
+                        : "Not Provided"}
                   </Descriptions.Item>
                   <Descriptions.Item label="Adverse Reaction To Coffee">
-                  {nutrition.adverseReactionToCoffee?.describe|| ""}
+                    {nutrition.adverseReactionToCoffee?.describe || ""}
                   </Descriptions.Item>
                   <Descriptions.Item label="Reaction To Caffeine">
-                  {nutrition.reactionToCaffeine || ""}
+                    {nutrition.reactionToCaffeine || ""}
                   </Descriptions.Item>
                 </Descriptions>
               )}
@@ -819,7 +817,7 @@ function SwitchContent({
                 <Descriptions column={1} bordered>
                   {[
                     { label: "Smoke Presently", value: substance.smokePresently !== null ? (substance.smokePresently ? "Yes" : "No") : "N/A" },
-                    { label: "Smoke Presently Other", value: substance.smokeCurrently || "" },
+                    ...(substance.smokeCurrently ? [{ label: "Smoke Presently Other", value: substance.smokeCurrently }] : []),
                     { label: "Smoking Currently", value: substance.smokingCurrently ? `Packs/Day: ${substance.smokingCurrently.packsDay}, Years: ${substance.smokingCurrently.years}, Type: ${substance.smokingCurrently.type}` : "N/A" },
                     { label: "Attempted to Quit", value: substance.attempedToQuit?.yesNo ? "Yes" : "No" },
                     { label: "Describe Quit Attempt", value: substance.attempedToQuit?.describe || "Not Attempted to Quit" },
@@ -1469,36 +1467,36 @@ function SwitchContent({
                                 {Object.entries(item).map(([subKey, subValue]) => (
                                   <Tag color="blue" key={subKey} className="mr-2 mb-2">
                                     {subKey === "level" ? (
-                                    subValue === 0 ? "None" :
-                                    subValue === 1 ? "Mild" :
-                                    subValue === 2 ? "Moderate" :
-                                    subValue === 3 ? "Severe" :
-                                    subValue
-                                  ) : (
-                                    <>
-                                      <strong>
-                                        {subKey.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase())}:
-                                      </strong>{" "}
-                                      {subValue}
-                                    </>
-                                  )}
+                                      subValue === 0 ? "None" :
+                                      subValue === 1 ? "Mild" :
+                                      subValue === 2 ? "Moderate" :
+                                      subValue === 3 ? "Severe" :
+                                      subValue || "Not Provided"
+                                    ) : (
+                                      <>
+                                        <strong>
+                                          {subKey.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase())}:
+                                        </strong>{" "}
+                                        {subValue || "Not Provided"}
+                                      </>
+                                    )}
                                   </Tag>
                                 ))}
                               </div>
                             ))
                           ) : (
-                            <Typography.Text type="secondary">N/A</Typography.Text>
+                            <Typography.Text type="secondary">Not Provided</Typography.Text>
                           )
                         ) : typeof value === "object" && value !== null ? (
                           <>
                             {value.yesNo ? (
-                              <Tag color="green" >Yes</Tag>
+                              <Tag color="green">Yes</Tag>
                             ) : (
-                              <Tag color="red" >No</Tag>
+                              <Tag color="red">No</Tag>
                             )}
                             {value.describe && (
                               <div>
-                                <Typography.Text strong>Description:</Typography.Text> {value.describe}
+                                <Typography.Text strong>Description:</Typography.Text> {value.describe || "Not Provided"}
                               </div>
                             )}
                           </>
@@ -1508,10 +1506,11 @@ function SwitchContent({
                               <Tag color={value ? "green" : "red"}>{value ? "Yes" : "No"}</Tag>
                             ) : (
                               <Typography.Text>
-                                {value !== null && value !== undefined ? String(value) : "N/A"}
+                                {value !== null && value !== undefined ? String(value) : "Not Provided"}
                               </Typography.Text>
                             )}
-                          </Typography.Text>)}
+                          </Typography.Text>
+                        )}
                       </Descriptions.Item>
                     ))}
                 </Descriptions>
@@ -1519,8 +1518,7 @@ function SwitchContent({
             ))}
           </Row>
         </div>
-
-      )
+      );
 
     case 9:
       return loading ? (
@@ -1601,7 +1599,7 @@ function SwitchContent({
       );
     case 10:
       return loading ? (
-        <p>{stress}</p>
+        <p>Loading...</p>
       ) : (
         <div className="p-6 rounded-md shadow-md">
           <Row gutter={16}>
@@ -1609,256 +1607,201 @@ function SwitchContent({
             <Col xs={24} md={12}>
               <Descriptions column={1} bordered>
                 <Descriptions.Item label="Birth Control">
-                  {
-                    (reproductiveInfo?.birthControl === null || reproductiveInfo?.birthControl === undefined) ? '' :
-                      (
-                        (reproductiveInfo?.birthControl ? 'Yes, ' : 'No') + '' +
-                        (reproductiveInfo?.birthControl && reproductiveInfo?.hormonalBirthControl !== "N/A" ? reproductiveInfo?.hormonalBirthControl+ ', '  : ' ') + '' +
-                        (reproductiveInfo?.birthControl && reproductiveInfo?.nonHormonalBirthControl !== "N/A" ? reproductiveInfo?.nonHormonalBirthControl : ' ')
-                      )
-                  }
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    <Tag color={reproductiveInfo?.birthControl ? "green" : "red"}>
+                      {reproductiveInfo?.birthControl ? "Yes" : "No"}
+                    </Tag>
+                    {reproductiveInfo?.birthControl && reproductiveInfo?.hormonalBirthControl !== "Not Provided" && (
+                      <Tag color="blue">{reproductiveInfo?.hormonalBirthControl}</Tag>
+                    )}
+                    {reproductiveInfo?.birthControl && reproductiveInfo?.nonHormonalBirthControl !== "Not Provided" && (
+                      <Tag color="purple">{reproductiveInfo?.nonHormonalBirthControl}</Tag>
+                    )}
+                  </div>
                 </Descriptions.Item>
                 <Descriptions.Item label="Currently Pregnant">
-                  {reproductiveInfo?.currentlyPregnant === null || reproductiveInfo?.currentlyPregnant === undefined ? 'N/A' : (reproductiveInfo?.currentlyPregnant ? 'Yes' : 'No')}
+                  <Tag color={reproductiveInfo?.currentlyPregnant ? "green" : "red"}>
+                    {reproductiveInfo?.currentlyPregnant === null || reproductiveInfo?.currentlyPregnant === undefined ? 'Not Provided' : (reproductiveInfo?.currentlyPregnant ? 'Yes' : 'No')}
+                  </Tag>
                 </Descriptions.Item>
                 <Descriptions.Item label="Trying to conceive">
-                  {reproductiveInfo?.tryingToConceive === null || reproductiveInfo?.tryingToConceive === undefined ? 'N/A' : (reproductiveInfo?.tryingToConceive ? 'Yes' : 'No')}
+                  <Tag color={reproductiveInfo?.tryingToConceive ? "green" : "red"}>
+                    {reproductiveInfo?.tryingToConceive === null || reproductiveInfo?.tryingToConceive === undefined ? 'Not Provided' : (reproductiveInfo?.tryingToConceive ? 'Yes' : 'No')}
+                  </Tag>
                 </Descriptions.Item>
                 <Descriptions.Item label="Difficulty Trying To Conceive">
-                  {reproductiveInfo?.difficultyTryingToConceive === null || reproductiveInfo?.difficultyTryingToConceive === undefined ? 'N/A' : (reproductiveInfo?.difficultyTryingToConceive ? 'Yes' : 'No')}
+                  <Tag color={reproductiveInfo?.difficultyTryingToConceive ? "red" : "green"}>
+                    {reproductiveInfo?.difficultyTryingToConceive === null || reproductiveInfo?.difficultyTryingToConceive === undefined ? 'Not Provided' : (reproductiveInfo?.difficultyTryingToConceive ? 'Yes' : 'No')}
+                  </Tag>
                 </Descriptions.Item>
                 <Descriptions.Item label="Family Member With Reproductive Concerns">
-                  {reproductiveInfo?.familyMemberWithReproductiveConcerns || "N/A"}
+                  <Tag color={reproductiveInfo?.familyMemberWithReproductiveConcerns === "Yes" ? "red" : "green"}>
+                    {reproductiveInfo?.familyMemberWithReproductiveConcerns || "Not Provided"}
+                  </Tag>
                 </Descriptions.Item>
-                {/* <Descriptions.Item label="How Long Trying To Conceive">
-                  {reproductiveInfo?.howLongTryingToConceive || "N/A"}
-                </Descriptions.Item> */}
                 <Descriptions.Item label="Method To Conceive">
-                  {reproductiveInfo?.methodToConceive?.length ? reproductiveInfo.methodToConceive.join(', ') : "N/A"}
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    {reproductiveInfo?.methodToConceive?.length ? 
+                      reproductiveInfo.methodToConceive.map((method, index) => (
+                        <Tag color="blue" key={index}>
+                          {method}
+                        </Tag>
+                      )) : 
+                      <Tag color="default">Not Provided</Tag>
+                    }
+                  </div>
                 </Descriptions.Item>
-                <Descriptions.Item label="Method To Conceive other">
-                  {reproductiveInfo?.otherMethodsConceive || ""}
-                </Descriptions.Item>
+                {reproductiveInfo?.otherMethodsConceive && (
+                  <Descriptions.Item label="Other Methods">
+                    <Tag color="purple">{reproductiveInfo.otherMethodsConceive}</Tag>
+                  </Descriptions.Item>
+                )}
                 <Descriptions.Item label="Charting To Conceive">
-                  {reproductiveInfo?.chartingToConceive?.length ? reproductiveInfo.chartingToConceive.join(', ') : "N/A"}
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    {reproductiveInfo?.chartingToConceive?.length ? 
+                      reproductiveInfo.chartingToConceive.map((method, index) => (
+                        <Tag color="cyan" key={index}>
+                          {method}
+                        </Tag>
+                      )) : 
+                      <Tag color="default">Not Provided</Tag>
+                    }
+                  </div>
                 </Descriptions.Item>
-                <Descriptions.Item label="Charting To Conceive other">
-                  {reproductiveInfo?.otherChartingCycle || ""}
-                </Descriptions.Item>
+                {reproductiveInfo?.otherChartingCycle && (
+                  <Descriptions.Item label="Other Charting Methods">
+                    <Tag color="purple">{reproductiveInfo.otherChartingCycle}</Tag>
+                  </Descriptions.Item>
+                )}
                 <Descriptions.Item label="Current Therapy">
-                {reproductiveInfo?.currentTherapy === null || reproductiveInfo?.currentTherapy === undefined ? 'N/A' : (reproductiveInfo?.currentTherapy ? 'Yes' : 'No')}
+                  <Tag color={reproductiveInfo?.currentTherapy ? "green" : "red"}>
+                    {reproductiveInfo?.currentTherapy === null || reproductiveInfo?.currentTherapy === undefined ? 'Not Provided' : (reproductiveInfo?.currentTherapy ? 'Yes' : 'No')}
+                  </Tag>
                 </Descriptions.Item>
                 <Descriptions.Item label="Method Fertility Awareness">
-                  {reproductiveInfo?.methodFertilityAwareness || "N/A"}
+                  <Tag color="blue">{reproductiveInfo?.methodFertilityAwareness || "Not Provided"}</Tag>
                 </Descriptions.Item>
                 <Descriptions.Item label="Intercouse Each Cycle">
-                  {reproductiveInfo?.intercouseEachCycle || "N/A"}
+                  <Tag color="blue">{reproductiveInfo?.intercouseEachCycle || "Not Provided"}</Tag>
                 </Descriptions.Item>
                 <Descriptions.Item label="Menstrual Pain During Period">
-                  {reproductiveInfo?.menstrualPainDuringPeriod || "N/A"}
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    {Array.isArray(reproductiveInfo?.menstrualPainDuringPeriod) && reproductiveInfo.menstrualPainDuringPeriod.length > 0 ? 
+                      reproductiveInfo.menstrualPainDuringPeriod.map((pain, index) => (
+                        <Tag color="red" key={index}>
+                          {pain}
+                        </Tag>
+                      )) : 
+                      <Tag color="default">Not Provided</Tag>
+                    }
+                  </div>
                 </Descriptions.Item>
-                <Descriptions.Item label="Menstral Bleeding Pelvic Pain Duration">
-                  {reproductiveInfo?.menstralBleedingPelvicPain?.duration || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Menstral Bleeding Pelvic Pain Severity">
-                  {reproductiveInfo?.menstralBleedingPelvicPain?.colour || "N/A"}
+                <Descriptions.Item label="Menstral Bleeding Pelvic Pain">
+                  <div style={{ display: 'flex', gap: '8px', flexDirection: 'column' }}>
+                    <Tag color="blue">Duration: {reproductiveInfo?.menstralBleedingPelvicPain?.duration || "Not Provided"}</Tag>
+                    <Tag color="purple">Severity: {reproductiveInfo?.menstralBleedingPelvicPain?.colour || "Not Provided"}</Tag>
+                  </div>
                 </Descriptions.Item>
                 <Descriptions.Item label="Experience Pelvic Pain">
-                  {reproductiveInfo?.experiencePelvicPain === null || reproductiveInfo?.experiencePelvicPain === undefined ? 'N/A' : (reproductiveInfo.experiencePelvicPain ? 'Yes' : 'No')}
+                  <Tag color={reproductiveInfo?.experiencePelvicPain ? "red" : "green"}>
+                    {reproductiveInfo?.experiencePelvicPain === null || reproductiveInfo?.experiencePelvicPain === undefined ? 'Not Provided' : (reproductiveInfo.experiencePelvicPain ? 'Yes' : 'No')}
+                  </Tag>
                 </Descriptions.Item>
-
-                <Descriptions.Item label="Mid Cycle Spotting">
-                  {reproductiveInfo?.midCycleSpotting === null || reproductiveInfo?.midCycleSpotting === undefined ? 'N/A' : (reproductiveInfo.midCycleSpotting ? 'Yes' : 'No')}
-                </Descriptions.Item>
-
-                <Descriptions.Item label="Mid Cycle Spotting Frequency">
-                  {reproductiveInfo?.midCycleSpottingFrequency?.frequency || 'N/A'}
-                </Descriptions.Item>
-
-                <Descriptions.Item label="Mid Cycle Spotting Duration">
-                  {reproductiveInfo?.midCycleSpottingFrequency?.duration || 'N/A'}
-                </Descriptions.Item>
-
-                <Descriptions.Item label="Mid Cycle Spotting Colour">
-                  {reproductiveInfo?.midCycleSpottingFrequency?.colour || 'N/A'}
-                </Descriptions.Item>
-                {/* <Descriptions.Item label="Other Charting Cycle">
-                  {reproductiveInfo?.otherChartingCycle || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Other Methods Conceive">
-                  {reproductiveInfo?.otherMethodsConceive || "N/A"}
-                </Descriptions.Item> */}
-               
-
-                <>
-                  {/* <Descriptions.Item label="Utilizing Fertility Awareness">
-                    {reproductiveInfo?.utilizingFertilityAwareness === null || reproductiveInfo.utilizingFertilityAwareness === undefined ? 'N/A' : (reproductiveInfo.utilizingFertilityAwareness ? 'Yes' : 'No')}
-                  </Descriptions.Item> */}
-                  {/* <Descriptions.Item label="Cycle Discharge After Period Spotting Duration">
-                    {reproductiveInfo?.cycleDischargeAfterPeriodSpotting?.duration || "N/A"}
-                  </Descriptions.Item> */}
-                  {/* <Descriptions.Item label="Cycle Discharge After Period Spotting Color">
-                    {reproductiveInfo?.cycleDischargeAfterPeriodSpotting?.color || "N/A"}
-                  </Descriptions.Item> */}
-                  {/* <Descriptions.Item label="Cycle Discharge Creamy Duration">
-                    {reproductiveInfo?.cycleDischargeCreamy?.duration || "N/A"}
-                  </Descriptions.Item>  */}
-                  {/* <Descriptions.Item label="Cycle Discharge Creamy Colour">
-                    {reproductiveInfo?.cycleDischargeCreamy?.colour || "N/A"}
-                  </Descriptions.Item>  */}
-                  {/* <Descriptions.Item label="Cycle Discharge Egg White Duration">
-                    {reproductiveInfo?.cycleDischargeEggWhite?.duration || "N/A"}
-                  </Descriptions.Item> */}
-                  {/* <Descriptions.Item label="Cycle Discharge Egg White Colour">
-                    {reproductiveInfo?.cycleDischargeEggWhite?.colour || "N/A"}
-                  </Descriptions.Item> */}
-                  {/* <Descriptions.Item label="Cycle Discharge Menstral Bleeding Duration">
-                    {reproductiveInfo?.cycleDischargeMenstralBleeding?.duration || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Cycle Discharge Menstral Bleeding Colour">
-                    {reproductiveInfo?.cycleDischargeMenstralBleeding?.colour || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Cycle Discharge Pre Period Duration">
-                    {reproductiveInfo?.cycleDischargePrePeriod?.duration || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Cycle Discharge Pre Period Colour">
-                    {reproductiveInfo?.cycleDischargePrePeriod?.colour || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Cycle Discharge Watery Duration">
-                    {reproductiveInfo?.cycleDischargeWatery?.duration || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Cycle Discharge Watery Colour">
-                    {reproductiveInfo?.cycleDischargeWatery?.colour || "N/A"}
-                  </Descriptions.Item> */}
-
-                  {/* <Descriptions.Item label="Hormonal Birth Control">
-                    {reproductiveInfo?.hormonalBirthControl || "N/A"}
-                  </Descriptions.Item> */}
-                </>
-
               </Descriptions>
             </Col>
 
             {/* Second Column */}
             <Col xs={24} md={12}>
               <Descriptions column={1} bordered>
-                <Descriptions.Item label="During Circle Pelvic Pain Duration">
-                  {reproductiveInfo?.duringCirclePelvicPain?.duration || "N/A"}
+                <Descriptions.Item label="During Circle Pelvic Pain">
+                  <div style={{ display: 'flex', gap: '8px', flexDirection: 'column' }}>
+                    <Tag color="blue">Duration: {reproductiveInfo?.duringCirclePelvicPain?.duration || "Not Provided"}</Tag>
+                    <Tag color="purple">Severity: {reproductiveInfo?.duringCirclePelvicPain?.colour || "Not Provided"}</Tag>
+                  </div>
                 </Descriptions.Item>
-                <Descriptions.Item label="During Circle Pelvic Pain Colour">
-                  {reproductiveInfo?.duringCirclePelvicPain?.colour || "N/A"}
+                <Descriptions.Item label="Do You Have PMS Symptoms">
+                  <Tag color={reproductiveInfo?.doYouPmsSymptoms ? "red" : "green"}>
+                    {reproductiveInfo?.doYouPmsSymptoms === null || reproductiveInfo?.doYouPmsSymptoms === undefined ? 'Not Provided' : (reproductiveInfo?.doYouPmsSymptoms ? 'Yes' : 'No')}
+                  </Tag>
                 </Descriptions.Item>
-                <Descriptions.Item label="Do You Pms Symptoms">
-                {reproductiveInfo?.doYouPmsSymptoms === null || reproductiveInfo?.doYouPmsSymptoms === undefined ? 'N/A' : (reproductiveInfo?.doYouPmsSymptoms ? 'Yes' : 'No')}
-                </Descriptions.Item>
-                <Descriptions.Item label="Pms Symptoms">
-                  {Array.isArray(reproductiveInfo?.pmsSymptoms) && reproductiveInfo.pmsSymptoms.length > 0 ? (
-                    <div className="inside-table-content">
-                      {reproductiveInfo.pmsSymptoms.map((symptom, index) => (
-                        <Tag color="blue" key={index} className="m-1">
+                <Descriptions.Item label="PMS Symptoms">
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    {Array.isArray(reproductiveInfo?.pmsSymptoms) && reproductiveInfo.pmsSymptoms.length > 0 ? 
+                      reproductiveInfo.pmsSymptoms.map((symptom, index) => (
+                        <Tag color="orange" key={index}>
                           {symptom}
                         </Tag>
-                      ))}
+                      )) : 
+                      <Tag color="default">Not Provided</Tag>
+                    }
+                  </div>
+                </Descriptions.Item>
+                <Descriptions.Item label="PMS Details">
+                  <div style={{ display: 'flex', gap: '8px', flexDirection: 'column' }}>
+                    <Tag color="blue">Duration: {reproductiveInfo?.pms?.duration || "Not Provided"}</Tag>
+                    <Tag color="purple">Severity: {reproductiveInfo?.pms?.colour || "Not Provided"}</Tag>
+                  </div>
+                </Descriptions.Item>
+                <Descriptions.Item label="Cycle Lengths">
+                  <div style={{ display: 'flex', gap: '8px', flexDirection: 'column' }}>
+                    <Tag color="blue">Longest: {reproductiveInfo?.longestCycleLenght || "Not Provided"}</Tag>
+                    <Tag color="cyan">Shortest: {reproductiveInfo?.shortestCycleLenght || "Not Provided"}</Tag>
+                    <Tag color="geekblue">Average: {reproductiveInfo?.averageCycleLenght || "Not Provided"}</Tag>
+                  </div>
+                </Descriptions.Item>
+                <Descriptions.Item label="Mid Cycle Spotting">
+                  <div style={{ display: 'flex', gap: '8px', flexDirection: 'column' }}>
+                    <Tag color={reproductiveInfo?.midCycleSpotting ? "red" : "green"}>
+                      {reproductiveInfo?.midCycleSpotting === null || reproductiveInfo?.midCycleSpotting === undefined ? 'Not Provided' : (reproductiveInfo.midCycleSpotting ? 'Yes' : 'No')}
+                    </Tag>
+                    {reproductiveInfo?.midCycleSpotting && (
+                      <>
+                        <Tag color="blue">Frequency: {reproductiveInfo?.midCycleSpottingFrequency?.frequency || 'Not Provided'}</Tag>
+                        <Tag color="purple">Duration: {reproductiveInfo?.midCycleSpottingFrequency?.duration || 'Not Provided'}</Tag>
+                        <Tag color="cyan">Color: {reproductiveInfo?.midCycleSpottingFrequency?.colour || 'Not Provided'}</Tag>
+                      </>
+                    )}
+                  </div>
+                </Descriptions.Item>
+                <Descriptions.Item label="Discharge Details">
+                  <div style={{ display: 'flex', gap: '8px', flexDirection: 'column' }}>
+                    <div>
+                      <Typography.Text strong>Creamy:</Typography.Text>
+                      <div style={{ marginLeft: '8px', marginTop: '4px' }}>
+                        <Tag color="blue">Duration: {reproductiveInfo?.cycleDischargeCreamy?.duration || 'Not Provided'}</Tag>
+                        <Tag color="purple">Color: {reproductiveInfo?.cycleDischargeCreamy?.colour || 'Not Provided'}</Tag>
+                      </div>
                     </div>
-                  ) : (
-                    "N/A"
-                  )}
+                    <div>
+                      <Typography.Text strong>Watery:</Typography.Text>
+                      <div style={{ marginLeft: '8px', marginTop: '4px' }}>
+                        <Tag color="blue">Duration: {reproductiveInfo?.cycleDischargeWatery?.duration || 'Not Provided'}</Tag>
+                        <Tag color="purple">Color: {reproductiveInfo?.cycleDischargeWatery?.colour || 'Not Provided'}</Tag>
+                      </div>
+                    </div>
+                    <div>
+                      <Typography.Text strong>Egg White:</Typography.Text>
+                      <div style={{ marginLeft: '8px', marginTop: '4px' }}>
+                        <Tag color="blue">Duration: {reproductiveInfo?.cycleDischargeEggWhite?.duration || 'Not Provided'}</Tag>
+                        <Tag color="purple">Color: {reproductiveInfo?.cycleDischargeEggWhite?.colour || 'Not Provided'}</Tag>
+                      </div>
+                    </div>
+                    <div>
+                      <Typography.Text strong>Pre Period:</Typography.Text>
+                      <div style={{ marginLeft: '8px', marginTop: '4px' }}>
+                        <Tag color="blue">Duration: {reproductiveInfo?.cycleDischargePrePeriod?.duration || 'Not Provided'}</Tag>
+                        <Tag color="purple">Color: {reproductiveInfo?.cycleDischargePrePeriod?.colour || 'Not Provided'}</Tag>
+                      </div>
+                    </div>
+                    <div>
+                      <Typography.Text strong>After Period:</Typography.Text>
+                      <div style={{ marginLeft: '8px', marginTop: '4px' }}>
+                        <Tag color="blue">Duration: {reproductiveInfo?.cycleDischargeAfterPeriodSpotting?.duration || 'Not Provided'}</Tag>
+                        <Tag color="purple">Color: {reproductiveInfo?.cycleDischargeAfterPeriodSpotting?.colour || 'Not Provided'}</Tag>
+                      </div>
+                    </div>
+                  </div>
                 </Descriptions.Item>
-                <Descriptions.Item label="pms Duration">
-                  {reproductiveInfo?.pms?.duration || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="pms Colour">
-                  {reproductiveInfo?.pms?.colour || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Longest Cycle Lenght">
-                  {reproductiveInfo?.longestCycleLenght || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Shortest Cycle Lenght">
-                  {reproductiveInfo?.shortestCycleLenght || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Average Cycle Lenght">
-                  {reproductiveInfo?.averageCycleLenght || "N/A"}
-                </Descriptions.Item>
-                {/* <Descriptions.Item label="Who Do You Live With?">
-                  {reproductiveInfo.who_do_you_live_with || 'N/A'}
-                  </Descriptions.Item> */}
-                <Descriptions.Item label="Cycle Discharge Creamy Duration">
-                  {reproductiveInfo?.cycleDischargeCreamy?.duration || 'N/A'}
-                </Descriptions.Item>
-                <Descriptions.Item label="Cycle Discharge Creamy Colour">
-                  {reproductiveInfo?.cycleDischargeCreamy?.colour || 'N/A'}
-                </Descriptions.Item>
-                <Descriptions.Item label="Cycle Discharge Watery Duration">
-                  {reproductiveInfo?.cycleDischargeWatery?.duration || 'N/A'}
-                </Descriptions.Item>
-                <Descriptions.Item label="Cycle Discharge Watery Colour">
-                  {reproductiveInfo?.cycleDischargeWatery?.colour || 'N/A'}
-                </Descriptions.Item>
-                <Descriptions.Item label="Cycle Discharge Egg White Duration">
-                  {reproductiveInfo?.cycleDischargeEggWhite?.duration || 'N/A'}
-                </Descriptions.Item>
-                <Descriptions.Item label="Cycle Discharge Egg White Colour">
-                  {reproductiveInfo?.cycleDischargeEggWhite?.colour || 'N/A'}
-                </Descriptions.Item>
-                <Descriptions.Item label="Cycle Discharge Pre Period Duration">
-                  {reproductiveInfo?.cycleDischargePrePeriod?.duration || 'N/A'}
-                </Descriptions.Item>
-                <Descriptions.Item label="Cycle Discharge Pre Period Colour">
-                  {reproductiveInfo?.cycleDischargePrePeriod?.colour || 'N/A'}
-                </Descriptions.Item>
-                {/* <Descriptions.Item label="Cycle Discharge Menstral Bleeding Duration">
-                  {reproductiveInfo?.cycleDischargeMenstralBleeding?.duration || 'N/A'}
-                </Descriptions.Item>
-                <Descriptions.Item label="Cycle Discharge Menstral Bleeding Colour">
-                  {reproductiveInfo?.cycleDischargeMenstralBleeding?.colour || 'N/A'}
-                </Descriptions.Item>
-                <Descriptions.Item label="Cycle Discharge Menstral Bleeding Clots">
-                  {reproductiveInfo?.cycleDischargeMenstralBleeding?.clots ? "Yes" : "No"}
-                </Descriptions.Item> */}
-                <Descriptions.Item label="Cycle Discharge After Period Spotting Duration">
-                  {reproductiveInfo?.cycleDischargeAfterPeriodSpotting?.duration || 'N/A'}
-                </Descriptions.Item>
-                <Descriptions.Item label="Cycle Discharge After Period Color">
-                  {reproductiveInfo?.cycleDischargeAfterPeriodSpotting?.colour || 'N/A'}
-                </Descriptions.Item>
-                <Descriptions.Item label="Other Mucus Sub">
-                  {reproductiveInfo?.otherMucusSub || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Other Spotting Colour">
-                  {reproductiveInfo?.otherSpottingColour || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Other Watery Mucus">
-                  {reproductiveInfo?.otherWateryMucus || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Other White Mucus">
-                  {reproductiveInfo?.otherWhiteMucus || "N/A"}
-                </Descriptions.Item>
-
-
-
-
-
-                {/* <Descriptions.Item label="Intercouse Days">
-                    {reproductiveInfo?.intercouseDays || "N/A"}
-                  <Descriptions.Item label="Menstral Cycle Colour">
-                    {reproductiveInfo?.menstralCycleColour || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Menstral Cycle Duration">
-                    {reproductiveInfo?.menstralCycleDuration || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Menstral Cycle Frequency">
-                    {reproductiveInfo?.menstralCycleFrequency || "N/A"}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Mid Cycle Spotting">
-                    {reproductiveInfo?.midCycleSpotting === null || reproductiveInfo.midCycleSpotting === undefined ? 'N/A' : (reproductiveInfo.midCycleSpotting ? 'Yes' : 'No')}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Non Hormonal Birth Control">
-                    {reproductiveInfo?.nonHormonalBirthControl || "N/A"}
-                  </Descriptions.Item> 
-                  <Descriptions.Item label="Trying To Conceive">
-                    {reproductiveInfo?.tryingToConceive === null || reproductiveInfo.tryingToConceive === undefined ? 'N/A' : (reproductiveInfo.tryingToConceive ? 'Yes' : 'No')}
-                  </Descriptions.Item> */}
-
               </Descriptions>
             </Col>
           </Row>

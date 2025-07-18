@@ -1362,16 +1362,17 @@ const ReproductiveHealth = ({ onComplete }) => {
           ? (reproductiveHealthAnswers.is_trying_to_conceive_time || "N/A")
           : "N/A",
         
-        // Helper function to combine main array with "Other" values
         methodToConceive: (() => {
-          const mainMethods = patientReproductiveInfo?.methodToConceive || [];
-          const otherMethods = patientReproductiveInfo?.otherMethodsConceive || "";
-          const hasOtherContent = otherMethods.trim() !== "";
-          const methods = [...mainMethods];
-          if (hasOtherContent && !methods.includes("Other")) {
-            methods.push("Other");
+          const mainMethods = reproductiveHealthAnswers?.methods_trying_to_conceive || [];
+          // Filter out "Other" from main methods if it exists
+          const filteredMethods = mainMethods.filter(method => method !== "Other");
+          const otherMethod = reproductiveHealthAnswers?.methods_trying_to_conceive_other;
+          
+          // Only add other method if it exists and has content
+          if (otherMethod && otherMethod.trim()) {
+            return [...filteredMethods, otherMethod];
           }
-          return methods;
+          return filteredMethods;
         })(),
         otherMethodsConceive: reproductiveHealthAnswers?.methods_trying_to_conceive_other || "",
         

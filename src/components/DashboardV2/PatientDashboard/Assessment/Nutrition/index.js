@@ -340,13 +340,7 @@ const Nutrition = ({ onComplete }) => {
   }, [dispatch]);
 
   useEffect(() => {
-    const savedIndex = parseInt(localStorage.getItem("currentQuestionIndex3"), 10);
-    const savedAnswers = JSON.parse(localStorage.getItem("answers"));
-  
-    if (!isNaN(savedIndex) && savedAnswers) {
-      setCurrentQuestionIndex(savedIndex);
-      setAnswers(savedAnswers);
-    } else if (patientNutritionInfo && Object.keys(patientNutritionInfo).length > 0) {
+    if (patientNutritionInfo) {
       const normalizeYesNo = (value) => {
         if (value === true) return "Yes";
         if (value === false) return "No";
@@ -354,7 +348,6 @@ const Nutrition = ({ onComplete }) => {
       };
 
       const prefilledAnswers = {
-        does_skipping_meal_affect_you_other: patientNutritionInfo.reasonSkipMeal || "",
         special_nutritional_program: (() => {
           const base = patientNutritionInfo.specialDietProgram || [];
           const hasOther = patientNutritionInfo.specialDietOther && patientNutritionInfo.specialDietOther.trim() !== "";
@@ -363,60 +356,57 @@ const Nutrition = ({ onComplete }) => {
         special_nutritional_program_other: patientNutritionInfo.specialDietOther || "",
         special_diet_reason: patientNutritionInfo.specialDietReason || "",
         sensitive_food: normalizeYesNo(patientNutritionInfo.sensitiveToFood?.yesNo),
-        sensitive_food_other: patientNutritionInfo.sensitiveToFood?.describe || "",
         sensitive_food_info: patientNutritionInfo.sensitiveToFood?.describe || "",
         aversion_to_certain_food: normalizeYesNo(patientNutritionInfo.aversionToFood?.yesNo),
         aversion_to_certain_food_other: patientNutritionInfo.aversionToFood?.describe || "",
-        adverseList: (() => {
-          const base = patientNutritionInfo.adverseList || [];
-          const hasOther = patientNutritionInfo.adverseReactOther && patientNutritionInfo.adverseReactOther.trim() !== "";
-          return hasOther && !base.includes("Other") ? [...base, "Other"] : base;
+        adversely_react: patientNutritionInfo.adverseList || [],
+        adversely_react_other: patientNutritionInfo.adverseReactOther || "",
+        crave_for_foods: normalizeYesNo(patientNutritionInfo.anyFoodCraving?.yesNo),
+        crave_for_foods_other: patientNutritionInfo.anyFoodCraving?.describe || "",
+        eat_3_meals: normalizeYesNo(patientNutritionInfo.have3MealADay?.yesNo),
+        eat_3_meals_detail: patientNutritionInfo.have3MealADay?.yesNo === false ? String(patientNutritionInfo.have3MealADay.level || "") : "",
+        does_skipping_meal_affect_you: normalizeYesNo(patientNutritionInfo.skippingAMeal),
+        does_skipping_meal_affect_you_other: patientNutritionInfo.reasonSkipMeal || "",
+        meals_per_day: patientNutritionInfo.howManyEatOutPerWeek || "",
+        actors_applyingto_current_lifestyle: patientNutritionInfo.eatingHabits || [],
+        diet_detail_breakfast: patientNutritionInfo.typicalBreakfast || "",
+        diet_detail_lunch: patientNutritionInfo.typicalLunch || "",
+        diet_detail_dinner: patientNutritionInfo.typicalDinner || "",
+        diet_detail_snacks: patientNutritionInfo.typicalSnacks || "",
+        diet_detail_fluids: patientNutritionInfo.typicalFluid || "",
+        diet_servings_fruits: String(patientNutritionInfo.noTypicalFruits || "0"),
+        diet_serving_vegetables: String(patientNutritionInfo.noTypicalVegetables || "0"),
+        diet_servings_legumes: String(patientNutritionInfo.noTypicalLegumes || "0"),
+        diet_servings_meat: String(patientNutritionInfo.noTypicalRedMeat || "0"),
+        diet_servings_fish: String(patientNutritionInfo.noTypicalFish || "0"),
+        diet_servings_dairyalt: String(patientNutritionInfo.noTypicalDairy || "0"),
+        diet_servings_nuts: String(patientNutritionInfo.noTypicalNuts || "0"),
+        diet_servings_fatsandoil: String(patientNutritionInfo.noTypicalFats || "0"),
+        diet_servings_soda: String(patientNutritionInfo.noTypicalCanSoda || "0"),
+        diet_servings_sweets: String(patientNutritionInfo.noTypicalSweets || "0"),
+        caffeinated_beverages: normalizeYesNo(patientNutritionInfo.caffeinatedBeverages),
+        coffee_amount: patientNutritionInfo.coffeeCups || "",
+        tea_amount: patientNutritionInfo.teaCups || "",
+        soda_amount: patientNutritionInfo.sodaCups || "",
+        sensitive_food_caffeine: normalizeYesNo(patientNutritionInfo.adverseReactionToCoffee?.yesNo),
+        sensitive_food_caffeine_other: patientNutritionInfo.adverseReactionToCoffee?.describe || "",
+        sensitive_food_caffeine_feel: (() => {
+          const reactions = [];
+          if (patientNutritionInfo.reactionToCaffeine) {
+            if (patientNutritionInfo.reactionToCaffeine.includes("Irritable or weird")) reactions.push("Irritable or weird");
+            if (patientNutritionInfo.reactionToCaffeine.includes("Aches or pains")) reactions.push("Aches or pains");
+            if (patientNutritionInfo.reactionToCaffeine.includes("N/A")) reactions.push("N/A");
+          }
+          return reactions;
         })(),
-        adverseReactOther: patientNutritionInfo.adverseReactOther || "",
-        anyFoodCraving: {
-          yesNo: patientNutritionInfo.anyFoodCraving?.yesNo === true,
-          describe: patientNutritionInfo.anyFoodCraving?.describe || "",
-        },
-        have3MealADay: {
-          yesNo: patientNutritionInfo.have3MealADay?.yesNo === true,
-          level:
-            patientNutritionInfo.have3MealADay?.yesNo === false ? String(patientNutritionInfo.have3MealADay.level || "") : "3", // default to 3 if answered Yes
-        },
-        skippingAMeal: patientNutritionInfo.skippingAMeal === true,
-        reasonSkipMeal:patientNutritionInfo.skippingAMeal === true ? patientNutritionInfo.reasonSkipMeal : "",
-        howManyEatOutPerWeek: patientNutritionInfo.howManyEatOutPerWeek || "",
-        eatingHabits: patientNutritionInfo.eatingHabits || [],
-        typicalBreakfast: patientNutritionInfo.typicalBreakfast || "",
-        typicalLunch: patientNutritionInfo.typicalLunch || "",
-        typicalDinner: patientNutritionInfo.typicalDinner || "",
-        typicalSnacks: patientNutritionInfo.typicalSnacks || "",
-        typicalFluid: patientNutritionInfo.typicalFluid || "",
-        noTypicalFruits: patientNutritionInfo.noTypicalFruits || "0",
-        noTypicalVegetables: patientNutritionInfo.noTypicalVegetables || "0",
-        noTypicalLegumes: patientNutritionInfo.noTypicalLegumes || "0",
-        noTypicalRedMeat: patientNutritionInfo.noTypicalRedMeat || "0",
-        noTypicalFish: patientNutritionInfo.noTypicalFish || "0",
-        noTypicalDairy: patientNutritionInfo.noTypicalDairy || "0",
-        noTypicalNuts: patientNutritionInfo.noTypicalNuts || "0",
-        noTypicalFats: patientNutritionInfo.noTypicalFats || "0",
-        noTypicalCanSoda: patientNutritionInfo.noTypicalCanSoda || "0",
-        noTypicalSweets: patientNutritionInfo.noTypicalSweets || "0",
-        caffeinatedBeverages: patientNutritionInfo.caffeinatedBeverages === true,
-        coffeeCups: patientNutritionInfo.coffeeCups || "",
-        teaCups: patientNutritionInfo.teaCups || "",
-        sodaCups: patientNutritionInfo.sodaCups || "",
-        adverseReactionToCoffee: {
-          yesNo: patientNutritionInfo.adverseReactionToCoffee?.yesNo === true,
-          describe: patientNutritionInfo.adverseReactionToCoffee?.describe || "",
-        },
-        explainAdverseReactionToCoffee: patientNutritionInfo.adverseReactionToCoffee?.describe || "",
-        reactionToCaffeine: patientNutritionInfo.reactionToCaffeine || "",
-        sensitiveCaffeineOther: patientNutritionInfo.sensitiveCaffeineOther || "",
-        breakfastTime: patientNutritionInfo.breakfastTime || "",
-        lunchTime: patientNutritionInfo.lunchTime || "",
-        snacksTime: patientNutritionInfo.snacksTime || "",
-        dinnerTime: patientNutritionInfo.dinnerTime || "",
+        sensitive_food_caffeine_feel_other: patientNutritionInfo.sensitiveCaffeineOther || "",
+        breakfast_time: patientNutritionInfo.breakfastTime || "",
+        lunch_time: patientNutritionInfo.lunchTime || "",
+        snack_time: patientNutritionInfo.snacksTime || "",
+        dinner_time: patientNutritionInfo.dinnerTime || "",
       };
+
+      console.log("Setting answers with adversely_react:", prefilledAnswers.adversely_react);
       setAnswers(prefilledAnswers);
     } else {
       // Initialize with default values

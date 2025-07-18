@@ -59,6 +59,7 @@ const EmergencyContactInput = ({ value = {}, onChange }) => {
               onChange={(value) => handleChange("phoneType", value)}
               placeholder="Contact"
               style={{ width: "100%" }}
+              defaultValue="home"
             >
               <Select.Option value="home">Home</Select.Option>
               <Select.Option value="work">Work</Select.Option>

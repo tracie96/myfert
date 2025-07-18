@@ -1641,21 +1641,19 @@ function SwitchContent({
                 </Descriptions.Item>
                 <Descriptions.Item label="Method To Conceive">
                   <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                    {reproductiveInfo?.methodToConceive?.length ? 
-                      reproductiveInfo.methodToConceive.map((method, index) => (
-                        <Tag color="blue" key={index}>
-                          {method}
-                        </Tag>
-                      )) : 
+                    {reproductiveInfo?.methodToConceive?.length || reproductiveInfo?.otherMethodsConceive ? (
+                      [...(reproductiveInfo.methodToConceive || []), ...(reproductiveInfo.otherMethodsConceive ? [reproductiveInfo.otherMethodsConceive] : [])]
+                        .filter(method => !method.toLowerCase().includes('other'))
+                        .map((method, index) => (
+                          <Tag color="blue" key={index}>
+                            {method}
+                          </Tag>
+                        ))
+                    ) : (
                       <Tag color="default">Not Provided</Tag>
-                    }
+                    )}
                   </div>
                 </Descriptions.Item>
-                {reproductiveInfo?.otherMethodsConceive && (
-                  <Descriptions.Item label="Other Methods">
-                    <Tag color="purple">{reproductiveInfo.otherMethodsConceive}</Tag>
-                  </Descriptions.Item>
-                )}
                 <Descriptions.Item label="Trying To Conceive">
                   <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                     {reproductiveInfo?.chartingToConceive?.length ? 

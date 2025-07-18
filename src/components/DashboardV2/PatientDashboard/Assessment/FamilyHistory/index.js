@@ -1349,42 +1349,63 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
             </Select>
           </div>
         );
-      case "checkbox":
-        return (
-          <Checkbox.Group
-          name={question.name}
-          onChange={(checkedValues) => handleChange(checkedValues, question.name)}
-          value={answers[question.name] || []}
-          className="checkbox-group"
-        >
-          {question.options.map((option, index) => (
-            <Checkbox key={index} value={option} className="checkbox-item">
-              {option === "Other" || option === "Sexually transmitted disease (describe)" ? (
-                <>
-                  {option}
-                  {(answers[question.name]?.includes("Other") ||
-                    answers[question.name]?.includes("Sexually transmitted disease (describe)")) && (
-                    <>
-                      <br />
-                      <Input
-                        className="input_questtionnaire"
-                        placeholder="Please specify"
-                        value={answers[`${question.name}_other`] || ""}
-                        onChange={(e) =>
-                          handleChange(e.target.value, `${question.name}_other`)
-                        }
-                      />
-                    </>
-                  )}
-                </>
-              ) : (
-                option
-              )}
-            </Checkbox>
-          ))}
-        </Checkbox.Group>
+        case "checkbox": {
+          const isNASelected =
+            Array.isArray(answers[question.name]) &&
+            answers[question.name].includes("N/A");
         
-        );
+          return (
+            <Checkbox.Group
+              name={question.name}
+              onChange={(checkedValues) => {
+                let updated = checkedValues;
+                if (checkedValues.includes("N/A")) {
+                  updated = ["N/A"];
+                } else {
+                  updated = checkedValues.filter((v) => v !== "N/A");
+                }
+                handleChange(updated, question.name);
+              }}
+              value={answers[question.name] || []}
+              className="checkbox-group"
+            >
+              {question.options.map((option, index) => (
+                <Checkbox
+                  key={index}
+                  value={option}
+                  className="checkbox-item"
+                  disabled={option !== "N/A" && isNASelected}
+                >
+                  {option === "Other" ||
+                  option === "Sexually transmitted disease (describe)" ? (
+                    <>
+                      {option}
+                      {(answers[question.name]?.includes("Other") ||
+                        answers[question.name]?.includes(
+                          "Sexually transmitted disease (describe)"
+                        )) && !isNASelected && (
+                        <>
+                          <br />
+                          <Input
+                            className="input_questtionnaire"
+                            placeholder="Please specify"
+                            value={answers[`${question.name}_other`] || ""}
+                            onChange={(e) =>
+                              handleChange(e.target.value, `${question.name}_other`)
+                            }
+                          />
+                        </>
+                      )}
+                    </>
+                  ) : (
+                    option
+                  )}
+                </Checkbox>
+              ))}
+            </Checkbox.Group>
+          );
+        }
+        
       
         case "long_radio":
         return (

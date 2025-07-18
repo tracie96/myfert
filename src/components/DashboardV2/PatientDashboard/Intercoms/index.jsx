@@ -10,6 +10,7 @@ import {
 import { UserOutlined, SearchOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import '../../DoctorDashboard/Intercoms/styles.css';
 import SendButton from '../../../../assets/images/telegram.png';
+import * as signalR from '@microsoft/signalr';
 
 const PatientIntercom = () => {
   const [selectedUser, setSelectedUser] = useState(null);
@@ -18,6 +19,7 @@ const PatientIntercom = () => {
   const [activeTab, setActiveTab] = useState('active');
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
   const [initialLoad, setInitialLoad] = useState(true);
+  const [signalRConnection, setSignalRConnection] = useState(null);
   const dispatch = useDispatch();
   const messagesEndRef = useRef(null);
 
@@ -26,8 +28,40 @@ const PatientIntercom = () => {
   const isLoading = useSelector((state) => state.doctor.loading);
   const messages = useSelector((state) => state.doctor.messages?.chats);
   const chatRef = useSelector((state) => state.doctor.messages?.chatReference);
-  const chatLoading = useSelector((state) => state.doctor.chatLoading);
   const chatError = useSelector((state) => state.doctor.chatError);
+  const authToken = useSelector((state) => state.authentication?.userAuth?.obj?.token);
+
+  // Initialize SignalR connection
+  useEffect(() => {
+    if (authToken) {
+      const connection = new signalR.HubConnectionBuilder()
+        .withUrl('https://myfertilitydevapi-prod.azurewebsites.net/chathub', {
+          accessTokenFactory: () => authToken,
+          skipNegotiation: true,
+          transport: signalR.HttpTransportType.WebSockets
+        })
+        .withAutomaticReconnect()
+        .build();
+
+      connection.on("ReceiveMessage", (user, message) => {
+        if (selectedUser?.userRef === user) {
+          dispatch(getMessages(user));
+          dispatch(getChatHeads());
+        }
+      });
+
+      connection.start()
+        .then(() => {
+          setSignalRConnection(connection);
+          if (selectedUser && chatRef) {
+            connection.invoke("JoinChat", chatRef);
+          }
+        })
+        .catch(err => console.error('SignalR Connection Error:', err));
+
+      return () => connection.stop();
+    }
+  }, [authToken, selectedUser, chatRef, dispatch]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -121,32 +155,30 @@ const PatientIntercom = () => {
   const handleSendMessage = async () => {
     if (message.trim() && selectedUser && chatRef) {
       const userId = selectedUser.userRef || selectedUser.id;
-      console.log('Sending message:', {
-        userRef: userId,
-        chat: message.trim(),
-        chatRef: chatRef
-      });
+      const trimmedMessage = message.trim();
+      
       try {
-        const trimmedMessage = message.trim();
         setMessage(''); // Clear input immediately for better UX
 
-        // Send the message
+        // Send through SignalR if connected
+        if (signalRConnection) {
+          await signalRConnection.invoke("SendMessageToUser", userId, trimmedMessage, chatRef);
+        }
+
+        // Also send through API for persistence
         const response = await dispatch(sendMessage({
           userRef: userId,
           chat: trimmedMessage,
           chatRef: chatRef
         }));
 
-        // Immediately fetch new messages to ensure everything is in sync
         if (sendMessage.fulfilled.match(response)) {
           await dispatch(getMessages(userId));
-          // Refresh chat heads to update latest messages
           dispatch(getChatHeads());
-        } else {
-          console.error('Failed to send message:', response.error);
         }
       } catch (error) {
         console.error('Error sending message:', error);
+        setMessage(trimmedMessage); // Restore message if failed
       }
     }
   };
@@ -162,7 +194,7 @@ const PatientIntercom = () => {
   };
 
   const renderMessages = () => {
-    if (initialLoad && chatLoading) {
+    if (initialLoad && !messages) {
       return <div className="loading-messages">Loading messages...</div>;
     }
 
@@ -180,7 +212,8 @@ const PatientIntercom = () => {
     });
 
     return sortedMessages.map((msg, index) => {
-      const messagePosition = msg.isUser ? 'sent' : 'received';
+      // Message is from current user if isUser is false (since we're the patient)
+      const messagePosition = !msg.isUser ? 'sent' : 'received';
       
       return (
         <div 

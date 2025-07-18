@@ -11,6 +11,8 @@ import {
 import { UserOutlined, SearchOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import './styles.css';
 import SendButton from '../../../../assets/images/telegram.png';
+import * as signalR from '@microsoft/signalr';
+
 const Intercom = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [message, setMessage] = useState('');
@@ -18,6 +20,7 @@ const Intercom = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
   const [initialLoad, setInitialLoad] = useState(true);
+  const [signalRConnection, setSignalRConnection] = useState(null);
   const dispatch = useDispatch();
   const messagesEndRef = useRef(null);
 
@@ -27,12 +30,88 @@ const Intercom = () => {
   const isLoading = useSelector((state) => state.doctor.loading);
   const messages = useSelector((state) => state.doctor.messages?.chats);
   const chatRef = useSelector((state) => state.doctor.messages?.chatReference);
-  const chatLoading = useSelector((state) => state.doctor.chatLoading);
   const chatError = useSelector((state) => state.doctor.chatError);
+  const authToken = useSelector((state) => state.authentication?.userAuth?.obj?.token);
 
-  // This could come from your data source - number of days/files
-  
-  
+  // Initialize SignalR connection
+  useEffect(() => {
+    if (authToken) {
+      console.log('Setting up SignalR connection');
+      const connection = new signalR.HubConnectionBuilder()
+        .withUrl('https://myfertilitydevapi-prod.azurewebsites.net/chathub', {
+          accessTokenFactory: () => authToken,
+          skipNegotiation: true,
+          transport: signalR.HttpTransportType.WebSockets
+        })
+        .withAutomaticReconnect([0, 2000, 5000, 10000, 20000]) 
+        .configureLogging(signalR.LogLevel.Information)
+        .build();
+
+      connection.onclose((error) => {
+        console.log('SignalR connection closed', error);
+      });
+
+      connection.onreconnecting((error) => {
+        console.log('SignalR reconnecting', error);
+      });
+
+      connection.onreconnected((connectionId) => {
+        console.log('SignalR reconnected', connectionId);
+        if (selectedUser && chatRef) {
+          connection.invoke("JoinChat", chatRef)
+            .catch(err => console.error('Error rejoining chat:', err));
+        }
+      });
+
+      connection.on("ReceiveMessage", (user, message) => {
+        console.log('Received message from SignalR:', { user, message });
+        // Immediately update messages when receiving a new one
+        dispatch(getMessages(user));
+        dispatch(getChatHeads());
+      });
+
+      console.log('Starting SignalR connection...');
+      connection.start()
+        .then(() => {
+          console.log('SignalR connection started successfully');
+          setSignalRConnection(connection);
+          if (selectedUser && chatRef) {
+            connection.invoke("JoinChat", chatRef)
+              .then(() => {
+                console.log('Joined chat:', chatRef);
+                // Get initial messages after joining chat
+                dispatch(getMessages(selectedUser.userRef || selectedUser.id));
+              })
+              .catch(err => console.error('Error joining chat:', err));
+          }
+        })
+        .catch(err => {
+          console.error('SignalR Connection Error:', err);
+          // Try to fall back to long polling if WebSocket fails
+          const longPollingConnection = new signalR.HubConnectionBuilder()
+            .withUrl('https://myfertilitydevapi-prod.azurewebsites.net/chathub', {
+              accessTokenFactory: () => authToken,
+              transport: signalR.HttpTransportType.LongPolling
+            })
+            .withAutomaticReconnect()
+            .build();
+          
+          return longPollingConnection.start()
+            .then(() => {
+              console.log('SignalR fallback to long polling successful');
+              setSignalRConnection(longPollingConnection);
+            })
+            .catch(err => console.error('SignalR long polling fallback failed:', err));
+        });
+
+      return () => {
+        console.log('Cleaning up SignalR connection');
+        connection.stop()
+          .catch(err => console.error('Error stopping SignalR connection:', err));
+      };
+    }
+  }, [authToken, selectedUser, chatRef, dispatch]);
+
   useEffect(() => {
     const handleResize = () => {
       setIsMobileView(window.innerWidth <= 768);
@@ -41,20 +120,6 @@ const Intercom = () => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
-  // Add polling for chat heads
-  // useEffect(() => {
-  //   // Initial fetch
-  //   dispatch(getChatHeads());
-
-  //   // Set up polling interval
-  //   const interval = setInterval(() => {
-  //     dispatch(getChatHeads());
-  //   }, 2000); // 2 seconds
-
-  //   // Cleanup interval on unmount
-  //   return () => clearInterval(interval);
-  // }, [dispatch]);
 
   useEffect(() => {
     // Load chat heads first
@@ -68,15 +133,9 @@ const Intercom = () => {
         };
         
         if (activeTab === 'patients') {
-          const response = await dispatch(fetchPatientList(params));
-          if (!fetchPatientList.fulfilled.match(response)) {
-            console.error('Failed to fetch patient list:', response.error);
-          }
+          await dispatch(fetchPatientList(params));
         } else if (activeTab === 'providers') {
-          const response = await dispatch(fetchCareGivers(params));
-          if (!fetchCareGivers.fulfilled.match(response)) {
-            console.error('Failed to fetch providers list:', response.error);
-          }
+          await dispatch(fetchCareGivers(params));
         }
       } catch (error) {
         console.error('Error fetching users list:', error);
@@ -88,135 +147,7 @@ const Intercom = () => {
     }
   }, [dispatch, activeTab]);
 
-  // Load messages when a user is selected
-  useEffect(() => {
-    if (selectedUser?.userRef || selectedUser?.id) {
-      const userId = selectedUser.userRef || selectedUser.id;
-      setInitialLoad(true); // Reset initial load when user changes
-      console.log('Fetching messages for user:', userId);
-      dispatch(getMessages(userId))
-        .then(response => {
-          console.log('Messages response:', response);
-          setInitialLoad(false);
-        })
-        .catch(error => {
-          console.error('Error fetching messages:', error);
-          setInitialLoad(false);
-        });
-
-      // Set up polling interval for messages
-      const messageInterval = setInterval(() => {
-        dispatch(getMessages(userId))
-          .catch(error => {
-            console.error('Error polling messages:', error);
-          });
-      }, 5000); // Poll every 5 seconds
-
-      // Cleanup interval on unmount or when user changes
-      return () => clearInterval(messageInterval);
-    }
-  }, [dispatch, selectedUser]);
-
-  useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages]);
-
-  const handleUserSelect = (user) => {
-    console.log('Selected user:', user);
-    setSelectedUser(user);
-  };
-
-  const handleBackToList = () => {
-    setSelectedUser(null);
-  };
-
-  const handleSendMessage = async () => {
-    if (message.trim() && selectedUser && chatRef) {
-      const userId = selectedUser.userRef || selectedUser.id;
-      console.log('Sending message:', {
-        userRef: userId,
-        chat: message.trim(),
-        chatRef: chatRef
-      });
-      try {
-        const trimmedMessage = message.trim();
-        setMessage(''); // Clear input immediately for better UX
-
-        // Send the message
-        const response = await dispatch(sendMessage({
-          userRef: userId,
-          chat: trimmedMessage,
-          chatRef: chatRef
-        }));
-
-        if (sendMessage.fulfilled.match(response)) {
-          await dispatch(getMessages(userId));
-          dispatch(getChatHeads());
-        } else {
-          console.error('Failed to send message:', response.error);
-        }
-      } catch (error) {
-        console.error('Error sending message:', error);
-      }
-    }
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSendMessage();
-    }
-  };
-
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
-    setSelectedUser(null);
-    setSearchQuery(''); // Clear search when switching tabs
-  };
-
-  const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
-  };
-
-  const renderMessages = () => {
-    if (initialLoad && chatLoading) {
-      return <div className="loading-messages">Loading messages...</div>;
-    }
-
-    if (chatError) {
-      return <div className="error-messages">Error loading messages: {chatError.message}</div>;
-    }
-
-    if (!messages || messages.length === 0) {
-      return <div className="no-messages">No messages yet</div>;
-    }
-
-    // Sort messages by date (oldest to newest)
-    const sortedMessages = [...messages].sort((a, b) => {
-      return new Date(a.createdOn) - new Date(b.createdOn);
-    });
-
-    return sortedMessages.map((msg, index) => {
-      const messagePosition = msg.isUser ? 'sent' : 'received';
-      
-      return (
-        <div 
-          key={index} 
-          className={`message-bubble ${messagePosition}`}
-        >
-          <div className="message-content">
-            {msg.chat}
-            <div className="message-timestamp">
-              {new Date(msg.createdOn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-            </div>
-          </div>
-        </div>
-      );
-    });
-  };
-
-  // Update the filtering logic to handle different tabs
+  // Filter users based on search query and active tab
   const filteredUsers = useMemo(() => {
     let users = [];
     
@@ -250,9 +181,162 @@ const Intercom = () => {
     const query = searchQuery.toLowerCase();
     return users.filter(user => 
       user.username.toLowerCase().includes(query) || 
-      user.userRole.toLowerCase().includes(query)
+      (user.userRole && user.userRole.toLowerCase().includes(query))
     );
   }, [searchQuery, activeTab, chatHeads, patients, providers]);
+
+  // Modified handleSendMessage to use SignalR
+  const handleSendMessage = async () => {
+    if (!message.trim()) {
+      console.log('Message is empty, not sending');
+      return;
+    }
+
+    if (!selectedUser) {
+      console.error('No user selected');
+      return;
+    }
+
+    const userId = selectedUser.userRef || selectedUser.id;
+    const trimmedMessage = message.trim();
+
+    try {
+      // Clear input immediately for better UX
+      setMessage('');
+
+      // Send through API first
+      const response = await dispatch(sendMessage({
+        userRef: userId,
+        chat: trimmedMessage,
+        chatRef: chatRef
+      })).unwrap();
+
+      console.log('Send message response:', response);
+
+      // Immediately update messages to show the sent message
+      // Don't set initialLoad here since we're just updating
+      await dispatch(getMessages(userId));
+      dispatch(getChatHeads());
+
+      // Try SignalR if available
+      if (signalRConnection?.connectionStarted) {
+        try {
+          await signalRConnection.invoke("SendMessageToUser", userId, trimmedMessage, chatRef);
+          console.log('Message sent via SignalR successfully');
+        } catch (signalRError) {
+          console.error('SignalR send error:', signalRError);
+        }
+      }
+    } catch (error) {
+      console.error('Error in handleSendMessage:', error);
+      // Restore the message if sending failed
+      setMessage(trimmedMessage);
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      console.log('Enter pressed, attempting to send message');
+      handleSendMessage();
+    }
+  };
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    setSelectedUser(null);
+    setSearchQuery(''); // Clear search when switching tabs
+  };
+
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleUserSelect = async (user) => {
+    console.log('Selected user:', user);
+    setSelectedUser(user);
+    setInitialLoad(true); // Set loading only when switching users
+    
+    // Get messages for the selected user to establish chat reference
+    try {
+      const userId = user.userRef || user.id;
+      console.log('Fetching messages for user:', userId);
+      
+      const response = await dispatch(getMessages(userId));
+      if (getMessages.fulfilled.match(response)) {
+        console.log('Messages fetched successfully:', response.payload);
+        setInitialLoad(false); // Clear loading after successful fetch
+      } else {
+        console.error('Failed to fetch messages:', response.error);
+        setInitialLoad(false); // Clear loading on error too
+      }
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+      setInitialLoad(false); // Clear loading on error
+    }
+  };
+
+  // Add effect to handle chat reference updates
+  useEffect(() => {
+    if (selectedUser && !chatRef) {
+      console.log('No chat reference, fetching messages...');
+      const userId = selectedUser.userRef || selectedUser.id;
+      setInitialLoad(true); // Set loading when fetching initial messages
+      dispatch(getMessages(userId))
+        .then(() => setInitialLoad(false)) // Clear loading after fetch
+        .catch(() => setInitialLoad(false)); // Clear loading on error
+    }
+  }, [selectedUser, chatRef, dispatch]);
+
+  // Add effect to scroll to bottom when messages update
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
+
+  const handleBackToList = () => {
+    setSelectedUser(null);
+  };
+
+  const renderMessages = () => {
+    // Only show loading on initial load or user switch, not during message sends
+    if (initialLoad && !messages) {
+      return <div className="loading-messages">Loading messages...</div>;
+    }
+
+    if (chatError) {
+      return <div className="error-messages">Error loading messages: {chatError.message}</div>;
+    }
+
+    if (!messages || messages.length === 0) {
+      return <div className="no-messages">No messages yet</div>;
+    }
+
+    // Sort messages by date (oldest to newest)
+    const sortedMessages = [...messages].sort((a, b) => {
+      return new Date(a.createdOn) - new Date(b.createdOn);
+    });
+
+    return sortedMessages.map((msg, index) => {
+      // Message is from current user if isUser is true (since we're the doctor)
+      const messagePosition = msg.isUser ? 'sent' : 'received';
+      
+      return (
+        <div 
+          key={index} 
+          className={`message-bubble ${messagePosition}`}
+        >
+          <div className="message-content">
+            {msg.chat}
+            <div className="message-timestamp">
+              {new Date(msg.createdOn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </div>
+          </div>
+        </div>
+      );
+    });
+  };
 
   return (
     <div className="intercom-container">
@@ -369,8 +453,30 @@ const Intercom = () => {
                 onKeyPress={handleKeyPress}
                 placeholder="Enter message"
                 suffix={
-             <img src={SendButton} alt="send" width={50} height={50} onClick={handleSendMessage}/>
-
+                  <div 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      console.log('Send button clicked');
+                      handleSendMessage();
+                    }}
+                    style={{ 
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: '5px'
+                    }}
+                  >
+                    <img 
+                      src={SendButton} 
+                      alt="send" 
+                      width={40} 
+                      height={40} 
+                      style={{
+                        objectFit: 'contain'
+                      }}
+                    />
+                  </div>
                 }
               />
             </div>

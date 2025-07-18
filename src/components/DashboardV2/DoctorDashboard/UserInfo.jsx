@@ -420,14 +420,12 @@ function SwitchContent({
             <Col xs={24} md={12}>
               <Descriptions column={1} bordered>
 
-                <Descriptions.Item label="Emergency Phone (Work)">
-                  {generalInfo.emergencyPhoneHome || "N/A"}
-                </Descriptions.Item>
+                  <Descriptions.Item label={`Emergency Phone (${generalInfo.emergencyPhoneWork}`+')'}>
+                    {generalInfo.emergencyPhoneHome || "N/A"}
+                  </Descriptions.Item>
+
                 <Descriptions.Item label="How Did You Hear About Us?">
                   {generalInfo.howDidHearAbout || "N/A"}
-                </Descriptions.Item>
-                <Descriptions.Item label="Phone Type">
-                  {generalInfo.emergencyPhoneWork || "N/A"}
                 </Descriptions.Item>
               </Descriptions>
             </Col>

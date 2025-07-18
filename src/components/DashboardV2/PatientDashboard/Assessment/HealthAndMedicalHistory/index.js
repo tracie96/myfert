@@ -645,15 +645,26 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
           return !checkboxChecked || selectValid;
         });
   
-      case "checkbox_with_input":
-        return question.options.every((option) => {
-          const checkboxChecked = answers[option.name];
-          const inputValid = option.inputName
-            ? (answers[option.inputName] !== undefined && answers[option.inputName] !== "")
-            : true; 
-  
-          return !checkboxChecked || inputValid;
-        });
+        case "checkbox_with_input": {
+          const anySelected = question.options.some((option) => answers[option.name]);
+        
+          if (!anySelected) {
+            return false;
+          }
+        
+          for (const option of question.options) {
+            if (option.inputName && answers[option.name]) {
+              const inputValue = answers[option.inputName];
+              if (!inputValue || inputValue.trim() === "") {
+                message.error(`Please fill in the field for "${option.label}".`);
+                return false;
+              }
+            }
+          }
+        
+          return true;
+        }
+        
   
         case "checkbox": {
             if (!answers[question.name] || answers[question.name].length === 0) {

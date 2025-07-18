@@ -191,7 +191,7 @@ const questions = [
         question: "Severity",
         type: "radio",
         label: "Severity",
-        options: ["Mild", "Moderate", "Severe","None"],
+        options: ["Mild", "Moderate", "Severe"],
         name: "duration_per_cycle_severity_pelvic_pain",
       },
     ],
@@ -654,13 +654,23 @@ const StressAndRelationship = ({ onComplete }) => {
         delete updatedAnswers.spiritual_practice_desciption;
       }
     } else if (question && question.type === "checkbox") {
-      // For checkbox selections
-      updatedAnswers[name] = value;
-      // If "Other" is unchecked, clear its text input
-      if (Array.isArray(value) && !value.includes('Other')) {
+      let updatedValue = value;
+
+      // If "N/A" is selected, override other selections
+      if (Array.isArray(value) && value.includes("N/A")) {
+        updatedValue = ["N/A"];
+      } else if (Array.isArray(value) && value.length > 0) {
+        updatedValue = value.filter((v) => v !== "N/A");
+      }
+
+      updatedAnswers[name] = updatedValue;
+
+      // If "Other" is not selected, clear its text input
+      if (!updatedValue.includes("Other")) {
         delete updatedAnswers[`${name}_other`];
       }
-    } else {
+    }
+     else {
       // Default behavior for other types
       updatedAnswers[name] = value;
     }

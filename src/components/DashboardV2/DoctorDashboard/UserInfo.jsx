@@ -1656,7 +1656,7 @@ function SwitchContent({
                     <Tag color="purple">{reproductiveInfo.otherMethodsConceive}</Tag>
                   </Descriptions.Item>
                 )}
-                <Descriptions.Item label="Charting To Conceive">
+                <Descriptions.Item label="Trying To Conceive">
                   <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                     {reproductiveInfo?.chartingToConceive?.length ? 
                       reproductiveInfo.chartingToConceive.map((method, index) => (

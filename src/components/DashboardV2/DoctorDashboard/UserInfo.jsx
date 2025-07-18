@@ -1654,7 +1654,7 @@ function SwitchContent({
                     )}
                   </div>
                 </Descriptions.Item>
-                <Descriptions.Item label="Trying To Conceive">
+                <Descriptions.Item label="Biomarkers / Symptom">
                   <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                     {reproductiveInfo?.chartingToConceive?.length ? 
                       reproductiveInfo.chartingToConceive.map((method, index) => (
@@ -1666,11 +1666,11 @@ function SwitchContent({
                     }
                   </div>
                 </Descriptions.Item>
-                {reproductiveInfo?.otherChartingCycle && (
+                {/* {reproductiveInfo?.otherChartingCycle && (
                   <Descriptions.Item label="Other Charting Methods">
                     <Tag color="purple">{reproductiveInfo.otherChartingCycle}</Tag>
                   </Descriptions.Item>
-                )}
+                )} */}
                 <Descriptions.Item label="Current Therapy">
                   <Tag color={reproductiveInfo?.currentTherapy ? "green" : "red"}>
                     {reproductiveInfo?.currentTherapy === null || reproductiveInfo?.currentTherapy === undefined ? 'Not Provided' : (reproductiveInfo?.currentTherapy ? 'Yes' : 'No')}

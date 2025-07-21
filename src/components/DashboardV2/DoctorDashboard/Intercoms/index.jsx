@@ -79,7 +79,6 @@ const Intercom = () => {
             connection.invoke("JoinChat", chatRef)
               .then(() => {
                 console.log('Joined chat:', chatRef);
-                // Get initial messages after joining chat
                 dispatch(getMessages(selectedUser.userRef || selectedUser.id));
               })
               .catch(err => console.error('Error joining chat:', err));

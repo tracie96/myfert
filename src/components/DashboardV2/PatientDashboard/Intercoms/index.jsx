@@ -46,7 +46,7 @@ const PatientIntercom = () => {
       connection.on("ReceiveMessage", (user, message) => {
         if (selectedUser?.userRef === user) {
           dispatch(getMessages(user));
-          dispatch(getChatHeads());
+          // dispatch(getChatHeads());
         }
       });
 
@@ -174,7 +174,7 @@ const PatientIntercom = () => {
 
         if (sendMessage.fulfilled.match(response)) {
           await dispatch(getMessages(userId));
-          dispatch(getChatHeads());
+          // dispatch(getChatHeads());
         }
       } catch (error) {
         console.error('Error sending message:', error);

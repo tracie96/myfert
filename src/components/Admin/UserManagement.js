@@ -54,6 +54,11 @@ const UserManagement = () => {
       mode="inline"
       items={[
         {
+          key: 'application',
+          label: "View Application",
+          onClick: () => { setAccount(account); setOpen('Application'); }
+        },
+        {
           key: 'password',
           label: "Reset Password",
           onClick: () => { setAccount(account); setOpen('Password'); }

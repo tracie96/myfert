@@ -38,3 +38,6 @@
 .inbox-selected-item {
   background-color: #CEF2F4
 }
+.ant-popover-content{
+  width: 200px !important;
+}

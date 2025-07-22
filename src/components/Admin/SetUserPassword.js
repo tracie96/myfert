@@ -1,32 +1,55 @@
 import React from "react";
-import AdminModal from "./AdminModal";
+import { Modal, message } from "antd";
+import { useSelector } from "react-redux";
+import axios from "axios";
+import { baseUrl } from "../../utils/envAccess";
 
 const SetUserPassword = ({ isOpen, setOpen, account }) => {
-  const cleanup = () => {
-    setOpen('');
-  }
+  const userAuth = useSelector((state) => state?.authentication?.userAuth);
+  const token = userAuth?.obj?.token;
 
-  return <AdminModal
-    title='Reset User Password'
-    open={isOpen === 'Password'}
-    onCancel={cleanup}
-    footer={[
-      <div style={{display: 'flex', justifyContent: 'space-between'}}>
-        <button className="btn btn-secondary" onClick={cleanup}>
-          Cancel
-        </button>
-        <button className="btn btn-primary" onClick={() => {
-          console.log(`Account #${account}'s password has been reset`);
+  const handleSendResetLink = async () => {
+    if (!account) return message.warning("No patient selected.");
 
-          cleanup();
-        }}>
-          Confirm
-        </button>
-      </div>
-    ]}
-  >
-    <p style={{marginBottom: '0.5rem'}}>Are you sure you want to reset Account #{account}'s password?</p>
-  </AdminModal>
-}
+    try {
+      const config = {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { userRef: account }, // Send 'account' as query parameter
+      };
+
+      const response = await axios.get(
+        `${baseUrl}Admin/ResetUserPassword/${account}`, // Ensure account is part of the URL path
+        config // Pass the config with headers and params
+      );
+
+      // Check if the response indicates success
+      if (response.data && response.data.success) { 
+        message.success("Successfully sent the password reset email.");
+      } else {
+        message.error("Failed to send reset link. Please try again.");
+      }
+
+      setOpen('');
+    } catch (error) {
+      console.error(error);
+      message.error("Failed to send reset link.");
+    }
+  };
+
+  return (
+    <Modal
+      title="Send Password Reset Link"
+      open={isOpen === 'Password'}
+      onOk={handleSendResetLink}
+      onCancel={() => setOpen('')}
+      okText="Send Link"
+    >
+      <p>
+        Are you sure you want to send a password reset link to this patient?
+        They will receive an email with a secure link to reset their password.
+      </p>
+    </Modal>
+  );
+};
 
 export default SetUserPassword;

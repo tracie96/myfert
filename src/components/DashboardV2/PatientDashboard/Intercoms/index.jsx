@@ -319,6 +319,7 @@ const PatientIntercom = () => {
                   >
                     {!provider.userPicture && provider.username.charAt(0).toUpperCase()}
                   </Avatar>
+                  {provider.newMessage && <div className="new-message-indicator" />}
                 </div>
                 <div className="user-info">
                   <div className="user-name-container">

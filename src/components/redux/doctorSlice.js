@@ -928,7 +928,7 @@ export const getUnreadMessageCount = createAsyncThunk(
     };
     try {
       const response = await axios.get(
-        `${baseUrl}Chat/GetUnReadMsgCount`,
+        `${baseUrl}Chat/GetUnReadMsg`,
         config
       );
       return response.data;

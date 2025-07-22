@@ -20,6 +20,7 @@ import {
   FaSignOutAlt,
   FaStickyNote,
 } from "react-icons/fa";
+
 import { FaNotesMedical } from "react-icons/fa";
 export const GetSideBar = () => {
   const dispatch = useDispatch();
@@ -36,13 +37,10 @@ export const GetSideBar = () => {
     // Fetch unread count when component mounts
     dispatch(getUnreadMessageCount());
     
-    // Set up interval to fetch count every minute
     const interval = setInterval(() => {
       dispatch(getUnreadMessageCount());
-    }, 60000); // 60000 ms = 1 minute
-    
-    console.log("Current unread count:", unreadCount); 
-    
+    }, 60000); 
+        
     return () => clearInterval(interval);
   }, [dispatch, unreadCount]);
 
@@ -192,14 +190,8 @@ export const GetSideBar = () => {
       )}
       <Menu.Item key="12" icon={<FaStickyNote style={{ color: "#00ADEF" }} />}>
         <NavLink to="/patient/intercoms" style={{ textDecoration: "none" }}>
-          <Badge 
-            count={unreadCount} 
-            showZero
-            size="small"
-            offset={[5, 0]} 
-            style={{ backgroundColor: '#00ADEF', minWidth: '16px', height: '16px', padding: '0 4px', fontSize: '10px' }}
-          >
-            <span style={{ marginRight: '16px' }}>INTERCOM</span>
+          <Badge dot offset={[5, 0]} style={{ backgroundColor: '#ff4d4f' }}>
+            <span className="no-underline">INTERCOMS</span>
           </Badge>
         </NavLink>
       </Menu.Item>
@@ -249,14 +241,8 @@ export const GetSideBar = () => {
       </Menu.Item>
       <Menu.Item key="9" icon={<FaStickyNote style={{ color: "#00ADEF" }} />}>
         <NavLink to="/doctor/intercom" style={{ textDecoration: "none" }}>
-          <Badge 
-            count={unreadCount} 
-            showZero
-            size="small"
-            offset={[5, 0]} 
-            style={{ backgroundColor: '#00ADEF', minWidth: '16px', height: '16px', padding: '0 4px', fontSize: '10px' }}
-          >
-            <span style={{ marginRight: '16px' }}>INTERCOM</span>
+        <Badge dot offset={[5, 0]} style={{ backgroundColor: '#ff4d4f' }}>
+            <span className="no-underline">INTERCOMS</span>
           </Badge>
         </NavLink>
       </Menu.Item>

@@ -393,6 +393,7 @@ const Intercom = () => {
                   >
                     {!user.userPicture && user.username.charAt(0).toUpperCase()}
                   </Avatar>
+                  {user.newMessage && <div className="new-message-indicator" />}
                 </div>
                 <div className="user-info">
                   <div className="user-name-container">

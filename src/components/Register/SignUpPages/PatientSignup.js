@@ -77,6 +77,7 @@ const PatientSignup = () => {
     dob: null,
     height: 0,
     weight: 0,
+    uli:"",
     MetricImperial: false,
     isSMS: false,
     isSendResultToEmail: false,
@@ -268,7 +269,7 @@ const PatientSignup = () => {
     const validations = validatePassword(password);
     setPasswordValidations(validations);
   }, [password, username]);
-
+console.log(formValues)
   const handleDateChange = (date, dateString) => {
     setDob(dateString);
   };
@@ -887,7 +888,7 @@ const PatientSignup = () => {
                                   </div>
 
                                   <div className="row">
-                                    <div className="col-lg-12 col-sm-12">
+                                    <div className="col-lg-6 col-sm-12">
                                       <Form.Item
                                         label="Email"
                                         name="email"
@@ -921,6 +922,23 @@ const PatientSignup = () => {
                                         />
                                       </Form.Item>
                                     </div>
+                                    <div className="col-lg-6 col-sm-12">
+                                      <FormItem
+                                        label="Uli Number"
+                                        name="uli"
+                                        rules={[
+                                          {
+                                            required: true,
+                                            message:
+                                              "! Please enter your ULI Number",
+                                          },
+                                        ]}
+                                      >
+                                        <Input placeholder="000000" />
+                                      </FormItem>
+                                    </div>
+                                    </div>
+                                    <div className="row">
 
                                     <div className="col-lg-12 col-sm-12">
                                       <FormItem
@@ -946,8 +964,7 @@ const PatientSignup = () => {
                                         <Input placeholder="Enter Apartment Or Suite" />
                                       </FormItem>
                                     </div>
-                                  </div>
-
+</div>
                                   <div className="row">
                                     <div className="col-lg-6 col-sm-12">
                                       <FormItem

@@ -74,6 +74,7 @@ const UpdateProfile = () => {
       pharmacyName: "",
       pharmacyAddress: "",
       pharmacyPhoneNumber: "",
+      uli:"",
       pharmacyFaxNumber: "",
       // Add partner fields
       partnerFirstname: "",
@@ -145,6 +146,8 @@ const UpdateProfile = () => {
       setFieldValue("partnerGender", userData?.partnerGender || "");
       setFieldValue("partnerPronouns", userData?.partnerPronouns || "");
       setFieldValue("partnerDob", userData?.partnerDob || "");
+      setFieldValue("uli", userData?.uli || "");
+
 
       // If there's an existing profile image URL, set it
       setUploadedFileUrl(userData?.profile || null);
@@ -429,7 +432,23 @@ const UpdateProfile = () => {
                         />
                       </div>
                     </div>
+                    {userAuth?.obj?.role === "Patient" && (
+                    <div className="col-md-12">
+                    <div className="form-group">
+                      <label>ULI Number</label>
+                      <input
+                        className="form-control"
+                        name="uli"
+                        type="text"
+                        value={ values.uli}
+                        onChange={handleChange("uli")}
+                        onBlur={handleBlur("uli")}
+                      />
+                    </div>
+                  </div>
+                )}
                 </div>
+              
                 {userAuth?.obj?.role !== "Patient" && (
                   <div className="row">
                    

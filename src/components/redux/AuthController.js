@@ -150,6 +150,7 @@ export const postRegister = createAsyncThunk(
     formData.append("password", users.password);
     formData.append("confirmPassword", users.cpassword);
     formData.append("email", users.email);
+    formData.append("uli", users?.uli)
     formData.append("phoneNumber", users.phoneNumber);
     formData.append("dob", users.dob);
     formData.append("Height", users.height);

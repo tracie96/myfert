@@ -1,9 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Row, Col, Tabs, Table, Card, message, Input } from "antd";
 import {
-    ExperimentOutlined,
     FlagTwoTone,
-    QuestionCircleOutlined,
     SearchOutlined,
 } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
@@ -197,31 +195,31 @@ export default function DoctorDash() {
                 responsive: ["sm"]
             },
 
-            {
-                title: "Lab",
-                dataIndex: "lab",
-                key: "lab",
-                render: (lab) =>
-                    lab ? (
-                        <ExperimentOutlined style={{ color: "blue" }} />
-                    ) : (
-                        <QuestionCircleOutlined style={{ color: "gray" }} />
-                    ),
-                responsive: ["sm"]
+            // {
+            //     title: "Lab",
+            //     dataIndex: "lab",
+            //     key: "lab",
+            //     render: (lab) =>
+            //         lab ? (
+            //             <ExperimentOutlined style={{ color: "blue" }} />
+            //         ) : (
+            //             <QuestionCircleOutlined style={{ color: "gray" }} />
+            //         ),
+            //     responsive: ["sm"]
 
-            },
-            {
-                title: "Group",
-                dataIndex: "groups",
-                key: "groups",
-                render: () => <p> Individual Screen - M</p>,
-                responsive: ["sm"]
-            },
+            // },
+            // {
+            //     title: "Group",
+            //     dataIndex: "groups",
+            //     key: "groups",
+            //     render: () => <p> Individual Screen - M</p>,
+            //     responsive: ["sm"]
+            // },
             {
                 title: "Clinician",
                 dataIndex: "clinician",
                 key: "clinician",
-                render: (_, record) => <p>{record.createdById === loggedInUserId ? "You" : record.clinician || "Not Assigned"}</p>,
+                render: (_, record) => <p>{record.createdById === loggedInUserId ? "You" : record.clinician || "Assign to me"}</p>,
             },
             // {
             //     title: "Action",

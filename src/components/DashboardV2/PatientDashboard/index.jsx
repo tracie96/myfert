@@ -864,9 +864,7 @@ export default function PatDash() {
                             <p style={{ marginBottom: 12 }}>
                               To book your appointments, please create a separate account for our booking system.
                             </p>
-                            <p style={{ marginBottom: 12 }}>
-                              Start by booking your <b>Initial Assessments</b>. You can book single appointments or purchase an <b>Intro Package</b> which comes with a free Mira Starter Kit.
-                            </p>
+                         
                           </div>
                         </div>
                       </div>

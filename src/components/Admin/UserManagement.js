@@ -8,6 +8,7 @@ import axios from "axios";
 import { baseUrl } from "../../utils/envAccess";
 import { handleApiError } from "../Handler/ExceptionHandler";
 import ChangeEmail from "./ChangeEmail";
+import { message } from "antd";
 
 const UserManagement = () => {
   const [isOpen, setOpen] = useState('');
@@ -18,6 +19,14 @@ const UserManagement = () => {
   const [careProviderTable, setCareProviderTable] = useState([]);
   const [activeTabKey, setActiveTabKey] = useState('patients');
   const [careDataLoaded, setCareDataLoaded] = useState(false);
+  const [requestsData, setRequestsData] = useState([]);
+  const [requestsTable, setRequestsTable] = useState([]);
+  const [requestsPagination, setRequestsPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0
+  });
+
 
   const [searchParams, setSearchParams] = useState({
     account: '',
@@ -137,6 +146,78 @@ const UserManagement = () => {
     }
   ];
 
+  const requestColumns = [
+    {
+      title: 'Account #',
+      dataIndex: 'account',
+      key: 'account',
+    },
+    {
+      title: 'First Name',
+      dataIndex: 'firstName',
+      key: 'firstName',
+    },
+    {
+      title: 'Last Name',
+      dataIndex: 'lastName',
+      key: 'lastName',
+    },
+    {
+      title: 'Requested By',
+      dataIndex: 'requestedBy',
+      key: 'requestedBy',
+    },
+    {
+      title: 'Role',
+      dataIndex: 'role',
+      key: 'role',
+    },
+    {
+      title: 'Requested Date',
+      dataIndex: 'requestedDate',
+      key: 'requestedDate',
+    },
+    {
+      title: '',
+      key: 'actions',
+      render: (_, record) => (
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <button
+            style={{
+              backgroundColor: 'red',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              padding: '4px 12px',
+              fontWeight: 'bold'
+            }}
+            onClick={() => handleReject(record)}
+          >
+            Reject
+          </button>
+          <button
+            style={{
+              backgroundColor: 'green',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              padding: '4px 12px',
+              fontWeight: 'bold'
+            }}
+            onClick={() => handleAccept(record)}
+          >
+            Accept
+          </button>
+        </div>
+      )
+    }
+  ];
+
+  
+  const handleRequestsTableChange = (pagination, filters, sorter) => {
+    setRequestsPagination(pagination);
+  };
+
   // Fetch Patients
   useEffect(() => {
     const fetchPatients = async () => {
@@ -172,6 +253,82 @@ const UserManagement = () => {
     });
   }, [userAuth]);
 
+  //fetch Request data
+  useEffect(() => {
+    const fetchPendingRequests = async () => {
+      const config = {
+        headers: { Authorization: `Bearer ${userAuth?.obj?.token}` },
+      };
+      try {
+        const response = await axios.get(`${baseUrl}Admin/GetPendingCaregiverRequests`, config);
+        const res = response.data;
+  
+        if (!Array.isArray(res)) return;
+  
+        const formatted = res.map((item) => {
+          const account = item.id?.toString();
+          return {
+            key: account,
+            account: account,
+            firstName: item.patientfirstname || '',
+            lastName: item.patientlastname || '',
+            requestedBy: item.caregiver || '',
+            role: item.role || '',
+            requestedDate: new Date(item.createdOn).toLocaleDateString('en-US', {
+              month: 'long',
+              day: 'numeric',
+              year: 'numeric'
+            }),
+          };
+        });                     
+  
+        setRequestsData(formatted);
+        setRequestsPagination((prev) => ({ ...prev, total: formatted.length }));
+      } catch (error) {
+        handleApiError(error);
+      }
+    };
+  
+    if (activeTabKey === 'Requests') {
+      fetchPendingRequests();
+    }
+  }, [activeTabKey, userAuth]);
+
+    const handleAccept = async (record) => {
+      try {
+        const config = {
+          headers: { Authorization: `Bearer ${userAuth?.obj?.token}` },
+        };
+        const payload = {
+          yesNo: true,
+          id: parseInt(record.account) // ensure ID is number
+        };
+        await axios.post(`${baseUrl}Admin/AcceptRejectCaregiverPatientLink`, payload, config);
+        setRequestsTable(prev => prev.filter(item => item.account !== record.account));
+        message.success("Request accepted successfully");
+      } catch (error) {
+        handleApiError(error);
+      }
+    };
+    
+    const handleReject = async (record) => {
+      try {
+        const config = {
+          headers: { Authorization: `Bearer ${userAuth?.obj?.token}` },
+        };
+        const payload = {
+          yesNo: false,
+          id: parseInt(record.account)
+        };
+        await axios.post(`${baseUrl}Admin/AcceptRejectCaregiverPatientLink`, payload, config);
+        setRequestsTable(prev => prev.filter(item => item.account !== record.account));
+        message.success("Request rejected successfully");
+      } catch (error) {
+        handleApiError(error);
+      }
+    };  
+
+  
   // Fetch Care Providers
   useEffect(() => {
     const fetchCareProviders = async () => {
@@ -231,7 +388,9 @@ const UserManagement = () => {
 
     setTableData(filterRecords(dataSource));
     setCareProviderTable(filterRecords(careProviderSource));
-  }, [searchParams, dataSource, careProviderSource]);
+    setRequestsTable(filterRecords(requestsData));
+
+  }, [searchParams, dataSource, careProviderSource, requestsData]);
 
   const items = [
     {
@@ -263,15 +422,16 @@ const UserManagement = () => {
       key: 'Requests',
       children: (
         <Table
-          dataSource={careProviderTable}
-          columns={columns}
-          pagination={carePagination}
-          onChange={handleCareTableChange}
+          dataSource={requestsTable}
+          columns={requestColumns}
+          pagination={requestsPagination}
+          onChange={handleRequestsTableChange}
         />
       )
     }
   ];
 
+  
   return (
     <div style={{ margin: '2rem' }}>
       <div style={{ marginBottom: '1rem' }}>

@@ -116,6 +116,33 @@ export const deletePatientBloodWork = createAsyncThunk(
   }
 );
 
+export const linkDoctorToPatient = createAsyncThunk(
+  "doctor/linkDoctorToPatient",
+  async ({ patientRef }, { rejectWithValue, getState, dispatch }) => {
+    const user = getState()?.authentication?.userAuth;
+    
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+
+    try {
+      const response = await axios.post(
+        `${baseUrl}Doctor/LinkDoctorToPatient`,
+        { patientRef, link: true }, // send 'link: true' as required
+        config
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        handleApiError(error?.response?.data, dispatch, user)
+      );
+    }
+  }
+);
+
 export const addPatientBloodWork = createAsyncThunk(
   "doctor/addPatientBloodWork",
   async ({ patientRef, bloodWork }, { rejectWithValue, getState, dispatch }) => {

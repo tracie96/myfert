@@ -261,7 +261,7 @@ export default function DoctorDash() {
                                     height: "16px",
                                     borderRadius: "50%",
                                     border: "2px solid #666666",
-                                    backgroundColor: "#444444",
+                                    backgroundColor: "#fff",
                                     position: "relative",
                                 }}
                             />

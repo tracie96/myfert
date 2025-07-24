@@ -222,7 +222,7 @@ export default function DoctorDash() {
                 render: (_, record) => <p>{record.createdById === loggedInUserId ? "You" : record.clinician || "Assign to me"}</p>,
             },
             {
-                title: "Assigned to me",
+                title: "Action",
                 dataIndex: "assignedToMe",
                 key: "assignedToMe",
                 render: (_, record) => {
@@ -234,7 +234,7 @@ export default function DoctorDash() {
                     }
             
                     return (
-                        <button
+                        <div
                             onClick={async (e) => {
                                 e.stopPropagation(); // prevent row click
                                 try {
@@ -247,16 +247,25 @@ export default function DoctorDash() {
                                 }
                             }}
                             style={{
-                                padding: "4px 8px",
-                                border: "1px solid #1890ff",
-                                borderRadius: 4,
-                                backgroundColor: "#e6f7ff",
-                                color: "#1890ff",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "8px",
                                 cursor: "pointer",
+                                fontSize: "14px",
                             }}
                         >
-                            Assign to me
-                        </button>
+                            <span>Assign to Me</span>
+                            <div
+                                style={{
+                                    width: "16px",
+                                    height: "16px",
+                                    borderRadius: "50%",
+                                    border: "2px solid #666666",
+                                    backgroundColor: "#444444",
+                                    position: "relative",
+                                }}
+                            />
+                        </div>
                     );
                 },
             }

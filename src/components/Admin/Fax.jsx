@@ -64,7 +64,7 @@ const Fax = () => {
       key: 'patientName',
     },
     {
-      title: 'Patient Reference',
+      title: 'Patient ULI Number',
       dataIndex: 'patientRef',
       key: 'patientRef',
     },

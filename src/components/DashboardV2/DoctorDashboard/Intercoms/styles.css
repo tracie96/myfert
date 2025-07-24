@@ -298,7 +298,9 @@
   margin: 4px 0;
   font-size: 12px;
 }
-
+.filter-buttons .ant-segmented-item {
+  font-size: 12px !important;
+}
 .message-bubble.received {
   background: white;
   color: #333;

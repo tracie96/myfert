@@ -234,11 +234,11 @@ export const GetSideBar = () => {
           <span>NOTES</span>
         </NavLink>
       </Menu.Item>
-      <Menu.Item key="8" icon={<FaStickyNote style={{ color: "#00ADEF" }} />}>
+      {/* <Menu.Item key="8" icon={<FaStickyNote style={{ color: "#00ADEF" }} />}>
         <NavLink to="/doctor/fax" style={{ textDecoration: "none" }}>
           <span>FAX</span>
         </NavLink>
-      </Menu.Item>
+      </Menu.Item> */}
       <Menu.Item key="9" icon={<FaStickyNote style={{ color: "#00ADEF" }} />}>
         <NavLink to="/doctor/intercom" style={{ textDecoration: "none" }}>
         <Badge dot offset={[5, 0]} style={{ backgroundColor: '#ff4d4f' }}>
@@ -267,27 +267,32 @@ export const GetSideBar = () => {
     >
       <Menu.Item key="1" icon={<FaListOl style={{ color: "#00ADEF" }} />}>
         <NavLink to="/users" style={{ textDecoration: "none" }}>
-          <span style={{ whiteSpace: 'normal', lineHeight: '1.2' }}>User Management</span>
+          <span style={{ whiteSpace: 'normal', lineHeight: '1.2' }}>USER MANAGEMENT</span>
         </NavLink>
       </Menu.Item>
       <Menu.Item key="2" icon={<FaFileAlt style={{ color: "#00ADEF" }} />}>
         <NavLink to="/logs" style={{ textDecoration: "none" }}>
-          <span style={{ whiteSpace: 'normal', lineHeight: '1.2' }}>Logs</span>
+          <span style={{ whiteSpace: 'normal', lineHeight: '1.2' }}>LOGS</span>
         </NavLink>
       </Menu.Item>
       <Menu.Item key="3" icon={<FaChartPie style={{ color: "#00ADEF" }} />}>
         <NavLink to="/statistics" style={{ textDecoration: "none" }}>
-          <span style={{ whiteSpace: 'normal', lineHeight: '1.2' }}>Statistics</span>
+          <span style={{ whiteSpace: 'normal', lineHeight: '1.2' }}>STATISTICS</span>
         </NavLink>
       </Menu.Item>
       <Menu.Item key="4" icon={<FaInbox style={{ color: "#00ADEF" }} />}>
         <NavLink to="/ticketing" style={{ textDecoration: "none" }}>
-          <span style={{ whiteSpace: 'normal', lineHeight: '1.2' }}>Ticketing System</span>
+          <span style={{ whiteSpace: 'normal', lineHeight: '1.2' }}>TICKETING SYSTEM</span>
+        </NavLink>
+      </Menu.Item>
+      <Menu.Item key="5" icon={<FaNotesMedical style={{ color: "#00ADEF" }} />}>
+        <NavLink to="/admin/fax" style={{ textDecoration: "none" }}>
+          <span style={{ whiteSpace: 'normal', lineHeight: '1.2' }}>FAX</span>
         </NavLink>
       </Menu.Item>
       <Menu.Item key="5" icon={<FaServicestack style={{ color: "#00ADEF" }} />}>
         <NavLink to="/assignment" style={{ textDecoration: "none" }}>
-          <span style={{ whiteSpace: 'normal', lineHeight: '1.2' }}>Assignment of Care</span>
+          <span style={{ whiteSpace: 'normal', lineHeight: '1.2' }}>ASSIGNMENT OF CARE</span>
         </NavLink>
       </Menu.Item>
     </Menu>

@@ -54,6 +54,9 @@ function Login() {
         const resultAction = await dispatch(postLogin(values)).unwrap();
         if (resultAction?.status) {
           console.log(resultAction, "result");
+          
+          // Show success message
+          message.success('Login successful!');
 
           if (resultAction.obj.role === "Patient") {
             navigate("/patient");
@@ -67,6 +70,8 @@ function Login() {
         }
       } catch (error) {
         console.log("login-page api call error: " + error);
+        // Show error message
+        message.error('Login failed. Please check your credentials and try again.');
       }
     },
   });

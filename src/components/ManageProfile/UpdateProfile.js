@@ -92,8 +92,13 @@ const UpdateProfile = () => {
         const action = dispatch(updateProfile(updatedValues));
         const resultAction = await action;
         console.log(resultAction);
+        
+        // Show success message
+        message.success('Profile updated successfully!');
       } catch (error) {
         console.error(error);
+        // Show error message
+        message.error('Failed to update profile. Please try again.');
       } finally {
         setShowSpinner(false);
       }

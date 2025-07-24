@@ -5,7 +5,7 @@ import {
     SearchOutlined,
 } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { getZohoClientID, patientList } from "../../redux/doctorSlice";
+import { getZohoClientID, patientList, linkDoctorToPatient } from "../../redux/doctorSlice";
 import { useNavigate } from "react-router-dom";
 
 // const SwitchWrapper = ({ onChange, ...props }) => {
@@ -221,6 +221,46 @@ export default function DoctorDash() {
                 key: "clinician",
                 render: (_, record) => <p>{record.createdById === loggedInUserId ? "You" : record.clinician || "Assign to me"}</p>,
             },
+            {
+                title: "Assigned to me",
+                dataIndex: "assignedToMe",
+                key: "assignedToMe",
+                render: (_, record) => {
+                    if (record.createdById === loggedInUserId) {
+                        return <p>You</p>;
+                    }
+                    if (record.clinician) {
+                        return <p>{record.clinician}</p>;
+                    }
+            
+                    return (
+                        <button
+                            onClick={async (e) => {
+                                e.stopPropagation(); // prevent row click
+                                try {
+                                    await dispatch(linkDoctorToPatient({ patientRef: record.userRef }));
+                                    message.success("Patient assigned to you.");
+                                    fetchPatientList(); // refresh list
+                                } catch (error) {
+                                    console.error(error);
+                                    message.error("Failed to assign patient.");
+                                }
+                            }}
+                            style={{
+                                padding: "4px 8px",
+                                border: "1px solid #1890ff",
+                                borderRadius: 4,
+                                backgroundColor: "#e6f7ff",
+                                color: "#1890ff",
+                                cursor: "pointer",
+                            }}
+                        >
+                            Assign to me
+                        </button>
+                    );
+                },
+            }
+            
             // {
             //     title: "Action",
             //     key: "action",
@@ -264,7 +304,7 @@ export default function DoctorDash() {
             //     ),
             // },
         ],
-        [loggedInUserId]
+        [loggedInUserId, dispatch, fetchPatientList]
     );
 
     const PatientList = React.memo(

@@ -363,7 +363,7 @@ export default function DoctorDash() {
         {
             label: "Assigned to me",
             key: "2",
-            children: <PatientList />,
+            children: <></>,
         },
     ];
 

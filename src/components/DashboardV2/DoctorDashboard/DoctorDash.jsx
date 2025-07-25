@@ -226,11 +226,8 @@ export default function DoctorDash() {
                         <div>
                             {providers.map((provider, index) => (
                                 <div key={index}>
-                                    {provider.providerName}
-                                    {/* <br />
-                                    <span style={{ fontSize: "12px", color: "gray" }}>
-                                        {provider.providerRole}
-                                    </span> */}
+                                    {provider.providerName} {provider.statusRemark ? `(${provider.statusRemark})` : ""}
+                                    <br />
                                 </div>
                             ))}
                         </div>

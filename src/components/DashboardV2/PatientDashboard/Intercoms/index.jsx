@@ -1,16 +1,54 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, memo } from 'react';
 import { Input, Avatar, Segmented } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import { 
   fetchCareGivers, 
   getMessages, 
   sendMessage,
-  getChatHeads
+  getChatHeads,
+  markMessagesAsRead,
+  getUnreadMessageCount,
+  markChatAsReadOptimistically
 } from '../../../redux/doctorSlice';
 import { UserOutlined, SearchOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import '../../DoctorDashboard/Intercoms/styles.css';
 import SendButton from '../../../../assets/images/telegram.png';
 import * as signalR from '@microsoft/signalr';
+
+// Memoized user item component to prevent unnecessary re-renders
+const UserItem = memo(({ provider, isSelected, onSelect }) => {
+  
+  return (
+    <div
+      className={`user-item ${isSelected ? 'selected' : ''}`}
+      onClick={() => onSelect(provider)}
+    >
+      <div className="user-avatar">
+        <Avatar 
+          size={40}
+          src={provider.userPicture}
+          icon={!provider.userPicture && <UserOutlined />}
+          style={{ 
+            backgroundColor: !provider.userPicture ? '#00ADEF' : 'transparent',
+            color: !provider.userPicture ? '#fff' : undefined
+          }}
+        >
+          {!provider.userPicture && provider.username.charAt(0).toUpperCase()}
+        </Avatar>
+        {/* Only show indicator if explicitly true */}
+        {provider.newMessage === true && <div className="new-message-indicator" />}
+      </div>
+      <div className="user-info">
+        <div className="user-name-container">
+          <span className="user-name">{provider.username}</span>
+          {provider.userRole && (
+            <small className="user-role">{provider.userRole}</small>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+});
 
 const PatientIntercom = () => {
   const [selectedUser, setSelectedUser] = useState(null);
@@ -20,38 +58,74 @@ const PatientIntercom = () => {
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
   const [initialLoad, setInitialLoad] = useState(true);
   const [signalRConnection, setSignalRConnection] = useState(null);
+  const [autoReadStatus, setAutoReadStatus] = useState('');
   const dispatch = useDispatch();
   const messagesEndRef = useRef(null);
 
   const providers = useSelector((state) => state.doctor.careGivers || []);
   const chatHeads = useSelector((state) => state.doctor.chatHeads || []);
-  const isLoading = useSelector((state) => state.doctor.loading);
+  const isLoading = useSelector((state) => state.doctor.chatHeadsLoading);
   const messages = useSelector((state) => state.doctor.messages?.chats);
   const chatRef = useSelector((state) => state.doctor.messages?.chatReference);
   const chatError = useSelector((state) => state.doctor.chatError);
   const authToken = useSelector((state) => state.authentication?.userAuth?.obj?.token);
 
-  // Initialize SignalR connection
+  // Initialize SignalR connection - optimized to prevent unnecessary reconnections
   useEffect(() => {
-    if (authToken) {
+    if (authToken && !signalRConnection) {
       const connection = new signalR.HubConnectionBuilder()
         .withUrl('https://myfertilitydevapi-prod.azurewebsites.net/chathub', {
           accessTokenFactory: () => authToken,
           skipNegotiation: true,
           transport: signalR.HttpTransportType.WebSockets
         })
-        .withAutomaticReconnect()
+        .withAutomaticReconnect([0, 2000, 5000, 10000, 20000]) // More stable reconnection strategy
+        .configureLogging(signalR.LogLevel.Warning) // Reduce logging noise
         .build();
 
-      connection.on("ReceiveMessage", (user, message) => {
-        if (selectedUser?.userRef === user) {
-          dispatch(getMessages(user));
-          // dispatch(getChatHeads());
+      connection.on("ReceiveMessage", async (user, message) => {
+        console.log('SignalR: Received message from user:', user);
+        
+        try {
+          if (selectedUser?.userRef === user) {
+            // If user is actively viewing this chat, automatically mark messages as read
+            try {
+              setAutoReadStatus('Marking as read...');
+              await dispatch(markMessagesAsRead(user));
+              // Refresh unread count after marking as read
+              await dispatch(getUnreadMessageCount());
+              setAutoReadStatus('Marked as read');
+              // Clear status after 2 seconds
+              setTimeout(() => setAutoReadStatus(''), 2000);
+            } catch (error) {
+              console.error('Error auto-marking messages as read:', error);
+              setAutoReadStatus('Error marking as read');
+              setTimeout(() => setAutoReadStatus(''), 3000);
+            }
+            // Refresh messages for the current chat
+            dispatch(getMessages(user));
+          } else {
+            // If message is from a different user, refresh unread count
+            dispatch(getUnreadMessageCount());
+          }
+          
+          // Only refresh chat heads if message is from a different user (to show new message indicators)
+          if (selectedUser?.userRef !== user) {
+            console.log('SignalR: Refreshing chat heads after receiving message from different user');
+            dispatch(getChatHeads()).then(() => {
+              console.log('SignalR: Chat heads refreshed successfully');
+            }).catch(error => {
+              console.error('SignalR: Error refreshing chat heads:', error);
+            });
+          }
+        } catch (error) {
+          console.error('Error handling SignalR message:', error);
         }
       });
 
       connection.start()
         .then(() => {
+          console.log('SignalR: Connection started successfully');
           setSignalRConnection(connection);
           if (selectedUser && chatRef) {
             connection.invoke("JoinChat", chatRef);
@@ -59,9 +133,12 @@ const PatientIntercom = () => {
         })
         .catch(err => console.error('SignalR Connection Error:', err));
 
-      return () => connection.stop();
+      return () => {
+        connection.stop();
+        setSignalRConnection(null);
+      };
     }
-  }, [authToken, selectedUser, chatRef, dispatch]);
+  }, [authToken, dispatch, selectedUser, chatRef, signalRConnection]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -71,6 +148,14 @@ const PatientIntercom = () => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Handle joining chat rooms when selectedUser or chatRef changes
+  useEffect(() => {
+    if (signalRConnection && selectedUser && chatRef) {
+      signalRConnection.invoke("JoinChat", chatRef)
+        .catch(err => console.error('Error joining chat:', err));
+    }
+  }, [signalRConnection, selectedUser, chatRef]);
   // useEffect(() => {
   //   // Initial fetch
   //   dispatch(getChatHeads());
@@ -106,6 +191,14 @@ const PatientIntercom = () => {
     };
 
     loadProviders();
+
+    // Set up polling interval for chat heads to ensure they stay updated
+    const chatHeadsInterval = setInterval(() => {
+      dispatch(getChatHeads());
+    }, 30000); // Increased to 30 seconds to reduce frequency
+
+    // Cleanup interval on unmount
+    return () => clearInterval(chatHeadsInterval);
   }, [dispatch]);
 
   // Load messages when a user is selected
@@ -124,28 +217,50 @@ const PatientIntercom = () => {
           setInitialLoad(false);
         });
 
-      // Set up polling interval for messages
+      // Set up polling interval for messages (only when user is selected)
       const messageInterval = setInterval(() => {
         dispatch(getMessages(userId))
           .catch(error => {
             console.error('Error polling messages:', error);
           });
-      }, 5000); // Poll every 5 seconds
+      }, 20000); // Increased to 20 seconds to reduce frequency
 
       // Cleanup interval on unmount or when user changes
       return () => clearInterval(messageInterval);
     }
-  }, [dispatch, selectedUser]);
+  }, [dispatch, selectedUser]); // Include full selectedUser object to satisfy React Hook rules
 
+  // Combined auto-scroll effect to reduce re-renders
   useEffect(() => {
-    if (messagesEndRef.current) {
+    if (messagesEndRef.current && messages && messages.length > 0) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages]);
+  }, [messages]); // Include full messages array to satisfy React Hook rules
 
-  const handleUserSelect = (user) => {
+  const handleUserSelect = async (user) => {
     console.log('Selected user:', user);
     setSelectedUser(user);
+    
+    // Mark messages as read when user is selected (iMessage-like behavior)
+    if (user?.userRef || user?.id) {
+      const userId = user.userRef || user.id;
+      
+      // Immediately mark as read optimistically (iMessage-like instant feedback)
+      console.log('iMessage-like: Immediately marking chat as read optimistically');
+      dispatch(markChatAsReadOptimistically(userId));
+      
+      try {
+        // Mark messages as read via API
+        await dispatch(markMessagesAsRead(userId));
+        
+        // Only refresh unread count, chat heads are already updated optimistically
+        await dispatch(getUnreadMessageCount());
+        
+        console.log('iMessage-like: Messages marked as read successfully');
+      } catch (error) {
+        console.error('Error marking messages as read:', error);
+      }
+    }
   };
 
   const handleBackToList = () => {
@@ -174,7 +289,8 @@ const PatientIntercom = () => {
 
         if (sendMessage.fulfilled.match(response)) {
           await dispatch(getMessages(userId));
-          // dispatch(getChatHeads());
+          // Refresh chat heads to update any indicators
+          await dispatch(getChatHeads());
         }
       } catch (error) {
         console.error('Error sending message:', error);
@@ -231,12 +347,12 @@ const PatientIntercom = () => {
     });
   };
 
-  // Filter providers based on search query
+  // Filter providers based on search query - optimized to reduce re-renders
   const filteredProviders = useMemo(() => {
     let users = [];
     
     if (activeTab === 'active') {
-      users = chatHeads;
+      users = chatHeads || [];
     } else {
       // Show all providers
       const providersList = providers?.getRecord || providers || [];
@@ -253,9 +369,9 @@ const PatientIntercom = () => {
     const query = searchQuery.toLowerCase();
     return users.filter(user => 
       user.username.toLowerCase().includes(query) || 
-      user.userRole.toLowerCase().includes(query)
+      (user.userRole && user.userRole.toLowerCase().includes(query))
     );
-  }, [searchQuery, activeTab, chatHeads, providers]);
+  }, [searchQuery, activeTab, chatHeads, providers]); // Include full arrays to satisfy React Hook rules
 
   return (
     <div className="intercom-container">
@@ -302,34 +418,12 @@ const PatientIntercom = () => {
             <div className="loading-state">Loading providers...</div>
           ) : filteredProviders.length > 0 ? (
             filteredProviders.map((provider) => (
-              <div
+              <UserItem
                 key={provider.userRef}
-                className={`user-item ${selectedUser?.userRef === provider.userRef ? 'selected' : ''}`}
-                onClick={() => handleUserSelect(provider)}
-              >
-                <div className="user-avatar">
-                  <Avatar 
-                    size={40}
-                    src={provider.userPicture}
-                    icon={!provider.userPicture && <UserOutlined />}
-                    style={{ 
-                      backgroundColor: !provider.userPicture ? '#00ADEF' : 'transparent',
-                      color: !provider.userPicture ? '#fff' : undefined
-                    }}
-                  >
-                    {!provider.userPicture && provider.username.charAt(0).toUpperCase()}
-                  </Avatar>
-                  {provider.newMessage && <div className="new-message-indicator" />}
-                </div>
-                <div className="user-info">
-                  <div className="user-name-container">
-                    <span className="user-name">{provider.username}</span>
-                    {provider.userRole && (
-                      <small className="user-role">{provider.userRole}</small>
-                    )}
-                  </div>
-                </div>
-              </div>
+                provider={provider}
+                isSelected={selectedUser?.userRef === provider.userRef}
+                onSelect={handleUserSelect}
+              />
             ))
           ) : (
             <div className="no-results">
@@ -364,6 +458,15 @@ const PatientIntercom = () => {
                   <span className="user-name">{selectedUser.username}</span>
                   {selectedUser.userRole && (
                     <small className="text-muted">{selectedUser.userRole}</small>
+                  )}
+                  {autoReadStatus && (
+                    <small style={{ 
+                      color: autoReadStatus.includes('Error') ? '#ff4d4f' : '#52c41a',
+                      fontSize: '11px',
+                      marginTop: '2px'
+                    }}>
+                      {autoReadStatus}
+                    </small>
                   )}
                 </div>
               </div>

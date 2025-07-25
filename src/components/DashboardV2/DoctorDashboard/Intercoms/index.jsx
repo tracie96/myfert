@@ -6,7 +6,10 @@ import {
   fetchCareGivers, 
   getMessages, 
   sendMessage,
-  getChatHeads
+  getChatHeads,
+  markMessagesAsRead,
+  getUnreadMessageCount,
+  markChatAsReadOptimistically
 } from '../../../redux/doctorSlice';
 import { UserOutlined, SearchOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import './styles.css';
@@ -21,13 +24,14 @@ const Intercom = () => {
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
   const [initialLoad, setInitialLoad] = useState(true);
   const [signalRConnection, setSignalRConnection] = useState(null);
+  const [autoReadStatus, setAutoReadStatus] = useState('');
   const dispatch = useDispatch();
   const messagesEndRef = useRef(null);
 
   const patients = useSelector((state) => state.doctor.patientList || []);
   const providers = useSelector((state) => state.doctor.careGivers || []);
   const chatHeads = useSelector((state) => state.doctor.chatHeads || []);
-  const isLoading = useSelector((state) => state.doctor.loading);
+  const isLoading = useSelector((state) => state.doctor.chatHeadsLoading);
   const messages = useSelector((state) => state.doctor.messages?.chats);
   const chatRef = useSelector((state) => state.doctor.messages?.chatReference);
   const chatError = useSelector((state) => state.doctor.chatError);
@@ -63,18 +67,48 @@ const Intercom = () => {
         }
       });
 
-      connection.on("ReceiveMessage", (user, message) => {
-        console.log('Received message from SignalR:', { user, message });
-        // Immediately update messages when receiving a new one
-        dispatch(getMessages(user));
-        dispatch(getChatHeads());
+      connection.on("ReceiveMessage", async (user, message) => {
+        console.log('SignalR: Received message from user:', user);
+        
+        if (selectedUser?.userRef === user) {
+          // If user is actively viewing this chat, automatically mark messages as read
+          try {
+            setAutoReadStatus('Marking as read...');
+            await dispatch(markMessagesAsRead(user));
+            // Refresh unread count after marking as read
+            await dispatch(getUnreadMessageCount());
+            setAutoReadStatus('Marked as read');
+            // Clear status after 2 seconds
+            setTimeout(() => setAutoReadStatus(''), 2000);
+          } catch (error) {
+            console.error('Error auto-marking messages as read:', error);
+            setAutoReadStatus('Error marking as read');
+            setTimeout(() => setAutoReadStatus(''), 3000);
+          }
+          // Refresh messages for the current chat
+          dispatch(getMessages(user));
+        } else {
+          // If message is from a different user, refresh unread count
+          dispatch(getUnreadMessageCount());
+        }
+        
+        // Always refresh chat heads when receiving a message to show new message indicators
+        console.log('SignalR: Refreshing chat heads after receiving message');
+        dispatch(getChatHeads()).then(() => {
+          console.log('SignalR: Chat heads refreshed successfully');
+        }).catch(error => {
+          console.error('SignalR: Error refreshing chat heads:', error);
+        });
       });
 
-      console.log('Starting SignalR connection...');
       connection.start()
         .then(() => {
           console.log('SignalR connection started successfully');
           setSignalRConnection(connection);
+          // Refresh chat heads when connection is established
+          dispatch(getChatHeads()).then(() => {
+            console.log('SignalR: Initial chat heads refresh completed');
+          });
           if (selectedUser && chatRef) {
             connection.invoke("JoinChat", chatRef)
               .then(() => {
@@ -144,18 +178,26 @@ const Intercom = () => {
     if (activeTab !== 'active') {
       loadUsers();
     }
+
+    // Set up polling interval for chat heads to ensure they stay updated
+    const chatHeadsInterval = setInterval(() => {
+      dispatch(getChatHeads());
+    }, 15000); // Increased to 15 seconds to reduce frequency
+
+    // Cleanup interval on unmount
+    return () => clearInterval(chatHeadsInterval);
   }, [dispatch, activeTab]);
 
-  // Filter users based on search query and active tab
+  // Filter users based on search query and active tab - optimized to reduce re-renders
   const filteredUsers = useMemo(() => {
     let users = [];
     
     switch(activeTab) {
       case 'active':
-        users = chatHeads;
+        users = chatHeads || [];
         break;
       case 'patients':
-        users = patients.map(patient => ({
+        users = (patients || []).map(patient => ({
           userRef: patient.userRef,
           username: `${patient.firstname} ${patient.lastname}`,
           userPicture: patient.picture,
@@ -182,7 +224,7 @@ const Intercom = () => {
       user.username.toLowerCase().includes(query) || 
       (user.userRole && user.userRole.toLowerCase().includes(query))
     );
-  }, [searchQuery, activeTab, chatHeads, patients, providers]);
+  }, [searchQuery, activeTab, chatHeads, patients, providers]); // Include full arrays to satisfy React Hook rules
 
   // Modified handleSendMessage to use SignalR
   const handleSendMessage = async () => {
@@ -256,6 +298,32 @@ const Intercom = () => {
     setSelectedUser(user);
     setInitialLoad(true); // Set loading only when switching users
     
+    // Mark messages as read when user is selected (iMessage-like behavior)
+    if (user?.userRef || user?.id) {
+      const userId = user.userRef || user.id;
+      
+      // Immediately mark as read optimistically (iMessage-like instant feedback)
+      console.log('iMessage-like: Immediately marking chat as read optimistically');
+      dispatch(markChatAsReadOptimistically(userId));
+      
+      try {
+        // Mark messages as read via API
+        await dispatch(markMessagesAsRead(userId));
+        
+        // Refresh unread count and chat heads to ensure consistency
+        await Promise.all([
+          dispatch(getUnreadMessageCount()),
+          dispatch(getChatHeads())
+        ]);
+        
+        console.log('iMessage-like: Messages marked as read successfully');
+      } catch (error) {
+        console.error('Error marking messages as read:', error);
+        // Even if API fails, we still want to refresh chat heads
+        dispatch(getChatHeads());
+      }
+    }
+    
     // Get messages for the selected user to establish chat reference
     try {
       const userId = user.userRef || user.id;
@@ -287,12 +355,12 @@ const Intercom = () => {
     }
   }, [selectedUser, chatRef, dispatch]);
 
-  // Add effect to scroll to bottom when messages update
+  // Combined auto-scroll effect to reduce re-renders
   useEffect(() => {
-    if (messagesEndRef.current) {
+    if (messagesEndRef.current && messages && messages.length > 0) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages]);
+  }, [messages]); // Include full messages array to satisfy React Hook rules
 
   const handleBackToList = () => {
     setSelectedUser(null);
@@ -393,7 +461,7 @@ const Intercom = () => {
                   >
                     {!user.userPicture && user.username.charAt(0).toUpperCase()}
                   </Avatar>
-                  {user.newMessage && <div className="new-message-indicator" />}
+                  {user.newMessage === true && <div className="new-message-indicator" />}
                 </div>
                 <div className="user-info">
                   <div className="user-name-container">
@@ -438,6 +506,15 @@ const Intercom = () => {
                   <span className="user-name">{selectedUser.username}</span>
                   {selectedUser.userRole && (
                     <small className="text-muted">{selectedUser.userRole}</small>
+                  )}
+                  {autoReadStatus && (
+                    <small style={{ 
+                      color: autoReadStatus.includes('Error') ? '#ff4d4f' : '#52c41a',
+                      fontSize: '11px',
+                      marginTop: '2px'
+                    }}>
+                      {autoReadStatus}
+                    </small>
                   )}
                 </div>
               </div>

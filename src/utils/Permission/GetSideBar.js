@@ -32,14 +32,13 @@ export const GetSideBar = () => {
   const { Sider } = Layout;
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const location = useLocation();
-
   useEffect(() => {
     // Fetch unread count when component mounts
     dispatch(getUnreadMessageCount());
     
     const interval = setInterval(() => {
       dispatch(getUnreadMessageCount());
-    }, 60000); 
+    }, 10000); 
         
     return () => clearInterval(interval);
   }, [dispatch, unreadCount]);
@@ -190,9 +189,13 @@ export const GetSideBar = () => {
       )}
       <Menu.Item key="12" icon={<FaStickyNote style={{ color: "#00ADEF" }} />}>
         <NavLink to="/patient/intercoms" style={{ textDecoration: "none" }}>
-          <Badge dot offset={[5, 0]} style={{ backgroundColor: '#ff4d4f' }}>
+          {unreadCount ? (
+            <Badge dot offset={[5, 0]} style={{ backgroundColor: '#ff4d4f' }}>
+              <span className="no-underline">INTERCOMS</span>
+            </Badge>
+          ) : (
             <span className="no-underline">INTERCOMS</span>
-          </Badge>
+          )}
         </NavLink>
       </Menu.Item>
       <Menu.Item key="8" icon={<FaBook style={{ color: "#00ADEF" }} />}>
@@ -241,9 +244,13 @@ export const GetSideBar = () => {
       </Menu.Item> */}
       <Menu.Item key="9" icon={<FaStickyNote style={{ color: "#00ADEF" }} />}>
         <NavLink to="/doctor/intercom" style={{ textDecoration: "none" }}>
-        <Badge dot offset={[5, 0]} style={{ backgroundColor: '#ff4d4f' }}>
+          {unreadCount ? (
+            <Badge dot offset={[5, 0]} style={{ backgroundColor: '#ff4d4f' }}>
+              <span className="no-underline">INTERCOMS</span>
+            </Badge>
+          ) : (
             <span className="no-underline">INTERCOMS</span>
-          </Badge>
+          )}
         </NavLink>
       </Menu.Item>
         <Menu.Item

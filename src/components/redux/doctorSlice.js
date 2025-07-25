@@ -1,5 +1,5 @@
 import axios from "axios";
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, createAction } from "@reduxjs/toolkit";
 import { getResponse, handleApiError } from "../Handler/ExceptionHandler";
 import { baseUrl } from "../../utils/envAccess";
 
@@ -936,6 +936,7 @@ export const getChatHeads = createAsyncThunk(
         `${baseUrl}Chat/GetChatsHead`,
         config
       );
+
       return response.data;
     } catch (error) {
       return rejectWithValue(error?.response?.data);
@@ -964,6 +965,32 @@ export const getUnreadMessageCount = createAsyncThunk(
     }
   }
 );
+
+export const markMessagesAsRead = createAsyncThunk(
+  "doctor/markMessagesAsRead",
+  async (userRef, { rejectWithValue, getState }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        "accept": "text/plain",
+        "Authorization": `Bearer ${user?.obj?.token}`,
+      },
+    };
+    try {
+      const response = await axios.post(
+        `${baseUrl}Chat/MarkMessagesAsRead/${userRef}`,
+        {},
+        config
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error?.response?.data);
+    }
+  }
+);
+
+// Action creator for optimistic chat read update
+export const markChatAsReadOptimistically = createAction('doctor/markChatAsReadOptimistically');
 
 const doctorSlices = createSlice({
   name: "doctor",
@@ -1000,6 +1027,8 @@ const doctorSlices = createSlice({
     chatLoading: false,
     chatError: null,
     unreadMessageCount: 0,
+    chatHeadsLoading: false,
+    unreadCountLoading: false,
   },
   reducers: {
     // Add a reducer for optimistic message updates
@@ -1397,31 +1426,62 @@ const doctorSlices = createSlice({
 
     // Get Chat Heads
     builder.addCase(getChatHeads.pending, (state) => {
-      state.loading = true;
+      state.chatHeadsLoading = true;
       state.error = null;
     });
     builder.addCase(getChatHeads.fulfilled, (state, action) => {
-      state.loading = false;
+      state.chatHeadsLoading = false;
+
       state.chatHeads = action.payload.chats || [];
     });
     builder.addCase(getChatHeads.rejected, (state, action) => {
-      state.loading = false;
+      state.chatHeadsLoading = false;
       state.error = action.payload;
     });
 
     // Get Unread Message Count
     builder.addCase(getUnreadMessageCount.pending, (state) => {
-      state.loading = true;
+      state.unreadCountLoading = true;
       state.error = null;
     });
     builder.addCase(getUnreadMessageCount.fulfilled, (state, action) => {
-      state.loading = false;
+      state.unreadCountLoading = false;
       state.unreadMessageCount = action.payload;
       state.error = null;
     });
     builder.addCase(getUnreadMessageCount.rejected, (state, action) => {
-      state.loading = false;
+      state.unreadCountLoading = false;
       state.error = action.payload;
+    });
+
+    // Mark Messages As Read
+    builder.addCase(markMessagesAsRead.pending, (state) => {
+      state.unreadCountLoading = true;
+      state.error = null;
+    });
+    builder.addCase(markMessagesAsRead.fulfilled, (state, action) => {
+      state.unreadCountLoading = false;
+      // The unread count will be refreshed by the getUnreadMessageCount call
+      state.error = null;
+    });
+    builder.addCase(markMessagesAsRead.rejected, (state, action) => {
+      state.unreadCountLoading = false;
+      state.error = action.payload;
+    });
+
+    // Optimistic update for marking chat as read
+    builder.addCase(markChatAsReadOptimistically, (state, action) => {
+      const userRef = action.payload;
+      // Update the specific chat head to remove new message indicator
+      if (state.chatHeads && state.chatHeads.length > 0) {
+        const chatHeadIndex = state.chatHeads.findIndex(chat => chat.userRef === userRef);
+        if (chatHeadIndex !== -1) {
+          state.chatHeads[chatHeadIndex] = {
+            ...state.chatHeads[chatHeadIndex],
+            newMessage: false
+          };
+        }
+      }
     });
   },
 });

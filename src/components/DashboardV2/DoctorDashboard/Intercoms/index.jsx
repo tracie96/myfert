@@ -22,12 +22,12 @@ const Intercom = () => {
   const [activeTab, setActiveTab] = useState('active');
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
-  const [initialLoad, setInitialLoad] = useState(true);
+
   const [signalRConnection, setSignalRConnection] = useState(null);
   const [autoReadStatus, setAutoReadStatus] = useState('');
   const dispatch = useDispatch();
   const messagesEndRef = useRef(null);
-console.log(initialLoad)
+
   const patients = useSelector((state) => state.doctor.patientList || []);
   const providers = useSelector((state) => state.doctor.careGivers || []);
   const chatHeads = useSelector((state) => state.doctor.chatHeads || []);
@@ -296,7 +296,6 @@ console.log(initialLoad)
   const handleUserSelect = async (user) => {
     console.log('Selected user:', user);
     setSelectedUser(user);
-    setInitialLoad(true); // Set loading only when switching users
     
     // Mark messages as read when user is selected (iMessage-like behavior)
     if (user?.userRef || user?.id) {
@@ -332,14 +331,11 @@ console.log(initialLoad)
       const response = await dispatch(getMessages(userId));
       if (getMessages.fulfilled.match(response)) {
         console.log('Messages fetched successfully:', response.payload);
-        setInitialLoad(false); // Clear loading after successful fetch
       } else {
         console.error('Failed to fetch messages:', response.error);
-        setInitialLoad(false); // Clear loading on error too
       }
     } catch (error) {
       console.error('Error fetching messages:', error);
-      setInitialLoad(false); // Clear loading on error
     }
   };
 
@@ -348,10 +344,8 @@ console.log(initialLoad)
     if (selectedUser && !chatRef) {
       console.log('No chat reference, fetching messages...');
       const userId = selectedUser.userRef || selectedUser.id;
-      setInitialLoad(true); // Set loading when fetching initial messages
       dispatch(getMessages(userId))
-        .then(() => setInitialLoad(false)) // Clear loading after fetch
-        .catch(() => setInitialLoad(false)); // Clear loading on error
+        .catch(error => console.error('Error fetching messages:', error));
     }
   }, [selectedUser, chatRef, dispatch]);
 
@@ -380,13 +374,53 @@ console.log(initialLoad)
       return new Date(a.createdOn) - new Date(b.createdOn);
     });
 
-    return sortedMessages.map((msg, index) => {
+    // Group messages by date
+    const groupedMessages = [];
+    let currentDate = null;
+
+    sortedMessages.forEach((msg, index) => {
+      const messageDate = new Date(msg.createdOn);
+      const dateString = messageDate.toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+
+      // Add date header if it's a new date
+      if (currentDate !== dateString) {
+        currentDate = dateString;
+        groupedMessages.push({
+          type: 'date-header',
+          date: dateString,
+          key: `date-${index}`
+        });
+      }
+
+      // Add message
+      groupedMessages.push({
+        type: 'message',
+        message: msg,
+        key: `msg-${index}`
+      });
+    });
+
+    return groupedMessages.map((item) => {
+      if (item.type === 'date-header') {
+        return (
+          <div key={item.key} className="date-header">
+            <span className="date-text">{item.date}</span>
+          </div>
+        );
+      }
+
+      const msg = item.message;
       // Message is from current user if isUser is true (since we're the doctor)
       const messagePosition = msg.isUser ? 'sent' : 'received';
       
       return (
         <div 
-          key={index} 
+          key={item.key} 
           className={`message-bubble ${messagePosition}`}
         >
           <div className="message-content">

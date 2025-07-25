@@ -358,13 +358,53 @@ const PatientIntercom = () => {
       return new Date(a.createdOn) - new Date(b.createdOn);
     });
 
-    return sortedMessages.map((msg, index) => {
+    // Group messages by date
+    const groupedMessages = [];
+    let currentDate = null;
+
+    sortedMessages.forEach((msg, index) => {
+      const messageDate = new Date(msg.createdOn);
+      const dateString = messageDate.toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+
+      // Add date header if it's a new date
+      if (currentDate !== dateString) {
+        currentDate = dateString;
+        groupedMessages.push({
+          type: 'date-header',
+          date: dateString,
+          key: `date-${index}`
+        });
+      }
+
+      // Add message
+      groupedMessages.push({
+        type: 'message',
+        message: msg,
+        key: `msg-${index}`
+      });
+    });
+
+    return groupedMessages.map((item) => {
+      if (item.type === 'date-header') {
+        return (
+          <div key={item.key} className="date-header">
+            <span className="date-text">{item.date}</span>
+          </div>
+        );
+      }
+
+      const msg = item.message;
       // Message is from current user if isUser is false (since we're the patient)
       const messagePosition = !msg.isUser ? 'sent' : 'received';
       
       return (
         <div 
-          key={index} 
+          key={item.key} 
           className={`message-bubble ${messagePosition}`}
         >
           <div className="message-content">

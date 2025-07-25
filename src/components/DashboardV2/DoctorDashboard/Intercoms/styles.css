@@ -359,6 +359,26 @@
   color: #666;
 }
 
+/* Date header styles - WhatsApp-like */
+.date-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 16px 0 8px 0;
+  padding: 0 16px;
+}
+
+.date-text {
+  background: rgba(0, 0, 0, 0.1);
+  color: #666;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 12px;
+  border-radius: 12px;
+  text-align: center;
+  white-space: nowrap;
+}
+
 .message-input-container {
   padding: 10px;
   background: white;

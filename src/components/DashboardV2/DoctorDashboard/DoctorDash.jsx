@@ -217,56 +217,59 @@ export default function DoctorDash() {
             // },
             {
                 title: "Clinician",
-                dataIndex: "clinician",
+                dataIndex: "providers",
                 key: "clinician",
-                render: (_, record) => <p>{record.createdById === loggedInUserId ? "You" : record.clinician || "Assign to me"}</p>,
+                render: (providers) => {
+                    if (!Array.isArray(providers) || providers.length === 0) return "-";
+            
+                    return (
+                        <div>
+                            {providers.map((provider, index) => (
+                                <div key={index}>
+                                    {provider.providerName}
+                                    {/* <br />
+                                    <span style={{ fontSize: "12px", color: "gray" }}>
+                                        {provider.providerRole}
+                                    </span> */}
+                                </div>
+                            ))}
+                        </div>
+                    );
+                },
             },
             {
-                title: "Action",
+                title: "Assigned to me",
                 dataIndex: "assignedToMe",
                 key: "assignedToMe",
                 render: (_, record) => {
-                    if (record.createdById === loggedInUserId) {
-                        return <p>You</p>;
-                    }
-                    if (record.clinician) {
-                        return <p>{record.clinician}</p>;
-                    }
             
                     return (
-                        <div
-                            onClick={async (e) => {
-                                e.stopPropagation(); // prevent row click
-                                try {
-                                    await dispatch(linkDoctorToPatient({ patientRef: record.userRef }));
-                                    message.success("Patient assigned to you.");
-                                    fetchPatientList(); // refresh list
-                                } catch (error) {
-                                    console.error(error);
-                                    message.error("Failed to assign patient.");
-                                }
-                            }}
-                            style={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "8px",
-                                cursor: "pointer",
-                                fontSize: "14px",
-                            }}
-                        >
-                            <span>Assign to Me</span>
-                            <div
-                                style={{
-                                    width: "16px",
-                                    height: "16px",
-                                    borderRadius: "50%",
-                                    border: "2px solid #666666",
-                                    backgroundColor: "#fff",
-                                    position: "relative",
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                            <span>Assign to me</span>
+                            <button
+                                onClick={async (e) => {
+                                    e.stopPropagation(); // prevent row click
+                                    try {
+                                        await dispatch(linkDoctorToPatient({ patientRef: record.userRef }));
+                                        message.success("Patient assigned to you.");
+                                        fetchPatientList(); // refresh list
+                                    } catch (error) {
+                                        console.error(error);
+                                        message.error("Failed to assign patient.");
+                                    }
                                 }}
-                            />
+                                style={{
+                                    padding: "10px",
+                                    border: "1px solid rgb(24, 144, 255)",
+                                    backgroundColor: "red",
+                                    color: "rgb(24, 144, 255)",
+                                    cursor: "pointer",
+                                    borderRadius: "20px",
+                                }}
+                            >
+                            </button>
                         </div>
-                    );
+                    );                    
                 },
             }
             
@@ -313,7 +316,7 @@ export default function DoctorDash() {
             //     ),
             // },
         ],
-        [loggedInUserId, dispatch, fetchPatientList]
+        [ dispatch, fetchPatientList]
     );
 
     const PatientList = React.memo(

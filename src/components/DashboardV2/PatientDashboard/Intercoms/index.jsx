@@ -56,7 +56,7 @@ const PatientIntercom = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('active');
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
-  const [initialLoad, setInitialLoad] = useState(true);
+
   const [signalRConnection, setSignalRConnection] = useState(null);
   const [autoReadStatus, setAutoReadStatus] = useState('');
   const dispatch = useDispatch();
@@ -70,75 +70,113 @@ const PatientIntercom = () => {
   const chatError = useSelector((state) => state.doctor.chatError);
   const authToken = useSelector((state) => state.authentication?.userAuth?.obj?.token);
 
-  // Initialize SignalR connection - optimized to prevent unnecessary reconnections
+  // Initialize SignalR connection - matching Doctor Intercom stable implementation
   useEffect(() => {
-    if (authToken && !signalRConnection) {
+    if (authToken) {
+      console.log('Setting up SignalR connection');
       const connection = new signalR.HubConnectionBuilder()
         .withUrl('https://myfertilitydevapi-prod.azurewebsites.net/chathub', {
           accessTokenFactory: () => authToken,
           skipNegotiation: true,
           transport: signalR.HttpTransportType.WebSockets
         })
-        .withAutomaticReconnect([0, 2000, 5000, 10000, 20000]) // More stable reconnection strategy
-        .configureLogging(signalR.LogLevel.Warning) // Reduce logging noise
+        .withAutomaticReconnect([0, 2000, 5000, 10000, 20000]) 
+        .configureLogging(signalR.LogLevel.Information)
         .build();
+
+      connection.onclose((error) => {
+        console.log('SignalR connection closed', error);
+      });
+
+      connection.onreconnecting((error) => {
+        console.log('SignalR reconnecting', error);
+      });
+
+      connection.onreconnected((connectionId) => {
+        console.log('SignalR reconnected', connectionId);
+        if (selectedUser && chatRef) {
+          connection.invoke("JoinChat", chatRef)
+            .catch(err => console.error('Error rejoining chat:', err));
+        }
+      });
 
       connection.on("ReceiveMessage", async (user, message) => {
         console.log('SignalR: Received message from user:', user);
         
-        try {
-          if (selectedUser?.userRef === user) {
-            // If user is actively viewing this chat, automatically mark messages as read
-            try {
-              setAutoReadStatus('Marking as read...');
-              await dispatch(markMessagesAsRead(user));
-              // Refresh unread count after marking as read
-              await dispatch(getUnreadMessageCount());
-              setAutoReadStatus('Marked as read');
-              // Clear status after 2 seconds
-              setTimeout(() => setAutoReadStatus(''), 2000);
-            } catch (error) {
-              console.error('Error auto-marking messages as read:', error);
-              setAutoReadStatus('Error marking as read');
-              setTimeout(() => setAutoReadStatus(''), 3000);
-            }
-            // Refresh messages for the current chat
-            dispatch(getMessages(user));
-          } else {
-            // If message is from a different user, refresh unread count
-            dispatch(getUnreadMessageCount());
+        if (selectedUser?.userRef === user) {
+          // If user is actively viewing this chat, automatically mark messages as read
+          try {
+            setAutoReadStatus('Marking as read...');
+            await dispatch(markMessagesAsRead(user));
+            // Refresh unread count after marking as read
+            await dispatch(getUnreadMessageCount());
+            setAutoReadStatus('Marked as read');
+            // Clear status after 2 seconds
+            setTimeout(() => setAutoReadStatus(''), 2000);
+          } catch (error) {
+            console.error('Error auto-marking messages as read:', error);
+            setAutoReadStatus('Error marking as read');
+            setTimeout(() => setAutoReadStatus(''), 3000);
           }
-          
-          // Only refresh chat heads if message is from a different user (to show new message indicators)
-          if (selectedUser?.userRef !== user) {
-            console.log('SignalR: Refreshing chat heads after receiving message from different user');
-            dispatch(getChatHeads()).then(() => {
-              console.log('SignalR: Chat heads refreshed successfully');
-            }).catch(error => {
-              console.error('SignalR: Error refreshing chat heads:', error);
-            });
-          }
-        } catch (error) {
-          console.error('Error handling SignalR message:', error);
+          // Refresh messages for the current chat
+          dispatch(getMessages(user));
+        } else {
+          // If message is from a different user, refresh unread count
+          dispatch(getUnreadMessageCount());
         }
+        
+        // Always refresh chat heads when receiving a message to show new message indicators
+        console.log('SignalR: Refreshing chat heads after receiving message');
+        dispatch(getChatHeads()).then(() => {
+          console.log('SignalR: Chat heads refreshed successfully');
+        }).catch(error => {
+          console.error('SignalR: Error refreshing chat heads:', error);
+        });
       });
 
       connection.start()
         .then(() => {
-          console.log('SignalR: Connection started successfully');
+          console.log('SignalR connection started successfully');
           setSignalRConnection(connection);
+          // Refresh chat heads when connection is established
+          dispatch(getChatHeads()).then(() => {
+            console.log('SignalR: Initial chat heads refresh completed');
+          });
           if (selectedUser && chatRef) {
-            connection.invoke("JoinChat", chatRef);
+            connection.invoke("JoinChat", chatRef)
+              .then(() => {
+                console.log('Joined chat:', chatRef);
+                dispatch(getMessages(selectedUser.userRef || selectedUser.id));
+              })
+              .catch(err => console.error('Error joining chat:', err));
           }
         })
-        .catch(err => console.error('SignalR Connection Error:', err));
+        .catch(err => {
+          console.error('SignalR Connection Error:', err);
+          // Try to fall back to long polling if WebSocket fails
+          const longPollingConnection = new signalR.HubConnectionBuilder()
+            .withUrl('https://myfertilitydevapi-prod.azurewebsites.net/chathub', {
+              accessTokenFactory: () => authToken,
+              transport: signalR.HttpTransportType.LongPolling
+            })
+            .withAutomaticReconnect()
+            .build();
+          
+          return longPollingConnection.start()
+            .then(() => {
+              console.log('SignalR fallback to long polling successful');
+              setSignalRConnection(longPollingConnection);
+            })
+            .catch(err => console.error('SignalR long polling fallback failed:', err));
+        });
 
       return () => {
-        connection.stop();
-        setSignalRConnection(null);
+        console.log('Cleaning up SignalR connection');
+        connection.stop()
+          .catch(err => console.error('Error stopping SignalR connection:', err));
       };
     }
-  }, [authToken, dispatch, selectedUser, chatRef, signalRConnection]);
+  }, [authToken, selectedUser, chatRef, dispatch]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -205,16 +243,13 @@ const PatientIntercom = () => {
   useEffect(() => {
     if (selectedUser?.userRef || selectedUser?.id) {
       const userId = selectedUser.userRef || selectedUser.id;
-      setInitialLoad(true); // Reset initial load when user changes
       console.log('Fetching messages for user:', userId);
       dispatch(getMessages(userId))
         .then(response => {
           console.log('Messages response:', response);
-          setInitialLoad(false);
         })
         .catch(error => {
           console.error('Error fetching messages:', error);
-          setInitialLoad(false);
         });
 
       // Set up polling interval for messages (only when user is selected)
@@ -310,10 +345,6 @@ const PatientIntercom = () => {
   };
 
   const renderMessages = () => {
-    if (initialLoad && !messages) {
-      return <div className="loading-messages">Loading messages...</div>;
-    }
-
     if (chatError) {
       return <div className="error-messages">Error loading messages: {chatError.message}</div>;
     }
@@ -414,9 +445,7 @@ const PatientIntercom = () => {
         </div>
 
         <div className="users-list">
-          {isLoading ? (
-            <div className="loading-state">Loading providers...</div>
-          ) : filteredProviders.length > 0 ? (
+          {filteredProviders.length > 0 ? (
             filteredProviders.map((provider) => (
               <UserItem
                 key={provider.userRef}
@@ -427,7 +456,7 @@ const PatientIntercom = () => {
             ))
           ) : (
             <div className="no-results">
-              No providers found matching "{searchQuery}"
+              {isLoading ? 'Loading providers...' : `No providers found matching "${searchQuery}"`}
             </div>
           )}
         </div>

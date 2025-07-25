@@ -27,7 +27,7 @@ const Intercom = () => {
   const [autoReadStatus, setAutoReadStatus] = useState('');
   const dispatch = useDispatch();
   const messagesEndRef = useRef(null);
-
+console.log(initialLoad)
   const patients = useSelector((state) => state.doctor.patientList || []);
   const providers = useSelector((state) => state.doctor.careGivers || []);
   const chatHeads = useSelector((state) => state.doctor.chatHeads || []);
@@ -367,11 +367,6 @@ const Intercom = () => {
   };
 
   const renderMessages = () => {
-    // Only show loading on initial load or user switch, not during message sends
-    if (initialLoad && !messages) {
-      return <div className="loading-messages">Loading messages...</div>;
-    }
-
     if (chatError) {
       return <div className="error-messages">Error loading messages: {chatError.message}</div>;
     }
@@ -440,9 +435,7 @@ const Intercom = () => {
         </div>
 
         <div className="users-list">
-          {isLoading ? (
-            <div className="loading-state">Loading {activeTab === 'active' ? 'chats' : activeTab === 'patients' ? 'patients' : 'providers'}...</div>
-          ) : filteredUsers.length > 0 ? (
+          {filteredUsers.length > 0 ? (
             filteredUsers.map((user) => (
               <div
                 key={user.userRef}
@@ -475,7 +468,7 @@ const Intercom = () => {
             ))
           ) : (
             <div className="no-results">
-              No {activeTab === 'active' ? 'active chats' : activeTab === 'patients' ? 'patients' : 'providers'} found matching "{searchQuery}"
+              {isLoading ? `Loading ${activeTab === 'active' ? 'chats' : activeTab === 'patients' ? 'patients' : 'providers'}...` : `No ${activeTab === 'active' ? 'active chats' : activeTab === 'patients' ? 'patients' : 'providers'} found matching "${searchQuery}"`}
             </div>
           )}
         </div>

@@ -41,7 +41,7 @@ export const GetSideBar = () => {
     }, 10000); 
         
     return () => clearInterval(interval);
-  }, [dispatch, unreadCount]);
+  }, [dispatch]); // Remove unreadCount from dependencies to prevent interval recreation
 
   const showDrawer = () => {
     setVisible(true);

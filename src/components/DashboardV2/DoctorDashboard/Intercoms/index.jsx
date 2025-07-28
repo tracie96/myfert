@@ -68,9 +68,10 @@ const Intercom = () => {
       });
 
       connection.on("ReceiveMessage", async (user, message) => {
-        console.log('SignalR: Received message from user:', user);
+        console.log('SignalR: Received message from user:', user, 'Current selected user:', selectedUser?.userRef);
         
         if (selectedUser?.userRef === user) {
+          console.log('SignalR: Message is from currently selected user - auto-marking as read and refreshing messages');
           // If user is actively viewing this chat, automatically mark messages as read
           try {
             setAutoReadStatus('Marking as read...');
@@ -85,9 +86,11 @@ const Intercom = () => {
             setAutoReadStatus('Error marking as read');
             setTimeout(() => setAutoReadStatus(''), 3000);
           }
-          // Refresh messages for the current chat
-          dispatch(getMessages(user));
+          // Immediately refresh messages for the current chat to show new message
+          console.log('SignalR: Immediately refreshing messages for active chat');
+          await dispatch(getMessages(user));
         } else {
+          console.log('SignalR: Message is from different user - only updating unread count');
           // If message is from a different user, refresh unread count
           dispatch(getUnreadMessageCount());
         }
@@ -339,6 +342,29 @@ const Intercom = () => {
     }
   };
 
+  // Load messages when a user is selected and set up polling
+  useEffect(() => {
+    if (selectedUser?.userRef || selectedUser?.id) {
+      const userId = selectedUser.userRef || selectedUser.id;
+      console.log('Setting up message polling for user:', userId);
+      
+      // Set up polling interval for messages (only when user is selected)
+      const messageInterval = setInterval(() => {
+        console.log('Polling messages for user:', userId);
+        dispatch(getMessages(userId))
+          .catch(error => {
+            console.error('Error polling messages:', error);
+          });
+      }, 20000); // 20 seconds to avoid conflicts with SignalR
+
+      // Cleanup interval on unmount or when user changes
+      return () => {
+        console.log('Cleaning up message polling for user:', userId);
+        clearInterval(messageInterval);
+      };
+    }
+  }, [dispatch, selectedUser]); // Include full selectedUser object to satisfy React Hook rules
+
   // Add effect to handle chat reference updates
   useEffect(() => {
     if (selectedUser && !chatRef) {
@@ -351,6 +377,7 @@ const Intercom = () => {
 
   // Combined auto-scroll effect to reduce re-renders
   useEffect(() => {
+    console.log('Messages updated, count:', messages?.length);
     if (messagesEndRef.current && messages && messages.length > 0) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }

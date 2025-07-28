@@ -118,8 +118,9 @@ const PatientIntercom = () => {
             setAutoReadStatus('Error marking as read');
             setTimeout(() => setAutoReadStatus(''), 3000);
           }
-          // Refresh messages for the current chat
-          dispatch(getMessages(user));
+          // Immediately refresh messages for the current chat to show new message
+          console.log('SignalR: Immediately refreshing messages for active chat');
+          await dispatch(getMessages(user));
         } else {
           // If message is from a different user, refresh unread count
           dispatch(getUnreadMessageCount());

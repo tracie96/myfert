@@ -5,7 +5,7 @@ import {
     SearchOutlined,
 } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { getZohoClientID, patientList, linkDoctorToPatient } from "../../redux/doctorSlice";
+import { getZohoClientID, patientList, linkDoctorToPatient, patientbyDoctor } from "../../redux/doctorSlice";
 import { useNavigate } from "react-router-dom";
 
 // const SwitchWrapper = ({ onChange, ...props }) => {
@@ -24,11 +24,14 @@ export default function DoctorDash() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState("");
+    const [activeTab, setActiveTab] = useState("1");
+
     const loggedInUserId = useSelector(
         (state) => state?.authentication?.userAuth?.obj?.id,
     );
 
-    const [allData, setAllData] = useState([]); // Store all data fetched from the API
+    const [allData, setAllData] = useState([]);
+
     //const [data, setData] = useState([]); // Data for the current page
     const [loading, setLoading] = useState(false);
     const [pagination, setPagination] = useState({
@@ -40,48 +43,59 @@ export default function DoctorDash() {
         sortField: null,
         sortOrder: null,
     });
+    const userAuth = useSelector(
+        (state) => state?.authentication?.userAuth
+    );
+
 
     const fetchPatientList = useCallback(async () => {
         setLoading(true);
         const params = {
-            page: 0, // Fetch all data in one go
-            size: 500, // Adjust the size accordingly to fetch all the data
+            page: 0,
+            size: 500,
             sortColumn: sortConfig.sortField,
             sortDirection: sortConfig.sortOrder,
         };
 
         try {
-            const response = await dispatch(patientList(params));
-            if (patientList.fulfilled.match(response)) {
+            let response;
+
+            if (activeTab === "1") {
+                response = await dispatch(patientList(params));
+            } else {
+                response = await dispatch(patientbyDoctor(loggedInUserId));
+            }
+
+            if (
+                (activeTab === "1" && patientList.fulfilled.match(response)) ||
+                (activeTab === "2" && patientbyDoctor.fulfilled.match(response))
+            ) {
                 const updatedList = response?.payload?.data?.map((item) => {
                     if (item && item.createdById === loggedInUserId) {
                         item.createdBy = "You";
                     }
                     return item;
                 });
-                setAllData(updatedList); // Store all data
+
+                setAllData(updatedList);
                 setPagination((prev) => ({
                     ...prev,
-                    total: updatedList?.length, // Set total from the fetched data
+                    total: updatedList?.length,
                 }));
-               // setData(updatedList?.slice(0, pagination.pageSize)); // Display the first page
             }
         } catch (error) {
-            console.error("Error fetching users:", error);
-            message.error("Error fetching user list.");
+            console.error("Error fetching patients:", error);
+            message.error("Error fetching patient list.");
         } finally {
             setLoading(false);
         }
-    }, [
-        dispatch,
-        sortConfig.sortField,
-        sortConfig.sortOrder,
-        loggedInUserId,
-    ]);
+    }, [dispatch, sortConfig.sortField, sortConfig.sortOrder, activeTab, loggedInUserId]);
+
 
     useEffect(() => {
         fetchPatientList();
-    }, [fetchPatientList]);
+    }, [fetchPatientList, activeTab]);
+
 
     useEffect(() => {
         dispatch(getZohoClientID()).then((response) => {
@@ -111,9 +125,9 @@ export default function DoctorDash() {
         // Update the data displayed based on the new pagination
         const startIndex = (current - 1) * pageSize;
         const endIndex = startIndex + pageSize;
-        console.log({endIndex})
+        console.log({ endIndex })
 
-       // setData(allData.slice(startIndex, endIndex));
+        // setData(allData.slice(startIndex, endIndex));
     }, []);
     const handleSearch = useCallback((value) => {
         setSearchQuery(value);
@@ -152,7 +166,7 @@ export default function DoctorDash() {
 
     const filteredData = useMemo(() => {
         if (!searchQuery) return dataWithIds;
-        console.log({dataWithIds})
+        console.log({ dataWithIds })
         return dataWithIds.filter((item) =>
             item.firstname.toLowerCase().includes(searchQuery.toLowerCase()) ||
             item.lastname.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -161,14 +175,13 @@ export default function DoctorDash() {
         );
     }, [searchQuery, dataWithIds]);
 
-    const columns = useMemo(
-        () => [
+    const columns = useMemo(() => {
+        const baseColumns = [
             {
                 title: "First Name",
                 dataIndex: "firstname",
                 key: "firstname",
                 sorter: true,
-
             },
             {
                 title: "Last Name",
@@ -192,41 +205,21 @@ export default function DoctorDash() {
                     ) : (
                         <FlagTwoTone fill="red" twoToneColor={"red"} style={{ color: "red" }} />
                     ),
-                responsive: ["sm"]
+                responsive: ["sm"],
             },
-
-            // {
-            //     title: "Lab",
-            //     dataIndex: "lab",
-            //     key: "lab",
-            //     render: (lab) =>
-            //         lab ? (
-            //             <ExperimentOutlined style={{ color: "blue" }} />
-            //         ) : (
-            //             <QuestionCircleOutlined style={{ color: "gray" }} />
-            //         ),
-            //     responsive: ["sm"]
-
-            // },
-            // {
-            //     title: "Group",
-            //     dataIndex: "groups",
-            //     key: "groups",
-            //     render: () => <p> Individual Screen - M</p>,
-            //     responsive: ["sm"]
-            // },
             {
                 title: "Clinician",
                 dataIndex: "providers",
                 key: "clinician",
                 render: (providers) => {
                     if (!Array.isArray(providers) || providers.length === 0) return "-";
-            
+
                     return (
                         <div>
                             {providers.map((provider, index) => (
                                 <div key={index}>
-                                    {provider.providerName} {provider.statusRemark ? `(${provider.statusRemark})` : ""}
+                                    {provider.providerName}
+                                    {provider.statusRemark === "Approved" ? ` (Approved)` : ""}
                                     <br />
                                 </div>
                             ))}
@@ -234,87 +227,84 @@ export default function DoctorDash() {
                     );
                 },
             },
-            {
+        ];
+
+        if (activeTab === "1") {
+            baseColumns.push({
                 title: "Assigned to me",
                 dataIndex: "assignedToMe",
                 key: "assignedToMe",
                 render: (_, record) => {
-            
+                    const providers = Array.isArray(record.providers) ? record.providers : [];
+                    const fullName = `${userAuth?.obj?.firstName} ${userAuth?.obj?.lastName}`;
+
+                    const isAssignedToMe = providers.some(
+                        (provider) => provider?.providerName === fullName
+                    );
+
+                    if (isAssignedToMe) {
+                        return (
+                            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                <button
+                                    style={{ color: "#fff", borderRadius: "7px" }}
+                                    className="ant-btn css-dev-only-do-not-override-f7vrd6 ant-btn-primary"
+                                    disabled
+                                >
+                                    Un-Assign
+                                </button>
+                            </div>
+                        );
+                    }
+
                     return (
                         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                            <span>Assign to me</span>
                             <button
+                                style={{ color: "#fff", borderRadius: "7px" }}
+                                className="ant-btn css-dev-only-do-not-override-f7vrd6 ant-btn-primary"
                                 onClick={async (e) => {
-                                    e.stopPropagation(); // prevent row click
+                                    e.stopPropagation();
                                     try {
                                         await dispatch(linkDoctorToPatient({ patientRef: record.userRef }));
                                         message.success("Patient assigned to you.");
-                                        fetchPatientList(); // refresh list
+                                        await fetchPatientList();
+                                        const fullName = `${userAuth?.obj?.firstName} ${userAuth?.obj?.lastName}`;
+
+                                        setAllData((prevData) =>
+                                            prevData.map((item) =>
+                                                item.userRef === record.userRef
+                                                    ? {
+                                                        ...item,
+                                                        providers: [
+                                                            ...(item.providers || []),
+                                                            {
+                                                                userRef: loggedInUserId,
+                                                                providerName: fullName,
+                                                                status: 0,
+                                                                statusRemark: "Pending",
+                                                            },
+                                                        ],
+                                                    }
+                                                    : item
+                                            )
+                                        );
                                     } catch (error) {
                                         console.error(error);
                                         message.error("Failed to assign patient.");
                                     }
                                 }}
-                                style={{
-                                    padding: "10px",
-                                    border: "1px solid rgb(24, 144, 255)",
-                                    backgroundColor: "red",
-                                    color: "rgb(24, 144, 255)",
-                                    cursor: "pointer",
-                                    borderRadius: "20px",
-                                }}
                             >
+                                Assign to me
                             </button>
                         </div>
-                    );                    
+                    );
                 },
-            }
-            
-            // {
-            //     title: "Action",
-            //     key: "action",
-            //     render: (_, record) => (
-            //         <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-            //             <SwitchWrapper
-            //                 checked={record.patientStat?.statLevel === 1 || record.patientStat?.statLevel === 2 || record.patientStat?.statLevel === 3 || record.patientStat?.statLevel === 4}
-            //                 onChange={(checked, e) => handleSwitchChange(checked, record, 1, e)}
-            //             />
+            });
+        }
+
+        return baseColumns;
+    }, [activeTab, dispatch, loggedInUserId, fetchPatientList, userAuth?.obj?.firstName, userAuth?.obj?.lastName]);
 
 
-            //         </div>
-            //     ),
-            // },
-            // {
-            //     title: "Second Step",
-            //     key: "action1",
-            //     render: (_, record) => (
-            //         <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-            //             <Switch
-            //                 checked={record.patientStat?.statLevel === 4 || record.patientStat?.statLevel === 2}
-            //                 onChange={(checked, e) => handleSwitchChange(checked, record, 2, e)}
-            //                 // disabled={
-            //                 //     record.patientStat?.statLevel !== 2
-            //                 // } 
-            //                 />
-
-            //         </div>
-            //     ),
-            // },
-            // {
-            //     title: "Third Step",
-            //     key: "action2",
-            //     render: (_, record) => (
-            //         <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-            //             <Switch
-            //                 checked={record.patientStat?.statLevel === 4}
-            //                 onChange={(checked, e) => handleSwitchChange(checked, record, 4, e)}
-            //                />
-            //         </div>
-            //     ),
-            // },
-        ],
-        [ dispatch, fetchPatientList]
-    );
 
     const PatientList = React.memo(
         () => (
@@ -325,8 +315,8 @@ export default function DoctorDash() {
                     dataSource={filteredData?.slice(
                         (pagination.current - 1) * pagination.pageSize,
                         pagination.current * pagination.pageSize
-                      )}
-                      
+                    )}
+
                     loading={loading}
                     // scroll={{ x: "max-content" }}
                     pagination={{
@@ -373,15 +363,25 @@ export default function DoctorDash() {
                 <p style={{ color: "#335CAD", fontWeight: "bold", fontSize: "16px" }}>
                     Patient List
                 </p>
-                <Tabs items={items}
-                    tabBarExtraContent={<div style={{ marginBottom: 16 }}>
-                        <Input
-                            placeholder="Search"
-                            value={searchQuery}
-                            onChange={(e) => handleSearch(e.target.value)}
-                            prefix={<SearchOutlined />}
-                        />
-                    </div>} />
+                <Tabs
+                    activeKey={activeTab}
+                    onChange={(key) => {
+                        setActiveTab(key);
+                        setSearchQuery(""); // Optional: reset search when changing tabs
+                    }}
+                    items={items}
+                    tabBarExtraContent={
+                        <div style={{ marginBottom: 16 }}>
+                            <Input
+                                placeholder="Search"
+                                value={searchQuery}
+                                onChange={(e) => handleSearch(e.target.value)}
+                                prefix={<SearchOutlined />}
+                            />
+                        </div>
+                    }
+                />
+
             </Col>
         </Row>
     );

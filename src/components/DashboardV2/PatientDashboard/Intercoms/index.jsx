@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef, memo } from 'react';
-import { Input, Avatar, Segmented } from 'antd';
+import { Input, Avatar, Segmented, Dropdown } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
+import { EllipsisOutlined, DeleteOutlined } from '@ant-design/icons';
 import { 
   fetchCareGivers, 
   getMessages, 
@@ -18,6 +19,29 @@ import * as signalR from '@microsoft/signalr';
 // Memoized user item component to prevent unnecessary re-renders
 const UserItem = memo(({ provider, isSelected, onSelect }) => {
   
+  const handleOptionsClick = (e) => {
+    e.stopPropagation();
+  };
+
+  const handleDeleteChat = (userRef) => {
+    console.log('Delete chat for user:', userRef);
+    // TODO: Implement delete functionality
+  };
+
+  // Create dropdown menu items
+  const getDropdownItems = (userRef) => [
+    {
+      key: 'delete',
+      label: (
+        <div className="dropdown-item">
+          <DeleteOutlined style={{ color: '#ff4d4f' }} />
+          <span style={{ color: '#ff4d4f' }}>Delete Chat</span>
+        </div>
+      ),
+      onClick: () => handleDeleteChat(userRef),
+    },
+  ];
+
   return (
     <div
       className={`user-item ${isSelected ? 'selected' : ''}`}
@@ -45,6 +69,21 @@ const UserItem = memo(({ provider, isSelected, onSelect }) => {
             <small className="user-role">{provider.userRole}</small>
           )}
         </div>
+      </div>
+      <div className="chat-options">
+        <Dropdown
+          menu={{ items: getDropdownItems(provider.userRef) }}
+          trigger={['click']}
+          placement="bottomRight"
+          overlayStyle={{ minWidth: '140px' }}
+        >
+          <button 
+            className="options-button"
+            onClick={(e) => handleOptionsClick(e)}
+          >
+            <EllipsisOutlined />
+          </button>
+        </Dropdown>
       </div>
     </div>
   );

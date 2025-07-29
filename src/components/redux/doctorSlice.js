@@ -26,6 +26,34 @@ export const patientList = createAsyncThunk(
   },
 );
 
+export const patientbyDoctor = createAsyncThunk(
+  "doctor/GetPatientByDoctor",
+  async ({ page = 0, size = 100 }, { rejectWithValue, getState, dispatch }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+
+    try {
+      // Corrected endpoint without placeholder strings
+      const response = await axios.get(
+        `${baseUrl}Doctor/GetPatientByDoctor/${page}/${size}`,
+        config
+      );
+      console.log(response, 'responsessss');
+      return response;
+    } catch (error) {
+      return rejectWithValue(
+        handleApiError(error?.response?.data, dispatch, user)
+      );
+    }
+  }
+);
+
+
 export const fetchCareGivers = createAsyncThunk(
   "doctor/fetchCareGivers",
   async ({ page, size }, { rejectWithValue, getState }) => {

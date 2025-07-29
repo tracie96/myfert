@@ -253,18 +253,12 @@
   visibility: hidden;
   transition: all 0.3s ease;
   z-index: 10;
-  pointer-events: none;
-}
-
-.chat-options.show {
-  pointer-events: auto;
 }
 
 .user-item:hover .chat-options,
 .user-item.selected .chat-options {
   opacity: 1;
   visibility: visible;
-  pointer-events: auto;
 }
 
 .options-button {
@@ -290,60 +284,10 @@
   font-size: 16px;
 }
 
-.options-dropdown {
-  position: fixed;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
-  min-width: 140px;
-  z-index: 9999;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-10px);
-  transition: all 0.3s ease;
-  display: none;
-}
-
-.options-dropdown.show {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-  display: block;
-}
-
-.option-item {
-  padding: 12px 16px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+.dropdown-item {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 14px;
-  color: #333;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.option-item:last-child {
-  border-bottom: none;
-}
-
-.option-item:hover {
-  background: rgba(0, 173, 239, 0.1);
-  color: #00adef;
-}
-
-.option-item.delete {
-  color: #ff4d4f;
-}
-
-.option-item.delete:hover {
-  background: rgba(255, 77, 79, 0.1);
-  color: #ff4d4f;
-}
-
-.option-item .anticon {
   font-size: 14px;
 }
 

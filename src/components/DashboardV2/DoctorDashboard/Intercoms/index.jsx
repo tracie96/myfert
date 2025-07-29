@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { Input, Avatar, Segmented } from 'antd';
+import { Input, Avatar, Segmented, Dropdown } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import { EllipsisOutlined, DeleteOutlined } from '@ant-design/icons';
 import { 
@@ -26,7 +26,6 @@ const Intercom = () => {
 
   const [signalRConnection, setSignalRConnection] = useState(null);
   const [autoReadStatus, setAutoReadStatus] = useState('');
-  const [openOptionsMenu, setOpenOptionsMenu] = useState(null);
   const dispatch = useDispatch();
   const messagesEndRef = useRef(null);
 
@@ -383,59 +382,26 @@ const Intercom = () => {
 
   const handleOptionsClick = (e, userRef) => {
     e.stopPropagation();
-    
-    if (openOptionsMenu === userRef) {
-      setOpenOptionsMenu(null);
-      return;
-    }
-
-    // Calculate position for the dropdown
-    const button = e.currentTarget;
-    const rect = button.getBoundingClientRect();
-    const dropdown = document.querySelector(`[data-user-ref="${userRef}"] .options-dropdown`);
-    
-    if (dropdown) {
-      let top = rect.bottom + 8;
-      let left = rect.right - 140; // 140px is min-width
-      
-      // Check if dropdown would go off the bottom of the screen
-      const dropdownHeight = 50; // Approximate height of dropdown
-      if (top + dropdownHeight > window.innerHeight) {
-        top = rect.top - dropdownHeight - 8;
-      }
-      
-      // Check if dropdown would go off the right side of the screen
-      if (left + 140 > window.innerWidth) {
-        left = window.innerWidth - 150;
-      }
-      
-      dropdown.style.top = `${top}px`;
-      dropdown.style.left = `${left}px`;
-    }
-    
-    setOpenOptionsMenu(userRef);
   };
 
-  const handleDeleteChat = (e, userRef) => {
-    e.stopPropagation();
+  const handleDeleteChat = (userRef) => {
     console.log('Delete chat for user:', userRef);
     // TODO: Implement delete functionality
-    setOpenOptionsMenu(null);
   };
 
-  // Close options menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (!event.target.closest('.chat-options')) {
-        setOpenOptionsMenu(null);
-      }
-    };
-
-    document.addEventListener('click', handleClickOutside);
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, []);
+  // Create dropdown menu items
+  const getDropdownItems = (userRef) => [
+    {
+      key: 'delete',
+      label: (
+        <div className="dropdown-item">
+          <DeleteOutlined style={{ color: '#ff4d4f' }} />
+          <span style={{ color: '#ff4d4f' }}>Delete Chat</span>
+        </div>
+      ),
+      onClick: () => handleDeleteChat(userRef),
+    },
+  ];
 
   const renderMessages = () => {
     if (chatError) {
@@ -576,22 +542,20 @@ const Intercom = () => {
                     )}
                   </div>
                 </div>
-                <div className={`chat-options ${openOptionsMenu === user.userRef ? 'show' : ''}`}>
-                  <button 
-                    className="options-button"
-                    onClick={(e) => handleOptionsClick(e, user.userRef)}
+                <div className="chat-options">
+                  <Dropdown
+                    menu={{ items: getDropdownItems(user.userRef) }}
+                    trigger={['click']}
+                    placement="bottomRight"
+                    overlayStyle={{ minWidth: '140px' }}
                   >
-                    <EllipsisOutlined />
-                  </button>
-                  <div className={`options-dropdown ${openOptionsMenu === user.userRef ? 'show' : ''}`}>
-                    <div 
-                      className="option-item delete"
-                      onClick={(e) => handleDeleteChat(e, user.userRef)}
+                    <button 
+                      className="options-button"
+                      onClick={(e) => handleOptionsClick(e, user.userRef)}
                     >
-                      <DeleteOutlined />
-                      Delete Chat
-                    </div>
-                  </div>
+                      <EllipsisOutlined />
+                    </button>
+                  </Dropdown>
                 </div>
               </div>
             ))

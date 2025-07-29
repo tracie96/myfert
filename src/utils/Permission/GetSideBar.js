@@ -33,15 +33,9 @@ export const GetSideBar = () => {
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const location = useLocation();
   useEffect(() => {
-    // Fetch unread count when component mounts
+
     dispatch(getUnreadMessageCount());
-    
-    const interval = setInterval(() => {
-      dispatch(getUnreadMessageCount());
-    }, 10000); 
-        
-    return () => clearInterval(interval);
-  }, [dispatch]); // Remove unreadCount from dependencies to prevent interval recreation
+  }, [dispatch]);
 
   const showDrawer = () => {
     setVisible(true);

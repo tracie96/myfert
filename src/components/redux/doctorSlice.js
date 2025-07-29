@@ -989,6 +989,29 @@ export const markMessagesAsRead = createAsyncThunk(
   }
 );
 
+export const markChatsAsRead = createAsyncThunk(
+  "doctor/markChatsAsRead",
+  async (chatRef, { rejectWithValue, getState }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        "accept": "text/plain",
+        "Authorization": `Bearer ${user?.obj?.token}`,
+      },
+    };
+    try {
+      const response = await axios.post(
+        `${baseUrl}Chat/MarkChatsAsRead/${chatRef}`,
+        {},
+        config
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error?.response?.data);
+    }
+  }
+);
+
 // Action creator for optimistic chat read update
 export const markChatAsReadOptimistically = createAction('doctor/markChatAsReadOptimistically');
 
@@ -1465,6 +1488,21 @@ const doctorSlices = createSlice({
       state.error = null;
     });
     builder.addCase(markMessagesAsRead.rejected, (state, action) => {
+      state.unreadCountLoading = false;
+      state.error = action.payload;
+    });
+
+    // Mark Chats As Read
+    builder.addCase(markChatsAsRead.pending, (state) => {
+      state.unreadCountLoading = true;
+      state.error = null;
+    });
+    builder.addCase(markChatsAsRead.fulfilled, (state, action) => {
+      state.unreadCountLoading = false;
+      // The unread count will be refreshed by the getUnreadMessageCount call
+      state.error = null;
+    });
+    builder.addCase(markChatsAsRead.rejected, (state, action) => {
       state.unreadCountLoading = false;
       state.error = action.payload;
     });

@@ -12,6 +12,7 @@ import {
   Checkbox,
   DatePicker,
   Space,
+  Modal,
 } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -28,6 +29,37 @@ import InfoModal from "./InfoModal";
 import { getReproductiveHealthPatient } from "../../../../redux/AssessmentController";
 import { baseUrl } from "../../../../../utils/envAccess";
 import CervicalMucusModal from "./CervicalMucusModal";
+
+// Difficulty Conceiving Info Modal Component
+const DifficultyConceivingModal = ({ visible, onClose }) => {
+  return (
+    <Modal
+      title={
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <InfoCircleOutlined style={{ color: '#1890ff', marginRight: '8px' }} />
+          <span>Difficulty Trying to Conceive</span>
+        </div>
+      }
+      open={visible}
+      onCancel={onClose}
+      footer={[
+        <Button key="close" onClick={onClose}>
+          Close
+        </Button>
+      ]}
+      width={500}
+    >
+      <div style={{ padding: '16px 0' }}>
+        <p style={{ marginBottom: '12px', fontSize: '14px', lineHeight: '1.5' }}>
+          <strong>Difficulty Trying to Conceive:</strong> This refers to attempting to become pregnant for 6 months or more without success. It can also include situations where there have been multiple miscarriages.
+        </p>
+        <p style={{ fontSize: '14px', lineHeight: '1.5', color: '#666' }}>
+          This definition helps healthcare providers understand your reproductive health journey and provide appropriate guidance and support.
+        </p>
+      </div>
+    </Modal>
+  );
+};
 
 const { Option } = Select;
 
@@ -66,6 +98,7 @@ const questions = [
     title: "Reproductive Health Assessment",
     name: "is_trying_to_conceive",
     options: ["Yes", "No"],
+    // Note: This question is conditionally skipped if the patient answers "Yes" to being pregnant
   },
   {
     question: "Have you experienced difficulty trying to conceive? ",
@@ -73,6 +106,7 @@ const questions = [
     title: "Reproductive Health Assessment",
     name: "is_difficulty_to_conceive",
     options: ["Yes", "No"],
+    infoIcon: true,
   },
   {
     question:
@@ -82,12 +116,13 @@ const questions = [
     name: "is_family_health_concern",
     options: ["Yes", "No", "Unsure"],
   },
-  // {
-  //   question: "Since what date have you been trying to conceive?",
-  //   type: "date",
-  //   title: "Trying to Conceive",
-  //   name: "is_trying_to_conceive_time",
-  // },
+  {
+    question: "For approximately how long have you been trying to conceive?",
+    type: "number",
+    title: "Trying to Conceive",
+    name: "is_trying_to_conceive_time",
+    unit: "months",
+  },
 
   {
     question:
@@ -139,28 +174,28 @@ const questions = [
         type: "text",
         name: "charting_method",
       },
-      // {
-      //   question:
-      //   "How long have you been using fertility awareness based method(s)?",
-      //   type: "select_two",
-      // },
+      {
+        question: "How long have you been using fertility awareness based method(s)?",
+        type: "select_two",
+        name: "charting_method_duration",
+      },
     ],
   },
 
-  // {
-  //   question:
-  //   "How frequently do you have intercourse during your fertile window?",
-  //   type: "number_with_radio",
-  //   title: "Trying to Conceive",
-  //   name: "intercourse_during_fertile",
-  //   subQuestions: [
-  //       {
-  //         type: "number_with_radio_sub",
-  //         label: "",
-  //         name: "intercourse_during_fertile_sub",
-  //       },
-  //     ],
-  // },
+  {
+    question:
+    "How frequently do you have intercourse during your fertile window?",
+    type: "number_with_radio",
+    title: "Trying to Conceive",
+    name: "intercourse_during_fertile",
+    subQuestions: [
+        {
+          type: "number_with_radio_sub",
+          label: "",
+          name: "intercourse_during_fertile_sub",
+        },
+      ],
+  },
 
   {
     question: "How much do you have intercourse each cycle?",
@@ -213,6 +248,33 @@ const questions = [
       },
     ],
   },
+
+  {
+    question: "Describe the duration and severity of pain during menstrual bleeding.",
+    type: "number_with_radio",
+    title: "Cycle Information",
+    name: "duration_per_cycle",
+    sub_question: "Duration per Cycle",
+    question_description: "Period Pain: ",
+    question_description_answer: "LOW BACKACHE",
+    subQuestions: [
+      {
+        type: "number_with_radio_sub",
+        name: "duration_per_cycle_low_backache",
+      },
+     
+      {
+        question: "Severity",
+        type: "radio",
+        label: "Severity",
+        options: ["Mild", "Moderate", "Severe"],
+        name: "duration_per_cycle_severity_low_backache",
+      },
+    ],
+  },
+  
+
+  
   {
     question:
       "Do you experience low backache or pelvic pain around the middle of your cycle (when you are not bleeding)? ",
@@ -221,7 +283,29 @@ const questions = [
     name: "is_lower_back_pain",
     options: ["Yes", "No"],
   },
-
+  {
+    question: "Describe the duration and severity of pain during the middle of your cycle.",
+    type: "number_with_radio",
+    title: "Cycle Information",
+    name: "duration_per_cycle_mid",
+    sub_question: "Duration per Cycle",
+    question_description: "Mid-Cycle Pain: ",
+    question_description_answer: "PELVIC PAIN (not during menstrual bleeding)",
+    subQuestions: [
+      {
+        type: "number_with_radio_sub",
+        name: "duration_per_cycle_mid_pelvic_pain",
+      },
+     
+      {
+        question: "Severity",
+        type: "radio",
+        label: "Severity",
+        options: ["Mild", "Moderate", "Severe", "None"],
+        name: "duration_per_cycle_mid_severity_pelvic_pain",
+      },
+    ],
+  },
   {
     question: "Duration per Cycle",
     type: "number_with_radio",
@@ -275,12 +359,11 @@ const questions = [
         options: [
           "Bloating",
           "Bowel Movement changes",
+          "Mood Changes",
           "Acne",
           "Breast tenderness",
-          "Mood Changes",
           "Headache/ Migraine",
           "Nausea",
-          "Migraine",
           "Fatigue",
           "Poor Sleep",
           "Energy Increase",
@@ -611,6 +694,9 @@ const ReproductiveHealth = ({ onComplete }) => {
   const [isDisabled, setisDisabled] = useState(false);
   const [showInfoMoal,setShowInfoMoal] = useState(false);
   const [showCervicalMucusModal, setShowCervicalMucusModal] = useState(false);
+  const [showDifficultyConceivingModal, setShowDifficultyConceivingModal] = useState(false);
+  const [showPrePeriodSpottingInfo, setShowPrePeriodSpottingInfo] = useState(false);
+  const [showAfterPeriodSpottingInfo, setShowAfterPeriodSpottingInfo] = useState(false);
   const [answers, setAnswers] = useState({});
   const totalQuestions = questions.length;
   const dispatch = useDispatch();
@@ -1100,10 +1186,22 @@ const ReproductiveHealth = ({ onComplete }) => {
     localStorage.setItem("currentQuestionIndex5", currentQuestionIndex + 1);
 
     const currentQuestion = questions[currentQuestionIndex];
-    if(currentQuestion.name === "is_pms_symptom" && answers.is_pms_symptom === "No"){
+    
+    // Conditional logic for skipping questions based on answers
+    if (currentQuestion.name === "isPregnant" && answers.isPregnant === "Yes") {
+      // If patient is pregnant, skip the "trying to conceive" question
+      // Set a default value for the skipped question
+      const newAnswers = { ...answers, is_trying_to_conceive: "No" };
+      setAnswers(newAnswers);
       setCurrentQuestionIndex(currentQuestionIndex + 2);
       return;
     }
+    
+    if (currentQuestion.name === "is_pms_symptom" && answers.is_pms_symptom === "No") {
+      setCurrentQuestionIndex(currentQuestionIndex + 2);
+      return;
+    }
+    
     if (currentQuestionIndex < totalQuestions - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
@@ -1112,10 +1210,24 @@ const ReproductiveHealth = ({ onComplete }) => {
   
   const handlePrevious = () => {
     let getPmsSymtom = JSON.parse(localStorage.getItem("reproductiveHealthAnswers"));
-    if(getPmsSymtom?.is_pms_symptom === "No"){
+    
+    // Handle reverse conditional logic when going back
+    if (getPmsSymtom?.is_pms_symptom === "No") {
       setCurrentQuestionIndex(currentQuestionIndex - 2);
       return;
     }
+    
+    // Handle reverse logic for pregnancy question
+    if (getPmsSymtom?.isPregnant === "Yes") {
+      // If we're currently on a question that was skipped due to pregnancy,
+      // go back to the pregnancy question
+      const currentQuestion = questions[currentQuestionIndex];
+      if (currentQuestion.name === "is_difficulty_to_conceive") {
+        setCurrentQuestionIndex(currentQuestionIndex - 2);
+        return;
+      }
+    }
+    
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
     }
@@ -1123,6 +1235,13 @@ const ReproductiveHealth = ({ onComplete }) => {
 
   const handleChange = (value, name) => {
     let updatedAnswers = { ...answers };
+    
+    // Handle pregnancy answer change - if user changes from "Yes" to "No", 
+    // clear the automatically set "trying to conceive" answer
+    if (name === "isPregnant" && value === "No" && answers.isPregnant === "Yes") {
+      updatedAnswers.is_trying_to_conceive = ""; // Clear the auto-set value
+    }
+    
     // Handle disabling of color/severity when unsure is selected
     if (name.endsWith("_unsure")) {
       const baseName = name.replace("_unsure", "");
@@ -1400,6 +1519,10 @@ const ReproductiveHealth = ({ onComplete }) => {
         
         utilizingFertilityAwareness: reproductiveHealthAnswers.current_therapy === "Yes",
         methodFertilityAwareness: reproductiveHealthAnswers.charting_method || "N/A",
+        fertilityAwarenessDuration: reproductiveHealthAnswers.current_therapy === "Yes" ? {
+          years: reproductiveHealthAnswers.charting_method_duration_years || 0,
+          months: reproductiveHealthAnswers.charting_method_duration_months || 0
+        } : null,
         intercouseDays: formatDuration(reproductiveHealthAnswers.intercourse_during_fertile_sub),
         intercouseEachCycle: reproductiveHealthAnswers.is_frequent_intercourse_cycle || "N/A",
         
@@ -1975,16 +2098,23 @@ const ReproductiveHealth = ({ onComplete }) => {
       case "number":
         return (
           <Col style={{ marginBottom: "20px", display: "block" }}>
-            {/* Number Input */}
-            <Input
-              type="number"
-              className="input_questtionnaire"
-              name={question.name}
-              value={answers[question.name] || ""}
-              onChange={(e) => handleChange(e.target.value, question.name)}
-              style={{ marginBottom: "10px", width: isMobile ? "100%" : "10%" }}
-              min={0}
-            />
+            {/* Number Input with Unit */}
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <InputNumber
+                className="input_questtionnaire"
+                name={question.name}
+                value={answers[question.name] || ""}
+                onChange={(value) => handleChange(value, question.name)}
+                style={{ width: isMobile ? "100%" : "120px" }}
+                min={0}
+                placeholder="0"
+              />
+              {question.unit && (
+                <span style={{ fontSize: "14px", color: "#666" }}>
+                  {question.unit}
+                </span>
+              )}
+            </div>
             <br />
             {/* Checkbox */}
             <Checkbox
@@ -2015,6 +2145,40 @@ const ReproductiveHealth = ({ onComplete }) => {
                   of menstrual bleeding (any days of spotting will remain in the
                   previous cycle) until the day before your next period begins.
                 </Paragraph>
+              </div>
+            )}
+            {question.name === "pre_spotting" && showPrePeriodSpottingInfo && (
+              <div className="info-box info-form-message">
+                <div className="info-header info-header-message">
+                  <Title
+                    level={5}
+                    className="info-title"
+                    style={{ color: "#335CAD" }}
+                  >
+                   <InfoCircleOutlined />  Pre-Period Spotting:
+                  </Title>
+                  <Paragraph>
+                    This spotting happens just before menstrual bleeding begins.
+                    It is light and often serves as an early indicator that the period is about to start.
+                    It usually transitions into the regular menstrual flow shortly afterward.
+                  </Paragraph>
+                </div>
+              </div>
+            )}
+            {question.name === "after_period_spot" && showAfterPeriodSpottingInfo && (
+              <div className="info-box info-form-message">
+                <div className="info-header info-header-message">
+                  <Title
+                    level={5}
+                    className="info-title"
+                    style={{ color: "#335CAD" }}
+                  >
+                    <InfoCircleOutlined />  After Period Spotting:
+                  </Title>
+                  <Paragraph>
+                    This may occur at the tail end of menstrual bleeding as the flow tapers off into lighter spotting.
+                  </Paragraph>
+                </div>
               </div>
             )}
             <p style={{color:"#000"}}>{question.sub_question}</p>
@@ -2260,7 +2424,17 @@ const ReproductiveHealth = ({ onComplete }) => {
               cursor: 'pointer',
               fontSize: '18px'
             }}
-            onClick={() => setShowCervicalMucusModal(true)}
+            onClick={() => {
+              if (questions[currentQuestionIndex].name === "is_difficulty_to_conceive") {
+                setShowDifficultyConceivingModal(true);
+              } else if (questions[currentQuestionIndex].name === "pre_spotting") {
+                setShowPrePeriodSpottingInfo(!showPrePeriodSpottingInfo);
+              } else if (questions[currentQuestionIndex].name === "after_period_spot") {
+                setShowAfterPeriodSpottingInfo(!showAfterPeriodSpottingInfo);
+              } else {
+                setShowCervicalMucusModal(true);
+              }
+            }}
           />
         )}
         <div>{
@@ -2273,6 +2447,23 @@ const ReproductiveHealth = ({ onComplete }) => {
           </span>
         )}
       </h3>
+      
+      {/* Show informational message when "trying to conceive" question is skipped */}
+      {questions[currentQuestionIndex].name === "is_difficulty_to_conceive" && 
+       answers.isPregnant === "Yes" && (
+        <div style={{ 
+          margin: "10px 0", 
+          padding: "10px", 
+          backgroundColor: "#f0f8ff", 
+          border: "1px solid #d6e4ff", 
+          borderRadius: "4px",
+          fontSize: "14px",
+          color: "#1890ff"
+        }}>
+          <InfoCircleOutlined style={{ marginRight: "8px" }} />
+          The question "Are you currently trying to conceive?" was skipped because you indicated you are currently pregnant.
+        </div>
+      )}
       {showInfoMoal && 
         <InfoModal
           showInfoMoal={showInfoMoal} 
@@ -2282,6 +2473,10 @@ const ReproductiveHealth = ({ onComplete }) => {
       <CervicalMucusModal 
         visible={showCervicalMucusModal}
         onClose={() => setShowCervicalMucusModal(false)}
+      />
+      <DifficultyConceivingModal
+        visible={showDifficultyConceivingModal}
+        onClose={() => setShowDifficultyConceivingModal(false)}
       />
       {renderInput(questions[currentQuestionIndex])}
     </div>

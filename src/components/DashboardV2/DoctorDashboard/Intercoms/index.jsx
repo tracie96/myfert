@@ -89,19 +89,19 @@ const Intercom = () => {
           // Immediately refresh messages for the current chat to show new message
           console.log('SignalR: Immediately refreshing messages for active chat');
           await dispatch(getMessages(user));
+          // Don't refresh chat heads for active chat to preserve optimistic update
         } else {
           console.log('SignalR: Message is from different user - only updating unread count');
-          // If message is from a different user, refresh unread count
+          // If message is from a different user, refresh unread count and chat heads
           dispatch(getUnreadMessageCount());
+          // Only refresh chat heads for non-active chats to show new message indicators
+          console.log('SignalR: Refreshing chat heads for non-active chat');
+          dispatch(getChatHeads()).then(() => {
+            console.log('SignalR: Chat heads refreshed successfully');
+          }).catch(error => {
+            console.error('SignalR: Error refreshing chat heads:', error);
+          });
         }
-        
-        // Always refresh chat heads when receiving a message to show new message indicators
-        console.log('SignalR: Refreshing chat heads after receiving message');
-        dispatch(getChatHeads()).then(() => {
-          console.log('SignalR: Chat heads refreshed successfully');
-        }).catch(error => {
-          console.error('SignalR: Error refreshing chat heads:', error);
-        });
       });
 
       connection.start()
@@ -232,7 +232,6 @@ const Intercom = () => {
   // Modified handleSendMessage to use SignalR
   const handleSendMessage = async () => {
     if (!message.trim()) {
-      console.log('Message is empty, not sending');
       return;
     }
 
@@ -260,7 +259,7 @@ const Intercom = () => {
       // Immediately update messages to show the sent message
       // Don't set initialLoad here since we're just updating
       await dispatch(getMessages(userId));
-      dispatch(getChatHeads());
+      // Don't refresh chat heads to preserve optimistic state
 
       // Try SignalR if available
       if (signalRConnection?.connectionStarted) {
@@ -312,17 +311,13 @@ const Intercom = () => {
         // Mark messages as read via API
         await dispatch(markMessagesAsRead(userId));
         
-        // Refresh unread count and chat heads to ensure consistency
-        await Promise.all([
-          dispatch(getUnreadMessageCount()),
-          dispatch(getChatHeads())
-        ]);
+        // Only refresh unread count, chat heads are already updated optimistically
+        await dispatch(getUnreadMessageCount());
         
         console.log('iMessage-like: Messages marked as read successfully');
       } catch (error) {
         console.error('Error marking messages as read:', error);
-        // Even if API fails, we still want to refresh chat heads
-        dispatch(getChatHeads());
+        // Don't refresh chat heads on error to preserve optimistic state
       }
     }
     
@@ -359,7 +354,6 @@ const Intercom = () => {
 
       // Cleanup interval on unmount or when user changes
       return () => {
-        console.log('Cleaning up message polling for user:', userId);
         clearInterval(messageInterval);
       };
     }
@@ -368,7 +362,6 @@ const Intercom = () => {
   // Add effect to handle chat reference updates
   useEffect(() => {
     if (selectedUser && !chatRef) {
-      console.log('No chat reference, fetching messages...');
       const userId = selectedUser.userRef || selectedUser.id;
       dispatch(getMessages(userId))
         .catch(error => console.error('Error fetching messages:', error));
@@ -377,7 +370,6 @@ const Intercom = () => {
 
   // Combined auto-scroll effect to reduce re-renders
   useEffect(() => {
-    console.log('Messages updated, count:', messages?.length);
     if (messagesEndRef.current && messages && messages.length > 0) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
@@ -515,7 +507,7 @@ const Intercom = () => {
                   >
                     {!user.userPicture && user.username.charAt(0).toUpperCase()}
                   </Avatar>
-                  {user.newMessage === true && <div className="new-message-indicator" />}
+                  {user.newMessage === true &&   !selectedUser?.userRef === user.userRef && <div className="new-message-indicator" />}
                 </div>
                 <div className="user-info">
                   <div className="user-name-container">
@@ -587,7 +579,6 @@ const Intercom = () => {
                   <div 
                     onClick={(e) => {
                       e.preventDefault();
-                      console.log('Send button clicked');
                       handleSendMessage();
                     }}
                     style={{ 

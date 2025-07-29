@@ -35,8 +35,8 @@ const UserItem = memo(({ provider, isSelected, onSelect }) => {
         >
           {!provider.userPicture && provider.username.charAt(0).toUpperCase()}
         </Avatar>
-        {/* Only show indicator if explicitly true */}
-        {provider.newMessage === true && <div className="new-message-indicator" />}
+        {/* Only show indicator if explicitly true AND not currently selected */}
+        {provider.newMessage === true && !isSelected && <div className="new-message-indicator" />}
       </div>
       <div className="user-info">
         <div className="user-name-container">
@@ -121,18 +121,18 @@ const PatientIntercom = () => {
           // Immediately refresh messages for the current chat to show new message
           console.log('SignalR: Immediately refreshing messages for active chat');
           await dispatch(getMessages(user));
+          // Don't refresh chat heads for active chat to preserve optimistic update
         } else {
-          // If message is from a different user, refresh unread count
+          // If message is from a different user, refresh unread count and chat heads
           dispatch(getUnreadMessageCount());
+          // Only refresh chat heads for non-active chats to show new message indicators
+          console.log('SignalR: Refreshing chat heads for non-active chat');
+          dispatch(getChatHeads()).then(() => {
+            console.log('SignalR: Chat heads refreshed successfully');
+          }).catch(error => {
+            console.error('SignalR: Error refreshing chat heads:', error);
+          });
         }
-        
-        // Always refresh chat heads when receiving a message to show new message indicators
-        console.log('SignalR: Refreshing chat heads after receiving message');
-        dispatch(getChatHeads()).then(() => {
-          console.log('SignalR: Chat heads refreshed successfully');
-        }).catch(error => {
-          console.error('SignalR: Error refreshing chat heads:', error);
-        });
       });
 
       connection.start()
@@ -234,7 +234,7 @@ const PatientIntercom = () => {
     // Set up polling interval for chat heads to ensure they stay updated
     const chatHeadsInterval = setInterval(() => {
       dispatch(getChatHeads());
-    }, 30000); // Increased to 30 seconds to reduce frequency
+    }, 15000); // Increased to 30 seconds to reduce frequency
 
     // Cleanup interval on unmount
     return () => clearInterval(chatHeadsInterval);
@@ -325,8 +325,7 @@ const PatientIntercom = () => {
 
         if (sendMessage.fulfilled.match(response)) {
           await dispatch(getMessages(userId));
-          // Refresh chat heads to update any indicators
-          await dispatch(getChatHeads());
+          // Don't refresh chat heads to preserve optimistic state
         }
       } catch (error) {
         console.error('Error sending message:', error);
@@ -400,8 +399,10 @@ const PatientIntercom = () => {
       }
 
       const msg = item.message;
-      // Message is from current user if isUser is false (since we're the patient)
-      const messagePosition = !msg.isUser ? 'sent' : 'received';
+      // Debug: Check the isUser value for each message
+      
+      // Message is from current user if isUser is true (same logic as doctor-side)
+      const messagePosition = msg.isUser ? 'sent' : 'received';
       
       return (
         <div 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Input, Avatar, Segmented } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
+import { EllipsisOutlined, DeleteOutlined } from '@ant-design/icons';
 import { 
   patientList as fetchPatientList, 
   fetchCareGivers, 
@@ -25,6 +26,7 @@ const Intercom = () => {
 
   const [signalRConnection, setSignalRConnection] = useState(null);
   const [autoReadStatus, setAutoReadStatus] = useState('');
+  const [openOptionsMenu, setOpenOptionsMenu] = useState(null);
   const dispatch = useDispatch();
   const messagesEndRef = useRef(null);
 
@@ -379,6 +381,62 @@ const Intercom = () => {
     setSelectedUser(null);
   };
 
+  const handleOptionsClick = (e, userRef) => {
+    e.stopPropagation();
+    
+    if (openOptionsMenu === userRef) {
+      setOpenOptionsMenu(null);
+      return;
+    }
+
+    // Calculate position for the dropdown
+    const button = e.currentTarget;
+    const rect = button.getBoundingClientRect();
+    const dropdown = document.querySelector(`[data-user-ref="${userRef}"] .options-dropdown`);
+    
+    if (dropdown) {
+      let top = rect.bottom + 8;
+      let left = rect.right - 140; // 140px is min-width
+      
+      // Check if dropdown would go off the bottom of the screen
+      const dropdownHeight = 50; // Approximate height of dropdown
+      if (top + dropdownHeight > window.innerHeight) {
+        top = rect.top - dropdownHeight - 8;
+      }
+      
+      // Check if dropdown would go off the right side of the screen
+      if (left + 140 > window.innerWidth) {
+        left = window.innerWidth - 150;
+      }
+      
+      dropdown.style.top = `${top}px`;
+      dropdown.style.left = `${left}px`;
+    }
+    
+    setOpenOptionsMenu(userRef);
+  };
+
+  const handleDeleteChat = (e, userRef) => {
+    e.stopPropagation();
+    console.log('Delete chat for user:', userRef);
+    // TODO: Implement delete functionality
+    setOpenOptionsMenu(null);
+  };
+
+  // Close options menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.chat-options')) {
+        setOpenOptionsMenu(null);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
+
   const renderMessages = () => {
     if (chatError) {
       return <div className="error-messages">Error loading messages: {chatError.message}</div>;
@@ -494,6 +552,7 @@ const Intercom = () => {
                 key={user.userRef}
                 className={`user-item ${selectedUser?.userRef === user.userRef ? 'selected' : ''}`}
                 onClick={() => handleUserSelect(user)}
+                data-user-ref={user.userRef}
               >
                 <div className="user-avatar">
                   <Avatar 
@@ -515,6 +574,23 @@ const Intercom = () => {
                     {user.userRole && (
                       <small className="user-role">{user.userRole}</small>
                     )}
+                  </div>
+                </div>
+                <div className={`chat-options ${openOptionsMenu === user.userRef ? 'show' : ''}`}>
+                  <button 
+                    className="options-button"
+                    onClick={(e) => handleOptionsClick(e, user.userRef)}
+                  >
+                    <EllipsisOutlined />
+                  </button>
+                  <div className={`options-dropdown ${openOptionsMenu === user.userRef ? 'show' : ''}`}>
+                    <div 
+                      className="option-item delete"
+                      onClick={(e) => handleDeleteChat(e, user.userRef)}
+                    >
+                      <DeleteOutlined />
+                      Delete Chat
+                    </div>
                   </div>
                 </div>
               </div>

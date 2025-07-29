@@ -133,28 +133,6 @@ export default function DoctorDash() {
         setSearchQuery(value);
     }, []);
 
-    // const handleSwitchChange = useCallback(
-    //     async (checked, record, step) => {
-    //         console.log(record, "step");
-
-    //         if (checked) {
-    //             try {
-    //                 await dispatch(increaseUserStep({ patientId: record.userRef, step }));
-
-    //                 console.log(
-    //                     `${step} stage switch ${checked ? "enabled" : "disabled"} for record:`,
-    //                     record
-    //                 );
-
-    //                 fetchPatientList();
-    //             } catch (error) {
-    //                 console.error("Error while updating step:", error);
-    //             }
-    //         }
-    //     },
-    //     [dispatch, fetchPatientList]
-    // );
-
     const dataWithIds = useMemo(
         () =>
             allData?.map((item) => ({
@@ -194,18 +172,46 @@ export default function DoctorDash() {
                 dataIndex: "email",
                 key: "email",
                 sorter: true,
+                render: (email) => (
+                    <div
+                        style={{
+                            maxWidth: "240px",
+                            overflowX: "auto",
+                            whiteSpace: "nowrap",
+                        }}
+                    >
+                        {email}
+                    </div>
+                ),
+            },
+
+            {
+                title: "DOB",
+                dataIndex: "dob",
+                key: "dob",
+                sorter: true,
+                render: (dob) => dob ? new Date(dob).toLocaleDateString() : "-",
             },
             {
-                title: "Flag",
-                dataIndex: "flag",
-                key: "flag",
-                render: (flag) =>
-                    flag ? (
-                        <FlagTwoTone style={{ color: "red" }} twoToneColor={"red"} />
-                    ) : (
-                        <FlagTwoTone fill="red" twoToneColor={"red"} style={{ color: "red" }} />
-                    ),
-                responsive: ["sm"],
+                title: "Country",
+                dataIndex: "country",
+                key: "country",
+                sorter: true,
+                render: (country) => country || "-",
+            },
+            {
+                title: "City",  // <-- New City column
+                dataIndex: "city",
+                key: "city",
+                sorter: true,
+                render: (city) => city || "-",
+            },
+            {
+                title: "Phone Number", // <-- New Phone Number column
+                dataIndex: "phoneNumber",
+                key: "phoneNumber",
+                sorter: true,
+                render: (phone) => phone || "-",
             },
             {
                 title: "Clinician",
@@ -217,11 +223,15 @@ export default function DoctorDash() {
                     return (
                         <div>
                             {providers.map((provider, index) => (
-                                <div key={index}>
-                                    {provider.providerName}
-                                    {provider.statusRemark === "Approved" ? ` (Approved)` : ""}
-                                    <br />
+                                <div key={index} style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+                                    <span>{provider.providerName}</span>
+
+                                    {provider.statusRemark && (
+                                        <span style={{ width: "12px", height: "12px", backgroundColor: provider.statusRemark.toLowerCase() === "approved" ? "#52c41a" : "#f5222d", borderRadius: "50%", display: "inline-block" }}></span>
+
+                                    )}
                                 </div>
+
                             ))}
                         </div>
                     );
@@ -242,32 +252,19 @@ export default function DoctorDash() {
                         (provider) => provider?.providerName === fullName
                     );
 
-                    if (isAssignedToMe) {
-                        return (
-                            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                                <button
-                                    style={{ color: "#fff", borderRadius: "7px" }}
-                                    className="ant-btn css-dev-only-do-not-override-f7vrd6 ant-btn-primary"
-                                    disabled
-                                >
-                                    Un-Assign
-                                </button>
-                            </div>
-                        );
-                    }
-
                     return (
                         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                             <button
-                                style={{ color: "#fff", borderRadius: "7px" }}
-                                className="ant-btn css-dev-only-do-not-override-f7vrd6 ant-btn-primary"
+                                disabled={isAssignedToMe}
+                                className="isAssignBtn ant-btn css-dev-only-do-not-override-f7vrd6 ant-btn-primary"
                                 onClick={async (e) => {
+                                    if (isAssignedToMe) return;
+
                                     e.stopPropagation();
                                     try {
                                         await dispatch(linkDoctorToPatient({ patientRef: record.userRef }));
                                         message.success("Patient assigned to you.");
                                         await fetchPatientList();
-                                        const fullName = `${userAuth?.obj?.firstName} ${userAuth?.obj?.lastName}`;
 
                                         setAllData((prevData) =>
                                             prevData.map((item) =>
@@ -293,13 +290,14 @@ export default function DoctorDash() {
                                     }
                                 }}
                             >
-                                Assign to me
+                                {isAssignedToMe ? "Un-Assign" : "Assign"}
                             </button>
                         </div>
                     );
                 },
             });
         }
+
 
         return baseColumns;
     }, [activeTab, dispatch, loggedInUserId, fetchPatientList, userAuth?.obj?.firstName, userAuth?.obj?.lastName]);
@@ -308,38 +306,51 @@ export default function DoctorDash() {
 
     const PatientList = React.memo(
         () => (
-            <Card>
+            <>
+                <div className="status-indicators">
+                    <div className="status-item">
+                        <span className="status-dot approved"></span>
+                        <span>Approved</span>
+                    </div>
+                    <div className="status-item">
+                        <span className="status-dot pending"></span>
+                        <span>Pending</span>
+                    </div>
+                </div>
 
-                <Table
-                    columns={columns}
-                    dataSource={filteredData?.slice(
-                        (pagination.current - 1) * pagination.pageSize,
-                        pagination.current * pagination.pageSize
-                    )}
+                <Card>
+                    <Table
+                        columns={columns}
+                        dataSource={filteredData?.slice(
+                            (pagination.current - 1) * pagination.pageSize,
+                            pagination.current * pagination.pageSize
+                        )}
 
-                    loading={loading}
-                    // scroll={{ x: "max-content" }}
-                    pagination={{
-                        position: ['bottomRight'],
-                        current: pagination.current,
-                        pageSize: pagination.pageSize,
-                        total: pagination.total,
-                        showSizeChanger: true,
-                    }}
-                    onChange={handleTableChange}
-                    rowKey="id"
-                    onRow={(record) => ({
-                        onClick: (e) => {
-                            if (!e.target.closest(".ant-switch")) {
-                                localStorage.setItem("patient", JSON.stringify(record));
-                                navigate(`/doctor/user/${record.userRef}`, {
-                                    state: { user: record },
-                                });
-                            }
-                        },
-                    })}
-                />
-            </Card>
+                        loading={loading}
+                        // scroll={{ x: "max-content" }}
+                        pagination={{
+                            position: ['bottomRight'],
+                            current: pagination.current,
+                            pageSize: pagination.pageSize,
+                            total: pagination.total,
+                            showSizeChanger: true,
+                        }}
+                        onChange={handleTableChange}
+                        rowKey="id"
+                        scroll={{ x: "max-content" }}
+                    // onRow={(record) => ({
+                    //     onClick: (e) => {
+                    //         if (!e.target.closest(".ant-switch")) {
+                    //             localStorage.setItem("patient", JSON.stringify(record));
+                    //             navigate(`/doctor/user/${record.userRef}`, {
+                    //                 state: { user: record },
+                    //             });
+                    //         }
+                    //     },
+                    // })}
+                    />
+                </Card>
+            </>
         ),
         [columns, filteredData, loading, handleTableChange, navigate, pagination],
     );

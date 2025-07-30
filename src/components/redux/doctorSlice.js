@@ -146,9 +146,9 @@ export const deletePatientBloodWork = createAsyncThunk(
 
 export const linkDoctorToPatient = createAsyncThunk(
   "doctor/linkDoctorToPatient",
-  async ({ patientRef }, { rejectWithValue, getState, dispatch }) => {
+  async ({ patientRef, link = true }, { rejectWithValue, getState, dispatch }) => {
     const user = getState()?.authentication?.userAuth;
-    
+
     const config = {
       headers: {
         "Content-Type": "application/json",
@@ -159,7 +159,7 @@ export const linkDoctorToPatient = createAsyncThunk(
     try {
       const response = await axios.post(
         `${baseUrl}Doctor/LinkDoctorToPatient`,
-        { patientRef, link: true }, // send 'link: true' as required
+        { patientRef, link }, // now uses dynamic value
         config
       );
       return response.data;
@@ -170,6 +170,7 @@ export const linkDoctorToPatient = createAsyncThunk(
     }
   }
 );
+
 
 export const addPatientBloodWork = createAsyncThunk(
   "doctor/addPatientBloodWork",

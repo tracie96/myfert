@@ -183,35 +183,6 @@ export default function DoctorDash() {
                     </div>
                 ),
             },
-
-            {
-                title: "DOB",
-                dataIndex: "dob",
-                key: "dob",
-                sorter: true,
-                render: (dob) => dob ? new Date(dob).toLocaleDateString() : "-",
-            },
-            {
-                title: "Country",
-                dataIndex: "country",
-                key: "country",
-                sorter: true,
-                render: (country) => country || "-",
-            },
-            {
-                title: "City",  // <-- New City column
-                dataIndex: "city",
-                key: "city",
-                sorter: true,
-                render: (city) => city || "-",
-            },
-            {
-                title: "Phone Number", // <-- New Phone Number column
-                dataIndex: "phoneNumber",
-                key: "phoneNumber",
-                sorter: true,
-                render: (phone) => phone || "-",
-            },
             {
                 title: "Clinician",
                 dataIndex: "providers",
@@ -254,40 +225,49 @@ export default function DoctorDash() {
                     return (
                         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                             <button
-                                disabled={isAssignedToMe}
                                 className="isAssignBtn ant-btn css-dev-only-do-not-override-f7vrd6 ant-btn-primary"
                                 onClick={async (e) => {
-                                    if (isAssignedToMe) return;
-
-                                    e.stopPropagation();
                                     try {
-                                        await dispatch(linkDoctorToPatient({ patientRef: record.userRef }));
-                                        message.success("Patient assigned to you.");
+                                        const payload = {
+                                            patientRef: record.userRef,
+                                            link: !isAssignedToMe,  // false if already assigned (Un-Assign), true otherwise
+                                        };
+                                
+                                        await dispatch(linkDoctorToPatient(payload));
+                                        message.success(`Patient ${isAssignedToMe ? "unassigned" : "assigned"} successfully.`);
                                         await fetchPatientList();
-
+                                
                                         setAllData((prevData) =>
                                             prevData.map((item) =>
                                                 item.userRef === record.userRef
                                                     ? {
                                                         ...item,
-                                                        providers: [
-                                                            ...(item.providers || []),
-                                                            {
-                                                                userRef: loggedInUserId,
-                                                                providerName: fullName,
-                                                                status: 0,
-                                                                statusRemark: "Pending",
-                                                            },
-                                                        ],
+                                                        providers: !isAssignedToMe
+                                                            ? [
+                                                                ...(item.providers || []).filter(
+                                                                    (provider) => provider.providerName !== fullName
+                                                                ),
+                                                                {
+                                                                    userRef: loggedInUserId,
+                                                                    providerName: fullName,
+                                                                    status: 0,
+                                                                    statusRemark: "Pending",
+                                                                },
+                                                            ]
+                                                            : (item.providers || []).filter(
+                                                                (provider) => provider.providerName !== fullName
+                                                            ),
                                                     }
                                                     : item
                                             )
                                         );
+                                
                                     } catch (error) {
                                         console.error(error);
-                                        message.error("Failed to assign patient.");
+                                        message.error(`Failed to ${isAssignedToMe ? "unassign" : "assign"} patient.`);
                                     }
                                 }}
+                                
                             >
                                 {isAssignedToMe ? "Un-Assign" : "Assign"}
                             </button>

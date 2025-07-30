@@ -26,6 +26,7 @@ const Intercom = () => {
 
   const [signalRConnection, setSignalRConnection] = useState(null);
   const [autoReadStatus, setAutoReadStatus] = useState('');
+  const [connectionStatus, setConnectionStatus] = useState('disconnected');
   const dispatch = useDispatch();
   const messagesEndRef = useRef(null);
 
@@ -54,14 +55,17 @@ const Intercom = () => {
 
       connection.onclose((error) => {
         console.log('SignalR connection closed', error);
+        setConnectionStatus('disconnected');
       });
 
       connection.onreconnecting((error) => {
         console.log('SignalR reconnecting', error);
+        setConnectionStatus('reconnecting');
       });
 
       connection.onreconnected((connectionId) => {
         console.log('SignalR reconnected', connectionId);
+        setConnectionStatus('connected');
         if (selectedUser && chatRef) {
           connection.invoke("JoinChat", chatRef)
             .catch(err => console.error('Error rejoining chat:', err));
@@ -69,7 +73,17 @@ const Intercom = () => {
       });
 
       connection.on("ReceiveMessage", async (user, message) => {
-        console.log('SignalR: Received message from user:', user, 'Current selected user:', selectedUser?.userRef);
+        console.log('SignalR: Received message from user:', user, 'Message:', message, 'Current selected user:', selectedUser?.userRef);
+        
+        // Always dispatch getUnreadMessageCount when a new message comes in
+        // This ensures the sidebar and other components get updated
+        console.log('SignalR: Dispatching getUnreadMessageCount for new message');
+        try {
+          await dispatch(getUnreadMessageCount());
+          console.log('SignalR: getUnreadMessageCount dispatched successfully');
+        } catch (error) {
+          console.error('SignalR: Error dispatching getUnreadMessageCount:', error);
+        }
         
         if (selectedUser?.userRef === user) {
           console.log('SignalR: Message is from currently selected user - auto-marking as read and refreshing messages');
@@ -77,7 +91,7 @@ const Intercom = () => {
           try {
             setAutoReadStatus('Marking as read...');
             await dispatch(markMessagesAsRead(user));
-            // Refresh unread count after marking as read
+            // Refresh unread count again after marking as read
             await dispatch(getUnreadMessageCount());
             setAutoReadStatus('Marked as read');
             // Clear status after 2 seconds
@@ -92,15 +106,18 @@ const Intercom = () => {
           await dispatch(getMessages(user));
           // Don't refresh chat heads for active chat to preserve optimistic update
         } else {
-          console.log('SignalR: Message is from different user - only updating unread count');
-          // If message is from a different user, refresh unread count and chat heads
-          dispatch(getUnreadMessageCount());
-          // Only refresh chat heads for non-active chats to show new message indicators
+          console.log('SignalR: Message is from different user - updating chat heads');
+          // If message is from a different user, refresh chat heads to show new message indicators
           console.log('SignalR: Refreshing chat heads for non-active chat');
-          dispatch(getChatHeads()).then(() => {
-            console.log('SignalR: Chat heads refreshed successfully');
+          dispatch(getChatHeads()).then((result) => {
+            console.log('SignalR: Chat heads refreshed successfully', result);
           }).catch(error => {
             console.error('SignalR: Error refreshing chat heads:', error);
+          });
+          dispatch(getUnreadMessageCount()).then(() => {
+            console.log('SignalR: Unread count refreshed for non-active chat');
+          }).catch(error => {
+            console.error('SignalR: Error refreshing unread count:', error);
           });
         }
       });
@@ -109,9 +126,13 @@ const Intercom = () => {
         .then(() => {
           console.log('SignalR connection started successfully');
           setSignalRConnection(connection);
+          setConnectionStatus('connected');
           // Refresh chat heads when connection is established
           dispatch(getChatHeads()).then(() => {
             console.log('SignalR: Initial chat heads refresh completed');
+          });
+          dispatch(getUnreadMessageCount()).then(() => {
+            console.log('SignalR: Initial unread count refresh completed');
           });
           if (selectedUser && chatRef) {
             connection.invoke("JoinChat", chatRef)
@@ -161,6 +182,7 @@ const Intercom = () => {
   useEffect(() => {
     // Load chat heads first
     dispatch(getChatHeads());
+    dispatch(getUnreadMessageCount());
 
     const loadUsers = async () => {
       try {
@@ -186,6 +208,7 @@ const Intercom = () => {
     // Set up polling interval for chat heads to ensure they stay updated
     const chatHeadsInterval = setInterval(() => {
       dispatch(getChatHeads());
+      dispatch(getUnreadMessageCount());
     }, 15000); // Increased to 15 seconds to reduce frequency
 
     // Cleanup interval on unmount
@@ -199,6 +222,7 @@ const Intercom = () => {
     switch(activeTab) {
       case 'active':
         users = chatHeads || [];
+        console.log('Chat heads data:', chatHeads);
         break;
       case 'patients':
         users = (patients || []).map(patient => ({
@@ -290,6 +314,12 @@ const Intercom = () => {
     setActiveTab(tab);
     setSelectedUser(null);
     setSearchQuery(''); // Clear search when switching tabs
+    
+    // Refresh data when switching tabs
+    if (tab === 'active') {
+      dispatch(getChatHeads());
+      dispatch(getUnreadMessageCount());
+    }
   };
 
   const handleSearch = (e) => {
@@ -480,12 +510,21 @@ const Intercom = () => {
   return (
     <div className="intercom-container">
       <div className={`messages-sidebar ${isMobileView && selectedUser ? 'hidden' : ''}`}>
-        <div className="messages-header">
-          <h2>MESSAGES</h2>
-          <button className="new-message-btn">
-            <i className="fas fa-sync-alt"></i> New Message
-          </button>
-        </div>
+                  <div className="messages-header">
+            <h2>MESSAGES</h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ 
+                fontSize: '10px', 
+                padding: '2px 6px', 
+                borderRadius: '8px', 
+                background: connectionStatus === 'connected' ? 'rgba(76, 175, 80, 0.2)' : 'rgba(244, 67, 54, 0.2)',
+                color: connectionStatus === 'connected' ? '#fff' : '#f44336'
+              }}>
+                {connectionStatus}
+              </div>
+           
+            </div>
+          </div>
         
         <div className="search-container">
           <Input
@@ -532,7 +571,10 @@ const Intercom = () => {
                   >
                     {!user.userPicture && user.username.charAt(0).toUpperCase()}
                   </Avatar>
-                  {user.newMessage === true &&   !selectedUser?.userRef === user.userRef && <div className="new-message-indicator" />}
+                  {(user.newMessage === true || user.hasUnreadMessages === true || user.unreadCount > 0) && selectedUser?.userRef !== user.userRef && (
+                    <div className="new-message-indicator" />
+                  )}
+                 
                 </div>
                 <div className="user-info">
                   <div className="user-name-container">

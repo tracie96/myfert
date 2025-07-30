@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { Menu, Button, Drawer, Layout, Modal, Badge } from "antd";
 import { useMediaQuery } from "react-responsive";
 import { getUnreadMessageCount } from "../../components/redux/doctorSlice";
+import globalSignalRService from "../globalSignalR";
 // Import React Icons
 import {
   FaQrcode,
@@ -29,13 +30,59 @@ export const GetSideBar = () => {
   const accessDetails = useSelector((state) => state.intake.accessDetails);
   const [visible, setVisible] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [hasNewMessages, setHasNewMessages] = useState(false);
   const { Sider } = Layout;
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const location = useLocation();
   useEffect(() => {
+    // Initial unread count fetch
+    setTimeout(() => {
+      dispatch(getUnreadMessageCount());
+    }, 1000);
 
-    dispatch(getUnreadMessageCount());
-  }, [dispatch]);
+    // Initialize global SignalR connection for real-time notifications
+    const initializeSignalR = async () => {
+      if (userAuth?.obj?.token) {
+        try {
+          await globalSignalRService.initialize(userAuth.obj.token);
+          
+          // Add listener for new messages
+          const unsubscribe = globalSignalRService.addListener((eventType, data) => {
+            if (eventType === 'newMessage') {
+              console.log('Sidebar: New message received, updating unread count');
+              setHasNewMessages(true);
+              dispatch(getUnreadMessageCount());
+              
+              // Clear the new message indicator after 5 seconds
+              setTimeout(() => {
+                setHasNewMessages(false);
+              }, 5000);
+            }
+          });
+
+          // Cleanup listener on unmount
+          return unsubscribe;
+        } catch (error) {
+          console.error('Error initializing global SignalR in sidebar:', error);
+        }
+      }
+    };
+
+    const unsubscribe = initializeSignalR();
+
+    // Set up polling as fallback (every 30 seconds)
+    const pollingInterval = setInterval(() => {
+      dispatch(getUnreadMessageCount());
+    }, 30000);
+
+    // Cleanup function
+    return () => {
+      if (unsubscribe && typeof unsubscribe === 'function') {
+        unsubscribe();
+      }
+      clearInterval(pollingInterval);
+    };
+  }, [dispatch, userAuth?.obj?.token]);
 
   const showDrawer = () => {
     setVisible(true);
@@ -181,14 +228,14 @@ export const GetSideBar = () => {
           </NavLink>
         </Menu.Item>
       )}
-      <Menu.Item key="12" icon={<FaStickyNote style={{ color: "#00ADEF" }} />}>
+      <Menu.Item key="12" icon={<FaStickyNote style={{ color: hasNewMessages ? "#ff4d4f" : "#00ADEF" }} />}>
         <NavLink to="/patient/intercoms" style={{ textDecoration: "none" }}>
           {unreadCount ? (
             <Badge dot offset={[5, 0]} style={{ backgroundColor: '#ff4d4f' }}>
-              <span className="no-underline">INTERCOMS</span>
+              <span className="no-underline" style={{ color: hasNewMessages ? "#ff4d4f" : "inherit" }}>INTERCOMS</span>
             </Badge>
           ) : (
-            <span className="no-underline">INTERCOMS</span>
+            <span className="no-underline" style={{ color: hasNewMessages ? "#ff4d4f" : "inherit" }}>INTERCOMS</span>
           )}
         </NavLink>
       </Menu.Item>
@@ -236,14 +283,14 @@ export const GetSideBar = () => {
           <span>FAX</span>
         </NavLink>
       </Menu.Item> */}
-      <Menu.Item key="9" icon={<FaStickyNote style={{ color: "#00ADEF" }} />}>
+      <Menu.Item key="9" icon={<FaStickyNote style={{ color: hasNewMessages ? "#ff4d4f" : "#00ADEF" }} />}>
         <NavLink to="/doctor/intercom" style={{ textDecoration: "none" }}>
           {unreadCount ? (
             <Badge dot offset={[5, 0]} style={{ backgroundColor: '#ff4d4f' }}>
-              <span className="no-underline">INTERCOMS</span>
+              <span className="no-underline" style={{ color: hasNewMessages ? "#ff4d4f" : "inherit" }}>INTERCOMS</span>
             </Badge>
           ) : (
-            <span className="no-underline">INTERCOMS</span>
+            <span className="no-underline" style={{ color: hasNewMessages ? "#ff4d4f" : "inherit" }}>INTERCOMS</span>
           )}
         </NavLink>
       </Menu.Item>

@@ -95,7 +95,7 @@ const PatientIntercom = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('active');
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
-
+  const [connectionStatus, setConnectionStatus] = useState('disconnected');
   const [signalRConnection, setSignalRConnection] = useState(null);
   const [autoReadStatus, setAutoReadStatus] = useState('');
   const dispatch = useDispatch();
@@ -125,14 +125,17 @@ const PatientIntercom = () => {
 
       connection.onclose((error) => {
         console.log('SignalR connection closed', error);
+        setConnectionStatus('disconnected');
       });
 
       connection.onreconnecting((error) => {
         console.log('SignalR reconnecting', error);
+        setConnectionStatus('reconnecting');
       });
 
       connection.onreconnected((connectionId) => {
         console.log('SignalR reconnected', connectionId);
+        setConnectionStatus('connected');
         if (selectedUser && chatRef) {
           connection.invoke("JoinChat", chatRef)
             .catch(err => console.error('Error rejoining chat:', err));
@@ -140,14 +143,24 @@ const PatientIntercom = () => {
       });
 
       connection.on("ReceiveMessage", async (user, message) => {
-        console.log('SignalR: Received message from user:', user);
+        console.log('SignalR: Received message from user:', user, 'Message:', message);
+        
+        // Always dispatch getUnreadMessageCount when a new message comes in
+        // This ensures the sidebar and other components get updated
+        console.log('SignalR: Dispatching getUnreadMessageCount for new message');
+        try {
+          await dispatch(getUnreadMessageCount());
+          console.log('SignalR: getUnreadMessageCount dispatched successfully');
+        } catch (error) {
+          console.error('SignalR: Error dispatching getUnreadMessageCount:', error);
+        }
         
         if (selectedUser?.userRef === user) {
           // If user is actively viewing this chat, automatically mark messages as read
           try {
             setAutoReadStatus('Marking as read...');
             await dispatch(markMessagesAsRead(user));
-            // Refresh unread count after marking as read
+            // Refresh unread count again after marking as read
             await dispatch(getUnreadMessageCount());
             setAutoReadStatus('Marked as read');
             // Clear status after 2 seconds
@@ -162,14 +175,17 @@ const PatientIntercom = () => {
           await dispatch(getMessages(user));
           // Don't refresh chat heads for active chat to preserve optimistic update
         } else {
-          // If message is from a different user, refresh unread count and chat heads
-          dispatch(getUnreadMessageCount());
-          // Only refresh chat heads for non-active chats to show new message indicators
+          // If message is from a different user, refresh chat heads to show new message indicators
           console.log('SignalR: Refreshing chat heads for non-active chat');
           dispatch(getChatHeads()).then(() => {
             console.log('SignalR: Chat heads refreshed successfully');
           }).catch(error => {
             console.error('SignalR: Error refreshing chat heads:', error);
+          });
+          dispatch(getUnreadMessageCount()).then(() => {
+            console.log('SignalR: Unread count refreshed for non-active chat');
+          }).catch(error => {
+            console.error('SignalR: Error refreshing unread count:', error);
           });
         }
       });
@@ -181,6 +197,9 @@ const PatientIntercom = () => {
           // Refresh chat heads when connection is established
           dispatch(getChatHeads()).then(() => {
             console.log('SignalR: Initial chat heads refresh completed');
+          });
+          dispatch(getUnreadMessageCount()).then(() => {
+            console.log('SignalR: Initial unread count refresh completed');
           });
           if (selectedUser && chatRef) {
             connection.invoke("JoinChat", chatRef)
@@ -250,6 +269,7 @@ const PatientIntercom = () => {
   useEffect(() => {
     // Load chat heads first
     dispatch(getChatHeads());
+    dispatch(getUnreadMessageCount());
 
     // Then load all providers for the new message option
     const loadProviders = async () => {
@@ -273,6 +293,7 @@ const PatientIntercom = () => {
     // Set up polling interval for chat heads to ensure they stay updated
     const chatHeadsInterval = setInterval(() => {
       dispatch(getChatHeads());
+      dispatch(getUnreadMessageCount());
     }, 15000); // Increased to 30 seconds to reduce frequency
 
     // Cleanup interval on unmount
@@ -490,9 +511,20 @@ const PatientIntercom = () => {
       <div className={`messages-sidebar ${isMobileView && selectedUser ? 'hidden' : ''}`}>
         <div className="messages-header">
           <h2>MESSAGES</h2>
-          <button className="new-message-btn">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ 
+                fontSize: '10px', 
+                padding: '2px 6px', 
+                borderRadius: '8px', 
+                background: connectionStatus === 'connected' ? 'rgba(76, 175, 80, 0.2)' : 'rgba(244, 67, 54, 0.2)',
+                color: connectionStatus === 'connected' ? '#fff' : '#f44336'
+              }}>
+                {connectionStatus}
+              </div>
+              </div>
+          {/* <button className="new-message-btn">
             <i className="fas fa-sync-alt"></i> New Message
-          </button>
+          </button> */}
         </div>
         
         <div className="search-container">
@@ -505,9 +537,7 @@ const PatientIntercom = () => {
             allowClear
             bordered={false}
           />
-        </div>
-
-        <div className="filter-buttons">
+           <div className="filter-buttons">
           <Segmented
             value={activeTab}
             onChange={setActiveTab}
@@ -525,6 +555,10 @@ const PatientIntercom = () => {
           />
         </div>
 
+        </div>
+
+
+       
         <div className="users-list">
           {filteredProviders.length > 0 ? (
             filteredProviders.map((provider) => (

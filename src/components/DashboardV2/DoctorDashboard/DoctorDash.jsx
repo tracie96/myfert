@@ -107,6 +107,16 @@ export default function DoctorDash() {
         });
     }, [dispatch]);
 
+    useEffect(() => {
+        setPagination({
+            current: 1,
+            pageSize: 20,
+            total: 0,
+        });
+        setSearchQuery(""); // optional: clear search too
+    }, [activeTab]);
+    
+
     const handleTableChange = useCallback((newPagination, filters, sorter) => {
         const { current, pageSize } = newPagination;
 
@@ -172,13 +182,7 @@ export default function DoctorDash() {
                 key: "email",
                 sorter: true,
                 render: (email) => (
-                    <div
-                        style={{
-                            maxWidth: "240px",
-                            overflowX: "auto",
-                            whiteSpace: "nowrap",
-                        }}
-                    >
+                    <div>
                         {email}
                     </div>
                 ),
@@ -317,16 +321,16 @@ export default function DoctorDash() {
                         onChange={handleTableChange}
                         rowKey="id"
                         scroll={{ x: "max-content" }}
-                    // onRow={(record) => ({
-                    //     onClick: (e) => {
-                    //         if (!e.target.closest(".ant-switch")) {
-                    //             localStorage.setItem("patient", JSON.stringify(record));
-                    //             navigate(`/doctor/user/${record.userRef}`, {
-                    //                 state: { user: record },
-                    //             });
-                    //         }
-                    //     },
-                    // })}
+                        onRow={(record) => ({
+                            onClick: (e) => {
+                                if (!e.target.closest(".ant-switch")) {
+                                    localStorage.setItem("patient", JSON.stringify(record));
+                                    navigate(`/doctor/user/${record.userRef}`, {
+                                        state: { user: record },
+                                    });
+                                }
+                            },
+                        })}
                     />
                 </Card>
             </>

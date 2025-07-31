@@ -231,6 +231,7 @@ export default function DoctorDash() {
                             <button
                                 className="isAssignBtn ant-btn css-dev-only-do-not-override-f7vrd6 ant-btn-primary"
                                 onClick={async (e) => {
+                                    e.stopPropagation();
                                     try {
                                         const payload = {
                                             patientRef: record.userRef,

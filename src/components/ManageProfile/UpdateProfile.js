@@ -182,15 +182,11 @@ const UpdateProfile = () => {
         setUploadedFileUrl(url);
         setFieldValue("picture", url);
       
-        const originalName = info.file.originFileObj?.name || info.file.name;
-        const nameWithoutExtension = originalName.replace(/\.[^/.]+$/, '');
       
-        message.success(`${nameWithoutExtension} file uploaded successfully!`);
+        message.success(`Profile image uploaded successfully!`);
       } else if (status === "error") {
-        const originalName = info.file.originFileObj?.name || info.file.name;
-        const nameWithoutExtension = originalName.replace(/\.[^/.]+$/, '');
       
-        message.error(`${nameWithoutExtension} file upload failed.`);
+        message.error(`Profile image upload failed.`);
       }
       
     },

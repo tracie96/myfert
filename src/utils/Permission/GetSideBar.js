@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import fertilityImage from "../../assets/images/auth/fertilityImage.svg";
 import { useSelector, useDispatch } from "react-redux";
 import { Menu, Button, Drawer, Layout, Modal, Badge } from "antd";
 import { useMediaQuery } from "react-responsive";
 import { getUnreadMessageCount } from "../../components/redux/doctorSlice";
-import globalSignalRService from "../globalSignalR";
+import { getNotifications, markNotiAsRead } from "../../components/redux/globalSlice";
 // Import React Icons
 import {
   FaQrcode,
@@ -28,61 +28,196 @@ export const GetSideBar = () => {
   const unreadCount = useSelector((state) => state.doctor.unreadMessageCount);
   const { userAuth } = useSelector((state) => state.authentication);
   const accessDetails = useSelector((state) => state.intake.accessDetails);
+  const [notifications, setNotifications] = useState(null);
+
+  // Add CSS for notification badge animation
+ 
   const [visible, setVisible] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const [hasNewMessages, setHasNewMessages] = useState(false);
+  const [notificationBadges, setNotificationBadges] = useState({
+    labs: 0,
+    meds: 0,
+    supplements: 0,
+    notes: 0,
+    appointments: 0
+  });
   const { Sider } = Layout;
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const location = useLocation();
-  useEffect(() => {
-    // Initial unread count fetch
-    setTimeout(() => {
-      dispatch(getUnreadMessageCount());
-    }, 1000);
 
-    // Initialize global SignalR connection for real-time notifications
-    const initializeSignalR = async () => {
-      if (userAuth?.obj?.token) {
-        try {
-          await globalSignalRService.initialize(userAuth.obj.token);
+  // Function to categorize notifications by type
+  const categorizeNotifications = (notifications) => {
+    // Check both possible data structures
+    const notificationRecords = notifications?.data?.getRecord || notifications?.getRecord;
+    if (!notificationRecords) return { labs: 0, meds: 0, supplements: 0, notes: 0, appointments: 0 };
+    
+    const badges = { labs: 0, meds: 0, supplements: 0, notes: 0, appointments: 0 };
+    
+    console.log('🔍 Processing notifications:', notificationRecords);
+    console.log('🔍 Total notifications to process:', notificationRecords.length);
+    
+    notificationRecords.forEach((notification, index) => {
+      console.log(`📋 Processing notification ${index + 1}:`, {
+        id: notification.id,
+        title: notification.title,
+        description: notification.description,
+        isRead: notification.isRead
+      });
+      
+      if (notification.isRead === 0) { // Only count unread notifications
+        const title = notification.title;
+        const description = notification.description || '';
+        
+        console.log(`📋 Unread notification: ${title} - ${description} (isRead: ${notification.isRead})`);
+        
+        // Lab notifications - use title
+        if (title === "LabWork" || title === "LabRequisition") {
+          badges.labs++;
+          console.log('✅ Categorized as LABS');
+        }
+        // Medication notifications - use description for "Drug Medications" and title for "Prescription"
+        else if (description === "Drug Medications has been prescribed to you") {
+          badges.meds++;
+          console.log('✅ Categorized as MEDS');
+        }
+        // Supplement notifications - use description
+        else if (description.includes("Drug Supplements has been prescribed")) {
+          badges.supplements++;
+          console.log('✅ Categorized as SUPPLEMENTS');
+        }
+        // Patient note notifications - use title
+        else if (title === "PatientNote") {
+          badges.notes++;
+          console.log('✅ Categorized as NOTES');
+        }
+        // Appointment notifications
+        else if (title === "Appointment" || description.includes("appointment") || description.includes("schedule")) {
+          badges.appointments++;
+          console.log('✅ Categorized as APPOINTMENTS');
+        }
+        else {
+          console.log('❌ No category matched for unread notification');
+        }
+      } else {
+        console.log(`📋 Skipping read notification: ${notification.title}`);
+      }
+    });
+    
+    console.log('🏷️ Final badge counts:', badges);
+    return badges;
+  };
+
+  // Function to clear badge when menu item is clicked
+  const clearBadge = async (badgeType) => {
+    setNotificationBadges(prev => ({
+      ...prev,
+      [badgeType]: 0
+    }));
+
+    // Mark notifications as read based on type
+    const notificationRecords = notifications?.data?.getRecord || notifications?.getRecord;
+    if (notificationRecords) {
+      const notificationsToMark = notificationRecords.filter(notification => {
+        if (notification.isRead === 0) {
+          const title = notification.title;
+          const description = notification.description || '';
           
-          // Add listener for new messages
-          const unsubscribe = globalSignalRService.addListener((eventType, data) => {
-            if (eventType === 'newMessage') {
-              console.log('Sidebar: New message received, updating unread count');
-              setHasNewMessages(true);
-              dispatch(getUnreadMessageCount());
-              
-              // Clear the new message indicator after 5 seconds
-              setTimeout(() => {
-                setHasNewMessages(false);
-              }, 5000);
-            }
-          });
+          switch (badgeType) {
+            case 'labs':
+              return title === "LabWork" || title === "LabRequisition";
+            case 'meds':
+              return description === "Drug Medications has been prescribed to you";
+            case 'supplements':
+              return description.includes("Drug Supplements has been prescribed");
+            case 'notes':
+              return title === "PatientNote";
+            case 'appointments':
+              return title === "Appointment" || description.includes("appointment") || description.includes("schedule");
+            default:
+              return false;
+          }
+        }
+        return false;
+      });
 
-          // Cleanup listener on unmount
-          return unsubscribe;
+      // Mark each notification as read
+      for (const notification of notificationsToMark) {
+        try {
+          await dispatch(markNotiAsRead({ notiOrUser: "Noti", id: notification.id }));
         } catch (error) {
-          console.error('Error initializing global SignalR in sidebar:', error);
+          console.error('Error marking notification as read:', error);
         }
       }
+
+      // Refresh notifications after marking as read
+      await fetchNotifications();
+    }
+  };
+
+  useEffect(() => {
+    if (notifications) {
+      console.log('🔄 Notifications changed:', notifications);
+      const badges = categorizeNotifications(notifications);
+      console.log('🎯 Setting notification badges:', badges);
+      setNotificationBadges(badges);
+    } else {
+      console.log('❌ No notifications available');
+    }
+  }, [notifications]);
+
+  // Fetch notifications
+  const fetchNotifications = useCallback(async () => {
+    try {
+      console.log('🔄 Fetching notifications...');
+      const response = await dispatch(getNotifications());
+      if (getNotifications.fulfilled.match(response)) {
+        console.log('📥 Fetched notifications:', response.payload);
+        setNotifications(response.payload);
+      } else {
+        console.log('❌ Failed to fetch notifications:', response);
+      }
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+    }
+  }, [dispatch]);
+
+
+  // Fetch unread message count
+  const fetchUnreadCount = useCallback(async () => {
+    try {
+      await dispatch(getUnreadMessageCount());
+    } catch (error) {
+      console.error('Error fetching unread count:', error);
+    }
+  }, [dispatch]);
+
+  useEffect(() => {
+    let isMounted = true;
+    
+    // Initial fetches
+    const initialFetch = async () => {
+      if (isMounted) {
+        await fetchUnreadCount();
+        await fetchNotifications();
+      }
     };
-
-    const unsubscribe = initializeSignalR();
-
-    // Set up polling as fallback (every 30 seconds)
+    
+    initialFetch();
+    
+    // Set up interval to fetch notifications and unread count every 10 seconds (temporarily reduced for testing)
     const pollingInterval = setInterval(() => {
-      dispatch(getUnreadMessageCount());
-    }, 30000);
+      if (isMounted) {
+        fetchUnreadCount();
+        fetchNotifications(); 
+      }
+    }, 10000);
 
     // Cleanup function
     return () => {
-      if (unsubscribe && typeof unsubscribe === 'function') {
-        unsubscribe();
-      }
+      isMounted = false;
       clearInterval(pollingInterval);
     };
-  }, [dispatch, userAuth?.obj?.token]);
+  }, [fetchNotifications, fetchUnreadCount]);
 
   const showDrawer = () => {
     setVisible(true);
@@ -183,6 +318,7 @@ export const GetSideBar = () => {
       mode="inline"
       onClick={onClose}
     >
+      {console.log('🎨 Rendering menu with badges:', notificationBadges)}
       <Menu.Item key="1" icon={<FaQrcode style={{ color: "#00ADEF" }} />}>
         <NavLink to="/patient" style={{ textDecoration: "none" }}>
           <span>HOME</span>
@@ -200,27 +336,127 @@ export const GetSideBar = () => {
       </Menu.Item>
 
       <Menu.Item key="5" icon={<FaPills style={{ color: "#00ADEF" }} />}>
-        <NavLink to="/patient/meds" style={{ textDecoration: "none" }}>
-          <span>MEDS</span>
+        <NavLink to="/patient/meds" style={{ textDecoration: "none" }} onClick={async (e) => {
+          if (notificationBadges.meds > 0) {
+            e.preventDefault();
+            await clearBadge('meds');
+            // Navigate after clearing the badge
+            window.location.href = "/patient/meds";
+          }
+        }}>
+          {notificationBadges.meds > 0 ? (
+            <Badge 
+              count={notificationBadges.meds} 
+              offset={[10, 0]} 
+              className="notification-badge"
+              style={{ 
+                backgroundColor: '#ff4d4f',
+                fontSize: '8px',
+                minWidth: '12px',
+                height: '12px',
+                lineHeight: '12px',
+                padding: '0 4px'
+              }}
+            >
+              <span>MEDS</span>
+            </Badge>
+          ) : (
+            <span>MEDS</span>
+          )}
         </NavLink>
+     
       </Menu.Item>
       <Menu.Item key="9" icon={<FaFlask style={{ color: "#00ADEF" }} />}>
-        <NavLink to="/patient/labs" style={{ textDecoration: "none" }}>
-          <span>LABS</span>
+        <NavLink to="/patient/labs" style={{ textDecoration: "none" }} onClick={async (e) => {
+          if (notificationBadges.labs > 0) {
+            e.preventDefault();
+            await clearBadge('labs');
+            // Navigate after clearing the badge
+            window.location.href = "/patient/labs";
+          }
+        }}>
+          {notificationBadges.labs > 0 ? (
+            <Badge 
+              count={notificationBadges.labs} 
+              offset={[10, 0]} 
+              className="notification-badge"
+              style={{ 
+                backgroundColor: '#ff4d4f',
+                fontSize: '8px',
+                minWidth: '12px',
+                height: '12px',
+                lineHeight: '12px',
+                padding: '0 4px'
+              }}
+            >
+              <span>LABS</span>
+            </Badge>
+          ) : (
+            <span>LABS</span>
+          )}
         </NavLink>
       </Menu.Item>
 
       <Menu.Item key="10" icon={<FaNotesMedical style={{ color: "#00ADEF" }} />}>
-        <NavLink to="/patient/notes" style={{ textDecoration: "none" }}>
-          <span>NOTES</span>
+        <NavLink to="/patient/notes" style={{ textDecoration: "none" }} onClick={async (e) => {
+          if (notificationBadges.notes > 0) {
+            e.preventDefault();
+            await clearBadge('notes');
+            // Navigate after clearing the badge
+            window.location.href = "/patient/notes";
+          }
+        }}>
+          {notificationBadges.notes > 0 ? (
+            <Badge 
+              count={notificationBadges.notes} 
+              offset={[10, 0]} 
+              className="notification-badge"
+              style={{ 
+                backgroundColor: '#ff4d4f',
+                fontSize: '8px',
+                minWidth: '12px',
+                height: '12px',
+                lineHeight: '12px',
+                padding: '0 4px'
+              }}
+            >
+              <span>NOTES</span>
+            </Badge>
+          ) : (
+            <span>NOTES</span>
+          )}
         </NavLink>
       </Menu.Item>
       <Menu.Item key="11" icon={<FaPills style={{ color: "#00ADEF" }} />}>
-        <NavLink to="/patient/supplements" style={{ textDecoration: "none" }}>
-          <span>SUPPLEMENTS</span>
+        <NavLink to="/patient/supplements" style={{ textDecoration: "none" }} onClick={async (e) => {
+          if (notificationBadges.supplements > 0) {
+            e.preventDefault();
+            await clearBadge('supplements');
+            // Navigate after clearing the badge
+            window.location.href = "/patient/supplements";
+          }
+        }}>
+          {notificationBadges.supplements > 0 ? (
+            <Badge 
+              count={notificationBadges.supplements} 
+              offset={[10, 0]} 
+              className="notification-badge"
+              style={{ 
+                backgroundColor: '#ff4d4f',
+                  fontSize: '8px',
+                minWidth: '12px',
+                height: '12px',
+                lineHeight: '12px',
+                padding: '0 4px'
+              }}
+            >
+              <span>SUPPLEMENTS</span>
+            </Badge>
+          ) : (
+            <span>SUPPLEMENTS</span>
+          )}
         </NavLink>
       </Menu.Item>
-
       {getAccessDetailsStatus() && userAuth?.obj?.videoWatched && (
         <Menu.Item key="6" icon={<FaServicestack style={{ color: "#00ADEF" }} />}>
           <NavLink to="/patient/services" style={{ textDecoration: "none" }}>
@@ -228,14 +464,26 @@ export const GetSideBar = () => {
           </NavLink>
         </Menu.Item>
       )}
-      <Menu.Item key="12" icon={<FaStickyNote style={{ color: hasNewMessages ? "#ff4d4f" : "#00ADEF" }} />}>
+      <Menu.Item key="12" icon={<FaStickyNote style={{ color: "#00ADEF" }} />}>
         <NavLink to="/patient/intercoms" style={{ textDecoration: "none" }}>
           {unreadCount ? (
-            <Badge dot offset={[5, 0]} style={{ backgroundColor: '#ff4d4f' }}>
-              <span className="no-underline" style={{ color: hasNewMessages ? "#ff4d4f" : "inherit" }}>INTERCOMS</span>
+            <Badge 
+              dot 
+              offset={[3, 0]} 
+              className="notification-badge"
+              style={{ 
+                backgroundColor: '#ff4d4f',
+                fontSize: '8px',
+                minWidth: '12px',
+                height: '12px',
+                lineHeight: '12px',
+                padding: '0 4px'
+              }}
+            >
+              <span className="no-underline">INTERCOMS</span>
             </Badge>
           ) : (
-            <span className="no-underline" style={{ color: hasNewMessages ? "#ff4d4f" : "inherit" }}>INTERCOMS</span>
+            <span className="no-underline">INTERCOMS</span>
           )}
         </NavLink>
       </Menu.Item>
@@ -264,13 +512,15 @@ export const GetSideBar = () => {
         </NavLink>
       </Menu.Item>
       <Menu.Item key="4" icon={<FaFlask style={{ color: "#00ADEF" }} />}>
-        <NavLink to="/doctor/labs" style={{ textDecoration: "none" }}>
-          <span>LABS</span>
+        <NavLink to="/doctor/labs" style={{ textDecoration: "none" }} >
+         
+            <span>LABS</span>
+     
         </NavLink>
       </Menu.Item>
       <Menu.Item key="5" icon={<FaPills style={{ color: "#00ADEF" }} />}>
         <NavLink to="/doctor/meds" style={{ textDecoration: "none" }}>
-          <span>MEDS</span>
+            <span>MEDS</span>
         </NavLink>
       </Menu.Item>
       <Menu.Item key="6" icon={<FaNotesMedical style={{ color: "#00ADEF" }} />}>
@@ -283,14 +533,14 @@ export const GetSideBar = () => {
           <span>FAX</span>
         </NavLink>
       </Menu.Item> */}
-      <Menu.Item key="9" icon={<FaStickyNote style={{ color: hasNewMessages ? "#ff4d4f" : "#00ADEF" }} />}>
+      <Menu.Item key="9" icon={<FaStickyNote style={{ color: "#00ADEF" }} />}>
         <NavLink to="/doctor/intercom" style={{ textDecoration: "none" }}>
           {unreadCount ? (
             <Badge dot offset={[5, 0]} style={{ backgroundColor: '#ff4d4f' }}>
-              <span className="no-underline" style={{ color: hasNewMessages ? "#ff4d4f" : "inherit" }}>INTERCOMS</span>
+              <span className="no-underline">INTERCOMS</span>
             </Badge>
           ) : (
-            <span className="no-underline" style={{ color: hasNewMessages ? "#ff4d4f" : "inherit" }}>INTERCOMS</span>
+            <span className="no-underline">INTERCOMS</span>
           )}
         </NavLink>
       </Menu.Item>

@@ -50,8 +50,12 @@ const MedScreen = () => {
     const med = useSelector((state) => state.patient.medication); // Get medications from Redux store
     useEffect(() => {
         dispatch(getPatientMed(userAuth.userRef));
+    }, [userAuth.userRef, dispatch]);
+
+    // Separate useEffect for logging med changes
+    useEffect(() => {
         console.log('Medications from Redux:', med);
-    }, [userAuth.userRef, dispatch, med]);
+    }, [med]);
 
     useEffect(() => {
 

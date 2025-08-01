@@ -300,7 +300,7 @@ export const GetSideBar = () => {
       case "/ticketing":
         return "4";
       case "/assignment":
-        return "5";
+        return "6";
       default:
         return "1";
     }
@@ -588,7 +588,7 @@ export const GetSideBar = () => {
           <span style={{ whiteSpace: 'normal', lineHeight: '1.2' }}>FAX</span>
         </NavLink>
       </Menu.Item>
-      <Menu.Item key="5" icon={<FaServicestack style={{ color: "#00ADEF" }} />}>
+      <Menu.Item key="6" icon={<FaServicestack style={{ color: "#00ADEF" }} />}>
         <NavLink to="/assignment" style={{ textDecoration: "none" }}>
           <span style={{ whiteSpace: 'normal', lineHeight: '1.2' }}>ASSIGNMENT OF CARE</span>
         </NavLink>

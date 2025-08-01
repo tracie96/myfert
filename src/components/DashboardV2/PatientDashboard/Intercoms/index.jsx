@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo, useRef, memo } from 'react';
-import { Input, Avatar, Segmented, Dropdown } from 'antd';
+import { Input, Avatar, Segmented, Dropdown, Modal } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import { EllipsisOutlined, DeleteOutlined } from '@ant-design/icons';
+import { toast } from 'react-toastify';
 import { 
   fetchCareGivers, 
   getMessages, 
@@ -9,7 +10,8 @@ import {
   getChatHeads,
   markMessagesAsRead,
   getUnreadMessageCount,
-  markChatAsReadOptimistically
+  markChatAsReadOptimistically,
+  deleteChat
 } from '../../../redux/doctorSlice';
 import { UserOutlined, SearchOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import '../../DoctorDashboard/Intercoms/styles.css';
@@ -17,15 +19,10 @@ import SendButton from '../../../../assets/images/telegram.png';
 import * as signalR from '@microsoft/signalr';
 
 // Memoized user item component to prevent unnecessary re-renders
-const UserItem = memo(({ provider, isSelected, onSelect }) => {
+const UserItem = memo(({ provider, isSelected, onSelect, onDeleteChat }) => {
   
   const handleOptionsClick = (e) => {
     e.stopPropagation();
-  };
-
-  const handleDeleteChat = (userRef) => {
-    console.log('Delete chat for user:', userRef);
-    // TODO: Implement delete functionality
   };
 
   // Create dropdown menu items
@@ -38,7 +35,7 @@ const UserItem = memo(({ provider, isSelected, onSelect }) => {
           <span style={{ color: '#ff4d4f' }}>Delete Chat</span>
         </div>
       ),
-      onClick: () => handleDeleteChat(userRef),
+      onClick: () => onDeleteChat(userRef),
     },
   ];
 
@@ -95,7 +92,6 @@ const PatientIntercom = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('active');
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
-  const [connectionStatus, setConnectionStatus] = useState('disconnected');
   const [signalRConnection, setSignalRConnection] = useState(null);
   const [autoReadStatus, setAutoReadStatus] = useState('');
   const dispatch = useDispatch();
@@ -125,17 +121,14 @@ const PatientIntercom = () => {
 
       connection.onclose((error) => {
         console.log('SignalR connection closed', error);
-        setConnectionStatus('disconnected');
       });
 
       connection.onreconnecting((error) => {
         console.log('SignalR reconnecting', error);
-        setConnectionStatus('reconnecting');
       });
 
       connection.onreconnected((connectionId) => {
         console.log('SignalR reconnected', connectionId);
-        setConnectionStatus('connected');
         if (selectedUser && chatRef) {
           connection.invoke("JoinChat", chatRef)
             .catch(err => console.error('Error rejoining chat:', err));
@@ -363,6 +356,63 @@ const PatientIntercom = () => {
     setSelectedUser(null);
   };
 
+  const handleDeleteChat = async (userRef) => {
+    console.log('Delete chat for user:', userRef);
+
+    
+    if (activeTab === 'active') {
+      // For active chats, look in chatHeads
+      const chatHead = chatHeads.find(chat => chat.userRef === userRef);
+      console.log('Found chat head:', chatHead);
+    } else {
+      // For providers tab, look in filteredProviders
+      const user = filteredProviders.find(u => u.userRef === userRef);
+      console.log('Found user in providers:', user);
+    }
+    
+    Modal.confirm({
+      title: 'Delete Chat',
+      okText: 'Delete',
+      okType: 'danger',
+      cancelText: 'Cancel',
+      onOk: async () => {
+        try {
+          // Find the chat reference for this user
+          console.log('Looking for chat head with userRef:', userRef);
+          console.log('Available chat heads:', chatHeads.map(ch => ({ userRef: ch.userRef, chatRef: ch.chatRef })));
+          // const chatHead = chatHeads.find(chat => chat.userRef === userRef);
+          // console.log('Found chat head:', chatHead);
+          // if (!chatHead?.chatRef) {
+          //   console.error('No chat reference found for user:', userRef);
+          //   message.error('Chat reference not found');
+          //   return;
+          // }
+
+          // Call the delete API
+          // console.log('Attempting to delete chat with chatRef:', chatHead.chatRef);
+            const response = await dispatch(deleteChat(chatRef)).unwrap();
+          console.log('Chat deleted successfully:', response);
+
+          // Refresh chat heads to remove the deleted chat
+          await dispatch(getChatHeads());
+          await dispatch(getUnreadMessageCount());
+
+          // If the deleted chat was the currently selected one, clear the selection
+          if (selectedUser?.userRef === userRef) {
+            setSelectedUser(null);
+          }
+
+          // Show success message
+          toast.success('Chat deleted successfully');
+        } catch (error) {
+          console.error('Error deleting chat:', error);
+          // Show error message
+          toast.error('Failed to delete chat. Please try again.');
+        }
+      },
+    });
+  };
+
   const handleSendMessage = async () => {
     if (message.trim() && selectedUser && chatRef) {
       const userId = selectedUser.userRef || selectedUser.id;
@@ -511,17 +561,7 @@ const PatientIntercom = () => {
       <div className={`messages-sidebar ${isMobileView && selectedUser ? 'hidden' : ''}`}>
         <div className="messages-header">
           <h2>MESSAGES</h2>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{ 
-                fontSize: '10px', 
-                padding: '2px 6px', 
-                borderRadius: '8px', 
-                background: connectionStatus === 'connected' ? 'rgba(76, 175, 80, 0.2)' : 'rgba(244, 67, 54, 0.2)',
-                color: connectionStatus === 'connected' ? '#fff' : '#f44336'
-              }}>
-                {connectionStatus}
-              </div>
-              </div>
+        
           {/* <button className="new-message-btn">
             <i className="fas fa-sync-alt"></i> New Message
           </button> */}
@@ -567,6 +607,7 @@ const PatientIntercom = () => {
                 provider={provider}
                 isSelected={selectedUser?.userRef === provider.userRef}
                 onSelect={handleUserSelect}
+                onDeleteChat={handleDeleteChat}
               />
             ))
           ) : (

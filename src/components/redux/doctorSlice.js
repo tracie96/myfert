@@ -1044,6 +1044,35 @@ export const markChatsAsRead = createAsyncThunk(
 // Action creator for optimistic chat read update
 export const markChatAsReadOptimistically = createAction('doctor/markChatAsReadOptimistically');
 
+export const deleteChat = createAsyncThunk(
+  "doctor/deleteChat",
+  async (chatRef, { rejectWithValue, getState }) => {
+    const user = getState()?.authentication?.userAuth;
+    console.log('Delete chat - chatRef:', chatRef);
+    console.log('Delete chat - user token:', user?.obj?.token ? 'Present' : 'Missing');
+    
+    const config = {
+      headers: {
+        "accept": "text/plain",
+        "Authorization": `Bearer ${user?.obj?.token}`,
+      },
+    };
+    
+    const url = `${baseUrl}Chat/DeleteMessages/${chatRef}`;
+    console.log('Delete chat - API URL:', url);
+    
+    try {
+      const response = await axios.get(url, config);
+      console.log('Delete chat - API response:', response);
+      return response.data;
+    } catch (error) {
+      console.error('Delete chat - API error:', error);
+      console.error('Delete chat - Error response:', error?.response);
+      return rejectWithValue(error?.response?.data);
+    }
+  }
+);
+
 const doctorSlices = createSlice({
   name: "doctor",
   initialState: {
@@ -1081,6 +1110,8 @@ const doctorSlices = createSlice({
     unreadMessageCount: 0,
     chatHeadsLoading: false,
     unreadCountLoading: false,
+    deleteChatLoading: false,
+    deleteChatError: null,
   },
   reducers: {
     // Add a reducer for optimistic message updates
@@ -1549,6 +1580,22 @@ const doctorSlices = createSlice({
           };
         }
       }
+    });
+
+    // Delete Chat
+    builder.addCase(deleteChat.pending, (state) => {
+      state.deleteChatLoading = true;
+      state.deleteChatError = null;
+    });
+    builder.addCase(deleteChat.fulfilled, (state, action) => {
+      state.deleteChatLoading = false;
+      state.deleteChatError = null;
+      // Refresh chat heads after successful deletion
+      // The component will handle refreshing the chat heads
+    });
+    builder.addCase(deleteChat.rejected, (state, action) => {
+      state.deleteChatLoading = false;
+      state.deleteChatError = action.payload;
     });
   },
 });

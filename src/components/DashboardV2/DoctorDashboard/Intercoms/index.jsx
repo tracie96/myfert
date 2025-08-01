@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { Input, Avatar, Segmented, Dropdown } from 'antd';
+import { Input, Avatar, Segmented, Dropdown, Modal } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import { EllipsisOutlined, DeleteOutlined } from '@ant-design/icons';
+import { toast } from 'react-toastify';
 import { 
   patientList as fetchPatientList, 
   fetchCareGivers, 
@@ -10,7 +11,8 @@ import {
   getChatHeads,
   markMessagesAsRead,
   getUnreadMessageCount,
-  markChatAsReadOptimistically
+  markChatAsReadOptimistically,
+  deleteChat
 } from '../../../redux/doctorSlice';
 import { UserOutlined, SearchOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import './styles.css';
@@ -26,7 +28,6 @@ const Intercom = () => {
 
   const [signalRConnection, setSignalRConnection] = useState(null);
   const [autoReadStatus, setAutoReadStatus] = useState('');
-  const [connectionStatus, setConnectionStatus] = useState('disconnected');
   const dispatch = useDispatch();
   const messagesEndRef = useRef(null);
 
@@ -55,17 +56,14 @@ const Intercom = () => {
 
       connection.onclose((error) => {
         console.log('SignalR connection closed', error);
-        setConnectionStatus('disconnected');
       });
 
       connection.onreconnecting((error) => {
         console.log('SignalR reconnecting', error);
-        setConnectionStatus('reconnecting');
       });
 
       connection.onreconnected((connectionId) => {
         console.log('SignalR reconnected', connectionId);
-        setConnectionStatus('connected');
         if (selectedUser && chatRef) {
           connection.invoke("JoinChat", chatRef)
             .catch(err => console.error('Error rejoining chat:', err));
@@ -126,7 +124,6 @@ const Intercom = () => {
         .then(() => {
           console.log('SignalR connection started successfully');
           setSignalRConnection(connection);
-          setConnectionStatus('connected');
           // Refresh chat heads when connection is established
           dispatch(getChatHeads()).then(() => {
             console.log('SignalR: Initial chat heads refresh completed');
@@ -414,9 +411,50 @@ const Intercom = () => {
     e.stopPropagation();
   };
 
-  const handleDeleteChat = (userRef) => {
+  const handleDeleteChat = async (userRef) => {
     console.log('Delete chat for user:', userRef);
-    // TODO: Implement delete functionality
+    
+    // Find the user info for the confirmation dialog
+    const user = filteredUsers.find(u => u.userRef === userRef);
+    const userName = user?.username || 'this user';
+    
+    Modal.confirm({
+      title: 'Delete Chat',
+      content: `Are you sure you want to delete the chat with ${userName}? This action cannot be undone.`,
+      okText: 'Delete',
+      okType: 'danger',
+      cancelText: 'Cancel',
+      onOk: async () => {
+        try {
+          console.log('chatRef', chatRef);
+          // Find the chat reference for this user
+          // const chatHead = chatHeads.find(chat => chat.userRef === userRef);
+          // if (!chatHead?.chatRef) {
+          //   console.error('No chat reference found for user:', userRef);
+          //   toast.error('Chat reference not found');
+          //   return;
+          // }
+
+          // Call the delete API
+          const response = await dispatch(deleteChat(chatRef)).unwrap();
+          console.log('Chat deleted successfully:', response);
+
+          await dispatch(getChatHeads());
+          await dispatch(getUnreadMessageCount());
+
+          if (selectedUser?.userRef === userRef) {
+            setSelectedUser(null);
+          }
+
+          toast.success('Chat deleted successfully');
+        } catch (error) {
+
+          console.log('Error deleting chat:', error);
+          // Show error message
+          toast.error('Failed to delete chat. Please try again.');
+        }
+      },
+    });
   };
 
   // Create dropdown menu items
@@ -513,7 +551,7 @@ const Intercom = () => {
                   <div className="messages-header">
             <h2>MESSAGES</h2>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{ 
+              {/* <div style={{ 
                 fontSize: '10px', 
                 padding: '2px 6px', 
                 borderRadius: '8px', 
@@ -521,7 +559,7 @@ const Intercom = () => {
                 color: connectionStatus === 'connected' ? '#fff' : '#f44336'
               }}>
                 {connectionStatus}
-              </div>
+              </div> */}
            
             </div>
           </div>

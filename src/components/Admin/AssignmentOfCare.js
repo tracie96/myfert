@@ -10,7 +10,7 @@ import axios from "axios";
 import { baseUrl } from "../../utils/envAccess";
 import { handleApiError } from "../Handler/ExceptionHandler";
 import ChangeEmail from "./ChangeEmail";
-import { message } from "antd";
+import { message,Modal } from "antd";
 
 
 const AssignmentOfCare = () => {
@@ -378,38 +378,75 @@ const AssignmentOfCare = () => {
         }
     }, [activeTabKey, userAuth]);
 
-    const handleAccept = async (record) => {
-        try {
-            const config = {
-                headers: { Authorization: `Bearer ${userAuth?.obj?.token}` },
-            };
-            const payload = {
-                yesNo: true,
-                id: parseInt(record.account) // ensure ID is number
-            };
-            await axios.post(`${baseUrl}Admin/AcceptRejectCaregiverPatientLink`, payload, config);
-            setRequestsTable(prev => prev.filter(item => item.account !== record.account));
-            message.success("Request accepted successfully");
-        } catch (error) {
-            handleApiError(error);
-        }
+    const handleAccept = (record) => {
+        Modal.confirm({
+            title: (
+                <span>
+                    Do you wish to <span style={{ color: 'green', fontWeight: 'bold' }}>accept</span> this assignment?
+                </span>
+            ),
+            icon: null,
+            okText: 'Yes',
+            cancelText: 'Close',
+            okButtonProps: {
+                style: {
+                    backgroundColor: 'green',
+                    borderColor: 'green',
+                },
+            },
+            onOk: async () => {
+                try {
+                    const config = {
+                        headers: { Authorization: `Bearer ${userAuth?.obj?.token}` },
+                    };
+                    const payload = {
+                        yesNo: true,
+                        id: parseInt(record.account),
+                    };
+                    await axios.post(`${baseUrl}Admin/AcceptRejectCaregiverPatientLink`, payload, config);
+                    setRequestsTable(prev => prev.filter(item => item.account !== record.account));
+                    message.success("Request accepted successfully");
+                } catch (error) {
+                    handleApiError(error);
+                }
+            },
+        });
     };
+    
 
-    const handleReject = async (record) => {
-        try {
-            const config = {
-                headers: { Authorization: `Bearer ${userAuth?.obj?.token}` },
-            };
-            const payload = {
-                yesNo: false,
-                id: parseInt(record.account)
-            };
-            await axios.post(`${baseUrl}Admin/AcceptRejectCaregiverPatientLink`, payload, config);
-            setRequestsTable(prev => prev.filter(item => item.account !== record.account));
-            message.success("Request rejected successfully");
-        } catch (error) {
-            handleApiError(error);
-        }
+    const handleReject = (record) => {
+        Modal.confirm({
+            title: (
+                <span>
+                    Do you wish to <span style={{ color: 'red', fontWeight: 'bold' }}>reject</span> this assignment?
+                </span>
+            ),
+            icon: null,
+            okText: 'Yes',
+            cancelText: 'Close',
+            okButtonProps: {
+                style: {
+                    backgroundColor: 'red',
+                    borderColor: 'red',
+                },
+            },
+            onOk: async () => {
+                try {
+                    const config = {
+                        headers: { Authorization: `Bearer ${userAuth?.obj?.token}` },
+                    };
+                    const payload = {
+                        yesNo: false,
+                        id: parseInt(record.account),
+                    };
+                    await axios.post(`${baseUrl}Admin/AcceptRejectCaregiverPatientLink`, payload, config);
+                    setRequestsTable(prev => prev.filter(item => item.account !== record.account));
+                    message.success("Request rejected successfully");
+                } catch (error) {
+                    handleApiError(error);
+                }
+            },
+        });
     };
 
     const handleExpand = (key) => {

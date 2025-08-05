@@ -597,7 +597,7 @@ export const GetSideBar = () => {
   );
 
 
-  if (userAuth.obj.role === "SuperAdmin") {
+  if (userAuth?.obj?.role === "SuperAdmin") {
     return (
       <>
         <div>
@@ -677,7 +677,7 @@ export const GetSideBar = () => {
       </>
     );
   }
-  else if (userAuth.obj.role === "Doctor" || userAuth.obj.role === "FertilityEducator") {
+  else if (userAuth?.obj?.role === "Doctor" || userAuth?.obj?.role === "FertilityEducator") {
     return (
       <>
         <div>
@@ -824,7 +824,7 @@ export const GetSideBar = () => {
     );
   }
 
-  else if (userAuth.obj.role === "Patient") {
+  else if (userAuth?.obj?.role === "Patient") {
     return (
       <div>
         {isMobile ? (

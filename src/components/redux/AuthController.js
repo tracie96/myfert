@@ -27,7 +27,7 @@ export const postLogin = createAsyncThunk(
       if (!responseBack && responseBack === undefined) {
         return responseBack;
       }
-      localStorage.setItem("userInfo", JSON.stringify(responseBack));
+      // localStorage.setItem("userInfo", JSON.stringify(responseBack));
       return responseBack;
     } catch (error) {
       handleApiError(error, dispatch);
@@ -250,6 +250,29 @@ export const validateEmailOtp = createAsyncThunk(
       const response = await axios.post(
         `${baseUrl}Auth/ValidateEmailOtp`,
         { email, session, code },
+        config,
+      );
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  },
+);
+
+export const validateLoginOtp = createAsyncThunk(
+  "user/validateLoginOtp",
+  async ({ emailOrUsername, otp, validPeriod }, { rejectWithValue }) => {
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    try {
+      const response = await axios.post(
+        `${baseUrl}Auth/ValidateLoginOtp`,
+        { emailOrUsername, otp, validPeriod },
         config,
       );
       if (response.status === 200) {
@@ -911,6 +934,30 @@ const authSlices = createSlice({
       state.appErr = action?.payload?.message;
       state.loading = false;
       state.serverErr = undefined;
+      state.appStatus = action?.payload?.status;
+      state.appStatusCode = action?.payload?.statusCode;
+    });
+
+    // Validate Login OTP cases
+    builder.addCase(validateLoginOtp.pending, (state, action) => {
+      state.loading = true;
+      state.appErr = undefined;
+      state.serverErr = undefined;
+      state.appStatus = action?.payload?.status;
+      state.appStatusCode = action?.payload?.statusCode;
+    });
+    builder.addCase(validateLoginOtp.fulfilled, (state, action) => {
+      state.userAuth = action?.payload ? action.payload : state.userAuth;
+      state.appErr = undefined;
+      state.loading = false;
+      state.serverErr = undefined;
+      state.appStatus = action.payload?.status;
+      state.appStatusCode = action.payload?.statusCode;
+    });
+    builder.addCase(validateLoginOtp.rejected, (state, action) => {
+      state.appErr = action?.payload?.message;
+      state.loading = false;
+      state.serverErr = action?.error?.message;
       state.appStatus = action?.payload?.status;
       state.appStatusCode = action?.payload?.statusCode;
     });

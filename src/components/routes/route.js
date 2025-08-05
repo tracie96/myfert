@@ -107,15 +107,16 @@ const allowedDoctorRoles = ['Nurse', 'Doctor', 'PharmacistClinician', 'Nutrition
 const RoleProtectedRoute = ({ element, allowedRoles }) => {
   const userAuth = useSelector((state) => state?.authentication?.userAuth);
 
-  if (userAuth && Object.keys(userAuth).length > 0 && userAuth.obj.role === 'Patient') {
-    return <><Navigate to="/patient" replace /><PatDash /></>;
-  }
-
-  if (!userAuth || Object.keys(userAuth).length === 0) {
+  // Check if userAuth exists and has the required structure
+  if (!userAuth || Object.keys(userAuth).length === 0 || !userAuth.obj) {
     return <Navigate to="/" replace />;
   }
 
   const userRole = userAuth.obj.role;
+
+  if (userRole === 'Patient') {
+    return <><Navigate to="/patient" replace /><PatDash /></>;
+  }
 
   if (allowedRoles.includes(userRole)) {
     return element;
@@ -128,28 +129,35 @@ const ProtectedRoute = ({ allowedRoles }) => {
   console.log('allowedRoles', allowedRoles)
   const userAuth = useSelector((state) => state?.authentication?.userAuth);
 
-  if (userAuth && Object.keys(userAuth).length > 0 && userAuth.obj.role === 'Patient') {
+  // Check if userAuth exists and has the required structure
+  if (!userAuth || Object.keys(userAuth).length === 0 || !userAuth.obj) {
+    return <Login />;
+  }
+
+  const userRole = userAuth.obj.role;
+
+  if (userRole === 'Patient') {
     return <><Navigate to="/patient" replace /><PatDash /></>;
   }
-  if (userAuth && Object.keys(userAuth).length > 0 && userAuth.obj.role === 'Admin') {
+  if (userRole === 'Admin') {
     return <><Navigate to="/admin" replace /><UserManagement /></>;
   }
-  if (userAuth && Object.keys(userAuth).length > 0 && userAuth.obj.role === 'Nurse') {
+  if (userRole === 'Nurse') {
     return <><Navigate to="/nurse" replace /><DoctorDash /></>;
   }
-  if (userAuth && Object.keys(userAuth).length > 0 && userAuth.obj.role === 'Pharmacist') {
+  if (userRole === 'Pharmacist') {
     return <><Navigate to="/pharmacist" replace /><DoctorDash /></>;
   }
-  if (userAuth && Object.keys(userAuth).length > 0 && userAuth.obj.role === 'Nutritionist') {
+  if (userRole === 'Nutritionist') {
     return <><Navigate to="/nutritionist" replace /><DoctorDash /></>;
   }
-  if (userAuth && Object.keys(userAuth).length > 0 && userAuth.obj.role === 'FertilitySupport') {
+  if (userRole === 'FertilitySupport') {
     return <><Navigate to="/fertility-support" replace /><DoctorDash /></>;
   }
-  if (userAuth && Object.keys(userAuth).length > 0 && userAuth.obj.role === 'FertilityEducator') {
+  if (userRole === 'FertilityEducator') {
     return <><Navigate to="/fertility-educator" replace /><DoctorDash /></>;
   }
-  if (userAuth && Object.keys(userAuth).length > 0 && (allowedRoles.includes(userAuth.obj.role))) {
+  if (allowedRoles.includes(userRole)) {
     return <><Navigate to="/doctor" replace /><DoctorDash /></>;
   }
   return <Login />;

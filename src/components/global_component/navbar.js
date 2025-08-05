@@ -134,7 +134,7 @@ function Navbar() {
       <nav className="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top mt-3">
         <form className="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
           <div className="input-group">
-            {userAuth && (
+            {userAuth && userAuth.obj && (
               <span type="text" style={{ color: "#fff" }}>
                 {userAuth.obj.companyName ? (
                   <>
@@ -155,7 +155,7 @@ function Navbar() {
 
         {isMobile ? (
           <div className="input-group">
-            {userAuth && (
+            {userAuth && userAuth.obj && (
               <span type="text" style={{ color: "#fff", fontSize: '12px', margin: "0% 30%" }}>
                 {userAuth.obj.companyName ? (
                   <>

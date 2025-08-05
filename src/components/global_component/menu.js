@@ -71,14 +71,14 @@ const UserDropdown = ({ userAuth, setShowModal }) => {
       >
         <Avatar
           src={displayUser}
-          alt={userAuth.obj.firstName}
+          alt={userAuth?.obj?.firstName || "User"}
           icon={<UserOutlined />}
           size={42}
           style={{ marginRight: 8 }}
         />
         {isMobile?"":
         <span style={{ marginRight: 8, color: "#595959", fontSize: "14px" }}>
-          {displayUser?.firstName || userAuth.obj.firstName} {displayUser?.lastName || userAuth.obj.lastName}
+          {displayUser?.firstName || userAuth?.obj?.firstName || "User"} {displayUser?.lastName || userAuth?.obj?.lastName || ""}
         </span>}
         <DownOutlined style={{ color: "#595959", fontSize: "12px" }} />
       </div>

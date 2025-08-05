@@ -359,22 +359,79 @@ const PatientIntercom = () => {
   const handleDeleteChat = async (userRef) => {
     console.log('Delete chat for user:', userRef);
 
+    // Find the user info for the confirmation dialog
+    let userName = 'this provider';
     
     if (activeTab === 'active') {
       // For active chats, look in chatHeads
       const chatHead = chatHeads.find(chat => chat.userRef === userRef);
       console.log('Found chat head:', chatHead);
+      userName = chatHead?.username || 'this provider';
     } else {
       // For providers tab, look in filteredProviders
       const user = filteredProviders.find(u => u.userRef === userRef);
       console.log('Found user in providers:', user);
+      userName = user?.username || 'this provider';
     }
     
     Modal.confirm({
-      title: 'Delete Chat',
-      okText: 'Delete',
+      title: (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div className="delete-icon-container">
+            <DeleteOutlined className="delete-icon" />
+          </div>
+          <span style={{ fontSize: '18px', fontWeight: '600', color: '#262626' }}>
+            Delete Chat
+          </span>
+        </div>
+      ),
+      content: (
+        <div style={{ padding: '16px 0' }}>
+          <p style={{ 
+            fontSize: '14px', 
+            color: '#595959', 
+            lineHeight: '1.6',
+            margin: '0 0 16px 0'
+          }}>
+            Are you sure you want to delete the chat with{' '}
+            <span style={{ fontWeight: '600', color: '#262626' }}>{userName}</span>?
+          </p>
+          <div className="delete-warning">
+            <p style={{ 
+              fontSize: '13px', 
+              color: '#cf1322', 
+              margin: 0,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              <span style={{ fontSize: '14px' }}>⚠️</span>
+              This action cannot be undone. All messages will be permanently deleted.
+            </p>
+          </div>
+        </div>
+      ),
+      okText: 'Delete Chat',
       okType: 'danger',
       cancelText: 'Cancel',
+      width: 480,
+      centered: true,
+      okButtonProps: {
+        style: {
+          backgroundColor: '#ff4d4f',
+          borderColor: '#ff4d4f',
+          borderRadius: '6px',
+          height: '36px',
+          fontWeight: '500'
+        }
+      },
+      cancelButtonProps: {
+        style: {
+          borderRadius: '6px',
+          height: '36px',
+          fontWeight: '500'
+        }
+      },
       onOk: async () => {
         try {
           // Find the chat reference for this user

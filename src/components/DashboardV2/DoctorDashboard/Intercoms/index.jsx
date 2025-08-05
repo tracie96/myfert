@@ -419,11 +419,63 @@ const Intercom = () => {
     const userName = user?.username || 'this user';
     
     Modal.confirm({
-      title: 'Delete Chat',
-      content: `Are you sure you want to delete the chat with ${userName}? This action cannot be undone.`,
-      okText: 'Delete',
+      title: (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div className="delete-icon-container">
+            <DeleteOutlined className="delete-icon" />
+          </div>
+          <span style={{ fontSize: '18px', fontWeight: '600', color: '#262626' }}>
+            Delete Chat
+          </span>
+        </div>
+      ),
+      content: (
+        <div style={{ padding: '16px 0' }}>
+          <p style={{ 
+            fontSize: '14px', 
+            color: '#595959', 
+            lineHeight: '1.6',
+            margin: '0 0 16px 0'
+          }}>
+            Are you sure you want to delete the chat with{' '}
+            <span style={{ fontWeight: '600', color: '#262626' }}>{userName}</span>?
+          </p>
+          <div className="delete-warning">
+            <p style={{ 
+              fontSize: '13px', 
+              color: '#cf1322', 
+              margin: 0,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              <span style={{ fontSize: '14px' }}>⚠️</span>
+              This action cannot be undone. All messages will be permanently deleted.
+            </p>
+          </div>
+        </div>
+      ),
+      okText: 'Delete Chat',
       okType: 'danger',
       cancelText: 'Cancel',
+      width: 480,
+      centered: true,
+      okButtonProps: {
+        style: {
+          backgroundColor: '#ff4d4f',
+          borderColor: '#ff4d4f',
+          borderRadius: '6px',
+          height: '36px',
+          fontWeight: '500'
+        }
+      },
+      cancelButtonProps: {
+        style: {
+          borderRadius: '6px',
+          height: '36px',
+          fontWeight: '500'
+        }
+      },
       onOk: async () => {
         try {
           console.log('chatRef', chatRef);

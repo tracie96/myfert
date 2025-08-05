@@ -41,6 +41,7 @@
     "html2pdf.js": "^0.10.1",
     "jquery": "^3.7.1",
     "js-base64": "^3.7.7",
+    "jspdf-autotable": "^5.0.2",
     "moment": "^2.30.1",
     "moment-timezone": "^0.5.46",
     "momentum": "^4.0.0",

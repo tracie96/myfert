@@ -565,35 +565,35 @@ const questions = [
       ],
   },
 
-  // {
-  //   question:
-  //   "Discharge: Menstrual Bleeding",
-  //   type: "number_with_radio",
-  //   title: "Duration(put 0 if you do not experience it)",
-  //   name: "menstrual_bleeding",
-  //   value: 0,
-  //   subQuestions: [
-  //       {
-  //         type: "number_with_radio_sub",
-  //         label: "",
-  //         name: "menstrual_bleeding_sub",
-  //       },
-  //       {
-  //         question: "Colour",
-  //         type: "radio",
-  //         label: "Colour",
-  //         options: ["None", "Pink", "Red", "Brown",  "Black"],
-  //         name: "menstrual_bleeding_sub_colour",
-  //       },
-  //       {
-  //         question: "Clots",
-  //         type: "radio",
-  //         label: "Colour",
-  //         options: ["Yes", "No"],
-  //         name: "menstrual_bleeding_sub_clots",
-  //       },
-  //     ],
-  // },
+  {
+    question:
+    "Discharge: Menstrual Bleeding",
+    type: "number_with_radio",
+    title: "Duration(put 0 if you do not experience it)",
+    name: "menstrual_bleeding",
+    value: 0,
+    subQuestions: [
+        {
+          type: "number_with_radio_sub",
+          label: "",
+          name: "menstrual_bleeding_sub",
+        },
+        {
+          question: "Colour",
+          type: "radio",
+          label: "Colour",
+          options: ["None", "Pink", "Red", "Brown",  "Black"],
+          name: "menstrual_bleeding_sub_colour",
+        },
+        {
+          question: "Clots",
+          type: "radio",
+          label: "Colour",
+          options: ["Yes", "No"],
+          name: "menstrual_bleeding_sub_clots",
+        },
+      ],
+  },
 
   {
     question:

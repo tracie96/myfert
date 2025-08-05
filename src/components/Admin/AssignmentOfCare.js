@@ -577,24 +577,6 @@ const AssignmentOfCare = () => {
                         },
                         rowExpandable: () => true,
                         expandedRowKeys: expandedRowKeys,
-                        onExpand: async (expanded, record) => {
-                            const key = record.key; // Ensure consistent key usage
-                            // if (expanded) {
-                            //     if (!providerExpandedData[key]) {
-                            //         const children = await getProviderPatients(key);
-                            //         if (children.length > 0) {
-                            //             setExpandedRowKeys((prev) => [...prev, key]);
-                            //         } else {
-                            //             message.info("No patients assigned to this provider.");
-                            //         }
-                            //     } else {
-                            //         setExpandedRowKeys((prev) => [...prev, key]);
-                            //     }
-                            // } else {
-                            //     setExpandedRowKeys((prevKeys) => prevKeys.filter((k) => k !== key));
-                            // }
-                        },
-
                         expandIconColumnIndex: -1
                     }}
 
@@ -621,7 +603,7 @@ const AssignmentOfCare = () => {
         <div style={{ margin: '2rem' }}>
             <div style={{ marginBottom: '1rem' }}>
                 <h3 className="h3-admin-title">Users</h3>
-                <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                <div id="searchWrapper" style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                     <Input
                         placeholder="Search by Account #"
                         value={searchParams.account}

@@ -1,96 +1,76 @@
-import React, { useCallback, useState, } from "react";
-import { useDispatch } from "react-redux";
-import { Form, Input } from "antd";
-import { validateEmail } from "../redux/AuthController";
-import AdminModal from "./AdminModal";
+import React, { useState, useEffect } from "react";
+import { Modal, Input, message } from "antd";
+import axios from "axios";
+import { useSelector } from "react-redux";
+import { baseUrl } from "../../utils/envAccess";
+import { handleApiError } from "../Handler/ExceptionHandler";
 
 const ChangeEmail = ({ isOpen, setOpen, account }) => {
-  const [value, setValue] = useState('');
+  const [oldEmail, setOldEmail] = useState("");
+  const [newEmail, setNewEmail] = useState("");
+  const userAuth = useSelector((state) => state?.authentication?.userAuth);
 
-  const cleanup = () => {
-    setOpen('');
-  }
-
-  const dispatch = useDispatch();
-  const [emailCheck, setEmailCheck] = useState(null);
-  
-  const handleEmailBlur = useCallback(async () => {
-    const email = value;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (email) {
-      if (!emailRegex.test(email)) {
-        setEmailCheck({ error: true, message: "Please enter a valid email" });
-        return;
-      }
-
-      try {
-        const result = await dispatch(validateEmail(email));
-        if (validateEmail.fulfilled.match(result)) {
-          setEmailCheck(result.payload);
-        } else {
-          setEmailCheck(null);
-        }
-      } catch (error) {
-        console.error("Error validating email:", error);
-      }
-    } else {
-      setEmailCheck(null);
+  useEffect(() => {
+    if (isOpen === "Email") {
+      setOldEmail("");
+      setNewEmail("");
     }
-  }, [dispatch, value]);
+  }, [isOpen]);
 
-  return <AdminModal
-    title='Change Email'
-    open={isOpen === 'Email'}
-    onCancel={cleanup}
-    footer={[
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <button className="btn btn-secondary" onClick={cleanup}>
-          Cancel
-        </button>
-        <button className="btn btn-primary" onClick={() => {
-          console.log(`Account #${account}'s email has been set to ${value}`);
+  const handleSubmit = async () => {
+    if (!account || !oldEmail || !newEmail) {
+      message.error("Please fill in all fields.");
+      return;
+    }
 
-          cleanup();
-        }}>
-          Confirm
-        </button>
-      </div>
-    ]}
-  >
-    <p style={{ marginBottom: '0.5rem' }}>Enter Account #{account}'s new email:</p>
-    <Form.Item
-      name="email"
-      help={
-        emailCheck && (
-          <div
-            style={{
-              color:
-                emailCheck.statusCode ===
-                "200"
-                  ? "green"
-                  : "red",
-              fontSize: "12px",
-            }}
-          >
-            {emailCheck.message}
-          </div>
-        )
+    const payload = {
+      userRef: account,
+      oldEmail,
+      newEmail
+    };
+
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${userAuth?.obj?.token}`,
+          "Content-Type": "application/json"
+        }
+      };
+
+      const response = await axios.post(`${baseUrl}Admin/ChangeEmail`, payload, config);
+
+      if (response.status === 200 || response.data?.success) {
+        message.success("Email updated successfully.");
+        setOpen("");
+      } else {
+        message.error("Failed to update email.");
       }
-      rules={[
-        {
-          required: true,
-          message: "Please input your email!",
-        },
-      ]}
+    } catch (error) {
+      handleApiError(error);
+    }
+  };
+
+  return (
+    <Modal
+      title="Change Email"
+      open={isOpen === "Email"}
+      onCancel={() => setOpen("")}
+      onOk={handleSubmit}
+      okText="Confirm"
     >
       <Input
-        value={value}
-        onBlur={handleEmailBlur}
-        onChange={(e) => setValue(e.target.value)}
+        placeholder="Enter old email"
+        value={oldEmail}
+        onChange={(e) => setOldEmail(e.target.value)}
+        style={{ marginBottom: '1rem' }}
       />
-    </Form.Item>
-  </AdminModal>
-}
+      <Input
+        placeholder="Enter new email"
+        value={newEmail}
+        onChange={(e) => setNewEmail(e.target.value)}
+      />
+    </Modal>
+  );
+};
 
 export default ChangeEmail;

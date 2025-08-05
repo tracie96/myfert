@@ -322,16 +322,23 @@ export default function DoctorDash() {
                         onChange={handleTableChange}
                         rowKey="id"
                         scroll={{ x: "max-content" }}
-                        onRow={(record) => ({
-                            onClick: (e) => {
-                                if (!e.target.closest(".ant-switch")) {
-                                    localStorage.setItem("patient", JSON.stringify(record));
-                                    navigate(`/doctor/user/${record.userRef}`, {
-                                        state: { user: record },
-                                    });
-                                }
-                            },
-                        })}
+                        onRow={(record) => {
+                            if (activeTab !== "2") {
+                                return {}; // Disable row click for "All Patients"
+                            }
+                        
+                            return {
+                                onClick: (e) => {
+                                    if (!e.target.closest(".isAssignBtn")) {
+                                        localStorage.setItem("patient", JSON.stringify(record));
+                                        navigate(`/doctor/user/${record.userRef}`, {
+                                            state: { user: record },
+                                        });
+                                    }
+                                },
+                            };
+                        }}
+                        
                     />
                 </Card>
             </>

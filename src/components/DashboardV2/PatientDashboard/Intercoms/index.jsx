@@ -648,7 +648,6 @@ const PatientIntercom = () => {
                 value: 'providers'
               }
             ]}
-            block
           />
         </div>
 

@@ -186,7 +186,7 @@ const LoginOTPModal = ({ visible, onCancel, emailOrUsername, onSuccess }) => {
             value={bypassHours}
             onChange={setBypassHours}
             style={{ width: "100%" }}
-            size="large"
+            size="large" 
           >
             {Array.from({ length: 24 }, (_, i) => i + 1).map(hour => (
               <Select.Option key={hour} value={hour}>

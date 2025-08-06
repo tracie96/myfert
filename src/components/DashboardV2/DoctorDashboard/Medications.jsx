@@ -17,6 +17,7 @@ import { PlusOutlined, EditOutlined, DeleteOutlined, FileOutlined, FilePdfOutlin
 import Header from "./Components/Header";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { useMediaQuery } from "react-responsive";
 import { UploadOutlined } from "@ant-design/icons";
 import { addPatientDocuments, getPatientBloodWork, downloadBloodWork } from "../../redux/doctorSlice";
 
@@ -578,7 +579,7 @@ const MedicationTable = () => {
     });
   };
 
-  //const isMobile = windowWidth <= breakpoints.sm;
+  const isMobile = useMediaQuery({ maxWidth: 767 });
   const medicationColumns = [
     { title: 'Name', dataIndex: 'drugName', key: 'drugName', align: 'center' },
     { title: 'Strength', dataIndex: 'strength', key: 'strength', align: 'center' },
@@ -1107,32 +1108,33 @@ const MedicationTable = () => {
               { required: true, message: "Please select medication name" },
             ]}
           >
-            <select
-              placeholder="Select medication"
+            <div style={{maxWidth:"900px"}}>
+            <Select
+              placeholder="Search and select medication"
+              showSearch
+              filterOption={(input, option) =>
+                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+              }
               style={{ 
-                width: '100%', 
+                width: '100% !important', 
                 height: '40px', 
                 borderRadius: '8px',
                 border: '1px solid #d9d9d9',
-                padding: '0 11px',
                 fontSize: '14px',
-                backgroundColor: '#fff',
-                cursor: 'pointer'
+                backgroundColor: '#fff'
               }}
-              onChange={(e) => {
-                setSelectedMedication(e.target.value);
-                form.setFieldsValue({ drugName: e.target.value });
+              onChange={(value) => {
+                setSelectedMedication(value);
+                form.setFieldsValue({ drugName: value });
               }}
-            >
-              <option value="">Select medication</option>
-              {Object.keys(MEDICATION_DATA_MAP)
+              options={Object.keys(MEDICATION_DATA_MAP)
                 .sort((a, b) => a.localeCompare(b))
-                .map(med => (
-                  <option key={med} value={med}>
-                    {med}
-                  </option>
-                ))}
-            </select>
+                .map(med => ({
+                  label: med,
+                  value: med
+                }))}
+            />
+            </div>
           </Form.Item>
           {/* Show Route only after medication is selected */}
           {selectedMedication && (
@@ -1772,27 +1774,55 @@ const MedicationTable = () => {
       </Modal>
 
       {/* At the bottom of the medication list UI */}
-      <div style={{ display: 'flex', justifyContent: 'center', gap: 24, margin: '32px 0' }}>
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        gap: isMobile ? 12 : 24, 
+        margin: '32px 0',
+        flexDirection: isMobile ? 'column' : 'row',
+        alignItems: 'center'
+      }}>
         <Button
           type="primary"
-          size="large"
-          style={{ borderRadius: 8, fontWeight: 'bold', backgroundColor: '#52c41a', borderColor: '#52c41a' }}
+          size={isMobile ? "middle" : "large"}
+          style={{ 
+            borderRadius: 8, 
+            fontWeight: 'bold', 
+            backgroundColor: '#52c41a', 
+            borderColor: '#52c41a',
+            width: isMobile ? '100%' : 'auto',
+            height: isMobile ? '40px' : 'auto'
+          }}
           onClick={handleExportPDF}
         >
           Export PDF
         </Button>
         <Button
           type="default"
-          size="large"
-          style={{ borderRadius: 8, fontWeight: 'bold', border: '2px solid #00ADEF', color: '#00ADEF' }}
+          size={isMobile ? "middle" : "large"}
+          style={{ 
+            borderRadius: 8, 
+            fontWeight: 'bold', 
+            border: '2px solid #00ADEF', 
+            color: '#00ADEF',
+            width: isMobile ? '100%' : 'auto',
+            height: isMobile ? '40px' : 'auto'
+          }}
           onClick={handleFaxToPharmacy}
         >
           Fax to Pharmacy
         </Button>
         <Button
           type="dashed"
-          size="large"
-          style={{ borderRadius: 8, fontWeight: 'bold', border: '2px dashed #1a3c6b', color: '#1a3c6b' }}
+          size={isMobile ? "middle" : "large"}
+          style={{ 
+            borderRadius: 8, 
+            fontWeight: 'bold', 
+            border: '2px dashed #1a3c6b', 
+            color: '#1a3c6b',
+            width: isMobile ? '100%' : 'auto',
+            height: isMobile ? '40px' : 'auto'
+          }}
           onClick={() => setPreviewVisible(true)}
         >
           Prescription Preview

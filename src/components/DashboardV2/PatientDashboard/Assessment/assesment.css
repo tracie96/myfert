@@ -37,9 +37,9 @@
   border-color: 1px solid #01acee;
   color: #01acee;
 }
-.ant-select-dropdown{
+/* .ant-select-dropdown{
 max-width: 150px !important;
-width: 150px !important;}
+width: 150px !important;} */
 
 .ant-btn-default:not(:disabled):not(.ant-btn-disabled):hover {
   background: none;
@@ -198,7 +198,7 @@ width: 150px !important;}
   justify-content: "space-between";
 }
 .ant-select {
-  width: 50% !important;
+  width: 50%;
 }
 .moderate, .success, .ant-pagination-options-size-changer.ant-select-show-arrow{width: 100% !important;}
 

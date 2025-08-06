@@ -29,3 +29,9 @@
   min-width: 100% !important;
   max-width: 100% !important;
 }
+.rc-virtual-list-holder-inner{
+  width: 400px !important;
+}
+.ant-select .ant-select-outlined .ant-select-in-form-item {
+  width: 800px !important;
+}

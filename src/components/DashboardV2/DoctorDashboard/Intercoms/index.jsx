@@ -635,7 +635,6 @@ const Intercom = () => {
                 { label: 'Patients', value: 'patients' },
                 { label: 'Providers', value: 'providers' }
               ]}
-              block
             />
           </div>
         </div>

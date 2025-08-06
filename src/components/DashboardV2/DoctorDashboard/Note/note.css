@@ -294,11 +294,11 @@
 }
 
 /* Remove the restrictive width on ant-select-dropdown */
-.ant-select-dropdown {
+/* .ant-select-dropdown {
   width: auto !important;
   max-width: none !important;
   min-width: 200px !important;
-}
+} */
 
 /* Ensure the select input field is properly sized */
 .ant-select {

@@ -240,24 +240,34 @@ const AssignmentOfCare = () => {
     ];
 
     const handleProviderExpand = async (record) => {
-        const key = record.account;
-
+        const key = record.key;
+    
+        // Collapse if already expanded
         if (expandedRowKeys.includes(key)) {
             setExpandedRowKeys(prev => prev.filter(k => k !== key));
             return;
         }
-
+    
+        // If data is already cached, just expand
         if (providerExpandedData[key]) {
             setExpandedRowKeys(prev => [...prev, key]);
             return;
         }
-
+    
+        // Show loading spinner
         setLoadingKeys(prev => [...prev, key]);
-
+    
         try {
             const children = await getProviderPatients(key);
+    
+            // Cache was updated in getProviderPatients
             setExpandedRowKeys(prev => [...prev, key]);
-
+    
+            // Show message only if no data returned
+            if (!children || children.length === 0) {
+               // message.info("No patients assigned to this provider.");
+            }
+    
         } catch (err) {
             console.error("Error fetching patients", err);
         } finally {

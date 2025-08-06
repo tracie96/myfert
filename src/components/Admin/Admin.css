@@ -49,7 +49,7 @@
   /* .container-fluid div:first-child{
     margin: 2rem 0rem !important;
   } */
-   #searchWrapper{
+   #searchWrapper, .searchWrapper{
     flex-direction: column;
    }
   .ant-table {

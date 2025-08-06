@@ -9,6 +9,7 @@ import { baseUrl } from "../../utils/envAccess";
 import { handleApiError } from "../Handler/ExceptionHandler";
 import ChangeEmail from "./ChangeEmail";
 import { message } from "antd";
+import PatientInformationView from "./PatientInformationView";
 
 const UserManagement = () => {
   const [isOpen, setOpen] = useState('');
@@ -242,6 +243,8 @@ const UserManagement = () => {
           account: account,
           firstName: user.firstname || '',
           lastName: user.lastname || '',
+          email: user.email || '',
+          dob: user.dob ? new Date(user.dob).toLocaleDateString('en-CA') : '',
           role: 'Patient',
           activated: user.patientStat || 'Active',
           acceptingPatients: 'Yes',
@@ -436,7 +439,7 @@ const UserManagement = () => {
     <div style={{ margin: '2rem' }}>
       <div style={{ marginBottom: '1rem' }}>
         <h3 className="h3-admin-title">Users</h3>
-        <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+        <div className="searchWrapper" style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
           <Input
             placeholder="Search by Account #"
             value={searchParams.account}
@@ -464,6 +467,13 @@ const UserManagement = () => {
 
       <SetUserPassword isOpen={isOpen} setOpen={setOpen} account={currAccount} />
       <ChangeEmail isOpen={isOpen} setOpen={setOpen} account={currAccount} />
+      <PatientInformationView
+        isOpen={isOpen}
+        setOpen={setOpen}
+        account={currAccount}
+        patientList={dataSource}
+      />
+
     </div>
   );
 }

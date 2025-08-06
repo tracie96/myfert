@@ -34,213 +34,11 @@ import 'jspdf-autotable';
 import "./medication.css";
 import { useRef } from 'react';
 import fertilityLogo from '../../../assets/images/auth/fertilityImage.svg';
+import { ROUTE_STRENGTH_MAP, MEDICATION_DATA_MAP, ALL_ROUTES, DEFAULT_STRENGTHS } from "../../../utils/medicationData";
 const { Text, Link } = Typography;
 const { Dragger } = Upload;
 
-// Dose options by route
-const DOSE_OPTIONS_BY_ROUTE = {
-  "Oral": [
-    "0.25 mg", "0.5 mg", "1 mg", "2 mg", "2.5 mg", "5 mg", "10 mg", "25 mg", "50 mg", "100 mg", "200 mg", "400 mg", "500 mg", "850 mg", "1000 mg"
-  ],
-  "Subcutaneous (SubQ) Injection": [
-    "75 IU", "150 IU", "225 IU", "250 IU", "500 IU", "1,000 IU", "5,000 IU", "10,000 IU", "0.1 mg", "0.25 mg", "0.5 mg", "1 mg"
-  ],
-  "Intramuscular (IM) Injection": [
-    "250 IU", "500 IU", "1,000 IU", "2,000 IU", "5,000 IU", "10,000 IU", "0.25 mg", "0.5 mg", "1 mg", "2 mg"
-  ],
-  "Vaginal": [
-    "100 mg suppository", "200 mg suppository", "8% gel", "90 mg gel"
-  ],
-  "Rectal": [
-    "100 mg suppository", "200 mg suppository", "250 mg", "500 mg"
-  ],
-  "Transdermal (Patch)": [
-    "0.025 mg", "0.05 mg", "0.075 mg", "0.1 mg"
-  ],
-  "Sublingual": [
-    "0.25 mg", "0.5 mg", "1 mg", "2 mg"
-  ],
-  "Intranasal": [
-    "0.1 mg", "0.2 mg", "0.5 mg per spray"
-  ],
-  "Intrauterine": [
-    "10 mg", "20 mg"
-  ],
-  "Other": [
-    "20 mg", "40 mg", "60 mg", "81 mg", "325 mg", "1 g"
-  ]
-};
-// Unified medication mapping for routes and strengths
-const MEDICATION_DATA_MAP = {
-  "Clomiphene Citrate": { routes: ["Oral"], strengths: ["25 mg", "50 mg"] },
-  "Letrozole": { routes: ["Oral"], strengths: ["2.5 mg"] },
-  "Follitropin alfa": { routes: ["Subcutaneous (SubQ) Injection"], strengths: ["75 IU", "150 IU", "225 IU", "300 IU"] },
-  "Follitropin beta": { routes: ["Subcutaneous (SubQ) Injection"], strengths: ["75 IU", "150 IU", "225 IU"] },
-  "Menotropins": { routes: ["IM Injection", "SubQ"], strengths: ["75 IU", "150 IU", "300 IU"] },
-  "Human Chorionic Gonadotropin (hCG)": { routes: ["SubQ", "IM"], strengths: ["1,000 IU", "5,000 IU", "10,000 IU"] },
-  "Leuprolide acetate": { routes: ["SubQ", "IM"], strengths: ["0.1 mg", "1 mg", "3.75 mg", "7.5 mg"] },
-  "Ganirelix acetate": { routes: ["SubQ"], strengths: ["0.25 mg"] },
-  "Cetrorelix": { routes: ["SubQ"], strengths: ["0.25 mg"] },
-  "Progesterone": { routes: ["Oral", "Vaginal", "Rectal", "IM", "SubQ", "Intrauterine"], strengths: ["100 mg", "200 mg", "400 mg (oral)", "8% gel (~90 mg)", "100 mg suppository", "200 mg suppository", "50 mg/mL IM", "10 mg IU device"] },
-  "Estradiol": { routes: ["Oral", "Transdermal", "Vaginal", "IM", "Subcutaneous implant", "Intranasal"], strengths: ["0.5 mg", "1 mg", "2 mg (oral)", "0.025 mg patch", "0.05 mg patch", "0.1 mg patch", "25 µg intranasal", "2 mg/mL IM"] },
-  "Medroxyprogesterone acetate": { routes: ["Oral", "IM"], strengths: ["2.5 mg", "5 mg", "10 mg (oral)", "150 mg/mL IM", "400 mg/mL IM"] },
-  "Dydrogesterone": { routes: ["Oral"], strengths: ["10 mg"] },
-  "Anastrozole": { routes: ["Oral"], strengths: ["1 mg"] },
-  "Tamoxifen": { routes: ["Oral"], strengths: ["10 mg", "20 mg"] },
-  "hMG (human menopausal gonadotropin)": { routes: ["IM", "SubQ"], strengths: ["75 IU", "150 IU", "300 IU"] },
-  "Levothyroxine": { routes: ["Oral"], strengths: ["25 µg", "50 µg", "75 µg", "100 µg", "125 µg", "150 µg", "200 µg"] },
-  "Liothyronine": { routes: ["Oral"], strengths: ["5 µg", "25 µg", "50 µg"] },
-  "Metformin": { routes: ["Oral"], strengths: ["500 mg", "850 mg", "1000 mg"] },
-  "Low-dose Aspirin": { routes: ["Oral"], strengths: ["81 mg"] },
-  "Heparin": { routes: ["SubQ", "IV"], strengths: ["5,000 units/mL"] },
-  "Enoxaparin": { routes: ["SubQ"], strengths: ["30 mg/0.3 mL", "40 mg/0.4 mL", "60 mg/0.6 mL", "80 mg/0.8 mL", "100 mg/1 mL"] },
-  "Prednisone": { routes: ["Oral"], strengths: ["1 mg", "5 mg", "10 mg", "20 mg", "50 mg"] },
-  "Cabergoline": { routes: ["Oral"], strengths: ["0.5 mg"] },
-  "Bromocriptine": { routes: ["Oral"], strengths: ["2.5 mg"] },
-  "Doxycycline": { routes: ["Oral", "IV"], strengths: ["100 mg (oral)", "100 mg/5 mL IV"] },
-  "Azithromycin": { routes: ["Oral", "IV"], strengths: ["250 mg", "500 mg (oral)", "500 mg/5 mL IV"] },
-  "Atorvastatin": { routes: ["Oral"], strengths: ["10 mg", "20 mg", "40 mg", "80 mg", "20 mg/5 mL suspension"] },
-  "Lisinopril": { routes: ["Oral"], strengths: ["2.5 mg", "5 mg", "10 mg", "20 mg", "30 mg", "40 mg"] },
-  "Amlodipine": { routes: ["Oral"], strengths: ["2.5 mg", "5 mg", "10 mg"] },
-  "Metoprolol": { routes: ["Oral"], strengths: ["25 mg", "50 mg", "100 mg"] },
-  "Albuterol": { routes: ["Inhalation", "Oral"], strengths: ["90 mcg/inhalation", "2 mg oral"] },
-  "Losartan": { routes: ["Oral"], strengths: ["25 mg", "50 mg", "100 mg"] },
-  "Omeprazole": { routes: ["Oral"], strengths: ["10 mg", "20 mg", "40 mg"] },
-  "Gabapentin": { routes: ["Oral"], strengths: ["100 mg", "300 mg", "400 mg", "600 mg", "800 mg"] },
-  "Sertraline": { routes: ["Oral"], strengths: ["25 mg", "50 mg", "100 mg"] },
-  "Hydrochlorothiazide": { routes: ["Oral"], strengths: ["12.5 mg", "25 mg", "50 mg", "100 mg"] },
-  "Rosuvastatin": { routes: ["Oral"], strengths: ["5 mg", "10 mg", "20 mg", "40 mg"] },
-  "Amphetamine/Dextroamphetamine": { routes: ["Oral"], strengths: ["5 mg", "10 mg", "15 mg", "20 mg", "25 mg", "30 mg"] },
-  "Escitalopram": { routes: ["Oral"], strengths: ["5 mg", "10 mg", "20 mg"] },
-  "Pantoprazole": { routes: ["Oral"], strengths: ["20 mg", "40 mg"] },
-  "Montelukast": { routes: ["Oral"], strengths: ["4 mg", "5 mg", "10 mg"] },
-  "Trazodone": { routes: ["Oral"], strengths: ["50 mg", "100 mg", "150 mg", "300 mg"] },
-  "Simvastatin": { routes: ["Oral"], strengths: ["5 mg", "10 mg", "20 mg", "40 mg", "80 mg"] },
-  "Tamsulosin": { routes: ["Oral"], strengths: ["0.4 mg", "0.8 mg"] },
-  "Bupropion": { routes: ["Oral"], strengths: ["75 mg", "150 mg", "300 mg"] },
-  "Fluoxetine": { routes: ["Oral"], strengths: ["10 mg", "20 mg", "40 mg", "60 mg"] },
-  "Acetaminophen/Hydrocodone": { routes: ["Oral"], strengths: ["325 mg / 5 mg", "500 mg / 5 mg"] },
-  "Furosemide": { routes: ["Oral", "IV"], strengths: ["20 mg", "40 mg", "80 mg", "10 mg/mL IV"] }
-};
-// Add new medications to MEDICATION_DATA_MAP
-Object.assign(MEDICATION_DATA_MAP, {
-  "Duloxetine": { routes: ["Oral"], strengths: ["20 mg", "30 mg", "40 mg", "60 mg"] },
-  "Methylphenidate": { routes: ["Oral"], strengths: ["10 mg", "20 mg", "30 mg", "40 mg", "60 mg"] },
-  "Ibuprofen": { routes: ["Oral"], strengths: ["200 mg", "400 mg", "600 mg", "800 mg"] },
-  "Carvedilol": { routes: ["Oral"], strengths: ["3.125 mg", "6.25 mg", "12.5 mg", "25 mg"] },
-  "Potassium Chloride": { routes: ["Oral", "IV"], strengths: ["10 mEq", "15 mEq", "20 mEq", "40 mEq"] },
-  "Aspirin": { routes: ["Oral"], strengths: ["81 mg", "325 mg", "500 mg"] },
-  "Pravastatin": { routes: ["Oral"], strengths: ["10 mg", "20 mg", "40 mg", "80 mg"] },
-  "Ergocalciferol (Vitamin D2)": { routes: ["Oral"], strengths: ["1,250 IU", "50,000 IU"] },
-  "Allopurinol": { routes: ["Oral"], strengths: ["100 mg", "300 mg", "600 mg"] },
-  "Tadalafil": { routes: ["Oral"], strengths: ["2.5 mg", "5 mg", "10 mg", "20 mg"] },
-  "Venlafaxine": { routes: ["Oral"], strengths: ["25 mg", "37.5 mg", "50 mg", "75 mg", "100 mg"] },
-  "Clonazepam": { routes: ["Oral"], strengths: ["0.5 mg", "1 mg", "2 mg"] },
-  "Meloxicam": { routes: ["Oral"], strengths: ["7.5 mg", "15 mg"] },
-  "Spironolactone": { routes: ["Oral"], strengths: ["25 mg", "50 mg", "100 mg"] },
-  "Fluconazole": { routes: ["Oral", "IV"], strengths: ["50 mg", "100 mg", "150 mg", "200 mg"] },
-  "Warfarin": { routes: ["Oral"], strengths: ["1 mg", "2 mg", "2.5 mg", "3 mg", "4 mg", "5 mg", "6 mg", "7.5 mg", "10 mg"] },
-  "Clindamycin": { routes: ["Oral", "IV"], strengths: ["75 mg", "150 mg", "300 mg"] },
-  "Lorazepam": { routes: ["Oral", "IV"], strengths: ["0.5 mg", "1 mg", "2 mg"] },
-  "Zolpidem": { routes: ["Oral"], strengths: ["5 mg", "10 mg"] },
-  "Levetiracetam": { routes: ["Oral", "IV"], strengths: ["250 mg", "500 mg", "750 mg", "1000 mg"] },
-  "Fentanyl": { routes: ["Transdermal", "Buccal", "Sublingual", "Intranasal", "IV", "IM"], strengths: ["12 mcg/hr patch", "25 mcg/hr patch", "50 mcg/hr patch", "100 mcg/hr patch", "200 mcg/hr patch"] },
-  "Hydrocodone/Acetaminophen": { routes: ["Oral"], strengths: ["5 mg / 325 mg", "7.5 mg / 325 mg", "10 mg / 325 mg"] },
-  "Oxycodone": { routes: ["Oral"], strengths: ["5 mg", "10 mg", "15 mg", "20 mg", "30 mg"] },
-  "Divalproex Sodium": { routes: ["Oral"], strengths: ["125 mg", "250 mg", "500 mg"] },
-  "Metronidazole": { routes: ["Oral", "IV"], strengths: ["250 mg", "500 mg"] },
-  "Ranitidine": { routes: ["Oral", "IV"], strengths: ["75 mg", "150 mg", "300 mg"] },
-  "Dexamethasone": { routes: ["Oral", "IV", "IM"], strengths: ["0.5 mg", "1 mg", "2 mg", "4 mg", "8 mg"] },
-  "Ondansetron": { routes: ["Oral", "IV", "IM"], strengths: ["4 mg", "8 mg"] },
-  "Phenobarbital": { routes: ["Oral", "IV"], strengths: ["15 mg", "30 mg", "60 mg", "100 mg"] },
-  "Valacyclovir": { routes: ["Oral"], strengths: ["500 mg", "1,000 mg"] },
-  "Amitriptyline": { routes: ["Oral"], strengths: ["10 mg", "25 mg", "50 mg", "75 mg", "100 mg", "150 mg"] },
-  "Propranolol": { routes: ["Oral", "IV"], strengths: ["10 mg", "20 mg", "40 mg", "60 mg", "80 mg"] },
-  "Hydroxyzine": { routes: ["Oral", "IM", "IV"], strengths: ["10 mg", "25 mg", "50 mg"] },
-  "Alprazolam": { routes: ["Oral"], strengths: ["0.25 mg", "0.5 mg", "1 mg", "2 mg"] },
-  "Citalopram": { routes: ["Oral"], strengths: ["10 mg", "20 mg", "40 mg"] },
-  "Mometasone": { routes: ["Nasal", "Topical"], strengths: ["50 mcg spray", "0.1% cream"] },
-  "Sildenafil": { routes: ["Oral"], strengths: ["20 mg", "25 mg", "50 mg", "100 mg"] },
-  "Methotrexate": { routes: ["Oral", "IM", "IV", "SubQ"], strengths: ["2.5 mg", "7.5 mg", "10 mg", "15 mg", "20 mg", "25 mg"] },
-  "Budesonide": { routes: ["Inhalation", "Nasal"], strengths: ["90 mcg", "180 mcg"] },
-  "Cyclobenzaprine": { routes: ["Oral"], strengths: ["5 mg", "10 mg"] },
-  "Loratadine": { routes: ["Oral"], strengths: ["10 mg"] },
-  "Clonidine": { routes: ["Oral", "Transdermal"], strengths: ["0.1 mg", "0.2 mg", "0.3 mg"] },
-  "Buspirone": { routes: ["Oral"], strengths: ["5 mg", "7.5 mg", "10 mg", "15 mg", "30 mg"] },
-  "Dextroamphetamine": { routes: ["Oral"], strengths: ["5 mg", "10 mg", "15 mg", "20 mg", "30 mg"] },
-  "Mirtazapine": { routes: ["Oral"], strengths: ["15 mg", "30 mg", "45 mg"] },
-  "Ticlopidine": { routes: ["Oral"], strengths: ["250 mg"] },
-  "Phenazopyridine": { routes: ["Oral"], strengths: ["100 mg", "200 mg"] },
-  "Olanzapine": { routes: ["Oral", "IM"], strengths: ["2.5 mg", "5 mg", "7.5 mg", "10 mg", "15 mg", "20 mg"] },
-  "Levocetirizine": { routes: ["Oral"], strengths: ["5 mg"] },
-  "Lamotrigine": { routes: ["Oral"], strengths: ["25 mg", "50 mg", "100 mg", "150 mg", "200 mg"] },
-  "Topiramate": { routes: ["Oral"], strengths: ["25 mg", "50 mg", "100 mg", "200 mg"] },
-  "Risperidone": { routes: ["Oral", "IM"], strengths: ["0.25 mg", "0.5 mg", "1 mg", "2 mg", "3 mg", "4 mg"] },
-  "Hydralazine": { routes: ["Oral", "IV"], strengths: ["10 mg", "25 mg", "50 mg", "100 mg"] }
-});
-// Add the latest batch of medications to MEDICATION_DATA_MAP
-Object.assign(MEDICATION_DATA_MAP, {
-  "Acyclovir": { routes: ["Oral", "IV", "Topical"], strengths: ["200 mg", "400 mg", "800 mg", "5% cream"] },
-  "Alprazolam": { routes: ["Oral"], strengths: ["0.25 mg", "0.5 mg", "1 mg", "2 mg"] },
-  "Amiodarone": { routes: ["Oral", "IV"], strengths: ["100 mg", "200 mg"] },
-  "Amoxicillin": { routes: ["Oral"], strengths: ["250 mg", "500 mg", "875 mg"] },
-  "Amlodipine": { routes: ["Oral"], strengths: ["2.5 mg", "5 mg", "10 mg"] },
-  "Aripiprazole": { routes: ["Oral", "IM"], strengths: ["2 mg", "5 mg", "10 mg", "15 mg", "20 mg", "30 mg"] },
-  "Atomoxetine": { routes: ["Oral"], strengths: ["10 mg", "18 mg", "25 mg", "40 mg", "60 mg", "80 mg", "100 mg"] },
-  "Atorvastatin": { routes: ["Oral"], strengths: ["10 mg", "20 mg", "40 mg", "80 mg"] },
-  "Azithromycin": { routes: ["Oral", "IV"], strengths: ["250 mg", "500 mg", "600 mg"] },
-  "Benazepril": { routes: ["Oral"], strengths: ["5 mg", "10 mg", "20 mg", "40 mg"] },
-  "Benzonatate": { routes: ["Oral"], strengths: ["100 mg", "200 mg"] },
-  "Bupropion": { routes: ["Oral"], strengths: ["75 mg", "100 mg", "150 mg", "200 mg", "300 mg"] },
-  "Buspirone": { routes: ["Oral"], strengths: ["5 mg", "7.5 mg", "10 mg", "15 mg", "30 mg"] },
-  "Candesartan": { routes: ["Oral"], strengths: ["4 mg", "8 mg", "16 mg", "32 mg"] },
-  "Carbamazepine": { routes: ["Oral"], strengths: ["100 mg", "200 mg", "400 mg"] },
-  "Carvedilol": { routes: ["Oral"], strengths: ["3.125 mg", "6.25 mg", "12.5 mg", "25 mg"] },
-  "Cephalexin": { routes: ["Oral"], strengths: ["250 mg", "500 mg"] },
-  "Cetirizine": { routes: ["Oral"], strengths: ["5 mg", "10 mg"] },
-  "Chlorpheniramine": { routes: ["Oral"], strengths: ["4 mg"] },
-  "Ciprofloxacin": { routes: ["Oral", "IV"], strengths: ["250 mg", "500 mg", "750 mg"] },
-  "Clindamycin": { routes: ["Oral", "IV"], strengths: ["75 mg", "150 mg", "300 mg"] },
-  "Clonazepam": { routes: ["Oral"], strengths: ["0.5 mg", "1 mg", "2 mg"] },
-  "Clopidogrel": { routes: ["Oral"], strengths: ["75 mg", "300 mg"] },
-  "Codeine": { routes: ["Oral"], strengths: ["15 mg", "30 mg", "60 mg"] },
-  "Dexamethasone": { routes: ["Oral", "IV", "IM"], strengths: ["0.5 mg", "1 mg", "2 mg", "4 mg", "8 mg"] },
-  "Dexmethylphenidate": { routes: ["Oral"], strengths: ["2.5 mg", "5 mg", "10 mg"] },
-  "Diazepam": { routes: ["Oral", "IV", "IM", "Rectal"], strengths: ["2 mg", "5 mg", "10 mg"] },
-  "Diclofenac": { routes: ["Oral", "Topical"], strengths: ["25 mg", "50 mg", "75 mg", "100 mg"] },
-  "Dicyclomine": { routes: ["Oral", "IM"], strengths: ["10 mg", "20 mg"] },
-  "Digoxin": { routes: ["Oral", "IV"], strengths: ["0.125 mg", "0.25 mg"] },
-  "Diltiazem": { routes: ["Oral", "IV"], strengths: ["30 mg", "60 mg", "90 mg", "120 mg"] },
-  "Diphenhydramine": { routes: ["Oral", "IM", "IV"], strengths: ["25 mg", "50 mg"] },
-  "Divalproex Sodium": { routes: ["Oral"], strengths: ["125 mg", "250 mg", "500 mg"] },
-  "Dobutamine": { routes: ["IV"], strengths: ["12.5 mg/mL"] },
-  "Docusate": { routes: ["Oral"], strengths: ["100 mg", "250 mg"] },
-  "Doxazosin": { routes: ["Oral"], strengths: ["1 mg", "2 mg", "4 mg", "8 mg"] },
-  "Doxycycline": { routes: ["Oral", "IV"], strengths: ["100 mg", "150 mg"] },
-  "Enalapril": { routes: ["Oral"], strengths: ["2.5 mg", "5 mg", "10 mg", "20 mg"] },
-  "Enoxaparin": { routes: ["SubQ"], strengths: ["30 mg/0.3 mL", "40 mg/0.4 mL", "60 mg/0.6 mL", "80 mg/0.8 mL", "100 mg/1 mL"] },
-  "Escitalopram": { routes: ["Oral"], strengths: ["5 mg", "10 mg", "20 mg"] },
-  "Esomeprazole": { routes: ["Oral", "IV"], strengths: ["20 mg", "40 mg"] },
-  "Estradiol": { routes: ["Oral", "Transdermal", "Vaginal", "IM", "SubQ", "Intranasal"], strengths: ["0.5 mg", "1 mg", "2 mg", "25 mcg patch", "50 mcg patch", "100 mcg patch"] },
-  "Etanercept": { routes: ["SubQ"], strengths: ["25 mg", "50 mg"] },
-  "Fentanyl": { routes: ["Transdermal", "Buccal", "Sublingual", "Intranasal", "IV", "IM"], strengths: ["12 mcg/hr patch", "25 mcg/hr patch", "50 mcg/hr patch", "100 mcg/hr patch", "200 mcg/hr patch"] },
-  "Finasteride": { routes: ["Oral"], strengths: ["1 mg", "5 mg"] },
-  "Fluconazole": { routes: ["Oral", "IV"], strengths: ["50 mg", "100 mg", "150 mg", "200 mg"] },
-  "Fluoxetine": { routes: ["Oral"], strengths: ["10 mg", "20 mg", "40 mg", "60 mg"] },
-  "Fluticasone": { routes: ["Inhalation", "Nasal", "Topical"], strengths: ["50 mcg", "100 mcg", "250 mcg"] },
-  "Furosemide": { routes: ["Oral", "IV"], strengths: ["20 mg", "40 mg", "80 mg", "10 mg/mL IV"] },
-  "Gabapentin": { routes: ["Oral"], strengths: ["100 mg", "300 mg", "400 mg", "600 mg", "800 mg"] },
-  "Gemfibrozil": { routes: ["Oral"], strengths: ["600 mg"] },
-  "Glyburide": { routes: ["Oral"], strengths: ["1.25 mg", "2.5 mg", "5 mg"] },
-  "Heparin": { routes: ["SubQ", "IV"], strengths: ["5,000 units/mL"] }
-});
-const ALL_ROUTES = [
-  "Oral", "Subcutaneous (SubQ) Injection", "IM Injection", "IM", "SubQ", "Vaginal", "Rectal", "Transdermal", "Transdermal (Patch)", "Sublingual", "Intranasal", "Intrauterine", "IV", "Intravenous (IV)", "Inhalation", "Subcutaneous implant", "Subcutaneous implant", "Other"
-];
-const DEFAULT_STRENGTHS = [
-  "25 mcg", "50 mcg", "75 mcg", "100 mcg", "125 mcg", "200 mcg",
-  "0.025 mg", "0.05 mg", "0.1 mg", "0.25 mg", "0.5 mg", "1 mg", "2 mg", "2.5 mg", "5 mg", "10 mg", "20 mg", "25 mg", "50 mg", "75 mg", "100 mg", "200 mg", "250 mg", "400 mg", "500 mg", "850 mg", "1000 mg", "2000 mg", "5000 mg", "7500 mg", "10000 mg", "75 IU", "150 IU", "250 IU", "500 IU", "1000 IU", "5000 IU", "10000 IU", "10000 units/mL", "20 mg/mL", "50 mg/mL", "100 mg/mL"
-];
+// Medication data is now imported from utils/medicationData.js
 const MedicationTable = () => {
   const patient = JSON.parse(localStorage.getItem("patient")) || {
     userRef: "",
@@ -838,8 +636,8 @@ const MedicationTable = () => {
     if (!strength) return [];
     
     // First check if we have predefined options for this route
-    if (route && DOSE_OPTIONS_BY_ROUTE[route]) {
-      return DOSE_OPTIONS_BY_ROUTE[route].map(dose => ({
+    if (route && ROUTE_STRENGTH_MAP[route]) {
+      return ROUTE_STRENGTH_MAP[route].map(dose => ({
         label: dose,
         value: dose
       }));
@@ -1127,7 +925,7 @@ const MedicationTable = () => {
                 setSelectedMedication(value);
                 form.setFieldsValue({ drugName: value });
               }}
-              options={Object.keys(MEDICATION_DATA_MAP)
+              options={Object?.keys(MEDICATION_DATA_MAP)
                 .sort((a, b) => a.localeCompare(b))
                 .map(med => ({
                   label: med,
@@ -1355,33 +1153,7 @@ const MedicationTable = () => {
             </select>
           </Form.Item>
 
-          {/* Test field (same size as Quantity) */}
-          <Form.Item
-            label="Test"
-            name="test"
-            labelCol={{ span: 24 }}
-            wrapperCol={{ span: 24 }}
-          >
-            <select
-              style={{ 
-                width: '100%', 
-                height: '40px', 
-                borderRadius: '8px',
-                border: '1px solid #d9d9d9',
-                padding: '0 11px',
-                fontSize: '14px',
-                backgroundColor: '#fff',
-                cursor: 'pointer'
-              }}
-              placeholder="Select test option"
-              onChange={(e) => form.setFieldsValue({ test: e.target.value })}
-            >
-              <option value="">Select test option</option>
-              <option value="option1">Option 1</option>
-              <option value="option2">Option 2</option>
-              <option value="option3">Option 3</option>
-            </select>
-          </Form.Item>
+       
         </Form>
       </Modal>
 

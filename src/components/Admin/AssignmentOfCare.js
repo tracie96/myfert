@@ -10,7 +10,7 @@ import axios from "axios";
 import { baseUrl } from "../../utils/envAccess";
 import { handleApiError } from "../Handler/ExceptionHandler";
 import ChangeEmail from "./ChangeEmail";
-import { message,Modal } from "antd";
+import { message, Modal, Spin } from "antd";
 
 
 const AssignmentOfCare = () => {
@@ -27,7 +27,7 @@ const AssignmentOfCare = () => {
     const [requestsTable, setRequestsTable] = useState([]);
     const [expandedRowKeys, setExpandedRowKeys] = useState([]);
     const [providerExpandedData, setProviderExpandedData] = useState({});
-
+    const [loadingKeys, setLoadingKeys] = useState([]); // tracks which keys are loading
 
 
     const [requestsPagination, setRequestsPagination] = useState({
@@ -240,22 +240,31 @@ const AssignmentOfCare = () => {
     ];
 
     const handleProviderExpand = async (record) => {
-        const key = record.key;
-        if (!expandedRowKeys.includes(key)) {
-            if (!providerExpandedData[key]) {
-                const children = await getProviderPatients(key);
-                if (children.length > 0) {
-                    setExpandedRowKeys(prev => [...prev, key]);
-                } else {
-                    message.info("No patients assigned to this provider.");
-                }
-            } else {
-                setExpandedRowKeys(prev => [...prev, key]);
-            }
-        } else {
+        const key = record.account;
+
+        if (expandedRowKeys.includes(key)) {
             setExpandedRowKeys(prev => prev.filter(k => k !== key));
+            return;
+        }
+
+        if (providerExpandedData[key]) {
+            setExpandedRowKeys(prev => [...prev, key]);
+            return;
+        }
+
+        setLoadingKeys(prev => [...prev, key]);
+
+        try {
+            const children = await getProviderPatients(key);
+            setExpandedRowKeys(prev => [...prev, key]);
+
+        } catch (err) {
+            console.error("Error fetching patients", err);
+        } finally {
+            setLoadingKeys(prev => prev.filter(k => k !== key));
         }
     };
+
     const getProviderPatients = async (doctorRef) => {
         if (providerExpandedData[doctorRef]) {
             return providerExpandedData[doctorRef]; // return cached
@@ -566,6 +575,15 @@ const AssignmentOfCare = () => {
                     expandable={{
                         expandedRowRender: (record) => {
                             const data = providerExpandedData[record.account];
+                            if (loadingKeys.includes(record.key)) {
+                                return (
+                                    <div style={{ padding: '1rem', textAlign: 'center' }}>
+                                        <Spin tip="Loading patients..." />
+                                    </div>
+                                );
+                                
+                            }
+                    
                             return (
                                 <Table
                                     columns={providerExpandedColumns}
@@ -577,8 +595,9 @@ const AssignmentOfCare = () => {
                         },
                         rowExpandable: () => true,
                         expandedRowKeys: expandedRowKeys,
-                        expandIconColumnIndex: -1
+                        expandIconColumnIndex: -1,
                     }}
+                    
 
                 />
             )

@@ -619,14 +619,14 @@ const MedicationTable = () => {
   };
 
   // Helper to extract days from duration string
-  function getDurationInDays(duration) {
-    if (!duration) return 1;
-    const lower = duration.toLowerCase();
-    if (lower.includes('day')) return parseInt(lower);
-    if (lower.includes('week')) return parseInt(lower) * 7;
-    if (lower.includes('month')) return parseInt(lower) * 30;
-    return parseInt(duration) || 1;
-  }
+  // function getDurationInDays(duration) {
+  //   if (!duration) return 1;
+  //   const lower = duration.toLowerCase();
+  //   if (lower.includes('day')) return parseInt(lower);
+  //   if (lower.includes('week')) return parseInt(lower) * 7;
+  //   if (lower.includes('month')) return parseInt(lower) * 30;
+  //   return parseInt(duration) || 1;
+  // }
 
   // State for PRN max per day
   const [prnMax, setPrnMax] = useState(1);
@@ -876,23 +876,47 @@ const MedicationTable = () => {
           form={form}
           layout="vertical"
           onValuesChange={(changed, all) => {
-            let freq = all.frequency;
-            let dur = all.duration;
-            let dosesPerDay = FREQUENCY_TO_DOSES_PER_DAY[freq] || 1;
+            const { strength, dose, frequency, duration } = all;
+          
+            let dosesPerDay = FREQUENCY_TO_DOSES_PER_DAY[frequency] || 1;
             let days = 1;
-            // Parse duration robustly
-            days = getDurationInDays(dur);
-            // Special handling for PRN
-            if (freq === 'As needed (PRN)') {
+          
+            // Parse duration
+            if (typeof duration === 'string') {
+              const dayMatch = duration.match(/(\d+)\s*day/);
+              const weekMatch = duration.match(/(\d+)\s*week/);
+              const monthMatch = duration.match(/(\d+)\s*month/);
+              if (dayMatch) days = parseInt(dayMatch[1]);
+              else if (weekMatch) days = parseInt(weekMatch[1]) * 7;
+              else if (monthMatch) days = parseInt(monthMatch[1]) * 30;
+              else if (!isNaN(Number(duration))) days = Number(duration);
+            }
+          
+            // Handle PRN
+            if (frequency === 'As needed (PRN)') {
               dosesPerDay = prnMax || 1;
             }
-            // Once weekly
-            if (freq === 'Once weekly') {
+          
+            // Weekly logic
+            if (frequency === 'Once weekly') {
               days = Math.ceil(days / 7);
             }
-            // Only auto-calc if both present
-            if (freq && dur) {
-              const quantity = Math.max(1, Math.ceil(dosesPerDay * days));
+          
+            // Extract numeric values from strength and dose
+            const extractNumeric = (val) => {
+              if (!val) return 1;
+              const match = val.match(/([\d.]+)/);
+              return match ? parseFloat(match[1]) : 1;
+            };
+          
+            const doseAmount = extractNumeric(dose);
+            const strengthAmount = extractNumeric(strength);
+          
+            // Calculate quantity needed
+            if (dose && strength && frequency && duration) {
+              const unitsPerDose = strengthAmount > 0 ? doseAmount / strengthAmount : 1;
+              const rawQty = unitsPerDose * dosesPerDay * days;
+              const quantity = Math.max(1, Math.ceil(rawQty));
               form.setFieldsValue({ quantity });
             } else {
               form.setFieldsValue({ quantity: 1 });

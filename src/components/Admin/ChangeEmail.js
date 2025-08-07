@@ -5,17 +5,17 @@ import { useSelector } from "react-redux";
 import { baseUrl } from "../../utils/envAccess";
 import { handleApiError } from "../Handler/ExceptionHandler";
 
-const ChangeEmail = ({ isOpen, setOpen, account }) => {
+const ChangeEmail = ({ isOpen, setOpen, account, email }) => {
   const [oldEmail, setOldEmail] = useState("");
   const [newEmail, setNewEmail] = useState("");
   const userAuth = useSelector((state) => state?.authentication?.userAuth);
 
   useEffect(() => {
     if (isOpen === "Email") {
-      setOldEmail("");
+      setOldEmail(email || "");
       setNewEmail("");
     }
-  }, [isOpen]);
+  }, [isOpen, email]);
 
   const handleSubmit = async () => {
     if (!account || !oldEmail || !newEmail) {
@@ -59,9 +59,9 @@ const ChangeEmail = ({ isOpen, setOpen, account }) => {
       okText="Confirm"
     >
       <Input
-        placeholder="Enter old email"
+        placeholder="Old email"
         value={oldEmail}
-        onChange={(e) => setOldEmail(e.target.value)}
+        readOnly
         style={{ marginBottom: '1rem' }}
       />
       <Input

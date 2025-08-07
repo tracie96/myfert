@@ -972,10 +972,13 @@ const MedicationTable = () => {
                   height: '40px', 
                   borderRadius: '8px',
                   border: '1px solid #d9d9d9',
-                  padding: '0 11px',
+                  padding: '8px 11px',
                   fontSize: '14px',
                   backgroundColor: '#fff',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  overflow: 'visible',
+                  zIndex: 1000,
+                  lineHeight: '1.2'
                 }}
                 onChange={(e) => form.setFieldsValue({ route: e.target.value })}
               >
@@ -1000,10 +1003,13 @@ const MedicationTable = () => {
                   height: '40px', 
                   borderRadius: '8px',
                   border: '1px solid #d9d9d9',
-                  padding: '0 11px',
+                  padding: '8px 11px',
                   fontSize: '14px',
                   backgroundColor: '#fff',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  overflow: 'visible',
+                  zIndex: 1000,
+                  lineHeight: '1.2'
                 }}
                 onChange={(e) => {
                   setSelectedStrength(e.target.value);
@@ -1031,10 +1037,13 @@ const MedicationTable = () => {
                   height: '40px', 
                   borderRadius: '8px',
                   border: '1px solid #d9d9d9',
-                  padding: '0 11px',
+                  padding: '8px 11px',
                   fontSize: '14px',
                   backgroundColor: '#fff',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  overflow: 'visible',
+                  zIndex: 1000,
+                  lineHeight: '1.2'
                 }}
                 onChange={(e) => form.setFieldsValue({ dose: e.target.value })}
               >
@@ -1058,10 +1067,13 @@ const MedicationTable = () => {
                 height: '40px', 
                 borderRadius: '8px',
                 border: '1px solid #d9d9d9',
-                padding: '0 11px',
+                padding: '8px 11px',
                 fontSize: '14px',
                 backgroundColor: '#fff',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                overflow: 'visible',
+                zIndex: 1000,
+                lineHeight: '1.2'
               }}
               onChange={(e) => {
                 form.setFieldsValue({ frequency: e.target.value });
@@ -1109,10 +1121,13 @@ const MedicationTable = () => {
                 height: '40px', 
                 borderRadius: '8px',
                 border: '1px solid #d9d9d9',
-                padding: '0 11px',
+                padding: '8px 11px',
                 fontSize: '14px',
                 backgroundColor: '#fff',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                overflow: 'visible',
+                zIndex: 1000,
+                lineHeight: '1.2'
               }}
               onChange={(e) => form.setFieldsValue({ duration: e.target.value })}
             >
@@ -1158,10 +1173,13 @@ const MedicationTable = () => {
                 height: '40px', 
                 borderRadius: '8px',
                 border: '1px solid #d9d9d9',
-                padding: '0 11px',
+                padding: '8px 11px',
                 fontSize: '14px',
                 backgroundColor: '#fff',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                overflow: 'visible',
+                zIndex: 1000,
+                lineHeight: '1.2'
               }}
               onChange={(e) => form.setFieldsValue({ refills: e.target.value })}
             >

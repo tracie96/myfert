@@ -10,10 +10,12 @@ import { handleApiError } from "../Handler/ExceptionHandler";
 import ChangeEmail from "./ChangeEmail";
 import { message } from "antd";
 import PatientInformationView from "./PatientInformationView";
+import CareProviderManagement from "./CareProviderManagement";
 
 const UserManagement = () => {
   const [isOpen, setOpen] = useState('');
   const [currAccount, setAccount] = useState('');
+  const [currRole, setCurrRole] = useState('');
   const [dataSource, setDataSource] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [careProviderSource, setCareProviderSource] = useState([]);
@@ -22,6 +24,8 @@ const UserManagement = () => {
   const [careDataLoaded, setCareDataLoaded] = useState(false);
   const [requestsData, setRequestsData] = useState([]);
   const [requestsTable, setRequestsTable] = useState([]);
+  const [currEmail, setCurrEmail] = useState('');
+
   const [requestsPagination, setRequestsPagination] = useState({
     current: 1,
     pageSize: 10,
@@ -49,38 +53,51 @@ const UserManagement = () => {
 
   const userAuth = useSelector((state) => state?.authentication?.userAuth);
 
-  const MenuPopover = ({ account }) => (
+  const MenuPopover = ({ account, role, email }) => (
     <Popover
       placement="rightTop"
-      content={<ContentMenu account={account} />}
+      content={<ContentMenu account={account} role={role} email={email} />}
       trigger='click'
     >
       <MoreOutlined />
     </Popover>
   );
-
-  const ContentMenu = ({ account }) => (
+  
+  const ContentMenu = ({ account, role, email }) => (
     <Menu
       mode="inline"
       items={[
         {
           key: 'application',
           label: "View Application",
-          onClick: () => { setAccount(account); setOpen('Application'); }
+          onClick: () => { 
+            setAccount(account); 
+            setCurrRole(role); 
+            setOpen('Application'); 
+          }
         },
         {
           key: 'password',
           label: "Reset Password",
-          onClick: () => { setAccount(account); setOpen('Password'); }
+          onClick: () => { 
+            setAccount(account); 
+            setOpen('Password'); 
+          }
         },
         {
           key: 'switch',
           label: "Change Email",
-          onClick: () => { setAccount(account); setOpen('Email'); }
+          onClick: () => {
+            setAccount(account);
+            setCurrEmail(email); // SIMPLIFIED HERE
+            setOpen('Email');
+          }
         }
       ]}
     />
   );
+  
+  
 
   const handleTableChange = (pagination, filters, sorter) => {
     setPagination(pagination);
@@ -248,7 +265,7 @@ const UserManagement = () => {
           role: 'Patient',
           activated: user.patientStat || 'Active',
           acceptingPatients: 'Yes',
-          menu: <MenuPopover account={account} />,
+          menu: <MenuPopover account={account} role="Patient" email={user.email}  />,
         };
       });
       setDataSource(formatted);
@@ -354,7 +371,8 @@ const UserManagement = () => {
             role: 'Care Provider',
             activated: user.patientStat || 'Active',
             acceptingPatients: 'Yes',
-            menu: <MenuPopover account={account} />,
+            email: user.email || '',
+            menu: <MenuPopover account={account} role="Care Provider" email={user.email} />,
           };
         });
   
@@ -466,13 +484,35 @@ const UserManagement = () => {
 
 
       <SetUserPassword isOpen={isOpen} setOpen={setOpen} account={currAccount} />
-      <ChangeEmail isOpen={isOpen} setOpen={setOpen} account={currAccount} />
-      <PatientInformationView
+      <ChangeEmail
         isOpen={isOpen}
-        setOpen={setOpen}
+        setOpen={(value) => {
+          setOpen(value);
+          if (value === '') setCurrEmail('');
+        }}
         account={currAccount}
-        patientList={dataSource}
+        email={currEmail}
       />
+
+
+      {currRole === 'Patient' && (
+        <PatientInformationView
+          isOpen={isOpen}
+          setOpen={setOpen}
+          account={currAccount}
+          patientList={dataSource}
+        />
+      )}
+
+      {currRole === 'Care Provider' && (
+        <CareProviderManagement
+          isOpen={isOpen}
+          setOpen={setOpen}
+          account={currAccount}
+          providerList={careProviderSource}
+        />
+      )}
+
 
     </div>
   );

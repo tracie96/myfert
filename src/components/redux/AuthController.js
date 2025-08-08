@@ -532,12 +532,14 @@ export const resetPassword = createAsyncThunk(
         data,
         config,
       );
-      getResponse(response, dispatch);
+      const responseBack = getResponse(response, dispatch);
       if (response?.data?.status) {
         toast.success(response?.data?.message);
       }
+      return responseBack;
     } catch (error) {
       handleApiError(error, dispatch);
+      return rejectWithValue(error);
     }
   },
 );

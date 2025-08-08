@@ -49,6 +49,7 @@ function Login() {
   const [showLoginOTPModal, setShowLoginOTPModal] = useState(false);
   const [resendEmail, setResendEmail] = useState("");
   const [pendingLoginData, setPendingLoginData] = useState(null);
+
   const { values, handleBlur, handleChange, handleSubmit, errors } = useFormik({
     initialValues,
     validationSchema: validateLogin,
@@ -69,6 +70,10 @@ function Login() {
             message.success('Login successful!');
             handleSuccessfulLogin(resultAction);
           }
+        } else {
+          // Handle unsuccessful login (status: false)
+          console.log("Login unsuccessful:", resultAction);
+          message.error(resultAction.message || 'Login failed. Please check your credentials and try again.');
         }
       } catch (error) {
         console.log("login-page api call error: " + error);

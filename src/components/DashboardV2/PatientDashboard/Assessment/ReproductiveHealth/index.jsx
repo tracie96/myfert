@@ -63,6 +63,215 @@ const DifficultyConceivingModal = ({ visible, onClose }) => {
 
 const { Option } = Select;
 
+// File Upload Components
+const UploadIcon = ({ className = "" }) => {
+  return (
+    <div style={{ 
+      width: "34px", 
+      height: "34px", 
+      display: "flex", 
+      alignItems: "center", 
+      justifyContent: "center",
+      color: "#00ADEF",
+      fontSize: "24px"
+    }}>
+      ☁️
+    </div>
+  );
+};
+
+const UploadButton = ({ onClick, disabled = false, className = "" }) => {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      style={{
+        border: "none",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "stretch",
+        color: "white",
+        fontWeight: "bold",
+        justifyContent: "center",
+        backgroundColor: "#00ADEF",
+        marginTop: "28px",
+        padding: "18px 15px",
+        borderRadius: "10px",
+        cursor: disabled ? "not-allowed" : "pointer",
+        opacity: disabled ? 0.5 : 1,
+        transition: "background-color 0.2s",
+        ...className
+      }}
+      onMouseEnter={(e) => {
+        if (!disabled) e.target.style.backgroundColor = "#0099d4";
+      }}
+      onMouseLeave={(e) => {
+        if (!disabled) e.target.style.backgroundColor = "#00ADEF";
+      }}
+    >
+      <span style={{ color: "white" }}>Browse Files</span>
+    </button>
+  );
+};
+
+const FileUploadArea = ({ 
+  onFileSelect, 
+  acceptedFileTypes = "*", 
+  maxFileSize = 10 * 1024 * 1024, // 10MB default
+  className = "" 
+}) => {
+  const fileInputRef = React.useRef(null);
+  const [isDragOver, setIsDragOver] = React.useState(false);
+  const [uploadStatus, setUploadStatus] = React.useState('');
+
+  const handleFileSelection = React.useCallback((files) => {
+    if (!files || files.length === 0) return;
+
+    // Validate file size
+    const validFiles = Array.from(files).filter(file => {
+      if (file.size > maxFileSize) {
+        setUploadStatus(`File "${file.name}" is too large. Maximum size is ${maxFileSize / (1024 * 1024)}MB.`);
+        return false;
+      }
+      return true;
+    });
+
+    if (validFiles.length > 0) {
+      const fileList = new DataTransfer();
+      validFiles.forEach(file => fileList.items.add(file));
+      onFileSelect?.(validFiles);
+      setUploadStatus(`${validFiles.length} file(s) selected successfully.`);
+    }
+  }, [maxFileSize, onFileSelect]);
+
+  const handleDragOver = React.useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(true);
+  }, []);
+
+  const handleDragLeave = React.useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+  }, []);
+
+  const handleDrop = React.useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+    
+    const files = e.dataTransfer.files;
+    handleFileSelection(files);
+  }, [handleFileSelection]);
+
+  const handleBrowseClick = React.useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
+
+  const handleFileInputChange = React.useCallback((e) => {
+    handleFileSelection(e.target.files);
+  }, [handleFileSelection]);
+
+  const handleKeyDown = React.useCallback((e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleBrowseClick();
+    }
+  }, [handleBrowseClick]);
+
+  return (
+    <section style={{ 
+      maxWidth: "546px", 
+      borderRadius: "0px", 
+      ...className 
+    }}>
+      <p style={{ 
+        color: "black", 
+        fontSize: "15px", 
+        fontWeight: "normal", 
+        zIndex: 10,
+        marginBottom: "30px"
+      }}>
+        If you have an app you were using to track your cycle, you can upload it here.
+      </p>
+      
+      <div
+        style={{
+          border: "2px dashed #00ADEF",
+          display: "flex",
+          width: "100%",
+          flexDirection: "column",
+          alignItems: "center",
+          textAlign: "center",
+          justifyContent: "center",
+          padding: "22px 20px",
+          borderRadius: "6px",
+          cursor: "pointer",
+          backgroundColor: isDragOver ? "#f0f8ff" : "#fafafa",
+          borderColor: isDragOver ? "#0099d4" : "#00ADEF",
+          transition: "all 0.2s"
+        }}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        onClick={handleBrowseClick}
+        onKeyDown={handleKeyDown}
+        tabIndex={0}
+        role="button"
+        aria-label="File upload area. Click to browse files or drag and drop files here."
+      >
+        <div style={{ 
+          display: "flex", 
+          width: "151px", 
+          maxWidth: "100%", 
+          flexDirection: "column", 
+          alignItems: "center" 
+        }}>
+          <UploadIcon />
+          
+          <div style={{ 
+            color: "#335CAD", 
+            fontWeight: "normal", 
+            marginTop: "19px",
+            fontSize: "11px"
+          }}>
+            Drag and drop
+            <br />
+            <br />
+            - OR -
+          </div>
+          
+          <UploadButton onClick={handleBrowseClick} />
+        </div>
+        
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          accept={acceptedFileTypes}
+          onChange={handleFileInputChange}
+          style={{ display: "none" }}
+          aria-hidden="true"
+        />
+      </div>
+      
+      {uploadStatus && (
+        <div style={{ 
+          marginTop: "16px", 
+          padding: "12px", 
+          borderRadius: "6px", 
+          backgroundColor: "#f0f8ff", 
+          border: "1px solid #d6e4ff" 
+        }}>
+          <p style={{ fontSize: "14px", color: "#1e40af" }}>{uploadStatus}</p>
+        </div>
+      )}
+    </section>
+  );
+};
+
 const questions = [
   {
     question: "Are you currently using birth control?",
@@ -616,77 +825,13 @@ const questions = [
         },
       ],
   },
-
-
-  // {
-  //   question: "Discharge: Creamy, yogurt-like, or glue-like cervical mucus",
-  //   type: "long_radio",
-  //   isCyleSpotting: true,
-  //   title: "cycle spotting",
-  //   name: "mid_cycle_spotting",
-  //   options: ["Yes", "No"],
-  //   sub_question: "Duration per Cycle",
-  //   subQuestions: [
-  //     {
-  //       question: "Colour",
-  //       type: "radio",
-  //       label: "Colour",
-  //       options: ["None", "White"],
-  //       name: "duration_per_cycle_colour",
-  //     },
-  //   ],
-  // },
-  
-  //
-  // {
-  //   question:
-  //     "With whom do you live? (Include children, parents, relatives, friends, pets)",
-  //   type: "long_textarea",
-  //   title: "Relationships",
-  //   name: "who_do_you_live_with",
-  // },
-
-  // {
-  //   question: "Current occupation:",
-  //   title: "Relationships",
-  //   type: "long_textarea",
-  //   name: "current_occupation",
-  // },
-  // {
-  //   question: "Previous occupation:",
-  //   type: "long_textarea",
-  //   title: "Relationships",
-  //   name: "previous_occupation",
-  // },
-  // {
-  //   question:
-  //     "Do you have resources for emotional support? (Check all that apply)",
-  //   type: "checkbox",
-  //   title: "Relationships",
-  //   name: "resourcces_for_emotional_support",
-  //   options: [
-  //     "Spouse/Partner",
-  //     "Family",
-  //     "Friends",
-  //     "Religious/Spiritual",
-  //     "Pets",
-  //     "Other",
-  //   ],
-  // },
-  // {
-  //   question: "Do you have a religious or spiritual practice?",
-  //   type: "long_radio",
-  //   title: "Relationships",
-  //   name: "spiritual_practice",
-  //   options: ["Yes", "No"],
-  //   subQuestions: [
-  //     {
-  //       question: "If Yes: what kind",
-  //       type: "text",
-  //       name: "spiritual_practice_desciption",
-  //     },
-  //   ],
-  // },
+  {
+    question: "Upload Cycle Chart (optional)",
+    type: "cycle_chart_upload",
+    title: "Cycle Discharge",
+    name: "cycle_chart_upload",
+    prefix: "If you have an app you were using to track your cycle, you can upload it here.",
+  },
 ];
 
 const ReproductiveHealth = ({ onComplete }) => {
@@ -998,9 +1143,66 @@ const ReproductiveHealth = ({ onComplete }) => {
     if (question.type === "info" || question.type === "info_spotting") {
       return true;
     }
+    // Skip validation for cycle_chart_upload as it's optional
+    if (question.type === "cycle_chart_upload") {
+      return true;
+    }
     //console.log("answers[subQuestion.name]--", answers[subQuestion.name]);
     if(question.type === "long_radio" &&  (mainAnswer === "" || mainAnswer === undefined || mainAnswer === null)){
       return false;
+    }
+    
+    // Validate number_with_radio type questions (duration and severity)
+    if (question.type === "number_with_radio") {
+      // Check if any subquestion has a duration value
+      let hasDurationValue = false;
+      let hasSeverityValue = false;
+      let isDurationUnsure = false;
+      
+      if (question.subQuestions) {
+        for (const subQuestion of question.subQuestions) {
+          if (subQuestion.type === "number_with_radio_sub") {
+            const durationValue = answers[subQuestion.name];
+            const durationUnsure = answers[`${subQuestion.name}_unsure`];
+            
+            // Check if duration is filled (either has value or is marked as unsure)
+            if (durationValue !== undefined && durationValue !== "" && durationValue !== null) {
+              hasDurationValue = true;
+            }
+            if (durationUnsure) {
+              hasDurationValue = true;
+              isDurationUnsure = true;
+            }
+          }
+          
+          if (subQuestion.type === "radio" && subQuestion.label === "Severity") {
+            const severityValue = answers[subQuestion.name];
+            if (severityValue && severityValue !== "" && severityValue !== "N/A" && severityValue !== "None") {
+              hasSeverityValue = true;
+            }
+          }
+        }
+      }
+      
+      // If duration is marked as "Unsure", allow proceeding without severity
+      if (isDurationUnsure) {
+        return true;
+      }
+      
+      // If duration is provided (not unsure), severity must also be selected
+      if (hasDurationValue && !hasSeverityValue) {
+        return false;
+      }
+      
+      // If severity is selected, duration must also be provided
+      if (hasSeverityValue && !hasDurationValue) {
+        return false;
+      }
+      
+      // Require at least some input - either duration or severity must be provided
+      if (!hasDurationValue && !hasSeverityValue) {
+        return false;
+      }
     }
     if (
       questions[currentQuestionIndex].name === "relaxation_techniques" &&
@@ -1020,11 +1222,53 @@ const ReproductiveHealth = ({ onComplete }) => {
     
     if (
       questions[currentQuestionIndex].name === "current_therapy" &&
-      answers["current_therapy"] === "Yes" &&
-      (!answers["charting_method"])
+      answers["current_therapy"] === "Yes"
     ) {
-      return;
+      const chartingMethod = answers["charting_method"];
+      const durationYears = answers["charting_method_duration_years"];
+      const durationMonths = answers["charting_method_duration_months"];
+      
+      // If "Yes" is selected, both method and duration must be filled
+      if (!chartingMethod || (!durationYears && !durationMonths)) {
+        return false;
+      }
+      
+      // If duration is provided, at least one of years or months should be filled
+      if (durationYears === "" && durationMonths === "") {
+        return false;
+      }
+      
+      return true;
     }
+    
+    // Validate PMS symptoms questions
+    if (
+      questions[currentQuestionIndex].name === "pms_sympton" &&
+      answers["is_pms_symptom"] === "Yes"
+    ) {
+      const pmsSymptoms = answers["pms_sympton"];
+      const pmsDuration = answers["pms_sympton_check"];
+      const pmsDurationUnsure = answers["pms_sympton_check_unsure"];
+      const pmsSeverity = answers["pms_sympton_severity"];
+      
+      // If "Yes" is selected for PMS symptoms, must provide details
+      if (!pmsSymptoms || pmsSymptoms.length === 0) {
+        return false;
+      }
+      
+      // Must provide duration (either value or unsure)
+      if (!pmsDuration && !pmsDurationUnsure) {
+        return false;
+      }
+      
+      // Must provide severity
+      if (!pmsSeverity || pmsSeverity === "") {
+        return false;
+      }
+      
+      return true;
+    }
+    
     if (questions[currentQuestionIndex].name !== "cervical_mucus" && (mainAnswer === null || mainAnswer === "")) {
       return false;
     } 
@@ -1099,11 +1343,24 @@ const ReproductiveHealth = ({ onComplete }) => {
                 duration_per_cycle_pelvic_pain: "duration_per_cycle_severity_pelvic_pain",
                 duration_per_cycle_pp_not_menstrual: "duration_per_mild_cycle_severity_pp_not_menstrual",
                 cycle_spotting_sub_number: "cycle_spotting_sub",
-                pms_sympton_check: "pms_sympton_severity"
+                pms_sympton_check: "pms_sympton_severity",
+              
               };
             
               const relatedField = relatedRadioFields[subQuestion.name];
               const relatedAnswer = answers[relatedField];
+
+              // For cycle length questions, if they have a value or are unsure, allow proceeding
+              if (["longest_cycle_radio", "shortest_cycle_radio", "average_cycle_radio"].includes(subQuestion.name)) {
+                if (hasValue || subUnsure) {
+                  return true;
+                }
+                // Only fail if no value and not unsure
+                if (!hasValue && !subUnsure) {
+                  subQuestionsValid = false;
+                  return false;
+                }
+              }
 
               if (!relatedField) return true;
               if (hasValue && parsed > 0 && (!relatedAnswer || relatedAnswer === "" || relatedAnswer === "N/A" || relatedAnswer === "None")) {
@@ -1602,7 +1859,8 @@ const ReproductiveHealth = ({ onComplete }) => {
             : (reproductiveHealthAnswers.after_period_spot_colour || "N/A")
         },
         chartBase64: reproductiveHealthAnswers.charting_method || "",
-        currentTherapy: reproductiveHealthAnswers.current_therapy === "Yes"
+        currentTherapy: reproductiveHealthAnswers.current_therapy === "Yes",
+        cycleChartUpload: reproductiveHealthAnswers.cycle_chart_upload || "skipped"
       };
       
       const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
@@ -1788,7 +2046,7 @@ const ReproductiveHealth = ({ onComplete }) => {
           // disabled={answers[subQuestion.name] === "Unsure" || answers[subQuestion.name] === "None"}
            style={{
              height: 35,
-             borderColor: "#00ADEF",
+            //  borderColor: "#00ADEF",
              width: isMobile ? "100%" : "50%",
            }}
          />
@@ -1806,7 +2064,7 @@ const ReproductiveHealth = ({ onComplete }) => {
           // disabled={answers[subQuestion.name] === "Unsure" || answers[subQuestion.name] === "None"}
            style={{
              height: 35,
-             borderColor: "#00ADEF",
+            //  borderColor: "#00ADEF",
              width: isMobile ? "100%" : "50%",
            }}
          />
@@ -2345,6 +2603,30 @@ const ReproductiveHealth = ({ onComplete }) => {
               renderSubQuestions(question.subQuestions)}
           </div>
         );
+      case "cycle_chart_upload":
+        return (
+          <div style={{ marginBottom: "20px" }}>
+            <FileUploadArea
+              onFileSelect={(files) => {
+                // Handle file selection
+                console.log('Selected files:', files);
+                handleChange("completed", question.name);
+              }}
+              acceptedFileTypes=".pdf,.jpg,.jpeg,.png,.csv,.json,.xlsx,.xls"
+              maxFileSize={5 * 1024 * 1024} // 5MB
+              className={{ marginBottom: "20px" }}
+            />
+            <div style={{ 
+              marginTop: "8px", 
+              fontSize: "12px", 
+              color: "#666", 
+              fontStyle: "italic",
+             
+            }}>
+              This step is optional. You can skip this if you don't have cycle tracking data to upload.
+            </div>
+          </div>
+        );
 
       default:
         return null;
@@ -2411,6 +2693,17 @@ const ReproductiveHealth = ({ onComplete }) => {
       <h3 style={{ margin: "20px 0", fontWeight:"600", color: "#000", fontSize: "15px" }}>
         {["info", "infoSpotting"].includes(questions[currentQuestionIndex]?.name) ? "" : label}
         {questions[currentQuestionIndex].question}{" "}
+        {questions[currentQuestionIndex]?.prefix && (
+          <div style={{ 
+            fontSize: "14px", 
+            color: "#666", 
+            fontWeight: "normal", 
+            marginTop: "8px",
+            fontStyle: "italic"
+          }}>
+            {questions[currentQuestionIndex].prefix}
+          </div>
+        )}
         {questions[currentQuestionIndex]?.infoIconBtn && (
           <span style={{cursor: "pointer"}} onClick={handleInfoModal}>
             {questions[currentQuestionIndex]?.infoIconBtn}

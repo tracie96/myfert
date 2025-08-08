@@ -243,8 +243,8 @@ export const getPatientMed = createAsyncThunk(
 );
 export const addPatientMed = createAsyncThunk(
   "doctor/addPatientMed",
-  async ({ drugName, dose, amount, route, frequency, patientRef }, { rejectWithValue, getState, dispatch }) => {
-    console.log(drugName, dose, amount, route, frequency, patientRef);
+  async ({ drugName, dose, amount, route, frequency, strength, duration, refills, patientRef }, { rejectWithValue, getState, dispatch }) => {
+    console.log(drugName, dose, amount, route, frequency, strength, duration, refills, patientRef);
 
     const user = getState()?.authentication?.userAuth;
     const config = {
@@ -257,7 +257,7 @@ export const addPatientMed = createAsyncThunk(
     try {
       const response = await axios.post(
         `${baseUrl}Doctor/AddPatientMed`,
-        { drugName, dose, amount, route, frequency, patientRef },
+        { drugName, dose, amount, route, frequency, strength, duration, refills, patientRef },
         config
       );
       return response.data;

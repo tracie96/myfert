@@ -23,6 +23,7 @@ import { addPatientDocuments, getPatientBloodWork, downloadBloodWork } from "../
 
 import {
   getPatientMed,
+  addPatientMed,
   addPatientSupplement,
   getPatientSupplements,
   deletePatientMed,
@@ -38,7 +39,6 @@ import { ROUTE_STRENGTH_MAP, MEDICATION_DATA_MAP, ALL_ROUTES, DEFAULT_STRENGTHS 
 const { Text, Link } = Typography;
 const { Dragger } = Upload;
 
-// Medication data is now imported from utils/medicationData.js
 const MedicationTable = () => {
   const patient = JSON.parse(localStorage.getItem("patient")) || {
     userRef: "",
@@ -223,26 +223,36 @@ const MedicationTable = () => {
           setEditingIndex(null);
           message.success("Medication updated locally!");
         } else {
-          // Add new medication
-          setLocalMedications((prev) => [
-            ...prev,
-            {
-              drugName: values.drugName,
-              strength: values.strength,
-              route: values.route,
-              dose: values.dose,
-              frequency: values.frequency,
-              duration: values.duration,
-              quantity: values.quantity,
-              refills: values.refills,
-            },
-          ]);
-          message.success("Medication added locally!");
+          // Add new medication to server
+          const payload = {
+            drugName: values.drugName,
+            dose: values.dose,
+            amount: values.quantity.toString(), // Using quantity as amount, ensure it's a string
+            route: values.route,
+            frequency: values.frequency,
+            strength: values.strength,
+            duration: values.duration,
+            refills: values.refills,
+            patientRef: patient.userRef
+          };
+
+          const result = await dispatch(addPatientMed(payload));
+          
+          if (addPatientMed.fulfilled.match(result)) {
+            message.success("Medication added successfully!");
+            dispatch(getPatientMed(patient.userRef));
+            setIsAddModalVisible(false);
+            form.resetFields();
+          } else if (addPatientMed.rejected.match(result)) {
+            console.error('Medication add rejected:', result.error);
+            message.error("Failed to add medication. Please try again.");
+          } else {
+            message.error("Failed to add medication.");
+          }
         }
-        setIsAddModalVisible(false);
-        form.resetFields();
       } catch (error) {
-        message.error("Failed to add medication.");
+        console.error('Error details:', error);
+        message.error("Failed to add medication. Please try again.");
       }
     });
   };
@@ -1184,14 +1194,14 @@ const MedicationTable = () => {
               onChange={(e) => form.setFieldsValue({ refills: e.target.value })}
             >
               <option value="">Select refills</option>
-              <option value={0}>0</option>
-              <option value={1}>1</option>
-              <option value={2}>2</option>
-              <option value={3}>3</option>
-              <option value={4}>4</option>
-              <option value={5}>5</option>
-              <option value={6}>6</option>
-              <option value={12}>12</option>
+              <option value="0">0</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="12">12</option>
             </select>
           </Form.Item>
 

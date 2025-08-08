@@ -47,11 +47,11 @@ const AssignmentOfCare = () => {
         lastName: ''
     });
 
-    //   const [pagination, setPagination] = useState({
-    //     current: 1,
-    //     pageSize: 10,
-    //     total: 0
-    //   });
+      const [patientsPagination, setPatientsPagination] = useState({
+        current: 1,
+        pageSize: 10,
+        total: 0
+      });
 
     const [carePagination, setCarePagination] = useState({
         current: 1,
@@ -347,14 +347,18 @@ const AssignmentOfCare = () => {
                     acceptingPatients: 'Yes',
                     menu: <MenuPopover account={account} />,
                     providers: user.providers || [],
-
                 };
             });
-
+        
             setDataSource(formatted);
-            // setPagination((prev) => ({ ...prev, total: formatted.length }));
-        });
+            setPatientsPagination((prev) => ({ ...prev, total: formatted.length })); // ✅ set total
+        });        
     }, [userAuth]);
+
+    const handlePatientsTableChange = (pagination, filters, sorter) => {
+        setPatientsPagination(pagination);
+    };
+    
 
     //fetch Request data
     useEffect(() => {
@@ -553,23 +557,24 @@ const AssignmentOfCare = () => {
                 <Table
                     dataSource={tableData}
                     columns={columns}
-                    pagination={false}
+                    pagination={patientsPagination}
+                    onChange={handlePatientsTableChange}
                     expandable={{
                         expandedRowRender: (record) => (
                             <Table
                                 columns={expandedColumns}
-                                dataSource={getExpandedData(record)} // <-- get mock or real child data here
+                                dataSource={getExpandedData(record)}
                                 pagination={false}
                                 rowKey="key"
                             />
                         ),
                         rowExpandable: () => true,
-
                         expandedRowKeys: expandedRowKeys,
                         onExpand: (expanded, record) => handleExpand(record.key),
-                        expandIconColumnIndex: -1 // Prevent default arrow column
+                        expandIconColumnIndex: -1
                     }}
                 />
+
 
             )
         },

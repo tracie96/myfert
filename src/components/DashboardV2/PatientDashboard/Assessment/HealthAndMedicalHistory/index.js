@@ -27,10 +27,10 @@ import { baseUrl } from "../../../../../utils/envAccess";
 
 const { Option } = Select;
 
-const startYear = 2025;
+//const startYear = 2025;
 
-const disableBefore2006 = (current) => {
-  return current && current > dayjs(`${startYear}-01-01`);
+const disableFutureDates = (current) => {
+  return current && current > dayjs().endOf('day');
 };
 
 const questions = [
@@ -312,7 +312,6 @@ const questions = [
       "Harsh chemicals (solvents, glues, gas, acids, etc)",
       "Paints",
       "Airplane travel",
-      "None",
       "Other",
     ],
   },
@@ -1107,19 +1106,21 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
             ))}
           </Select>
         )}
+        {subQuestion.name === "harmful_chemical_exposure_length" && (
+          <span style={{ color: "#000" }}> days</span>
+        )}
         {subQuestion.type === "date" && (
           <DatePicker
-            disabledDate={disableBefore2006}
-            defaultPickerValue={dayjs(`${startYear}-01-01`)}
-            value={answers[subQuestion.name] ? dayjs(answers[subQuestion.name]) : null}
-            format="YYYY-MM-DD"
-            style={{
-              width: isMobile ? "100%" : "50%",
-              height: "42px",
-              borderColor: "#000"
-            }}
-            onChange={(date, dateString) => handleChange(dateString, subQuestion.name)}
-          />
+          disabledDate={disableFutureDates}
+          value={answers[subQuestion.name] ? dayjs(answers[subQuestion.name]) : null}
+          format="YYYY-MM-DD"
+          style={{
+            width: isMobile ? "100%" : "50%",
+            height: "42px",
+            borderColor: "#000"
+          }}
+          onChange={(date, dateString) => handleChange(dateString, subQuestion.name)}
+        />
         )}
         {subQuestion.type === "checkbox" && (
           <Checkbox.Group

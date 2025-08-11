@@ -49,6 +49,9 @@ const UpdateProfile = () => {
       "You must be 18 years or older"
     ),
     partnerDob: Yup.date().nullable(),
+    designation: Yup.string().max(100, "Designation must be less than 100 characters"),
+    licenceNumber: Yup.string().max(50, "Licence number must be less than 50 characters"),
+    signature: Yup.string().max(500, "Signature must be less than 500 characters"),
   });
 
   const formik = useFormik({
@@ -76,6 +79,10 @@ const UpdateProfile = () => {
       pharmacyPhoneNumber: "",
       uli:"",
       pharmacyFaxNumber: "",
+      // Add new fields
+      designation: "",
+      licenceNumber: "",
+      signature: "",
       // Add partner fields
       partnerFirstname: "",
       partnerLastname: "",
@@ -144,6 +151,11 @@ const UpdateProfile = () => {
       setFieldValue("pharmacyAddress", userData?.pharmacyAddress || "");
       setFieldValue("pharmacyPhoneNumber", userData?.pharmacyPhoneNumber || "");
       setFieldValue("pharmacyFaxNumber", userData?.pharmacyFaxNumber || "");
+
+      // Set new fields
+      setFieldValue("designation", userData?.designation || "");
+      setFieldValue("licenceNumber", userData?.licenceNumber || "");
+      setFieldValue("signature", userData?.signature || "");
 
       // Set partner values
       setFieldValue("partnerFirstname", userData?.partnerFirstname || "");
@@ -433,6 +445,62 @@ const UpdateProfile = () => {
                         />
                       </div>
                     </div>
+                    
+                    {/* New fields for designation, licence number, and signature */}
+                    <div className="col-md-6">
+                      <div className="form-group">
+                        <label>Designation</label>
+                        <input
+                          className="form-control"
+                          name="designation"
+                          type="text"
+                          value={values.designation}
+                          onChange={handleChange("designation")}
+                          onBlur={handleBlur("designation")}
+                          placeholder="Enter your designation"
+                        />
+                        {errors.designation && (
+                          <small className="text-danger">{errors.designation}</small>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="col-md-6">
+                      <div className="form-group">
+                        <label>Licence Number</label>
+                        <input
+                          className="form-control"
+                          name="licenceNumber"
+                          type="text"
+                          value={values.licenceNumber}
+                          onChange={handleChange("licenceNumber")}
+                          onBlur={handleBlur("licenceNumber")}
+                          placeholder="Enter your licence number"
+                        />
+                        {errors.licenceNumber && (
+                          <small className="text-danger">{errors.licenceNumber}</small>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="col-md-12">
+                      <div className="form-group">
+                        <label>Signature</label>
+                        <textarea
+                          className="form-control"
+                          name="signature"
+                          rows="3"
+                          value={values.signature}
+                          onChange={handleChange("signature")}
+                          onBlur={handleBlur("signature")}
+                          placeholder="Enter your signature or any additional notes"
+                        />
+                        {errors.signature && (
+                          <small className="text-danger">{errors.signature}</small>
+                        )}
+                      </div>
+                    </div>
+                    
                     {userAuth?.obj?.role === "Patient" && (
                     <div className="col-md-12">
                     <div className="form-group">

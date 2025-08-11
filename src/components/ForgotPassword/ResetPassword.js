@@ -38,7 +38,6 @@ function ResetPassword() {
     specialChar: false,
   });
 
-  // Get Redux state for error handling
   const { appErr, serverErr } = useSelector((state) => state.authentication);
 
   const session = new URLSearchParams(location.search).get("Token");

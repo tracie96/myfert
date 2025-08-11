@@ -30,9 +30,9 @@ import {
   editPatientMed,
 } from "../../redux/doctorSlice";
 import moment from "moment";
-import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import "./medication.css";
+import { getUserProfile } from "../../redux/AuthController";
 import { useRef } from 'react';
 import fertilityLogo from '../../../assets/images/auth/fertilityImage.svg';
 import { ROUTE_STRENGTH_MAP, MEDICATION_DATA_MAP, ALL_ROUTES, DEFAULT_STRENGTHS } from "../../../utils/medicationData";
@@ -60,6 +60,7 @@ const MedicationTable = () => {
   const [newLabResultFile, setNewLabResultFile] = useState(null);
   const [newLabResultName, setNewLabResultName] = useState("");
   const [prescriptionFiles, setPrescriptionFiles] = useState([]);
+
   //const [isNewLabResultVisible, setIsNewLabResultVisible] = useState(false);
   //const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [isAddSupplementModalVisible, setIsAddSupplementModalVisible] =
@@ -78,6 +79,14 @@ const MedicationTable = () => {
   // Add state for selected strength
   const [selectedStrength, setSelectedStrength] = useState(null);
   const [previewVisible, setPreviewVisible] = useState(false);
+  // Add local state for user profile
+  const [userProfileData, setUserProfileData] = useState({
+    firstName: '',
+    lastName: '',
+    designation: '',
+    licenceNumber: '',
+    phoneNumber: ''
+  });
 
   const [form] = Form.useForm();
   const [supplementForm] = Form.useForm();
@@ -113,6 +122,9 @@ const MedicationTable = () => {
     setIsModalVisible(modalType === "patientSelect");
     //setIsNewLabResultVisible(modalType === "newLabResult");
   };
+  
+  const userProfile = useSelector((state) => state?.profile?.userData);
+  console.log('User profile:', userProfile);
 
   const handleDownload = async (fileRef, filename) => {
     try {
@@ -164,6 +176,43 @@ const MedicationTable = () => {
   useEffect(() => {
     localStorage.setItem('localMedications', JSON.stringify(localMedications));
   }, [localMedications]);
+
+  // Function to fetch user profile data
+  const fetchUserProfile = useCallback(async () => {
+    try {
+      const resultAction = await dispatch(getUserProfile());
+      const response = resultAction.payload;
+      console.log('Profile API Response:', response);
+      
+      // Check if response is nested in an obj property
+      const userData = response?.obj || response;
+      
+      if (userData) {
+        setUserProfileData({
+          firstName: userData?.firstname || userData?.firstName || '',
+          lastName: userData?.lastName || userData?.lastname || '',
+          designation: userData?.designation || '',
+          licenceNumber: userData?.licenceNumber || '',
+          phoneNumber: userData?.phoneNumber || ''
+        });
+        console.log('User profile data set:', userData);
+      }
+    } catch (error) {
+      console.error('Profile fetch error:', error);
+    }
+  }, [dispatch]);
+
+  // Fetch user profile data when component mounts
+  useEffect(() => {
+    if (!userProfile || Object.keys(userProfile).length === 0) {
+      dispatch(getUserProfile());
+    }
+  }, [dispatch, userProfile]);
+
+  // Fetch user profile data on component mount
+  useEffect(() => {
+    fetchUserProfile();
+  }, [fetchUserProfile]);
 
   const handleModalClose = () => {
     navigate("/doctor");
@@ -227,7 +276,7 @@ const MedicationTable = () => {
           const payload = {
             drugName: values.drugName,
             dose: values.dose,
-            amount: values.quantity.toString(), // Using quantity as amount, ensure it's a string
+            amount: values.quantity.toString(),
             route: values.route,
             frequency: values.frequency,
             strength: values.strength,
@@ -395,7 +444,7 @@ const MedicationTable = () => {
     { title: 'Dose', dataIndex: 'dose', key: 'dose', align: 'center' },
     { title: 'Frequency', dataIndex: 'frequency', key: 'frequency', align: 'center' },
     { title: 'Duration', dataIndex: 'duration', key: 'duration', align: 'center' },
-    { title: 'Quantity', dataIndex: 'quantity', key: 'quantity', align: 'center' },
+    { title: 'Quantity', dataIndex: 'amount', key: 'amount', align: 'center' },
     { title: 'Refills', dataIndex: 'refills', key: 'refills', align: 'center' },
     {
       title: 'Actions',
@@ -510,8 +559,11 @@ const MedicationTable = () => {
             <PlusOutlined style={{ fontSize: "16px", color: "#1890ff" }} />
             <Text strong>Add New Medication</Text>
           </div>
+          {console.log('Table dataSource:', [...(serverMedications || []), ...(localMedications || [])])}
+          {console.log('serverMedications:', serverMedications)}
+          {console.log('localMedications:', localMedications)}
           <Table
-            dataSource={[...serverMedications, ...localMedications]}
+            dataSource={[...(serverMedications || []), ...(localMedications || [])]}
             columns={medicationColumns}
             pagination={false}
           />
@@ -693,43 +745,6 @@ const MedicationTable = () => {
   // Add export and fax handler
   const pdfRef = useRef(null);
 
-  const handleExportPDF = () => {
-    try {
-      const doc = new jsPDF();
-      const patientInfo = JSON.parse(localStorage.getItem('patient')) || {};
-      doc.setFontSize(16);
-      doc.text('Prescription Summary', 14, 18);
-      doc.setFontSize(12);
-      doc.text(`Patient: ${patientInfo.name || 'N/A'}`, 14, 28);
-      doc.text(`DOB: ${patientInfo.dob || 'N/A'}`, 14, 36);
-      doc.text(`Pharmacy Fax: ${patientInfo.pharmacyFax || 'N/A'}`, 14, 44);
-      const medRows = localMedications.map(med => [
-        med.drugName,
-        med.strength,
-        med.dose,
-        med.frequency,
-        med.duration,
-        med.quantity,
-        med.refills || '',
-        med.specialInstructions || ''
-      ]);
-      doc.autoTable({
-        head: [[
-          'Medication', 'Strength', 'Dose', 'Frequency', 'Duration', 'Quantity', 'Refills', 'Special Instructions'
-        ]],
-        body: medRows,
-        startY: 54,
-        styles: { fontSize: 10 },
-        headStyles: { fillColor: [22, 160, 133] }
-      });
-      doc.save('prescription.pdf');
-      pdfRef.current = doc;
-      message.success('PDF generated and downloaded.');
-    } catch (err) {
-      console.error('PDF Export Error:', err);
-      message.error('Failed to generate PDF. See console for details.');
-    }
-  };
 
   const handleFaxToPharmacy = () => {
     try {
@@ -811,14 +826,14 @@ const MedicationTable = () => {
                 </tr>
               </thead>
               <tbody>
-                {localMedications.map((med, idx) => (
+                {serverMedications?.map((med, idx) => (
                   <tr key={idx}>
                     <td style={{ border: '1px solid #ccc', padding: 4 }}>{med.drugName}</td>
                     <td style={{ border: '1px solid #ccc', padding: 4 }}>{med.strength}</td>
                     <td style={{ border: '1px solid #ccc', padding: 4 }}>{med.dose}</td>
                     <td style={{ border: '1px solid #ccc', padding: 4 }}>{med.frequency}</td>
                     <td style={{ border: '1px solid #ccc', padding: 4 }}>{med.duration}</td>
-                    <td style={{ border: '1px solid #ccc', padding: 4 }}>{med.quantity}</td>
+                    <td style={{ border: '1px solid #ccc', padding: 4 }}>{med.amount}</td>
                     <td style={{ border: '1px solid #ccc', padding: 4 }}>{med.refills}</td>
                   </tr>
                 ))}
@@ -830,10 +845,10 @@ const MedicationTable = () => {
         <div style={{ position: 'absolute', left: 0, bottom: 32, width: '100%' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
             <div style={{ fontSize: 13 }}>
-              <b>Prescriber's Name:</b><br />
-              Designation:<br />
-              License Number:<br />
-              Phone:
+              <b>Prescriber's Name: {userProfileData.firstName} {userProfileData.lastName}</b><br />
+              Designation: {userProfileData.designation}<br />
+              License Number: {userProfileData.licenceNumber}<br />
+              Phone: {userProfileData.phoneNumber}
             </div>
             <div style={{ textAlign: 'center', fontSize: 13 }}>
               <div style={{ borderBottom: '1px solid #222', width: 220, marginBottom: 4, marginLeft: 'auto' }}></div>
@@ -1606,21 +1621,7 @@ const MedicationTable = () => {
         flexDirection: isMobile ? 'column' : 'row',
         alignItems: 'center'
       }}>
-        <Button
-          type="primary"
-          size={isMobile ? "middle" : "large"}
-          style={{ 
-            borderRadius: 8, 
-            fontWeight: 'bold', 
-            backgroundColor: '#52c41a', 
-            borderColor: '#52c41a',
-            width: isMobile ? '100%' : 'auto',
-            height: isMobile ? '40px' : 'auto'
-          }}
-          onClick={handleExportPDF}
-        >
-          Export PDF
-        </Button>
+       
         <Button
           type="default"
           size={isMobile ? "middle" : "large"}

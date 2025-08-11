@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+// index.js (patched)
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Progress,
   Button,
@@ -25,7 +26,6 @@ import dayjs from 'dayjs';
 import { baseUrl } from "../../../../../utils/envAccess";
 
 const { Option } = Select;
-
 
 const questions = [
   {
@@ -229,6 +229,20 @@ const questions = [
     ],
   },
   {
+    question: "Have you ever used other hormonal birth control?",
+    type: "long_radio",
+    name: "used_hormonal_problems",
+    title: "Menstrual History",
+    options: ["Yes", "No"],
+    subQuestions: [
+      {
+        question: "If Yes: explain",
+        type: "text",
+        name: "used_hormonal_problems_bc",
+      },
+    ],
+  },
+  {
     question: "Use of other contraception?",
     type: "long_radio",
     name: "use_of_contraception",
@@ -239,7 +253,7 @@ const questions = [
         question: "If Yes:",
         type: "radio",
         name: "use_of_contraception_sub",
-        options: ["Condoms", "Diaphgram", "IUD", "Partner Vasectomy"],
+        options: ["Condoms", "Diaphgram", "IUD", "Partner Vasectomy", "Other"],
       },
     ],
   },
@@ -263,7 +277,7 @@ const questions = [
     type: "long_radio",
     name: "surgical_menopause",
     title: "Menstrual History",
-    options: ["Yes", "No"],
+    options: ["Yes", "No", "N/A"],
     subQuestions: [
       {
         question: "If Yes: explain surgery",
@@ -318,51 +332,17 @@ const questions = [
     options: [
       "Endometriosis",
       "Infertility",
+      "Fibrocystic breasts",
       "Vaginal infection",
       "Fibroids",
       "Ovarian cysts",
+      "Pelvic inflammatory disease",
+      "Reproductive cancer",
       "Sexually transmitted disease (describe)",
+      "N/A"
     ],
   },
-  // {
-  //   type: "date_radio",
-  //   name: "lastPapTest",
-  //   question: "If applicable, provide date",
-  //   buttonText: "Last Pap Test",
-  //   dateName: "papTestDate",
-  //   title: "Gynecological Screening/Procedures",
-  //   radioName: "papTestResult",
-  //   radioOptions: [
-  //     { label: "Normal", value: "normal" },
-  //     { label: "Abnormal", value: "abnormal" },
-  //   ],
-  // },
-  // {
-  //   type: "date_radio",
-  //   name: "lastPapTest",
-  //   question: "If applicable, provide date",
-  //   buttonText: "Last Mammogram",
-  //   dateName: "papTestDate",
-  //   title: "Gynecological Screening/Procedures",
-  //   radioName: "last_mammogram",
-  //   radioOptions: [
-  //     { label: "Normal", value: "normal" },
-  //     { label: "Abnormal", value: "abnormal" },
-  //   ],
-  // },
-  // {
-  //   type: "date_radio",
-  //   name: "lastPapTest",
-  //   question: "If applicable, provide date",
-  //   buttonText: "Last bone density",
-  //   dateName: "papTestDate",
-  //   title: "Gynecological Screening/Procedures",
-  //   radioName: "last_bone_density",
-  //   radioOptions: [
-  //     { label: "Normal", value: "normal" },
-  //     { label: "Abnormal", value: "abnormal" },
-  //   ],
-  // },
+  // ... rest unchanged ...
   {
     question: "Other tests/procedures (list type and dates):",
     type: "long_textarea",
@@ -374,7 +354,6 @@ const questions = [
 const PersonalAndFamilyHistory = ({ onComplete }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
-  const totalQuestions = questions.length;
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [unit, setUnit] = useState("Metric");
@@ -577,10 +556,31 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
     }
   }, [patientPersonalFamilyInfo]);
 
+  // Derive visibleQuestions from the full `questions` list and answers.
+  // If hormonal_birthcontrol === "No", remove the next 2 questions after it.
+  const visibleQuestions = useMemo(() => {
+    const v = [...questions];
+    const idx = v.findIndex(q => q.name === "hormonal_birthcontrol");
+    if (idx !== -1 && answers.hormonal_birthcontrol === "No") {
+      // remove the two following questions safely
+      v.splice(idx + 1, 2);
+    }
+    return v;
+  }, [answers]);
 
+  const totalQuestions = visibleQuestions.length;
+
+  // If currentQuestionIndex becomes out of bounds after visibleQuestions shrinks, clamp it.
+  useEffect(() => {
+    if (currentQuestionIndex > totalQuestions - 1) {
+      setCurrentQuestionIndex(Math.max(0, totalQuestions - 1));
+    }
+  }, [totalQuestions, currentQuestionIndex]);
 
   const validateQuestion = () => {
-    const question = questions[currentQuestionIndex];
+    const question = visibleQuestions[currentQuestionIndex];
+    if (!question) return true;
+
     if (question.question === "(Check if applicable)" || question.name === "other_test_procedures") {
       return true;
     }
@@ -703,9 +703,6 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
     }
   };
   
-  
-
-
   const handleExit = () => {
     navigate("/assessment");
   };
@@ -744,6 +741,38 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
           delete updatedAnswers[subQ.name];
           delete updatedAnswers[`${subQ.name}_other`];
         });
+      }
+      
+      // Special logic for "Use of hormonal birth control"
+      if (name === "hormonal_birthcontrol") {
+        if (value === "No") {
+          // Clear the next two related answers (their values and any subquestion values)
+          const qIndex = questions.findIndex(q => q.name === name);
+          if (qIndex !== -1) {
+            const next1Name = questions[qIndex + 1]?.name;
+            const next2Name = questions[qIndex + 2]?.name;
+            if (next1Name) {
+              delete updatedAnswers[next1Name];
+              const q1Obj = questions.find(q => q.name === next1Name);
+              if (q1Obj && q1Obj.subQuestions) {
+                q1Obj.subQuestions.forEach(sq => {
+                  delete updatedAnswers[sq.name];
+                  delete updatedAnswers[`${sq.name}_other`];
+                });
+              }
+            }
+            if (next2Name) {
+              delete updatedAnswers[next2Name];
+              const q2Obj = questions.find(q => q.name === next2Name);
+              if (q2Obj && q2Obj.subQuestions) {
+                q2Obj.subQuestions.forEach(sq => {
+                  delete updatedAnswers[sq.name];
+                  delete updatedAnswers[`${sq.name}_other`];
+                });
+              }
+            }
+          }
+        }
       }
 
       // Special handling for specific questions
@@ -912,6 +941,7 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
             value={answers[subQuestion.name] || ""}
             onChange={(e) => handleChange(e.target.value, subQuestion.name)}
             className="input_questtionnaire"
+            style={{ width: "100%", maxWidth: "640px" }}
           />
         )}
         {subQuestion.type === "inputNumber" && (
@@ -950,11 +980,31 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
                 value={option}
                 style={{ display: "block", marginBottom: "10px" }}
               >
-                <span style={{ verticalAlign: 'text-bottom' }}>{option}</span>
+                {option === "Other" ? (
+                  <>
+                    {option}
+                    {answers[subQuestion.name] === "Other" && (
+                      <>
+                        <br />
+                        <Input
+                          className="input_questtionnaire"
+                          placeholder="Please specify"
+                          value={answers[`${subQuestion.name}_other`] || ""}
+                          onChange={(e) =>
+                            handleChange(e.target.value, `${subQuestion.name}_other`)
+                          }
+                        />
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <span style={{ verticalAlign: 'text-bottom' }}>{option}</span>
+                )}
               </Radio>
             ))}
           </Radio.Group>
         )}
+
       </div>
     ));
   };
@@ -1119,13 +1169,25 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
                   <div style={{ marginBottom: 5 }}>{sub.question}</div>
                   <Input
                     type="number"
+                    min={0}
+                    onKeyDown={(e) => {
+                      if (e.key === "-" || e.key === "e") {
+                        e.preventDefault(); // block negative sign and exponential notation
+                      }
+                    }}
                     style={{ width: isMobile ? "100%" : "200px" }}
                     value={answers[sub.name] || ""}
-                    onChange={(e) => handleChange(e.target.value, sub.name)}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === "" || parseFloat(val) >= 0) {
+                        handleChange(val, sub.name);
+                      }
+                    }}
                     suffix={unit === "Metric" ? "kg" : "lbs"}
                   />
                 </div>
               ))}
+
             </div>
         
             {/* N / A CHECKBOX at bottom */}
@@ -1479,10 +1541,11 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
         return null;
     }
   };
+  const currentQuestion = visibleQuestions[currentQuestionIndex] || {};
   const label = (
     <span>
       {
-        questions[currentQuestionIndex].name !== "symptomatic_problems_menopause_other" && questions[currentQuestionIndex].name !== "other_test_procedures"? <span style={{ color: "red" }}>* </span>: undefined
+        currentQuestion.name !== "symptomatic_problems_menopause_other" && currentQuestion.name !== "other_test_procedures"? <span style={{ color: "red" }}>* </span>: undefined
       }
     </span>
   );
@@ -1502,13 +1565,13 @@ const PersonalAndFamilyHistory = ({ onComplete }) => {
         />
         <h3 style={{ margin: "20px 0", color: "#F2AA93" }}>
         
-          {questions[currentQuestionIndex].title}
+          {currentQuestion.title}
         </h3>
 
         <h3 style={{ margin: "20px 0", color: "#000", fontWeight: "600", fontSize: "15px" }}>
-        {label} {questions[currentQuestionIndex].question}
+        {label} {currentQuestion.question}
         </h3>
-        {renderInput(questions[currentQuestionIndex])}
+        {renderInput(currentQuestion)}
 
         <div
           style={{ margin: "20px 0", marginTop: isMobile ? 50 : 200 }}

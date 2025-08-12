@@ -13,7 +13,7 @@ import {
   List,
   Card,
 } from "antd";
-import { PlusOutlined, EditOutlined, DeleteOutlined, FileOutlined, FilePdfOutlined, FileImageOutlined } from "@ant-design/icons";
+import { PlusOutlined, EditOutlined, DeleteOutlined, FileOutlined, FilePdfOutlined, FileImageOutlined, DownloadOutlined } from "@ant-design/icons";
 import Header from "./Components/Header";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -31,6 +31,7 @@ import {
 } from "../../redux/doctorSlice";
 import moment from "moment";
 import 'jspdf-autotable';
+import jsPDF from 'jspdf';
 import "./medication.css";
 import { getUserProfile } from "../../redux/AuthController";
 import { useRef } from 'react';
@@ -436,6 +437,206 @@ const MedicationTable = () => {
     });
   };
 
+  const exportToPDF = () => {
+    try {
+      const doc = new jsPDF();
+      
+      // Get patient info
+      const patientInfo = JSON.parse(localStorage.getItem('patient')) || {};
+      const patientName = patientInfo.firstname ? `${patientInfo.firstname} ${patientInfo.lastname || ''}` : (patientInfo.name || patientInfo.fullName || patientInfo.patientName || '');
+      const phn = patientInfo.phn || patientInfo.uli || patientInfo.phnUli || '';
+      const address = patientInfo.address || patientInfo.city || '';
+      const phone = patientInfo.phone || patientInfo.patientPhone || patientInfo.phoneNumber || '';
+      const sex = 'Female';
+      let dob = patientInfo.dob || patientInfo.dateOfBirth || '';
+      if (typeof dob === 'string' && dob.includes('T00:00:00')) {
+        dob = dob.replace('T00:00:00', '').trim();
+      }
+      
+      // Add header
+      doc.setFontSize(20);
+      doc.text('My Fertility Labs', 105, 20, { align: 'center' });
+      
+      // Add contact info
+      doc.setFontSize(10);
+      doc.text('Ph: 1-403-760-7017', 20, 30);
+      doc.text('Fx: 1-825-902-8022', 20, 35);
+      doc.text('Edmonton: 11444 17 Ave SW, Edmonton, AB, T6W 2S5', 20, 40);
+      doc.text('Leduc: 6207 50 St #102, Leduc, AB T9E 7A9', 20, 45);
+      doc.text('Calgary: Suite 280, 7015 Macleod Trail SW, Calgary, Alberta, T2H 2K6', 20, 50);
+      
+      // Add patient info
+      doc.setFontSize(12);
+      doc.text(`Patient Name: ${patientName}`, 20, 65);
+      doc.text(`PHN (ULI): ${phn}`, 120, 65);
+      doc.text(`Address: ${address}`, 20, 75);
+      doc.text(`Patient Phone: ${phone}`, 20, 85);
+      doc.text(`Sex: ${sex}`, 120, 85);
+      doc.text(`DOB: ${dob}`, 180, 85);
+      
+      // Add RX section
+      doc.setFontSize(16);
+      doc.text('RX', 20, 105);
+      doc.setFontSize(12);
+      doc.text(`Date Prescribed: ${new Date().toLocaleDateString()}`, 60, 105);
+      
+      // Add medications table
+      const medicationsData = [...(serverMedications || []), ...(localMedications || [])];
+      if (medicationsData.length > 0) {
+        const tableData = medicationsData.map(med => [
+          med.drugName || 'N/A',
+          med.strength || 'N/A',
+          med.dose || 'N/A',
+          med.frequency || 'N/A',
+          med.duration || 'N/A',
+          med.amount || 'N/A',
+          med.refills || 'N/A'
+        ]);
+        
+        doc.autoTable({
+          head: [['Medication', 'Strength', 'Dose', 'Frequency', 'Duration', 'Quantity', 'Refills']],
+          body: tableData,
+          startY: 120,
+          styles: {
+            fontSize: 10,
+            cellPadding: 3
+          },
+          headStyles: {
+            fillColor: [26, 60, 107],
+            textColor: 255
+          },
+          columnStyles: {
+            0: { cellWidth: 35 },
+            1: { cellWidth: 25 },
+            2: { cellWidth: 25 },
+            3: { cellWidth: 30 },
+            4: { cellWidth: 25 },
+            5: { cellWidth: 20 },
+            6: { cellWidth: 20 }
+          }
+        });
+      }
+      
+      // Add prescriber info
+      const finalY = doc.lastAutoTable ? doc.lastAutoTable.finalY + 20 : 200;
+      doc.setFontSize(12);
+      doc.text(`Prescriber's Name: ${userProfileData.firstName || ''} ${userProfileData.lastName || ''}`, 20, finalY);
+      doc.text(`Designation: ${userProfileData.designation || ''}`, 20, finalY + 10);
+      doc.text(`License Number: ${userProfileData.licenceNumber || ''}`, 20, finalY + 20);
+      doc.text(`Phone: ${userProfileData.phoneNumber || ''}`, 20, finalY + 30);
+      
+      // Add signature line
+      doc.text('Signature', 180, finalY + 30);
+      doc.line(180, finalY + 35, 250, finalY + 35);
+      
+      // Save the PDF
+      doc.save(`prescription_${patientName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
+      message.success('Prescription PDF exported successfully!');
+    } catch (error) {
+      console.error('Error exporting PDF:', error);
+      message.error('Failed to export PDF');
+    }
+  };
+
+
+
+
+  const PrescriptionPreview = ({ patientInfo }) => {
+    // Fallback to localStorage if prop not provided
+    const info = patientInfo || JSON.parse(localStorage.getItem('patient')) || {};
+    console.log('PrescriptionPreview patientInfo:', info);
+    const patientName = info.firstname ? `${info.firstname} ${info.lastname || ''}` : (info.name || info.fullName || info.patientName || '');
+    const phn = info.phn || info.uli || info.phnUli || '';
+    const address = info.address || info.city || '';
+    const phone = info.phone || info.patientPhone || info.phoneNumber || '';
+    const sex = 'Female';
+    let dob = info.dob || info.dateOfBirth || '';
+    if (typeof dob === 'string' && dob.includes('T00:00:00')) {
+      dob = dob.replace('T00:00:00', '').trim();
+    }
+    return (
+      <div style={{ background: '#fff', padding: 32, minHeight: 900, fontFamily: 'Arial, sans-serif', position: 'relative' }}>
+        {/* Header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <img src={fertilityLogo} alt="MyFertility Labs" style={{ height: 48 }} />
+          <div style={{ textAlign: 'right', fontSize: 13 }}>
+            <b>My Fertility Labs</b><br />
+            Ph: 1-403-760-7017<br />
+            Fx: 1-825-902-8022
+          </div>
+        </div>
+        <div style={{ fontSize: 12, margin: '12px 0 0 0' }}>
+          Edmonton: 11444 17 Ave SW, Edmonton, AB, T6W 2S5<br />
+          Leduc: 6207 50 St #102, Leduc, AB T9E 7A9<br />
+          Calgary: Suite 280, 7015 Macleod Trail SW, Calgary, Alberta, T2H 2K6
+        </div>
+        {/* Patient Info */}
+        <div style={{ marginTop: 18, fontSize: 14 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px solid #222', paddingBottom: 4 }}>
+            <span><b>Patient Name:</b> {patientName}</span>
+            <span><b>PHN (ULI):</b> {phn}</span>
+          </div>
+          <div style={{ borderBottom: '2px solid #222', padding: '4px 0' }}>
+            <b>Address:</b> {address}
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px solid #222', padding: '4px 0' }}>
+            <span><b>Patient Phone:</b> {phone}</span>
+            <span><b>Sex:</b> {sex}</span>
+            <span><b>DOB:</b> {dob}</span>
+          </div>
+        </div>
+        {/* RX and Medications */}
+        <div style={{ display: 'flex', marginTop: 32 }}>
+          <div style={{ fontSize: 64, fontWeight: 'bold', color: '#1a3c6b', marginRight: 32, marginTop: -12 }}>RX</div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 'bold', marginBottom: 8 }}>Date Prescribed: {new Date().toLocaleDateString()}</div>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+              <thead>
+                <tr style={{ background: '#eaf6fa' }}>
+                  <th style={{ border: '1px solid #ccc', padding: 4 }}>Medication</th>
+                  <th style={{ border: '1px solid #ccc', padding: 4 }}>Strength</th>
+                  <th style={{ border: '1px solid #ccc', padding: 4 }}>Dose</th>
+                  <th style={{ border: '1px solid #ccc', padding: 4 }}>Frequency</th>
+                  <th style={{ border: '1px solid #ccc', padding: 4 }}>Duration</th>
+                  <th style={{ border: '1px solid #ccc', padding: 4 }}>Quantity</th>
+                  <th style={{ border: '1px solid #ccc', padding: 4 }}>Refills</th>
+                </tr>
+              </thead>
+              <tbody>
+                {serverMedications?.map((med, idx) => (
+                  <tr key={idx}>
+                    <td style={{ border: '1px solid #ccc', padding: 4 }}>{med.drugName}</td>
+                    <td style={{ border: '1px solid #ccc', padding: 4 }}>{med.strength}</td>
+                    <td style={{ border: '1px solid #ccc', padding: 4 }}>{med.dose}</td>
+                    <td style={{ border: '1px solid #ccc', padding: 4 }}>{med.frequency}</td>
+                    <td style={{ border: '1px solid #ccc', padding: 4 }}>{med.duration}</td>
+                    <td style={{ border: '1px solid #ccc', padding: 4 }}>{med.amount}</td>
+                    <td style={{ border: '1px solid #ccc', padding: 4 }}>{med.refills}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        {/* Prescriber Info and Signature */}
+        <div style={{ position: 'absolute', left: 0, bottom: 32, width: '100%' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+            <div style={{ fontSize: 13 }}>
+              <b>Prescriber's Name: {userProfileData.firstName} {userProfileData.lastName}</b><br />
+              Designation: {userProfileData.designation}<br />
+              License Number: {userProfileData.licenceNumber}<br />
+              Phone: {userProfileData.phoneNumber}
+            </div>
+            <div style={{ textAlign: 'center', fontSize: 13 }}>
+              <div style={{ borderBottom: '1px solid #222', width: 220, marginBottom: 4, marginLeft: 'auto' }}></div>
+              Signature
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const medicationColumns = [
     { title: 'Name', dataIndex: 'drugName', key: 'drugName', align: 'center' },
@@ -575,18 +776,39 @@ const MedicationTable = () => {
       label: "Supplements",
       children: (
         <>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              marginBottom: "20px",
-              cursor: "pointer",
-            }}
-            onClick={showAddSupplementModal}
-          >
-            <PlusOutlined style={{ fontSize: "16px", color: "#1890ff" }} />
-            <Text strong>Add New Supplement</Text>
+          <div style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "20px",
+          }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                cursor: "pointer",
+              }}
+              onClick={showAddSupplementModal}
+            >
+              <PlusOutlined style={{ fontSize: "16px", color: "#1890ff" }} />
+              <Text strong>Add New Supplement</Text>
+            </div>
+            
+            <Button
+              type="primary"
+              icon={<DownloadOutlined />}
+              onClick={exportToPDF}
+              style={{ 
+                background: '#52c41a',
+                borderColor: '#52c41a',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+            >
+              Export to PDF
+            </Button>
           </div>
           <Table
             dataSource={supplements}
@@ -601,24 +823,44 @@ const MedicationTable = () => {
       label: "Prescriptions",
       children: (
         <>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              marginBottom: "20px",
-              cursor: "pointer",
-            }}
-            onClick={showAddPrecriptionModal}
-          >
+          <div style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "20px",
+          }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                cursor: "pointer",
+              }}
+              onClick={showAddPrecriptionModal}
+            >
+              <Button
+                type="primary"
+                style={{ background: "#00ADEF", maxWidth: "200px" }}
+                onClick={() => setIsUploadModalVisible(true)}
+              >
+                + Add New Prescription
+              </Button>
+            </div>
+            
             <Button
               type="primary"
-              style={{ background: "#00ADEF", maxWidth: "200px" }}
-              onClick={() => setIsUploadModalVisible(true)}
+              icon={<DownloadOutlined />}
+              onClick={exportToPDF}
+              style={{ 
+                background: '#52c41a',
+                borderColor: '#52c41a',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
             >
-              + Add New Prescription
+              Export to PDF
             </Button>
-
           </div>
           <Card style={{ border: "1px solid #C2E6F8", marginBottom: "24px" }}>
             <Typography.Title level={5} style={{ marginBottom: "16px" }}>
@@ -660,6 +902,48 @@ const MedicationTable = () => {
           </Card>
 
 
+        </>
+      ),
+    },
+    {
+      key: "prescriptionPreview",
+      label: "Prescription Preview",
+      children: (
+        <>
+          <div style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "20px",
+          }}>
+            <Typography.Title level={4} style={{ margin: 0 }}>
+              Prescription Preview
+            </Typography.Title>
+            
+            <Button
+              type="primary"
+              icon={<DownloadOutlined />}
+              onClick={exportToPDF}
+              style={{ 
+                background: '#52c41a',
+                borderColor: '#52c41a',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+            >
+              Export to PDF
+            </Button>
+          </div>
+          
+          <div style={{ 
+            border: '1px solid #d9d9d9', 
+            borderRadius: '8px', 
+            padding: '20px',
+            backgroundColor: '#fafafa'
+          }}>
+            <PrescriptionPreview patientInfo={patient} />
+          </div>
         </>
       ),
     },
@@ -764,101 +1048,101 @@ const MedicationTable = () => {
     }
   };
 
-  const PrescriptionPreview = ({ patientInfo }) => {
-    // Fallback to localStorage if prop not provided
-    const info = patientInfo || JSON.parse(localStorage.getItem('patient')) || {};
-    console.log('PrescriptionPreview patientInfo:', info);
-    const patientName = info.firstname ? `${info.firstname} ${info.lastname || ''}` : (info.name || info.fullName || info.patientName || '');
-    const phn = info.phn || info.uli || info.phnUli || '';
-    const address = info.address || info.city || '';
-    const phone = info.phone || info.patientPhone || info.phoneNumber || '';
-    const sex = 'Female';
-    let dob = info.dob || info.dateOfBirth || '';
-    if (typeof dob === 'string' && dob.includes('T00:00:00')) {
-      dob = dob.replace('T00:00:00', '').trim();
-    }
-    return (
-      <div style={{ background: '#fff', padding: 32, width: 600, minHeight: 900, fontFamily: 'Arial, sans-serif', position: 'relative' }}>
-        {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <img src={fertilityLogo} alt="MyFertility Labs" style={{ height: 48 }} />
-          <div style={{ textAlign: 'right', fontSize: 13 }}>
-            <b>My Fertility Labs</b><br />
-            Ph: 1-403-760-7017<br />
-            Fx: 1-825-902-8022
-          </div>
-        </div>
-        <div style={{ fontSize: 12, margin: '12px 0 0 0' }}>
-          Edmonton: 11444 17 Ave SW, Edmonton, AB, T6W 2S5<br />
-          Leduc: 6207 50 St #102, Leduc, AB T9E 7A9<br />
-          Calgary: Suite 280, 7015 Macleod Trail SW, Calgary, Alberta, T2H 2K6
-        </div>
-        {/* Patient Info */}
-        <div style={{ marginTop: 18, fontSize: 14 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px solid #222', paddingBottom: 4 }}>
-            <span><b>Patient Name:</b> {patientName}</span>
-            <span><b>PHN (ULI):</b> {phn}</span>
-          </div>
-          <div style={{ borderBottom: '2px solid #222', padding: '4px 0' }}>
-            <b>Address:</b> {address}
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px solid #222', padding: '4px 0' }}>
-            <span><b>Patient Phone:</b> {phone}</span>
-            <span><b>Sex:</b> {sex}</span>
-            <span><b>DOB:</b> {dob}</span>
-          </div>
-        </div>
-        {/* RX and Medications */}
-        <div style={{ display: 'flex', marginTop: 32 }}>
-          <div style={{ fontSize: 64, fontWeight: 'bold', color: '#1a3c6b', marginRight: 32, marginTop: -12 }}>RX</div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 'bold', marginBottom: 8 }}>Date Prescribed: {new Date().toLocaleDateString()}</div>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-              <thead>
-                <tr style={{ background: '#eaf6fa' }}>
-                  <th style={{ border: '1px solid #ccc', padding: 4 }}>Medication</th>
-                  <th style={{ border: '1px solid #ccc', padding: 4 }}>Strength</th>
-                  <th style={{ border: '1px solid #ccc', padding: 4 }}>Dose</th>
-                  <th style={{ border: '1px solid #ccc', padding: 4 }}>Frequency</th>
-                  <th style={{ border: '1px solid #ccc', padding: 4 }}>Duration</th>
-                  <th style={{ border: '1px solid #ccc', padding: 4 }}>Quantity</th>
-                  <th style={{ border: '1px solid #ccc', padding: 4 }}>Refills</th>
-                </tr>
-              </thead>
-              <tbody>
-                {serverMedications?.map((med, idx) => (
-                  <tr key={idx}>
-                    <td style={{ border: '1px solid #ccc', padding: 4 }}>{med.drugName}</td>
-                    <td style={{ border: '1px solid #ccc', padding: 4 }}>{med.strength}</td>
-                    <td style={{ border: '1px solid #ccc', padding: 4 }}>{med.dose}</td>
-                    <td style={{ border: '1px solid #ccc', padding: 4 }}>{med.frequency}</td>
-                    <td style={{ border: '1px solid #ccc', padding: 4 }}>{med.duration}</td>
-                    <td style={{ border: '1px solid #ccc', padding: 4 }}>{med.amount}</td>
-                    <td style={{ border: '1px solid #ccc', padding: 4 }}>{med.refills}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-        {/* Prescriber Info and Signature */}
-        <div style={{ position: 'absolute', left: 0, bottom: 32, width: '100%' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-            <div style={{ fontSize: 13 }}>
-              <b>Prescriber's Name: {userProfileData.firstName} {userProfileData.lastName}</b><br />
-              Designation: {userProfileData.designation}<br />
-              License Number: {userProfileData.licenceNumber}<br />
-              Phone: {userProfileData.phoneNumber}
-            </div>
-            <div style={{ textAlign: 'center', fontSize: 13 }}>
-              <div style={{ borderBottom: '1px solid #222', width: 220, marginBottom: 4, marginLeft: 'auto' }}></div>
-              Signature
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
+  // const PrescriptionPreview = ({ patientInfo }) => {
+  //   // Fallback to localStorage if prop not provided
+  //   const info = patientInfo || JSON.parse(localStorage.getItem('patient')) || {};
+  //   console.log('PrescriptionPreview patientInfo:', info);
+  //   const patientName = info.firstname ? `${info.firstname} ${info.lastname || ''}` : (info.name || info.fullName || info.patientName || '');
+  //   const phn = info.phn || info.uli || info.phnUli || '';
+  //   const address = info.address || info.city || '';
+  //   const phone = info.phone || info.patientPhone || info.phoneNumber || '';
+  //   const sex = 'Female';
+  //   let dob = info.dob || info.dateOfBirth || '';
+  //   if (typeof dob === 'string' && dob.includes('T00:00:00')) {
+  //     dob = dob.replace('T00:00:00', '').trim();
+  //   }
+  //   return (
+  //     <div style={{ background: '#fff', padding: 32, minHeight: 900, fontFamily: 'Arial, sans-serif', position: 'relative' }}>
+  //       {/* Header */}
+  //       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+  //         <img src={fertilityLogo} alt="MyFertility Labs" style={{ height: 48 }} />
+  //         <div style={{ textAlign: 'right', fontSize: 13 }}>
+  //           <b>My Fertility Labs</b><br />
+  //           Ph: 1-403-760-7017<br />
+  //           Fx: 1-825-902-8022
+  //         </div>
+  //       </div>
+  //       <div style={{ fontSize: 12, margin: '12px 0 0 0' }}>
+  //         Edmonton: 11444 17 Ave SW, Edmonton, AB, T6W 2S5<br />
+  //         Leduc: 6207 50 St #102, Leduc, AB T9E 7A9<br />
+  //         Calgary: Suite 280, 7015 Macleod Trail SW, Calgary, Alberta, T2H 2K6
+  //       </div>
+  //       {/* Patient Info */}
+  //       <div style={{ marginTop: 18, fontSize: 14 }}>
+  //         <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px solid #222', paddingBottom: 4 }}>
+  //           <span><b>Patient Name:</b> {patientName}</span>
+  //           <span><b>PHN (ULI):</b> {phn}</span>
+  //         </div>
+  //         <div style={{ borderBottom: '2px solid #222', padding: '4px 0' }}>
+  //           <b>Address:</b> {address}
+  //         </div>
+  //         <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px solid #222', padding: '4px 0' }}>
+  //           <span><b>Patient Phone:</b> {phone}</span>
+  //           <span><b>Sex:</b> {sex}</span>
+  //           <span><b>DOB:</b> {dob}</span>
+  //         </div>
+  //       </div>
+  //       {/* RX and Medications */}
+  //       <div style={{ display: 'flex', marginTop: 32 }}>
+  //         <div style={{ fontSize: 64, fontWeight: 'bold', color: '#1a3c6b', marginRight: 32, marginTop: -12 }}>RX</div>
+  //         <div style={{ flex: 1 }}>
+  //           <div style={{ fontWeight: 'bold', marginBottom: 8 }}>Date Prescribed: {new Date().toLocaleDateString()}</div>
+  //           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+  //             <thead>
+  //               <tr style={{ background: '#eaf6fa' }}>
+  //                 <th style={{ border: '1px solid #ccc', padding: 4 }}>Medication</th>
+  //                 <th style={{ border: '1px solid #ccc', padding: 4 }}>Strength</th>
+  //                 <th style={{ border: '1px solid #ccc', padding: 4 }}>Dose</th>
+  //                 <th style={{ border: '1px solid #ccc', padding: 4 }}>Frequency</th>
+  //                 <th style={{ border: '1px solid #ccc', padding: 4 }}>Duration</th>
+  //                 <th style={{ border: '1px solid #ccc', padding: 4 }}>Quantity</th>
+  //                 <th style={{ border: '1px solid #ccc', padding: 4 }}>Refills</th>
+  //               </tr>
+  //             </thead>
+  //             <tbody>
+  //               {serverMedications?.map((med, idx) => (
+  //                 <tr key={idx}>
+  //                   <td style={{ border: '1px solid #ccc', padding: 4 }}>{med.drugName}</td>
+  //                   <td style={{ border: '1px solid #ccc', padding: 4 }}>{med.strength}</td>
+  //                   <td style={{ border: '1px solid #ccc', padding: 4 }}>{med.dose}</td>
+  //                   <td style={{ border: '1px solid #ccc', padding: 4 }}>{med.frequency}</td>
+  //                   <td style={{ border: '1px solid #ccc', padding: 4 }}>{med.duration}</td>
+  //                   <td style={{ border: '1px solid #ccc', padding: 4 }}>{med.amount}</td>
+  //                   <td style={{ border: '1px solid #ccc', padding: 4 }}>{med.refills}</td>
+  //                 </tr>
+  //               ))}
+  //             </tbody>
+  //           </table>
+  //         </div>
+  //       </div>
+  //       {/* Prescriber Info and Signature */}
+  //       <div style={{ position: 'absolute', left: 0, bottom: 32, width: '100%' }}>
+  //         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+  //           <div style={{ fontSize: 13 }}>
+  //             <b>Prescriber's Name: {userProfileData.firstName} {userProfileData.lastName}</b><br />
+  //             Designation: {userProfileData.designation}<br />
+  //             License Number: {userProfileData.licenceNumber}<br />
+  //             Phone: {userProfileData.phoneNumber}
+  //           </div>
+  //           <div style={{ textAlign: 'center', fontSize: 13 }}>
+  //             <div style={{ borderBottom: '1px solid #222', width: 220, marginBottom: 4, marginLeft: 'auto' }}></div>
+  //             Signature
+  //           </div>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   );
+  // };
 
   return (
     <div>

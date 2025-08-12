@@ -189,14 +189,20 @@ const MedicationTable = () => {
       const userData = response?.obj || response;
       
       if (userData) {
+        // Extract signature URL from the nested response structure
+        const signatureUrl = userData?.signature?.response?.secure_url || 
+                           userData?.signature?.file?.response?.secure_url || '';
+        
         setUserProfileData({
           firstName: userData?.firstname || userData?.firstName || '',
           lastName: userData?.lastName || userData?.lastname || '',
           designation: userData?.designation || '',
-          licenceNumber: userData?.licenceNumber || '',
-          phoneNumber: userData?.phoneNumber || ''
+          licenceNumber: userData?.licenseNumber || userData?.licenceNumber || '', // Fixed spelling
+          phoneNumber: userData?.phoneNumber || '',
+          signature: signatureUrl
         });
         console.log('User profile data set:', userData);
+        console.log('Signature URL extracted:', signatureUrl);
       }
     } catch (error) {
       console.error('Profile fetch error:', error);
@@ -518,7 +524,7 @@ const MedicationTable = () => {
       }
       
       // Add prescriber info
-      const finalY = doc.lastAutoTable ? doc.lastAutoTable.finalY + 20 : 200;
+    const finalY = doc.lastAutoTable ? doc.lastAutoTable.finalY + 20 : 200;
       doc.setFontSize(12);
       doc.text(`Prescriber's Name: ${userProfileData.firstName || ''} ${userProfileData.lastName || ''}`, 20, finalY);
       doc.text(`Designation: ${userProfileData.designation || ''}`, 20, finalY + 10);

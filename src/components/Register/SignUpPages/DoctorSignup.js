@@ -76,7 +76,6 @@ const DoctorSignup = ({ userRole }) => {
     isAcceptTermsAndCondition: false,
     isAssessor: location.state?.isAccessor,
   };
-
   const uploadProps = {
     name: 'file',
     multiple: false,

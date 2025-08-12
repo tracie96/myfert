@@ -30,8 +30,8 @@ import {
   editPatientMed,
 } from "../../redux/doctorSlice";
 import moment from "moment";
-import 'jspdf-autotable';
 import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 import "./medication.css";
 import { getUserProfile } from "../../redux/AuthController";
 import { useRef } from 'react';
@@ -1940,7 +1940,11 @@ const MedicationTable = () => {
       <Modal
         open={previewVisible}
         onCancel={() => setPreviewVisible(false)}
-        footer={null}
+        footer={[
+          <Button key="download" type="primary" icon={<DownloadOutlined />} onClick={exportToPDF} style={{ background: '#52c41a', borderColor: '#52c41a' }}>
+            Download PDF
+          </Button>
+        ]}
         width={700}
         style={{ top: 24 }}
         bodyStyle={{ padding: 0, background: '#f8f8f8' }}

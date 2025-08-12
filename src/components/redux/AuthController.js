@@ -177,7 +177,7 @@ export const postRegister = createAsyncThunk(
       users.isAcceptTermsAndCondition,
     );
     formData.append("AgreeToUseData", users.AgreeToUseData);
-    formData.append("DigitalSignature", users.DigitalSignature);
+    formData.append("Signature", users.DigitalSignature);
     formData.append("ExistOnMira", users.ExistOnMira);
     formData.append("isAssessor", users.isAssessor);
     formData.append("licenseDocument", users.licenseDocument);

@@ -628,8 +628,26 @@ const MedicationTable = () => {
               Phone: {userProfileData.phoneNumber}
             </div>
             <div style={{ textAlign: 'center', fontSize: 13 }}>
-              <div style={{ borderBottom: '1px solid #222', width: 220, marginBottom: 4, marginLeft: 'auto' }}></div>
-              Signature
+              {userProfileData.signature ? (
+                <img 
+                  src={userProfileData.signature} 
+                  alt="Signature" 
+                  style={{ 
+                    width: 220, 
+                    height: 60, 
+                    objectFit: 'contain',
+                    border: '1px solid #222'
+                  }} 
+                />
+              ) : (
+                <div style={{ borderBottom: '1px solid #222', width: 220, marginBottom: 4, marginLeft: 'auto' }}>
+                  Signature (No image loaded)
+                </div>
+              )}
+              {/* Debug info */}
+              <div style={{ fontSize: 10, color: '#666', marginTop: 5 }}>
+                Signature URL: {userProfileData.signature || 'None'}
+              </div>
             </div>
           </div>
         </div>

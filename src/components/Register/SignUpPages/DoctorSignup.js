@@ -284,7 +284,7 @@ const DoctorSignup = ({ userRole }) => {
         MetricImperial: true,
         ExistOnMira: false,
         AgreeToUseData: true,
-        DigitalSignature: signatureUrl,
+        Signature: signatureUrl,
         licenseDocument: uploadedFileUrl,
         designation: values.designation,
         licenseNumber: values.licenseNumber,

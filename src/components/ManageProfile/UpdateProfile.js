@@ -52,6 +52,7 @@ const UpdateProfile = () => {
     designation: Yup.string().max(100, "Designation must be less than 100 characters"),
     licenceNumber: Yup.string().max(50, "Licence number must be less than 50 characters"),
     signature: Yup.string().max(500, "Signature must be less than 500 characters"),
+    profileUrl: Yup.string().url("Please enter a valid URL"),
   });
 
   const formik = useFormik({
@@ -83,6 +84,7 @@ const UpdateProfile = () => {
       designation: "",
       licenceNumber: "",
       signature: "",
+      profileUrl: "",
       // Add partner fields
       partnerFirstname: "",
       partnerLastname: "",
@@ -94,7 +96,11 @@ const UpdateProfile = () => {
     onSubmit: async (values) => {
       try {
         setShowSpinner(true);
-        const updatedValues = { ...values, profile: uploadedFileUrl };
+        const updatedValues = { 
+          ...values, 
+          profile: uploadedFileUrl,
+          profileUrl: values.profileUrl // Include the profile URL
+        };
         dispatch(updateProfileUser(updatedValues));
         const action = dispatch(updateProfile(updatedValues));
         const resultAction = await action;
@@ -156,6 +162,7 @@ const UpdateProfile = () => {
       setFieldValue("designation", userData?.designation || "");
       setFieldValue("licenceNumber", userData?.licenceNumber || "");
       setFieldValue("signature", userData?.signature || "");
+      setFieldValue("profileUrl", userData?.profile || "");
 
       // Set partner values
       setFieldValue("partnerFirstname", userData?.partnerFirstname || "");
@@ -498,6 +505,100 @@ const UpdateProfile = () => {
                         {errors.signature && (
                           <small className="text-danger">{errors.signature}</small>
                         )}
+                      </div>
+                    </div>
+
+                    <div className="col-md-12">
+                      <div className="form-group">
+                        <label>Profile Image</label>
+                        <div className="mb-3">
+                          {values.profileUrl && (
+                            <div className="mb-2">
+                              <strong>Current Profile Image:</strong>
+                              <div className="mt-2">
+                                <img 
+                                  src={values.profileUrl} 
+                                  alt="Profile" 
+                                  style={{ 
+                                    maxWidth: '200px', 
+                                    maxHeight: '200px', 
+                                    borderRadius: '8px',
+                                    border: '1px solid #d9d9d9'
+                                  }} 
+                                />
+                              </div>
+                              <div className="mt-2">
+                                <a 
+                                  href={values.profileUrl} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="btn btn-outline-primary btn-sm"
+                                >
+                                  <i className="fas fa-external-link-alt"></i> View Full Size
+                                </a>
+                                <button
+                                  type="button"
+                                  className="btn btn-outline-secondary btn-sm ml-2"
+                                  onClick={() => {
+                                    if (values.profileUrl) {
+                                      navigator.clipboard.writeText(values.profileUrl);
+                                      message.success('Profile image URL copied to clipboard!');
+                                    }
+                                  }}
+                                  title="Copy URL"
+                                >
+                                  <i className="fas fa-copy"></i> Copy URL
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                        
+                        <Upload.Dragger
+                          name="file"
+                          multiple={false}
+                          action="https://api.cloudinary.com/v1_1/tracysoft/upload"
+                          data={{
+                            upload_preset: "myfertility",
+                          }}
+                          onChange={(info) => {
+                            const { status } = info.file;
+                            
+                            if (status === "done") {
+                              const url = info.file.response.secure_url;
+                              setFieldValue("profileUrl", url);
+                              setUploadedFileUrl(url);
+                              message.success('Profile image uploaded successfully!');
+                            } else if (status === "error") {
+                              message.error('Profile image upload failed.');
+                            }
+                          }}
+                          onDrop={(e) => {
+                            console.log("Dropped files", e.dataTransfer.files);
+                          }}
+                          accept="image/*"
+                          showUploadList={false}
+                          style={{
+                            border: '2px dashed #d9d9d9',
+                            borderRadius: '8px',
+                            backgroundColor: '#fafafa'
+                          }}
+                        >
+                          <p className="ant-upload-drag-icon">
+                            <i className="fas fa-cloud-upload-alt" style={{ fontSize: '48px', color: '#1890ff' }}></i>
+                          </p>
+                          <p className="ant-upload-text">Click or drag image file to upload</p>
+                          <p className="ant-upload-hint">
+                            Support for JPG, PNG, GIF up to 10MB
+                          </p>
+                        </Upload.Dragger>
+                        
+                        {errors.profileUrl && (
+                          <small className="text-danger">{errors.profileUrl}</small>
+                        )}
+                        <small className="text-muted">
+                          Upload a new profile image. The image will be automatically optimized and stored securely.
+                        </small>
                       </div>
                     </div>
                     

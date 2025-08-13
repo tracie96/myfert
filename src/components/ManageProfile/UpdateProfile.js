@@ -52,7 +52,6 @@ const UpdateProfile = () => {
     designation: Yup.string().max(100, "Designation must be less than 100 characters"),
     licenceNumber: Yup.string().max(50, "Licence number must be less than 50 characters"),
     signature: Yup.string().max(500, "Signature must be less than 500 characters"),
-    profileUrl: Yup.string().url("Please enter a valid URL"),
   });
 
   const formik = useFormik({
@@ -84,7 +83,6 @@ const UpdateProfile = () => {
       designation: "",
       licenceNumber: "",
       signature: "",
-      profileUrl: "",
       // Add partner fields
       partnerFirstname: "",
       partnerLastname: "",
@@ -162,7 +160,6 @@ const UpdateProfile = () => {
       setFieldValue("designation", userData?.designation || "");
       setFieldValue("licenceNumber", userData?.licenceNumber || "");
       setFieldValue("signature", userData?.signature || "");
-      setFieldValue("profileUrl", userData?.profile || "");
 
       // Set partner values
       setFieldValue("partnerFirstname", userData?.partnerFirstname || "");
@@ -493,35 +490,17 @@ const UpdateProfile = () => {
                     <div className="col-md-12">
                       <div className="form-group">
                         <label>Signature</label>
-                        <textarea
-                          className="form-control"
-                          name="signature"
-                          rows="3"
-                          value={values.signature}
-                          onChange={handleChange("signature")}
-                          onBlur={handleBlur("signature")}
-                          placeholder="Enter your signature or any additional notes"
-                        />
-                        {errors.signature && (
-                          <small className="text-danger">{errors.signature}</small>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="col-md-12">
-                      <div className="form-group">
-                        <label>Profile Image</label>
                         <div className="mb-3">
-                          {values.profileUrl && (
+                          {values.signature && (
                             <div className="mb-2">
-                              <strong>Current Profile Image:</strong>
+                              <strong>Current Signature:</strong>
                               <div className="mt-2">
                                 <img 
-                                  src={values.profileUrl} 
-                                  alt="Profile" 
+                                  src={values.signature} 
+                                  alt="Signature" 
                                   style={{ 
                                     maxWidth: '200px', 
-                                    maxHeight: '200px', 
+                                    maxHeight: '100px', 
                                     borderRadius: '8px',
                                     border: '1px solid #d9d9d9'
                                   }} 
@@ -529,7 +508,7 @@ const UpdateProfile = () => {
                               </div>
                               <div className="mt-2">
                                 <a 
-                                  href={values.profileUrl} 
+                                  href={values.signature} 
                                   target="_blank" 
                                   rel="noopener noreferrer"
                                   className="btn btn-outline-primary btn-sm"
@@ -540,9 +519,9 @@ const UpdateProfile = () => {
                                   type="button"
                                   className="btn btn-outline-secondary btn-sm ml-2"
                                   onClick={() => {
-                                    if (values.profileUrl) {
-                                      navigator.clipboard.writeText(values.profileUrl);
-                                      message.success('Profile image URL copied to clipboard!');
+                                    if (values.signature) {
+                                      navigator.clipboard.writeText(values.signature);
+                                      message.success('Signature image URL copied to clipboard!');
                                     }
                                   }}
                                   title="Copy URL"
@@ -566,11 +545,10 @@ const UpdateProfile = () => {
                             
                             if (status === "done") {
                               const url = info.file.response.secure_url;
-                              setFieldValue("profileUrl", url);
-                              setUploadedFileUrl(url);
-                              message.success('Profile image uploaded successfully!');
+                              setFieldValue("signature", url);
+                              message.success('Signature uploaded successfully!');
                             } else if (status === "error") {
-                              message.error('Profile image upload failed.');
+                              message.error('Signature upload failed.');
                             }
                           }}
                           onDrop={(e) => {
@@ -585,19 +563,19 @@ const UpdateProfile = () => {
                           }}
                         >
                           <p className="ant-upload-drag-icon">
-                            <i className="fas fa-cloud-upload-alt" style={{ fontSize: '48px', color: '#1890ff' }}></i>
+                            <i className="fas fa-signature" style={{ fontSize: '48px', color: '#1890ff' }}></i>
                           </p>
-                          <p className="ant-upload-text">Click or drag image file to upload</p>
+                          <p className="ant-upload-text">Click or drag signature image to upload</p>
                           <p className="ant-upload-hint">
                             Support for JPG, PNG, GIF up to 10MB
                           </p>
                         </Upload.Dragger>
                         
-                        {errors.profileUrl && (
-                          <small className="text-danger">{errors.profileUrl}</small>
+                        {errors.signature && (
+                          <small className="text-danger">{errors.signature}</small>
                         )}
                         <small className="text-muted">
-                          Upload a new profile image. The image will be automatically optimized and stored securely.
+                          Upload your signature image. This will be used for official documents and prescriptions.
                         </small>
                       </div>
                     </div>

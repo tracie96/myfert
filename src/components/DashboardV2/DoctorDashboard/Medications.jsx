@@ -419,29 +419,98 @@ const MedicationTable = () => {
 
   const handleEdit = (record) => {
     setEditingMedication(record);
-    editForm.setFieldsValue(record);
+    
+    // Set the selected medication for the dropdowns to work properly
+    const medicationName = record.drugName || record.medicationName;
+    setSelectedMedication(medicationName);
+    
+    // Map backend field names to form field names
+    const mappedRecord = {
+      drugName: medicationName,
+      strength: record.strength,
+      route: record.route,
+      dose: record.dose,
+      frequency: record.frequency,
+      duration: record.duration,
+      quantity: record.amount || record.quantity, // Map 'amount' to 'quantity'
+      refills: record.refills
+    };
+    
+    console.log('Setting form values:', mappedRecord);
+    
+    // Set form values after a small delay to ensure state is updated
+    setTimeout(() => {
+      editForm.setFieldsValue(mappedRecord);
+      console.log('Form values set:', editForm.getFieldsValue());
+    }, 100);
+    
     setIsEditModalVisible(true);
   };
 
   const handleEditSubmit = () => {
-    editForm.validateFields().then(async (values) => {
-      try {
-        await dispatch(
-          editPatientMed({
-            ...values,
-            id: editingMedication.id,
-          })
-        ).unwrap();
+    // Get all form values directly
+    const formValues = editForm.getFieldsValue();
+    console.log('Raw form values:', formValues);
+    
+    // Check if we have the required values
+    if (!formValues.drugName || !formValues.strength || !formValues.route || !formValues.dose || !formValues.frequency || !formValues.duration || !formValues.quantity || !formValues.refills) {
+      message.error("Please fill in all required fields");
+      console.log('Missing required fields:', {
+        drugName: !!formValues.drugName,
+        strength: !!formValues.strength,
+        route: !!formValues.route,
+        dose: !!formValues.dose,
+        frequency: !!formValues.frequency,
+        duration: !!formValues.duration,
+        quantity: !!formValues.quantity,
+        refills: !!formValues.refills
+      });
+      return;
+    }
 
-        message.success("Medication updated successfully!");
-        dispatch(getPatientMed(patient.userRef));
-        setIsEditModalVisible(false);
-        editForm.resetFields();
-      } catch (error) {
-        console.error('Error details:', error);
-        message.error("Failed to update medication.");
-      }
-    });
+    try {
+      // Map form field names back to backend field names (capitalized)
+      const mappedValues = {
+        drugName: formValues.drugName,
+        strength: formValues.strength,
+        route: formValues.route,
+        dose: formValues.dose,
+        frequency: formValues.frequency,
+        duration: formValues.duration,
+        amount: formValues.quantity, 
+        refills: formValues.refills
+      };
+
+      console.log('Mapped values for API:', mappedValues);
+      console.log('Editing medication ID:', editingMedication.id);
+
+      const payload = {
+        ...mappedValues,
+        id: editingMedication.id,
+      };
+
+      console.log('Final payload:', payload);
+
+      // Call the API
+      dispatch(editPatientMed(payload)).then((result) => {
+        if (editPatientMed.fulfilled.match(result)) {
+          message.success("Medication updated successfully!");
+          dispatch(getPatientMed(patient.userRef));
+          setIsEditModalVisible(false);
+          setSelectedMedication(null);
+          editForm.resetFields();
+        } else {
+          message.error("Failed to update medication");
+        }
+      }).catch((error) => {
+        console.error('API call failed:', error);
+        message.error("Failed to update medication");
+      });
+
+    } catch (error) {
+      console.error('Error in handleEditSubmit:', error);
+      message.error("Failed to update medication");
+    }
   };
 
   const exportToPDF = () => {
@@ -1170,6 +1239,35 @@ const MedicationTable = () => {
   //   );
   // };
 
+  // Helper function to extract numeric values from strings
+  const extractNumeric = (val) => {
+    if (!val) return 1;
+    const match = val.match(/([\d.]+)/);
+    return match ? parseFloat(match[1]) : 1;
+  };
+
+  // Effect to populate form when edit modal opens
+  useEffect(() => {
+    if (isEditModalVisible && editingMedication) {
+      const medicationName = editingMedication.drugName || editingMedication.medicationName;
+      setSelectedMedication(medicationName);
+      
+      const mappedRecord = {
+        drugName: medicationName,
+        strength: editingMedication.strength,
+        route: editingMedication.route,
+        dose: editingMedication.dose,
+        frequency: editingMedication.frequency,
+        duration: editingMedication.duration,
+        quantity: editingMedication.amount || editingMedication.quantity,
+        refills: editingMedication.refills
+      };
+      
+      console.log('useEffect: Setting form values:', mappedRecord);
+      editForm.setFieldsValue(mappedRecord);
+    }
+  }, [isEditModalVisible, editingMedication, editForm]);
+
   return (
     <div>
       {patient ? (
@@ -1238,11 +1336,6 @@ const MedicationTable = () => {
             }
           
             // Extract numeric values from strength and dose
-            const extractNumeric = (val) => {
-              if (!val) return 1;
-              const match = val.match(/([\d.]+)/);
-              return match ? parseFloat(match[1]) : 1;
-            };
           
             const doseAmount = extractNumeric(dose);
             const strengthAmount = extractNumeric(strength);
@@ -1539,49 +1632,130 @@ const MedicationTable = () => {
         title="Edit Medication"
         open={isEditModalVisible}
         onOk={handleEditSubmit}
-        onCancel={() => setIsEditModalVisible(false)}
+        onCancel={() => {
+          setIsEditModalVisible(false);
+          setSelectedMedication(null); // Reset selected medication when closing
+        }}
         okText="Update"
       >
         <Form
           form={editForm}
           layout="vertical"
+          onValuesChange={(changedValues, allValues) => {
+            const { dose, strength, frequency, duration } = allValues;
+            
+            // Extract numeric values
+            const doseAmount = extractNumeric(dose);
+            const strengthAmount = extractNumeric(strength);
+            const frequencyValue = extractNumeric(frequency);
+            const durationValue = extractNumeric(duration);
+            
+            // Calculate doses per day and days
+            const dosesPerDay = frequencyValue || 1;
+            const days = durationValue || 1;
+            
+            // Calculate quantity needed
+            if (dose && strength && frequency && duration) {
+              const unitsPerDose = strengthAmount > 0 ? doseAmount / strengthAmount : 1;
+              const rawQty = unitsPerDose * dosesPerDay * days;
+              const quantity = Math.max(1, Math.ceil(rawQty));
+              editForm.setFieldsValue({ quantity });
+            } else {
+              editForm.setFieldsValue({ quantity: 1 });
+            }
+          }}
         >
           <Form.Item
             label="Name"
             name="drugName"
             rules={[
-              { required: true, message: "Please enter medication name" },
+              { required: true, message: "Please select medication name" },
             ]}
           >
-            <Input
+            <div style={{maxWidth:"900px"}}>
+            <Select
+              placeholder="Search and select medication"
+              showSearch
+              filterOption={(input, option) =>
+                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+              }
+              style={{ 
+                width: '100% !important', 
+                height: '40px', 
+                borderRadius: '8px',
+                border: '1px solid #d9d9d9',
+                fontSize: '14px',
+                backgroundColor: '#fff'
+              }}
+              onChange={(value) => {
+                setSelectedMedication(value);
+                editForm.setFieldsValue({ drugName: value });
+              }}
+              options={Object?.keys(MEDICATION_DATA_MAP)
+                .sort((a, b) => a.localeCompare(b))
+                .map(med => ({
+                  label: med,
+                  value: med
+                }))}
+            />
+            </div>
+          </Form.Item>
+
+          <Form.Item
+            label="Strength"
+            name="strength"
+            rules={[
+              { required: true, message: "Please select strength" },
+            ]}
+          >
+            <Select
+              placeholder="Select strength"
               style={{ 
                 width: '100%', 
                 height: '40px', 
                 borderRadius: '8px',
                 border: '1px solid #d9d9d9',
-                padding: '0 11px',
                 fontSize: '14px',
                 backgroundColor: '#fff'
               }}
+              onChange={(value) => {
+                setSelectedStrength(value);
+                editForm.setFieldsValue({ strength: value });
+              }}
+              options={selectedMedication ? (MEDICATION_DATA_MAP[selectedMedication]?.strengths || []).map(strength => ({
+                label: strength,
+                value: strength
+              })) : []}
             />
           </Form.Item>
 
           <Form.Item
             label="Route"
             name="route"
-            rules={[{ required: true, message: "Please enter route" }]}
+            rules={[{ required: true, message: "Please select route" }]}
           >
-            <Input
+            <Select
+              placeholder="Select route"
               style={{ 
                 width: '100%', 
                 height: '40px', 
                 borderRadius: '8px',
                 border: '1px solid #d9d9d9',
-                padding: '0 11px',
                 fontSize: '14px',
                 backgroundColor: '#fff'
               }}
-            />
+            >
+              <Select.Option value="oral">Oral</Select.Option>
+              <Select.Option value="topical">Topical</Select.Option>
+              <Select.Option value="injection">Injection</Select.Option>
+              <Select.Option value="inhalation">Inhalation</Select.Option>
+              <Select.Option value="sublingual">Sublingual</Select.Option>
+              <Select.Option value="rectal">Rectal</Select.Option>
+              <Select.Option value="vaginal">Vaginal</Select.Option>
+              <Select.Option value="ophthalmic">Ophthalmic</Select.Option>
+              <Select.Option value="otic">Otic</Select.Option>
+              <Select.Option value="nasal">Nasal</Select.Option>
+            </Select>
           </Form.Item>
 
           <Form.Item
@@ -1590,6 +1764,7 @@ const MedicationTable = () => {
             rules={[{ required: true, message: "Please enter dose" }]}
           >
             <Input
+              placeholder="Enter dose (e.g., 1, 2, 0.5)"
               style={{ 
                 width: '100%', 
                 height: '40px', 
@@ -1605,39 +1780,72 @@ const MedicationTable = () => {
           <Form.Item
             label="Frequency"
             name="frequency"
-            rules={[{ required: true, message: "Please enter frequency" }]}
+            rules={[{ required: true, message: "Please select frequency" }]}
           >
-            <Input
+            <Select
+              placeholder="Select frequency"
               style={{ 
                 width: '100%', 
                 height: '40px', 
                 borderRadius: '8px',
                 border: '1px solid #d9d9d9',
-                padding: '0 11px',
                 fontSize: '14px',
                 backgroundColor: '#fff'
               }}
-            />
+            >
+              <Select.Option value="1">Once daily</Select.Option>
+              <Select.Option value="2">Twice daily</Select.Option>
+              <Select.Option value="3">Three times daily</Select.Option>
+              <Select.Option value="4">Four times daily</Select.Option>
+              <Select.Option value="6">Every 6 hours</Select.Option>
+              <Select.Option value="8">Every 8 hours</Select.Option>
+              <Select.Option value="12">Every 12 hours</Select.Option>
+              <Select.Option value="24">Every 24 hours</Select.Option>
+              <Select.Option value="48">Every 48 hours</Select.Option>
+              <Select.Option value="72">Every 72 hours</Select.Option>
+              <Select.Option value="168">Weekly</Select.Option>
+              <Select.Option value="336">Every 2 weeks</Select.Option>
+              <Select.Option value="504">Every 3 weeks</Select.Option>
+              <Select.Option value="672">Every 4 weeks</Select.Option>
+              <Select.Option value="as_needed">As needed</Select.Option>
+            </Select>
           </Form.Item>
 
           <Form.Item
             label="Duration"
             name="duration"
-            rules={[{ required: true, message: "Please enter duration" }]}
+            rules={[{ required: true, message: "Please select duration" }]}
           >
-            <Input
+            <Select
+              placeholder="Select duration"
               style={{ 
                 width: '100%', 
                 height: '40px', 
                 borderRadius: '8px',
                 border: '1px solid #d9d9d9',
-                padding: '0 11px',
                 fontSize: '14px',
                 backgroundColor: '#fff'
               }}
-            />
+            >
+              <Select.Option value="1">1 day</Select.Option>
+              <Select.Option value="2">2 days</Select.Option>
+              <Select.Option value="3">3 days</Select.Option>
+              <Select.Option value="5">5 days</Select.Option>
+              <Select.Option value="7">1 week</Select.Option>
+              <Select.Option value="10">10 days</Select.Option>
+              <Select.Option value="14">2 weeks</Select.Option>
+              <Select.Option value="21">3 weeks</Select.Option>
+              <Select.Option value="28">4 weeks</Select.Option>
+              <Select.Option value="30">1 month</Select.Option>
+              <Select.Option value="60">2 months</Select.Option>
+              <Select.Option value="90">3 months</Select.Option>
+              <Select.Option value="180">6 months</Select.Option>
+              <Select.Option value="365">1 year</Select.Option>
+              <Select.Option value="continuous">Continuous</Select.Option>
+            </Select>
           </Form.Item>
 
+          {/* Quantity field (auto-calculated, read-only) */}
           <Form.Item
             label="Quantity"
             name="quantity"
@@ -1645,35 +1853,46 @@ const MedicationTable = () => {
           >
             <Input
               type="number"
-              style={{ 
-                width: '100%', 
-                height: '40px', 
-                borderRadius: '8px',
-                border: '1px solid #d9d9d9',
-                padding: '0 11px',
-                fontSize: '14px',
-                backgroundColor: '#fff'
-              }}
+              min={1}
+              style={{ width: '100%', height: '40px', borderRadius: '8px' }}
+              placeholder="Auto-calculated based on frequency and duration"
+              disabled
             />
           </Form.Item>
 
+          {/* Refills field */}
           <Form.Item
             label="Refills"
             name="refills"
-            rules={[{ required: true, message: "Please enter refills" }]}
+            rules={[{ required: true, message: "Please select refills" }]}
           >
-            <Input
-              type="number"
+            <select
+              placeholder="Select refills"
               style={{ 
                 width: '100%', 
                 height: '40px', 
                 borderRadius: '8px',
                 border: '1px solid #d9d9d9',
-                padding: '0 11px',
+                padding: '8px 11px',
                 fontSize: '14px',
-                backgroundColor: '#fff'
+                backgroundColor: '#fff',
+                cursor: 'pointer',
+                overflow: 'visible',
+                zIndex: 1000,
+                lineHeight: '1.2'
               }}
-            />
+              onChange={(e) => editForm.setFieldsValue({ refills: e.target.value })}
+            >
+              <option value="">Select refills</option>
+              <option value="0">0</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="12">12</option>
+            </select>
           </Form.Item>
         </Form>
       </Modal>

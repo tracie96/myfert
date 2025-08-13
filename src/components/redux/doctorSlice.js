@@ -269,7 +269,7 @@ export const addPatientMed = createAsyncThunk(
 
 export const editPatientMed = createAsyncThunk(
   "doctor/editPatientMed",
-  async ({ drugName, dose, amount, route, frequency, id }, { rejectWithValue, getState, dispatch }) => {
+  async ({ drugName, dose, amount, route, frequency, id, refills, strength, duration }, { rejectWithValue, getState, dispatch }) => {
     const user = getState()?.authentication?.userAuth;
     const config = {
       headers: {
@@ -277,11 +277,11 @@ export const editPatientMed = createAsyncThunk(
         Authorization: `Bearer ${user?.obj?.token}`,
       },
     };
-
+    console.log(drugName, dose, amount, route, frequency, id, refills, strength, duration,'editPatientMed')
     try {
-      const response = await axios.post(
+      const response = await axios.patch(
         `${baseUrl}Doctor/EditPatientMed`,
-        { drugName, dose, amount, route, frequency, id },
+        { drugName, dose, amount, route, frequency, id, refills, strength, duration },
         config
       );
       return response.data;

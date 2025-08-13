@@ -11,6 +11,8 @@ import ChangeEmail from "./ChangeEmail";
 import { message } from "antd";
 import PatientInformationView from "./PatientInformationView";
 import CareProviderManagement from "./CareProviderManagement";
+import { useNavigate } from "react-router-dom";
+
 
 const UserManagement = () => {
   const [isOpen, setOpen] = useState('');
@@ -25,6 +27,7 @@ const UserManagement = () => {
   const [requestsData, setRequestsData] = useState([]);
   const [requestsTable, setRequestsTable] = useState([]);
   const [currEmail, setCurrEmail] = useState('');
+  const navigate = useNavigate();
 
   const [requestsPagination, setRequestsPagination] = useState({
     current: 1,
@@ -53,17 +56,17 @@ const UserManagement = () => {
 
   const userAuth = useSelector((state) => state?.authentication?.userAuth);
 
-  const MenuPopover = ({ account, role, email }) => (
+  const MenuPopover = ({ account, role, email, firstname, lastname, dob }) => (
     <Popover
       placement="rightTop"
-      content={<ContentMenu account={account} role={role} email={email} />}
+      content={<ContentMenu account={account} role={role} email={email} firstname={firstname} lastname={lastname} dob={dob}/>}
       trigger='click'
     >
       <MoreOutlined />
     </Popover>
   );
   
-  const ContentMenu = ({ account, role, email }) => (
+  const ContentMenu = ({ account, role, email, firstname, lastname, dob }) => (
     <Menu
       mode="inline"
       items={[
@@ -89,8 +92,17 @@ const UserManagement = () => {
           label: "Change Email",
           onClick: () => {
             setAccount(account);
-            setCurrEmail(email); // SIMPLIFIED HERE
+            setCurrEmail(email); 
             setOpen('Email');
+          }
+        },
+        {
+          key: 'Log',
+          label: "Log",
+          onClick: () => {
+            navigate('/log', {
+              state: { account, email, role, firstname, lastname, dob }
+            });
           }
         }
       ]}
@@ -265,7 +277,7 @@ const UserManagement = () => {
           role: 'Patient',
           activated: user.patientStat || 'Active',
           acceptingPatients: 'Yes',
-          menu: <MenuPopover account={account} role="Patient" email={user.email}  />,
+          menu: <MenuPopover account={account} role="Patient" email={user.email} firstname={user.firstname} lastname={user.lastname} dob={user.dob} />,
         };
       });
       setDataSource(formatted);

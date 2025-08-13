@@ -97,6 +97,7 @@ import Note from "../DashboardV2/DoctorDashboard/Note";
 import PatientNote from "../DashboardV2/PatientDashboard/Note";
 import Fax from "../DashboardV2/DoctorDashboard/Fax";
 import AssignmentOfCare from  "../Admin/AssignmentOfCare";
+import Log from  "../Admin/Log";
 import SupplementScreen from "../DashboardV2/PatientDashboard/Supplement";
 import Intercom from "../DashboardV2/DoctorDashboard/Intercoms";
 import PatientIntercom from "../DashboardV2/PatientDashboard/Intercoms";
@@ -258,6 +259,7 @@ const getRouter = createBrowserRouter(
         <Route path="doctor/fax" element={<Fax />} />
         <Route path="admin/fax" element={<Fax />} />
         <Route path="/assignment" element={<AssignmentOfCare />} />
+        <Route path="/log" element={<Log />} />
 
         <Route path="doctor/intercom" element={<Intercom />} />
 

@@ -189,6 +189,7 @@ const MedicationTable = () => {
       const userData = response?.obj || response;
       
       if (userData) {
+        console.log('User data:', userData);
         // Extract signature URL from the nested response structure
         const signatureUrl = userData?.signature?.response?.secure_url || 
                            userData?.signature?.file?.response?.secure_url || '';
@@ -199,7 +200,7 @@ const MedicationTable = () => {
           designation: userData?.designation || '',
           licenceNumber: userData?.licenseNumber || userData?.licenceNumber || '', // Fixed spelling
           phoneNumber: userData?.phoneNumber || '',
-          signature: signatureUrl
+          signature: userData?.signature || ''
         });
         console.log('User profile data set:', userData);
         console.log('Signature URL extracted:', signatureUrl);
@@ -576,7 +577,7 @@ const MedicationTable = () => {
           Leduc: 6207 50 St #102, Leduc, AB T9E 7A9<br />
           Calgary: Suite 280, 7015 Macleod Trail SW, Calgary, Alberta, T2H 2K6
         </div>
-        {/* Patient Info */}
+     
         <div style={{ marginTop: 18, fontSize: 14 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px solid #222', paddingBottom: 4 }}>
             <span><b>Patient Name:</b> {patientName}</span>
@@ -591,7 +592,7 @@ const MedicationTable = () => {
             <span><b>DOB:</b> {dob}</span>
           </div>
         </div>
-        {/* RX and Medications */}
+
         <div style={{ display: 'flex', marginTop: 32 }}>
           <div style={{ fontSize: 64, fontWeight: 'bold', color: '#1a3c6b', marginRight: 32, marginTop: -12 }}>RX</div>
           <div style={{ flex: 1 }}>
@@ -628,21 +629,22 @@ const MedicationTable = () => {
         <div style={{ position: 'absolute', left: 0, bottom: 32, width: '100%' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
             <div style={{ fontSize: 13 }}>
+              {console.log('User profile data:', userProfileData)}
               <b>Prescriber's Name: {userProfileData.firstName} {userProfileData.lastName}</b><br />
               Designation: {userProfileData.designation}<br />
               License Number: {userProfileData.licenceNumber}<br />
               Phone: {userProfileData.phoneNumber}
             </div>
             <div style={{ textAlign: 'center', fontSize: 13 }}>
-              {userProfileData.signature ? (
+              {userProfileData?.signature ? (
                 <img 
-                  src={userProfileData.signature} 
+                  src={userProfileData?.signature} 
                   alt="Signature" 
                   style={{ 
                     width: 220, 
                     height: 60, 
                     objectFit: 'contain',
-                    border: '1px solid #222'
+                    borderBottom: '1px solid #222',
                   }} 
                 />
               ) : (
@@ -652,7 +654,7 @@ const MedicationTable = () => {
               )}
               {/* Debug info */}
               <div style={{ fontSize: 10, color: '#666', marginTop: 5 }}>
-                Signature URL: {userProfileData.signature || 'None'}
+                Signature
               </div>
             </div>
           </div>

@@ -568,11 +568,11 @@ export const GetSideBar = () => {
           <span style={{ whiteSpace: 'normal', lineHeight: '1.2' }}>USER MANAGEMENT</span>
         </NavLink>
       </Menu.Item>
-      <Menu.Item key="2" icon={<FaFileAlt style={{ color: "#00ADEF" }} />}>
-        <NavLink to="/logs" style={{ textDecoration: "none" }}>
+      {/* <Menu.Item key="2" icon={<FaFileAlt style={{ color: "#00ADEF" }} />}>
+        <NavLink to="/log" style={{ textDecoration: "none" }}>
           <span style={{ whiteSpace: 'normal', lineHeight: '1.2' }}>LOGS</span>
         </NavLink>
-      </Menu.Item>
+      </Menu.Item> */}
       <Menu.Item key="3" icon={<FaChartPie style={{ color: "#00ADEF" }} />}>
         <NavLink to="/statistics" style={{ textDecoration: "none" }}>
           <span style={{ whiteSpace: 'normal', lineHeight: '1.2' }}>STATISTICS</span>

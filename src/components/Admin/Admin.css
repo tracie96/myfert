@@ -12,6 +12,43 @@
   border: 3px solid #C2E6F8; 
   border-radius: 10px;
 }
+.reply-box {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-top: 1px solid #ccc;
+  margin-top: 20px;
+  background-color: #f9f9f9;
+}
+
+.reply-box input {
+  flex: 1;
+  padding: 10px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-right: 10px;
+  outline: none;
+}
+
+.reply-box input:focus {
+  border-color: #007bff;
+}
+
+.reply-box button {
+  padding: 10px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.reply-box button:hover {
+  background-color: #0056b3;
+}
 
 .inbox-content-div {
   display: flex;
@@ -20,6 +57,15 @@
 
 .inbox-bottom-border {
   border-bottom: 3px solid #C2E6F8;
+}
+.userDetails .label {
+  font-weight: bold;
+  color: #2c3e50; /* or any color you prefer */
+}
+
+.userDetails .value {
+  font-weight: normal;
+  color: #000; /* value text color */
 }
 
 .inbox-list-item {
@@ -40,6 +86,122 @@
 }
 .ant-popover-content{
   width: 200px !important;
+}
+
+.ticket-container {
+  display: flex;
+  height: 100vh;
+  font-family: sans-serif;
+  gap: 10px;
+}
+.btn-group{
+  display: inline-block;
+  text-align: right;
+}
+
+.ticket-list {
+  width: 28%;
+  border: 1px solid #c7e7f9;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 10px;
+}
+
+.ticket-item {
+  padding: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
+
+.ticket-item.active {
+  background-color: #e6f0ff;
+}
+
+.ticket-item .email {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+.ticket-item .subject {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 5px;
+}
+.ticket-item .preview {
+  font-size: 12px;
+  color: #777;
+  margin-bottom: 5px;
+}
+
+.ticket-detail {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border: #c8e7fa 1px solid;
+  padding: 10px 5px;
+  border-radius: 10px;
+}
+
+.ticket-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #c7e7f9;
+}
+.ticket-header+h4{
+  border-bottom: 1px solid #c7e7f9;
+  padding: 10px 15px;
+}
+.ticket-header .email{
+  font-weight: 500;
+}
+.userDetails{display: flex; gap: 15px;}
+
+.btn-group button {
+  margin-left: 5px;
+  padding: 6px 12px;
+  border: none;
+  color: white;
+  border-radius: 6px;
+  width: 100px;
+}
+
+.btn-action {
+  background-color: #0094ff;
+}
+.btn-close {
+  background-color: #ff4d4d;
+}
+
+.message-thread {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.message {
+  background-color: #f1f5ff;
+  padding: 10px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+}
+.message.agent {
+  background-color: #e8f7ff;
+}
+
+.reply-box {
+  padding: 10px;
+  border-top: 1px solid #ddd;
+}
+.reply-box input {
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+.eye-icon {
+  cursor: pointer;
+  vertical-align: middle;
+  font-size: 18px;
 }
 
 /* .ant-table-tbody .ant-table-row > .ant-table-cell-row-hover {
@@ -81,4 +243,5 @@
   .ant-table-wrapper table {
     width: 100%;
   }
+  
 }

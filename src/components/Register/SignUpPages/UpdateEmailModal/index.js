@@ -20,7 +20,21 @@ const EmailInputModal = ({
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (email && emailRegex.test(email)) {
       try {
-        const session = JSON.parse(localStorage.getItem("userInfo"))?.session;
+        const userInfoString = localStorage.getItem("userInfo");
+        if (!userInfoString) {
+          message.error("User information not found. Please try again.");
+          return;
+        }
+        
+        let userInfo;
+        try {
+          userInfo = JSON.parse(userInfoString);
+        } catch (error) {
+          message.error("Invalid user information. Please try again.");
+          return;
+        }
+        
+        const session = userInfo?.session;
 
         if (!session) {
           message.error("Session not found. Please try again.");

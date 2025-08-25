@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Progress, Button, Radio, Col, Row, Input, message, Checkbox } from "antd";
+import { Progress, Button, Radio, Col, Row, Input, message, Checkbox, DatePicker } from "antd";
 import { useNavigate } from "react-router-dom"; // useNavigate for react-router v6
 import { useDispatch, useSelector } from "react-redux";
 import { completeCard } from "../../../../redux/assessmentSlice";
@@ -9,6 +9,8 @@ import "../assesment.css";
 import { DeleteOutlined } from "@ant-design/icons";
 import { useMediaQuery } from "react-responsive";
 import { backBtnTxt, exitBtnTxt, saveAndContinueBtn, submitBtn } from "../../../../../utils/constant";
+import dayjs from "dayjs";
+import { baseUrl } from "../../../../../utils/envAccess";
 
 const questions = [
   {
@@ -331,16 +333,16 @@ const questions = [
     radioName: "injuries",
     radioOptions: [{ label: "comments", value: "Comments" }],
   },
-  {
-    type: "date_radio",
-    name: "back_injury",
-    question: "Injuries",
-    sub: "Back Injury",
-    dateName: "back_injury",
-    title: "Medical History: Illnesses/Conditions",
-    radioName: "back_injury",
-    radioOptions: [{ label: "comments", value: "Comments" }],
-  },
+  // {
+  //   type: "date_radio",
+  //   name: "back_injury",
+  //   question: "Injuries",
+  //   sub: "Back Injury",
+  //   dateName: "back_injury",
+  //   title: "Medical History: Illnesses/Conditions",
+  //   radioName: "back_injury",
+  //   radioOptions: [{ label: "comments", value: "Comments" }],
+  // },
   {
     type: "date_radio",
     name: "head_injury",
@@ -496,15 +498,25 @@ const IllnessAndCondition = ({ onComplete }) => {
 
   useEffect(() => {
     const mapApiResponseToFormState = (apiData) => {
-      console.log('Starting mapApiResponseToFormState with apiData:', apiData);
       const formAnswers = {};
+      if (apiData.respiratoryOther) {
+        formAnswers["healthConditions_Respiratory_others"] = apiData.respiratoryOther;
+        formAnswers["healthConditions_Urinary_Genital_others"] = apiData.urinaryOther;
+        formAnswers["healthConditions_Endocrine_Metabolic_others"] = apiData.endocrineOther;
+        formAnswers["healthConditions_Inflammatory_Immune_others"] = apiData.inflammatoryOther;
+        formAnswers["healthConditions_Musculoskeletal_others"] = apiData.muscuSkeletalOther;
+        formAnswers["healthConditions_Skin_others"] = apiData.skinOther;
+        formAnswers["healthConditions_Cardiovascular_others"] = apiData.cardiovascularOther;
+        formAnswers["healthConditions_Neurologic_Emotional_others"] = apiData.neurologicOther;
+        formAnswers["healthConditions_Cancer_others"] = apiData.cancerOther;
+      }
 
       if (apiData.gastroIntestinal && apiData.gastroIntestinal.length > 0) {
         for (const item of apiData.gastroIntestinal) {
           formAnswers[item.typeName] = item.yesNoNA;
         }
       }
-      
+
       if (apiData.respiratory && apiData.respiratory.length > 0) {
         for (const item of apiData.respiratory) {
           formAnswers[item.typeName] = item.yesNoNA;
@@ -546,13 +558,13 @@ const IllnessAndCondition = ({ onComplete }) => {
           formAnswers[item.typeName] = item.yesNoNA;
         }
       }
-      
+
       if (apiData.neurologic && apiData.neurologic.length > 0) {
         for (const item of apiData.neurologic) {
           formAnswers[item.typeName] = item.yesNoNA;
         }
       }
-      
+
       if (apiData.cancer && apiData.cancer.length > 0) {
         for (const item of apiData.cancer) {
           formAnswers[item.typeName] = item.yesNoNA;
@@ -653,8 +665,8 @@ const IllnessAndCondition = ({ onComplete }) => {
         );
 
         const hasOthersAnswer =
-          answers[`${question.name}_others`] !== undefined &&
-          answers[`${question.name}_others`] !== "";
+          answers[`${question.name}_${question.sub.replace(/\//g, '_')}_others`] !== undefined &&
+          answers[`${question.name}_${question.sub.replace(/\//g, '_')}_others`] !== "";
 
         return hasValidAnswer || hasOthersAnswer;
 
@@ -750,8 +762,16 @@ const IllnessAndCondition = ({ onComplete }) => {
       cardiovascular: getCategoryQuestions("Cardiovascular"),
       neurologic: getCategoryQuestions("Neurologic/Emotional"),
       cancer: getCategoryQuestions("Cancer"),
-
       // Rest of the structure remains unchanged
+      respiratoryOther: answers.healthConditions_Respiratory_others || "",
+      urinaryOther: answers.healthConditions_Urinary_Genital_others || "",
+      endocrineOther: answers.healthConditions_Endocrine_Metabolic_others || "",
+      inflammatoryOther: answers.healthConditions_Inflammatory_Immune_others || "",
+      muscuSkeletalOther: answers.healthConditions_Musculoskeletal_others || "",
+      cardiovascularOther: answers.healthConditions_Cardiovascular_others || "",
+      skinOther: answers.healthConditions_Skin_others || "",
+      neurologicOther: answers.healthConditions_Neurologic_Emotional_others || "",
+      cancerOther: answers.healthConditions_Cancer_others || "",
       diagnosticBoneDensity: {
         date: answers.boneDensity_na ? "" : answers.boneDensity || "",
         value: answers.boneDensity_na ? "" : answers.boneDensity_Comments || "",
@@ -824,7 +844,7 @@ const IllnessAndCondition = ({ onComplete }) => {
       injuriesOther: {
         date: answers.head_injury_others_na ? "" : answers.head_injury_others || "",
         value: answers.head_injury_others_Comments || "",
-        otherName: answers.head_injury_others_Others || "", 
+        otherName: answers.head_injury_others_Others || "",
       },
       surgeryAppen: {
         date: answers.appendectomy_na ? "" : answers.appendectomy || "",
@@ -870,14 +890,13 @@ const IllnessAndCondition = ({ onComplete }) => {
     };
 
     const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
-    const token = userInfo.obj.token || "";
-    fetch("https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/AddIllnessConditions", {
+    const token = userInfo?.obj?.token || "";
+    fetch(`${baseUrl}Patient/AddIllnessConditions`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         accept: "text/plain",
         Authorization: `${token}`,
-
       },
       body: JSON.stringify(apiData),
     })
@@ -933,7 +952,7 @@ const IllnessAndCondition = ({ onComplete }) => {
 
         return (
           <div key={question.name} style={{ marginBottom: "20px" }}>
-            <Button
+            {/* <Button
               type="primary"
               style={{
                 marginTop: "10px",
@@ -946,17 +965,33 @@ const IllnessAndCondition = ({ onComplete }) => {
               }}
             >
               {question.question}
-            </Button>
-            <p
-              style={{
-                color: "#00ADEF",
-                fontSize: isMobile ? "13px" : "15px",
-                fontWeight: "bold",
-                marginBottom: "10px"
-              }}
-            >
-              {question.sub}
-            </p>
+            </Button> */}
+            <div style={{
+              marginTop: "10px",
+              marginBottom: "10px",
+              background: "#335CAD",
+              padding: isMobile ? "5px" : "10px",
+              fontSize: isMobile ? "13px" : "15px",
+              fontWeight: "bold",
+              width: isMobile ? "100%" : "200px",
+              borderRadius: "8px",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center"
+            }}>
+              <p
+                style={{
+                  color: "#fff",
+                  fontSize: isMobile ? "13px" : "15px",
+                  fontWeight: "bold",
+                  margin: 0,
+                  textAlign: "center"
+                }}
+              >
+                {question.sub}
+              </p>
+            </div>
+
             <div style={{ marginBottom: "10px" }}>
               <Checkbox
                 checked={isNA}
@@ -969,14 +1004,13 @@ const IllnessAndCondition = ({ onComplete }) => {
             <div style={{ marginBottom: "10px" }}>
               <label style={{ color: "#000", fontSize: isMobile ? "13px" : "14px" }}>Date:</label>
               <br />
-              <Input
-                type="date"
+              <DatePicker
+                disabledDate={(current) => current && current > dayjs().endOf('day')}
+                value={answers[question.dateName] ? dayjs(answers[question.dateName]) : null}
+                format="YYYY-MM-DD"
                 className="input_questionnaire"
                 name={question.dateName}
-                value={answers[question.dateName] || ""}
-                onChange={(e) =>
-                  handleChange(e.target.value, question.dateName)
-                }
+                onChange={(date, dateString) => handleChange(dateString, question.dateName)}
                 style={{ width: isMobile ? "100%" : "200px" }}
                 disabled={isNA}
               />
@@ -1032,12 +1066,13 @@ const IllnessAndCondition = ({ onComplete }) => {
                     gap: "10px",
                   }}
                 >
-                  <Input
-                    type="date"
-                    value={entry.date || ""}
-                    onChange={(e) =>
+                  <DatePicker
+                    disabledDate={(current) => current && current > dayjs().endOf('day')}
+                    value={entry.date ? dayjs(entry.date) : null}
+                    format="YYYY-MM-DD"
+                    onChange={(date, dateString) =>
                       handleHospitalizationChange(
-                        e.target.value,
+                        dateString,
                         "date",
                         index,
                         question.name,
@@ -1092,18 +1127,24 @@ const IllnessAndCondition = ({ onComplete }) => {
       case "multi_yes_no":
         return (
           <div style={{ marginTop: "20px" }}>
-            <Button
-              type="primary"
-              style={{
-                background: "#335CAD",
-                padding: isMobile ? "10px" : "20px",
-                fontSize: isMobile ? "13px" : "15px",
-                fontWeight: "bold",
-                width: isMobile ? "100%" : "auto",
-              }}
-            >
-              {question.sub}
-            </Button>
+            <div style={{
+                    background: "#335CAD",
+                    padding: isMobile ? "10px 16px" : "12px 20px",
+                    fontSize: isMobile ? "13px" : "15px",
+                    fontWeight: "bold",
+                    width: "fit-content",
+                    height: "40px", // optional if using padding + flex
+                    borderRadius: "4px",
+                    color: "#fff",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer", // makes it behave like a button
+                    userSelect: "none",
+                
+                  }}>
+                     {question.sub}
+                  </div>
 
             {question.subQuestions.map((subQuestion) => (
               <div key={subQuestion.name} style={{ marginTop: 20 }}>
@@ -1155,9 +1196,9 @@ const IllnessAndCondition = ({ onComplete }) => {
                 marginTop: 20,
                 width: "100%"
               }}
-              value={answers[`${question.name}_others`] || ""}
+              value={answers[`${question.name}_${question.sub.replace(/\//g, '_')}_others`] || ""}
               onChange={(e) =>
-                handleChange(e.target.value.trim(), `${question.name}_others`)
+                handleChange(e.target.value.trim(), `${question.name}_${question.sub.replace(/\//g, '_')}_others`)
               }
             />
           </div>

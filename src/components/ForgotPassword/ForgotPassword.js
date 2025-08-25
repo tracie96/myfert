@@ -23,6 +23,8 @@ const validateForgotPassword = Yup.object({
 
 function ForgotPassword({ closeModal }) {
   const [showSpinner, setShowSpinner] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+  const [sentEmail, setSentEmail] = useState("");
   const dispatch = useDispatch();
 
   const { values, handleBlur, handleChange, handleSubmit, errors } = useFormik({
@@ -37,13 +39,77 @@ function ForgotPassword({ closeModal }) {
         const response = await dispatch(forgotPassword(transformedValues));
         if (response) {
           setShowSpinner(false);
+          setEmailSent(true);
+          setSentEmail(values.email);
           console.log("email success sent: ", response);
         }
       } catch (error) {
+        setShowSpinner(false);
+        console.error("Error sending email:", error);
       } finally {
+        setShowSpinner(false);
       }
     },
   });
+
+  // Show confirmation message after email is sent
+  if (emailSent) {
+    return (
+      <div className="bg-gradient-white">
+        <div className="container py-1">
+          <div className="row justify-content-center mt-4">
+            <div className="col-xl-10 col-lg-12 col-md-9">
+              <div className="">
+                <div className="">
+                  <div className="row">
+                    <div className="col-lg-6 d-none d-lg-block">
+                      <img src={forgot_password} alt="forgot" />
+                    </div>
+                    <div className="col-lg-6 mt-lg-5">
+                      <div className="">
+                        <div className="text-center">
+                          <h1 className="h4 mb-2" style={{ color: "#01ACEE" }}>
+                            Check Your Email
+                          </h1>
+                          <div className="m-4 p-2">
+                            <p className="mb-3">
+                              We've sent a password reset link to:
+                            </p>
+                            <p className="font-weight-bold text-primary mb-4">
+                              {sentEmail}
+                            </p>
+                            <p className="text-muted">
+                              Please check your email and click the link to reset your password. 
+                              If you don't see the email, check your spam folder.
+                            </p>
+                          </div>
+                        </div>
+                        <Divider style={{ marginTop: "10%" }} />
+                        <div
+                          className="text-center"
+                          style={{ paddingBottom: 30 }}
+                        >
+                          <span style={{ fontSize: "13px" }}>Back to </span>
+                          <NavLink
+                            className="small"
+                            to="/"
+                            style={{ color: "#01ADF0" }}
+                            onClick={()=>closeModal()}
+                          >
+                            Sign In!
+                          </NavLink>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gradient-white">
@@ -86,12 +152,6 @@ function ForgotPassword({ closeModal }) {
                             </small>
                           )}
                         </div>
-                        {/* <button
-                          type="submit"
-                          className="btn btn-primary btn-user btn-block"
-                        >
-                          Confirm
-                        </button> */}
                         <button
                           type="submit"
                           className="btn btn-user btn-block"
@@ -114,11 +174,6 @@ function ForgotPassword({ closeModal }) {
                         </button>
                       </form>
                       <Divider style={{ marginTop: "10%" }} />
-                      {/* <div className="text-center">
-                        <NavLink className="small" to="/register">
-                          Create an Account!
-                        </NavLink>
-                      </div> */}
                       <div
                         className="text-center"
                         style={{ paddingBottom: 30 }}
@@ -133,11 +188,6 @@ function ForgotPassword({ closeModal }) {
                           Sign In!
                         </NavLink>
                       </div>
-                      {/* <div className="text-center">
-                        <NavLink className="small" to="/">
-                          Login!
-                        </NavLink>
-                      </div> */}
                     </div>
                   </div>
                 </div>

@@ -18,6 +18,7 @@ import "../assesment.css";
 import { useMediaQuery } from "react-responsive";
 import { backBtnTxt, exitBtnTxt, saveAndContinueBtn, submitBtn } from "../../../../../utils/constant";
 import { getNutritionPatient } from "../../../../redux/AssessmentController";
+import { baseUrl } from "../../../../../utils/envAccess";
 
 const { Option } = Select;
 
@@ -41,6 +42,7 @@ const questions = [
       "No Wheat",
       "Gluten Free",
       "Other",
+      "None",
     ],
   },
   {
@@ -80,9 +82,10 @@ const questions = [
       "Chocolate",
       "Alcohol",
       "Red wine",
-      "Sulfte–containing foods (wine, dried fruit, salad bars)",
+      "SULFIT foods (wine, dried fruit, salad bars)",
       "Preservatives",
       "Food coloring",
+      "None",
       "Other",
     ],
   },
@@ -125,7 +128,7 @@ const questions = [
       "Eat more than 50% of meals away from home",
       "Healthy foods not readily available",
       "Poor snack choices",
-      "Signifcant other or family members don’t like healthy foods",
+      "Signifcant other or family members don't like healthy foods",
       "Signifcant other or family members have special dietary needs",
       "Love to eat",
       "Eat because I have to",
@@ -134,7 +137,7 @@ const questions = [
       "Emotional eater (eat when sad, lonely, bored, etc.)",
       "Eat too much under stress",
       "Eat too little under stress",
-      "Don’t care to cook",
+      "Don't care to cook",
       "Confused about nutrition advice",
     ],
   },
@@ -277,19 +280,19 @@ const questions = [
         question: "If yes, check amount:",
         type: "radio",
         name: "coffee_amount",
-        options: ["1", "2-4", "More than 4"],
+        options: ["1", "2-4", "More than 4", "N/A"],
         label: "Coffee (cups per day)",
       },
       {
         type: "radio",
         name: "tea_amount",
-        options: ["1", "2-4", "More than 4"],
+        options: ["1", "2-4", "More than 4", "N/A"],
         label: "Tea (cups per day)",
       },
       {
         type: "radio",
         name: "soda_amount",
-        options: ["1", "2-4", "More than 4"],
+        options: ["1", "2-4", "More than 4", "N/A"],
         label: "Caffeinated sodas—regular or diet (cans per day)",
       },
     ],
@@ -299,13 +302,28 @@ const questions = [
     type: "radio",
     name: "sensitive_food_caffeine",
     options: ["Yes", "No"],
+    subQuestions: [
+      {
+        question: "If Yes, please describe your reaction:",
+        type: "text",
+        name: "sensitive_food_caffeine_other"
+      }
+    ]
   },
   {
     question: "When you drink caffeine do you feel:",
-    type: "radio",
+    type: "checkbox",
     name: "sensitive_food_caffeine_feel",
-    options: ["Irritable or weird", "Aches or pains"],
-  },
+    options: ["Irritable or weird", "Aches or pains", "N/A", "Other"],
+    subQuestions: [
+      {
+        question: "Other",
+        type: "text",
+        name: "sensitive_food_caffeine_feel_other"
+      }
+    ]
+  }
+  
 ];
 
 const Nutrition = ({ onComplete }) => {
@@ -317,71 +335,84 @@ const Nutrition = ({ onComplete }) => {
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const patientNutritionInfo = useSelector((state) => state.intake?.patientNutritionInfo);
   
-  const mapNutritionInfoToAnswers = (info) => {
-    const normalizeYesNo = (value) => {
-      if (value === true) return "Yes";
-      if (value === false) return "No";
-      return null;
-    };
-  
-    return {
-      does_skipping_meal_affect_you_other: info.reasonSkipMeal || "",
-      special_nutritional_program: info.specialDietProgram || [],
-      special_diet_reason: info.specialDietReason || "",
-      sensitive_food: normalizeYesNo(info.sensitiveToFood?.yesNo),
-      sensitive_food_other: info.sensitiveToFood?.describe || "",
-      sensitive_food_info: info.sensitiveToFood?.describe || "",
-      aversion_to_certain_food: normalizeYesNo(info.aversionToFood?.yesNo),
-      adversely_react: info.adverseList || [],
-      crave_for_foods: normalizeYesNo(info.anyFoodCraving?.yesNo),
-      eat_3_meals: normalizeYesNo(info.have3MealADay?.yesNo),
-      eat_3_meals_detail: info.have3MealADay?.yesNo === "NO" ? info.have3MealADay.level : "",
-      meals_per_day: info.howManyEatOutPerWeek || "",
-      does_skipping_meal_affect_you: normalizeYesNo(info.skippingAMeal),
-      actors_applyingto_current_lifestyle: info.eatingHabits || [],
-      diet_detail_breakfast: info.typicalBreakfast || "",
-      diet_detail_lunch: info.typicalLunch || "",
-      diet_detail_dinner: info.typicalDinner || "",
-      diet_detail_snacks: info.typicalSnacks || "",
-      diet_detail_fluids: info.typicalFluid || "",
-      diet_servings_fruits: info.noTypicalFruits !== undefined ? String(info.noTypicalFruits) : "",
-      diet_serving_vegetables: info.noTypicalVegetables || 0,
-      diet_servings_legumes: info.noTypicalLegumes || 0,
-      diet_servings_meat: info.noTypicalRedMeat || 0,
-      diet_servings_fish: info.noTypicalFish || 0,
-      diet_servings_dairyalt: info.noTypicalDairy || 0,
-      diet_servings_nuts: info.noTypicalNuts || 0,
-      diet_servings_fatsandoil: info.noTypicalFats || 0,
-      diet_servings_soda: info.noTypicalCanSoda || 0,
-      diet_servings_sweets: info.noTypicalSweets || 0,
-      caffeinated_beverages: normalizeYesNo(info.caffeinatedBeverages),
-      coffee_amount: info.coffeeCups || "",
-      tea_amount: info.teaCups || "",
-      soda_amount: info.sodaCups || "",
-      sensitive_food_caffeine: normalizeYesNo(info.adverseReactionToCoffee),
-      sensitive_food_caffeine_feel: info.reactionToCaffeine || "",
-      breakfast_time: info.breakfastTime || "",
-      lunch_time: info.lunchTime || "",
-      snack_time: info.snacksTime || "",
-      dinner_time: info.dinnerTime || "",
-    };
-  };
-  
-
   useEffect(() => {
     dispatch(getNutritionPatient());
   }, [dispatch]);
 
   useEffect(() => {
-    const savedIndex = parseInt(localStorage.getItem("currentQuestionIndex3"), 10);
-    const savedAnswers = JSON.parse(localStorage.getItem("answers"));
-  
-    if (!isNaN(savedIndex) && savedAnswers) {
-      setCurrentQuestionIndex(savedIndex);
-      setAnswers(savedAnswers);
-    } else if (patientNutritionInfo && Object.keys(patientNutritionInfo).length > 0) {
-      const prefilledAnswers = mapNutritionInfoToAnswers(patientNutritionInfo);
+    if (patientNutritionInfo) {
+      const normalizeYesNo = (value) => {
+        if (value === true) return "Yes";
+        if (value === false) return "No";
+        return null;
+      };
+
+      const prefilledAnswers = {
+        special_nutritional_program: (() => {
+          const base = patientNutritionInfo.specialDietProgram || [];
+          const hasOther = patientNutritionInfo.specialDietOther && patientNutritionInfo.specialDietOther.trim() !== "";
+          return hasOther && !base.includes("Other") ? [...base, "Other"] : base;
+        })(),
+        special_nutritional_program_other: patientNutritionInfo.specialDietOther || "",
+        special_diet_reason: patientNutritionInfo.specialDietReason || "",
+        sensitive_food: normalizeYesNo(patientNutritionInfo.sensitiveToFood?.yesNo),
+        sensitive_food_info: patientNutritionInfo.sensitiveToFood?.describe || "",
+        aversion_to_certain_food: normalizeYesNo(patientNutritionInfo.aversionToFood?.yesNo),
+        aversion_to_certain_food_other: patientNutritionInfo.aversionToFood?.describe || "",
+        adversely_react: patientNutritionInfo.adverseList || [],
+        adversely_react_other: patientNutritionInfo.adverseReactOther || "",
+        crave_for_foods: normalizeYesNo(patientNutritionInfo.anyFoodCraving?.yesNo),
+        crave_for_foods_other: patientNutritionInfo.anyFoodCraving?.describe || "",
+        eat_3_meals: normalizeYesNo(patientNutritionInfo.have3MealADay?.yesNo),
+        eat_3_meals_detail: patientNutritionInfo.have3MealADay?.yesNo === false ? String(patientNutritionInfo.have3MealADay.level || "") : "",
+        does_skipping_meal_affect_you: normalizeYesNo(patientNutritionInfo.skippingAMeal),
+        does_skipping_meal_affect_you_other: patientNutritionInfo.reasonSkipMeal || "",
+        meals_per_day: patientNutritionInfo.howManyEatOutPerWeek || "",
+        actors_applyingto_current_lifestyle: patientNutritionInfo.eatingHabits || [],
+        diet_detail_breakfast: patientNutritionInfo.typicalBreakfast || "",
+        diet_detail_lunch: patientNutritionInfo.typicalLunch || "",
+        diet_detail_dinner: patientNutritionInfo.typicalDinner || "",
+        diet_detail_snacks: patientNutritionInfo.typicalSnacks || "",
+        diet_detail_fluids: patientNutritionInfo.typicalFluid || "",
+        diet_servings_fruits: String(patientNutritionInfo.noTypicalFruits || "0"),
+        diet_serving_vegetables: String(patientNutritionInfo.noTypicalVegetables || "0"),
+        diet_servings_legumes: String(patientNutritionInfo.noTypicalLegumes || "0"),
+        diet_servings_meat: String(patientNutritionInfo.noTypicalRedMeat || "0"),
+        diet_servings_fish: String(patientNutritionInfo.noTypicalFish || "0"),
+        diet_servings_dairyalt: String(patientNutritionInfo.noTypicalDairy || "0"),
+        diet_servings_nuts: String(patientNutritionInfo.noTypicalNuts || "0"),
+        diet_servings_fatsandoil: String(patientNutritionInfo.noTypicalFats || "0"),
+        diet_servings_soda: String(patientNutritionInfo.noTypicalCanSoda || "0"),
+        diet_servings_sweets: String(patientNutritionInfo.noTypicalSweets || "0"),
+        caffeinated_beverages: normalizeYesNo(patientNutritionInfo.caffeinatedBeverages),
+        coffee_amount: patientNutritionInfo.coffeeCups || "",
+        tea_amount: patientNutritionInfo.teaCups || "",
+        soda_amount: patientNutritionInfo.sodaCups || "",
+        sensitive_food_caffeine: normalizeYesNo(patientNutritionInfo.adverseReactionToCoffee?.yesNo),
+        sensitive_food_caffeine_other: patientNutritionInfo.adverseReactionToCoffee?.describe || "",
+        sensitive_food_caffeine_feel: (() => {
+          const reactions = [];
+          if (patientNutritionInfo.reactionToCaffeine) {
+            if (patientNutritionInfo.reactionToCaffeine.includes("Irritable or weird")) reactions.push("Irritable or weird");
+            if (patientNutritionInfo.reactionToCaffeine.includes("Aches or pains")) reactions.push("Aches or pains");
+            if (patientNutritionInfo.reactionToCaffeine.includes("N/A")) reactions.push("N/A");
+          }
+          return reactions;
+        })(),
+        sensitive_food_caffeine_feel_other: patientNutritionInfo.sensitiveCaffeineOther || "",
+        breakfast_time: patientNutritionInfo.breakfastTime || "",
+        lunch_time: patientNutritionInfo.lunchTime || "",
+        snack_time: patientNutritionInfo.snacksTime || "",
+        dinner_time: patientNutritionInfo.dinnerTime || "",
+      };
+
+      console.log("Setting answers with adversely_react:", prefilledAnswers.adversely_react);
       setAnswers(prefilledAnswers);
+    } else {
+      // Initialize with default values
+      setAnswers({
+        diet_servings_fruits: "0",
+      });
     }
   }, [patientNutritionInfo]);
 
@@ -409,8 +440,7 @@ const Nutrition = ({ onComplete }) => {
     switch (question.type) {
       case "long_select": {
         const value = answers[question.name];
-        console.log("value--", value);
-        if (value === undefined || value === null || value === "" || value === 0) {
+        if (value === undefined || value === null || value === "") {
           console.log(`Validation Failed: No value selected for ${question.name}`);
           return false;
         }
@@ -450,19 +480,45 @@ const Nutrition = ({ onComplete }) => {
           if (value === undefined || value === null || value === "") {
             console.log(`Validation Failed: No selection made for ${question.name}`);
             return false;
+          }      
+          
+          if (question.name === "does_skipping_meal_affect_you" && value === "Yes") {
+            const requiredField = "does_skipping_meal_affect_you_other";
+            if (!answers[requiredField] || answers[requiredField].trim() === "") {
+              console.log(`Validation Failed: ${requiredField} is required when 'Yes' is selected.`);
+              return false;
+            }
           }
-        
+          if (question.name === "crave_for_foods" && value === "Yes") {
+            const requiredField = "crave_for_foods_other";
+            if (!answers[requiredField] || answers[requiredField].trim() === "") {
+              console.log(`Validation Failed: ${requiredField} is required when 'Yes' is selected.`);
+              return false;
+            }
+          }
+
+          if (question.name === "aversion_to_certain_food" && value === "Yes") {
+            const requiredField = "aversion_to_certain_food_other";
+            if (!answers[requiredField] || answers[requiredField].trim() === "") {
+              console.log(`Validation Failed: ${requiredField} is required when 'Yes' is selected.`);
+              return false;
+            }
+          }
           // Optional logic for specific radios needing extra input
-          if (
-            value === "Yes" &&
-            ["sensitive_food", "sensitive_food_caffeine"].includes(question.name)
-          ) {
-            const detailField = `${question.name}_other`;
+          if (question.name === "sensitive_food" && value === "Yes") {
+            const detailField = "sensitive_food_info";
             if (!answers[detailField] || answers[detailField].trim() === "") {
               console.log(`Validation Failed: ${detailField} required.`);
               return false;
             }
           }
+          if (question.name === "sensitive_food_caffeine" && value === "Yes") {
+            const detailField = "sensitive_food_caffeine_other";
+            if (!answers[detailField] || answers[detailField].trim() === "") {
+              console.log(`Validation Failed: ${detailField} required.`);
+              return false;
+            }
+          }        
         
           return true;
         }
@@ -520,27 +576,73 @@ const Nutrition = ({ onComplete }) => {
   };
 
   const handleChange = (value, name) => {
-    setAnswers({
-      ...answers,
-      [name]: value,
-    });
+    // Find the question object by name
+    const question = questions.find(q => q.name === name);
+    const updatedAnswers = { ...answers };
+
+    if (question && question.type === "checkbox") {
+      if (name.endsWith('_other')) {
+        updatedAnswers[name] = value;
+      } else {
+        // For checkbox selections
+        updatedAnswers[name] = value;
+        // If "Other" is unchecked, clear its text input
+        if (!value.includes('Other')) {
+          delete updatedAnswers[`${name}_other`];
+        }
+      }
+    } else if (question && (question.type === "radio" || question.type === "long_radio" || question.type === "radiowithselect")) {
+      // For radio buttons, clear all related fields when selection changes
+      updatedAnswers[name] = value;
+      
+      // Clear any _other fields
+      delete updatedAnswers[`${name}_other`];
+      
+      // Clear subquestion answers if they exist
+      if (question.subQuestions) {
+        question.subQuestions.forEach(subQ => {
+          delete updatedAnswers[subQ.name];
+          delete updatedAnswers[`${subQ.name}_other`];
+        });
+      }
+
+      // Special handling for specific questions
+      if (name === "sensitive_food") {
+        delete updatedAnswers.sensitive_food_info;
+      } else if (name === "eat_3_meals") {
+        delete updatedAnswers.eat_3_meals_detail;
+      } else if (name === "caffeinated_beverages") {
+        delete updatedAnswers.coffee_amount;
+        delete updatedAnswers.tea_amount;
+        delete updatedAnswers.soda_amount;
+      }
+    } else {
+      // Default behavior for other types
+      updatedAnswers[name] = value;
+    }
+
+    setAnswers(updatedAnswers);
   };
+  
 
   const transformNutritionData = (answers) => {
+
     return {
       specialDietProgram: answers.special_nutritional_program || [],
+      specialDietOther: answers.special_nutritional_program_other || "",
       sensitiveToFood: {
         yesNo: answers.sensitive_food === "Yes",
-        describe: answers.sensitive_food_caffeine_feel || "",
+        describe: answers.sensitive_food_info || "",
       },
       aversionToFood: {
         yesNo: answers.aversion_to_certain_food === "Yes",
-        describe: "",
+        describe: answers.aversion_to_certain_food_other || "",
       },
       adverseList: answers.adversely_react || [],
+      adverseReactOther: answers.adversely_react_other || "",
       anyFoodCraving: {
         yesNo: answers.crave_for_foods === "Yes",
-        describe: "",
+        describe: answers.crave_for_foods_other || "",
       },
       have3MealADay: {
         yesNo: answers.eat_3_meals === "Yes",
@@ -572,10 +674,19 @@ const Nutrition = ({ onComplete }) => {
       coffeeCups: answers.coffee_amount,
       teaCups: answers.tea_amount || "",
       sodaCups: answers.soda_amount || "",
-      adverseReactionToCoffee: answers.sensitive_food_caffeine === "Yes",
-      explainAdverseReactionToCoffee:
-        answers.sensitive_food_caffeine_feel || "",
-      reactionToCaffeine: answers.sensitive_food_caffeine_feel || "",
+      adverseReactionToCoffee: {
+        yesNo: answers.sensitive_food_caffeine === "Yes",
+        describe: answers.sensitive_food_caffeine_other || "",
+      },
+      explainAdverseReactionToCoffee: answers.sensitive_food_caffeine_other || "",
+      reactionToCaffeine: (() => {
+        const processed = Array.isArray(answers.sensitive_food_caffeine_feel)
+          ? answers.sensitive_food_caffeine_feel
+          : [answers.sensitive_food_caffeine_feel].filter(Boolean);
+
+        return processed.length > 0 ? processed.join(", ") : "";
+      })(),
+      sensitiveCaffeineOther: answers.sensitive_food_caffeine_feel_other || "",
       specialDietReason:answers.special_diet_reason || "",
       breakfastTime:answers.breakfast_time || "",
       lunchTime:answers.lunch_time || "",
@@ -595,7 +706,7 @@ const Nutrition = ({ onComplete }) => {
     const transformedData = transformNutritionData(answers);
 
     fetch(
-      "https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/AddNutrition",
+      `${baseUrl}Patient/AddNutrition`,
       {
         method: "POST",
         headers: {
@@ -674,11 +785,32 @@ const Nutrition = ({ onComplete }) => {
               ))}
             </Radio.Group>
 
-            {answers[question.name] === "Yes" && (
+            {answers[question.name] === "Yes" && question.subQuestions && question.subQuestions.map((subQ, index) => (
+              <div key={index}>
+                <p style={{ marginTop: "10px", color: "#000", fontWeight: "600" }}>{subQ.question}</p>
+                <Input
+                  className="input_questtionnaire"
+                  required
+                  placeholder="Please describe"
+                  value={answers[subQ.name] || ""}
+                  onChange={(e) => handleChange(e.target.value, subQ.name)}
+                  style={{ marginTop: "10px" }}
+                />
+              </div>
+            ))}
+
+            {answers[question.name] === "Yes" && !question.subQuestions && (
               <Input
                 className="input_questtionnaire"
                 required
-                placeholder={question.name === "sensitive_food" ? "If Yes: list food and symptoms" : "If Yes, Please explain"}
+                placeholder={
+                  question.name === "sensitive_food"
+                    ? "If Yes: list food and symptoms"
+                    : question.name === "crave_for_foods"
+                    ? "If yes, what foods?"
+                    : "If Yes, Please explain"
+                }
+                
                 value={answers[`${question.name}_other`] || ""}
                 onChange={(e) =>
                   handleChange(e.target.value, `${question.name}_other`)
@@ -689,47 +821,47 @@ const Nutrition = ({ onComplete }) => {
           </>
         );
 
-      case "checkbox":
-        return (
-          <Checkbox.Group
-            name={question.name}
-            onChange={(checkedValues) =>
-              handleChange(checkedValues, question.name)
-            }
-            value={answers[question.name] || []}
-            className="checkbox-group"
-          >
-            {question.options.map((option, index) => (
-              <Checkbox key={index} value={option} className="checkbox-item">
-                {option === "Other" ? (
-                  <>
-                    {option}
-                    {answers[question.name] &&
-                      answers[question.name].includes("Other") && (
-                        <>
-                          <br />
-                          <Input
-                            className="input_questtionnaire"
-                            placeholder="Please specify"
-                            value={answers[`${question.name}_other`] || ""}
-                            onChange={(e) =>
-                              handleChange(
-                                e.target.value,
-                                `${question.name}_other`,
-                              )
-                            }
-                          />
-                        </>
+        case "checkbox":
+          return (
+            <Checkbox.Group
+              name={question.name}
+              onChange={(checkedValues) => {
+                // If "None" is selected, remove all others
+                let finalValues = checkedValues.includes("None")
+                  ? ["None"]
+                  : checkedValues.filter((val) => val !== "None");
+
+                handleChange(finalValues, question.name);
+              }}
+              value={answers[question.name] || []}
+              className="checkbox-group"
+            >
+
+              <div className="checkbox-rows">
+                {question.options.map((option, idx) => (
+                  <div key={idx} className="checkbox-row">
+                    <div className="checkbox-container" style={{flexDirection:"row", alignItems:"baseline"}}>
+                    <Checkbox value={option} className="checkbox-item" style={{ width: "calc(9% - 10px)" }}>
+                        {option}
+                      </Checkbox>
+                      {option === "Other" && answers[question.name]?.includes("Other") && (
+                        <Input
+                          className="input_questionnaire other-input"
+                          placeholder="Please describe"
+                          value={answers[`${question.name}_other`] || ""}
+                          onChange={e =>
+                            handleChange(e.target.value, `${question.name}_other`)
+                          }
+                        />
                       )}
-                  </>
-                ) : (
-                  option
-                )}
-              </Checkbox>
-            ))}
-          </Checkbox.Group>
-        );
-      
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Checkbox.Group>
+          );
+          
+          
         case "radiowithselect":
         return (
           <Radio.Group
@@ -825,9 +957,10 @@ const Nutrition = ({ onComplete }) => {
               <Select
                 className="select_questtionnaire"
                 name={question.name}
-                value={answers[question.name] !== undefined && answers[question.name] !== null ? answers[question.name] : ""}
+                value={answers[question.name] ?? ""}
                 onChange={(value) => handleChange(value, question.name)}
                 style={{ width: "292px", marginTop: "10px" }}
+                placeholder="Select number of servings"
               >
                 {question.selectOptions.map((option, index) => (
                   <Option key={index} value={option}>

@@ -77,12 +77,12 @@ export const getNotifications = createAsyncThunk(
     const users = getState()?.authentication?.userAuth;
     const config = {
       headers: {
-        Authorization: `Bearer ${users?.token}`,
+        Authorization: `Bearer ${users?.obj.token}`,
       },
     };
 
     try {
-      const url = `${baseUrl}Notification/GetNotification`;
+      const url = `${baseUrl}Notification/GetUnReadNotification`;
       const response = await axios.get(url, config);
       const responseBack = getResponse(response, dispatch, users);
       return responseBack;
@@ -104,12 +104,12 @@ export const markNotiAsRead = createAsyncThunk(
     const users = getState()?.authentication?.userAuth;
     const config = {
       headers: {
-        Authorization: `Bearer ${users?.token}`,
+        Authorization: `Bearer ${users?.obj?.token}`,
       },
     };
 
     try {
-      const url = `${baseUrl}Notification/MarkAsRead`;
+      const url = `${baseUrl}Notification/MarkAsRead/${id}`;
       const response = await axios.put(url, payload, config);
       const responseBack = getResponse(response, dispatch, users);
       return responseBack;
@@ -129,6 +129,16 @@ const globalSlice = createSlice({
     appStatus: null,
     appStatusCode: null,
     serverErr: null,
+    notifications: null,
+    unreadCount: 0
+  },
+  reducers: {
+    setNotifications: (state, action) => {
+      state.notifications = action.payload;
+    },
+    setUnreadCount: (state, action) => {
+      state.unreadCount = action.payload;
+    }
   },
   extraReducers: (builder) => {
     builder.addCase(getById.pending, (state, action) => {
@@ -206,6 +216,8 @@ const globalSlice = createSlice({
     });
     builder.addCase(getNotifications.fulfilled, (state, action) => {
       state.loading = false;
+      state.notifications = action.payload;
+      state.unreadCount = action.payload?.data?.unReadCount || 0;
       state.appErr = undefined;
       state.appStatus = false;
       state.appStatusCode = undefined;
@@ -243,4 +255,5 @@ const globalSlice = createSlice({
   },
 });
 
+export const { setNotifications, setUnreadCount } = globalSlice.actions;
 export default globalSlice.reducer;

@@ -1,7 +1,6 @@
 import { Layout, Menu } from "antd";
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
-import MyNavbar from "../global_component/navbar";
 import Footer from "../global_component/footer";
 import fertilityImage from "../../assets/images/auth/fertilityImage.svg";
 import {

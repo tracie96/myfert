@@ -22,7 +22,7 @@ const RootLayout = () => {
         {/* <div class="resBtnContent"> */}
         <div id="content-wrapper" className="d-flex flex-column">
           <div id="content" style={{ background: "#fff" }}>
-            {userAuth?.obj?.role !== "Doctor" && <MyNavbar />}
+             <MyNavbar />
             <div className="container-fluid">
               <Outlet />
               {/* <DashboardMain /> */}

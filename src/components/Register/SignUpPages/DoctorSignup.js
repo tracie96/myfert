@@ -33,6 +33,7 @@ const DoctorSignup = ({ userRole }) => {
   const [usernameCheck, setUsernameCheck] = useState("");
   const [emailCheck, setEmailCheck] = useState(null);
   const [uploadedFileUrl, setUploadedFileUrl] = useState(null);
+  const [signatureUrl, setSignatureUrl] = useState(null);
   const [emailVerificationVisible, setEmailVerificationVisible] =
     useState(false);
 
@@ -62,6 +63,9 @@ const DoctorSignup = ({ userRole }) => {
     city: "",
     postalCode: "",
     phoneNumber: "",
+    designation: "",
+    licenseNumber: "",
+    signature: "",
     medicalNumberOrProvinceHealthNumber: "",
     dob: "",
     height: "",
@@ -72,7 +76,6 @@ const DoctorSignup = ({ userRole }) => {
     isAcceptTermsAndCondition: false,
     isAssessor: location.state?.isAccessor,
   };
-
   const uploadProps = {
     name: 'file',
     multiple: false,
@@ -89,6 +92,29 @@ const DoctorSignup = ({ userRole }) => {
         message.success(`${info.file.name} file uploaded successfully!`);
       } else if (status === 'error') {
         message.error(`${info.file.name} file upload failed.`);
+      }
+    },
+    onDrop(e) {
+      console.log('Dropped files', e.dataTransfer.files);
+    },
+  };
+
+  const signatureUploadProps = {
+    name: 'file',
+    multiple: false,
+    action: 'https://api.cloudinary.com/v1_1/tracysoft/upload', 
+    data: {
+      upload_preset: 'myfertility',
+    },
+    onChange(info) {
+      const { status } = info.file;
+
+      if (status === 'done') {
+        const url = info.file.response.secure_url; 
+        setSignatureUrl(url);
+        message.success(`${info.file.name} signature uploaded successfully!`);
+      } else if (status === 'error') {
+        message.error(`${info.file.name} signature upload failed.`);
       }
     },
     onDrop(e) {
@@ -146,6 +172,13 @@ const DoctorSignup = ({ userRole }) => {
     phoneNumber: Yup.string()
       .min(8, "Phone Number must be at least 8 characters")
       .required("Please enter phone number"),
+    designation: Yup.string()
+      .min(2, "Designation must be at least 2 characters")
+      .required("Please enter your designation"),
+    licenseNumber: Yup.string()
+      .min(3, "License number must be at least 3 characters")
+      .required("Please enter your license number"),
+    signature: Yup.string().required("Please upload your signature"),
     medicalNumberOrProvinceHealthNumber: Yup.string()
       .min(
         8,
@@ -224,6 +257,18 @@ const DoctorSignup = ({ userRole }) => {
       message.error("Please input a valid email or username!");
       return;
     }
+    
+    // Validate signature upload
+    if (!signatureUrl) {
+      message.error("Please upload your signature before submitting the form.");
+      return;
+    }
+    
+    // Debug logging
+    console.log("Form values:", values);
+    console.log("Signature URL:", signatureUrl);
+    console.log("Uploaded file URL:", uploadedFileUrl);
+    
     try {
       setShowSpinner(true); // Show the spinner while processing
       const processedValues = {
@@ -238,8 +283,11 @@ const DoctorSignup = ({ userRole }) => {
         MetricImperial: true,
         ExistOnMira: false,
         AgreeToUseData: true,
-        DigitalSignature: '',
-        licenseDocument:uploadedFileUrl,
+        Signature: signatureUrl,
+        licenseDocument: uploadedFileUrl,
+        designation: values.designation,
+        licenseNumber: values.licenseNumber,
+        signature: signatureUrl,
         IsSendResultToEmail: true,
         IAgreeToReceiveInformation: true,
       };
@@ -652,9 +700,73 @@ const DoctorSignup = ({ userRole }) => {
                                 </div>
                               </div>
 
+                              <div className="row">
+                                <div className="col-lg-6 col-sm-12">
+                                  <FormItem
+                                    label="Designation"
+                                    name="designation"
+                                    rules={[
+                                      {
+                                        required: true,
+                                        message: "Please enter your designation",
+                                      },
+                                    ]}
+                                  >
+                                    <Input
+                                      placeholder="Enter Designation"
+                                      onChange={handleChange("designation")}
+                                    />
+                                  </FormItem>
+                                </div>
+                                <div className="col-lg-6 col-sm-12">
+                                  <FormItem
+                                    label="License Number"
+                                    name="licenseNumber"
+                                    rules={[
+                                      {
+                                        required: true,
+                                        message: "Please enter your license number",
+                                      },
+                                    ]}
+                                  >
+                                    <Input
+                                      placeholder="Enter License Number"
+                                      onChange={handleChange("licenseNumber")}
+                                    />
+                                  </FormItem>
+                                </div>
+                              </div>
+
                               <Form.Item
-                                label="Credentials / License / Insurance"
-                                name="credentials"
+                                label="Signature"
+                                name="signature"
+                                rules={[
+                                  {
+                                    validator: (_, value) => {
+                                      if (!signatureUrl) {
+                                        return Promise.reject('Please upload your signature');
+                                      }
+                                      return Promise.resolve();
+                                    },
+                                  },
+                                ]}
+                              >
+                                <Dragger {...signatureUploadProps}>
+                                  <p className="ant-upload-drag-icon">
+                                    <UploadOutlined />
+                                  </p>
+                                  <p className="ant-upload-text">Upload / Drag and drop your signature</p>
+                                </Dragger>
+                              </Form.Item>
+                              {signatureUrl && (
+                                <div style={{ color: 'green', marginTop: '8px' }}>
+                                  ✓ Signature uploaded successfully
+                                </div>
+                              )}
+
+                              <Form.Item
+                                label="License Document"
+                                name="licenseDocument"
                                 valuePropName="fileList"
                                 getValueFromEvent={({ fileList }) => fileList}
                               >
@@ -662,9 +774,14 @@ const DoctorSignup = ({ userRole }) => {
                                   <p className="ant-upload-drag-icon">
                                     <UploadOutlined />
                                   </p>
-                                  <p className="ant-upload-text">Upload / Drag and drop</p>
+                                  <p className="ant-upload-text">Upload / Drag and drop your license document</p>
                                 </Dragger>
                               </Form.Item>
+                              {uploadedFileUrl && (
+                                <div style={{ color: 'green', marginTop: '8px' }}>
+                                  ✓ License document uploaded successfully
+                                </div>
+                              )}
 
                          
                               <div className="row">

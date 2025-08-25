@@ -20,6 +20,7 @@ import { useMediaQuery } from "react-responsive";
 import { DeleteTwoTone, EditTwoTone } from "@ant-design/icons";
 import { backBtnTxt, exitBtnTxt, saveAndContinueBtn, submitBtn } from "../../../../../utils/constant";
 import { getHealthLifestylePatient } from "../../../../redux/AssessmentController";
+import { baseUrl } from "../../../../../utils/envAccess";
 
 const { Option } = Select;
 
@@ -119,7 +120,7 @@ const questions = [
       {
         type: "select",
         label: "Time/Duration (Minutes)",
-        options: Array.from({ length: 60 }, (_, i) => 1 + i),
+        options: Array.from({ length: 20 }, (_, i) => (i + 1) * 10),
         name: "cardio_aerobic_time_duration",
       },
     ],
@@ -147,7 +148,7 @@ const questions = [
       {
         type: "select",
         label: "Time/Duration (Minutes)",
-        options: Array.from({ length: 60 }, (_, i) => 1 + i),
+        options: Array.from({ length: 20 }, (_, i) => (i + 1) * 10),
         name: "strength_resistance_time_duration",
       },
     ],
@@ -175,7 +176,7 @@ const questions = [
       {
         type: "select",
         label: "Time/Duration (Minutes)",
-        options: Array.from({ length: 60 }, (_, i) => 1 + i),
+        options: Array.from({ length: 20 }, (_, i) => (i + 1) * 10),
         name: "flexibility_stretching_time_duration",
       },
     ],
@@ -203,7 +204,7 @@ const questions = [
       {
         type: "select",
         label: "Time/Duration (Minutes)",
-        options: Array.from({ length: 60 }, (_, i) => 1 + i),
+        options: Array.from({ length: 20 }, (_, i) => (i + 1) * 10),
         name: "sport_participated_time_duration",
       },
     ],
@@ -231,7 +232,7 @@ const questions = [
       {
         type: "select",
         label: "Time/Duration (Minutes)",
-        options: Array.from({ length: 48 }, (_, i) => 1 + i),
+        options: Array.from({ length: 20 }, (_, i) => (i + 1) * 10),
         name: "sports_leisure_time_duration",
       },
     ],
@@ -259,7 +260,7 @@ const questions = [
       {
         type: "select",
         label: "Time/Duration (Minutes)",
-        options: Array.from({ length: 60 }, (_, i) => i < 59 ? i + 1 : '60+'),
+        options: Array.from({ length: 20 }, (_, i) => (i + 1) * 10),
         name: "sport_participated_in_time_duration",
       },
     ],
@@ -295,69 +296,73 @@ const CurrentLifeStyle = ({ onComplete }) => {
   const navigate = useNavigate();
   const [currentConcern, setCurrentConcern] = useState([]);
   const [currentAllergies, setCurrentAllergies] = useState([]);
-  const [editingAllergies, setEditingAllergies] = useState(false);
+  const [editingAllergies, setEditingAllergies] = useState(null);
   const [editingKey, setEditingKey] = useState("");
   const [tempConcern, setTempConcern] = useState({});
   const [tempAllergy, setTempAllergy] = useState({});
   const patientHealthLifeStyleInfo = useSelector((state) => state.intake?.patientHealthLifestyle);
-console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
   const totalQuestions = questions.length;
 
   const isMobile = useMediaQuery({ maxWidth: 767 });
 
   const mapHealthLifestyleInfoToState = (info) => {
+    const normalizeYesNo = (value) => {
+      if (value === true || value === "Yes" || value === "true") return "Yes";
+      if (value === false || value === "No" || value === "false") return "No";
+      return ""; // ← Fix: always return a string
+    };
     const answersFromApi = {
-      do_you_have_current_health_concern: info.doYouOngoingHealth ? "Yes" : "No",
-      do_you_have_any_allergies: info.doYouAllergies ? "Yes" : "No",
+      do_you_have_current_health_concern: normalizeYesNo(info.doYouOngoingHealth),
+      do_you_have_any_allergies: normalizeYesNo(info.doYouAllergies),
       sleep_hours: info.sleepHours?.toString() || "",
-      problems_falling_asleep: info.problemSleeping ? "Yes" : "No",
-      problems_staying_asleep: info.stayingAsleep ? "Yes" : "No",
-      problems_with_insomnia: info.insomnia ? "Yes" : "No",
-      do_you_snore: info.doYouSnore ? "Yes" : "No",
-      do_you_feel_rested: info.restedUponAwake ? "Yes" : "No",
-      do_you_use_sleeping_aids: info.sleepingAids?.yesNo ? "Yes" : "No",
+      problems_falling_asleep: normalizeYesNo(info.problemSleeping),
+      problems_staying_asleep: normalizeYesNo(info.stayingAsleep),
+      problems_with_insomnia: normalizeYesNo(info.insomnia),
+      do_you_snore: normalizeYesNo(info.doYouSnore),
+      do_you_feel_rested: normalizeYesNo(info.restedUponAwake),
+      do_you_use_sleeping_aids: normalizeYesNo(info.sleepingAids?.yesNo),
       do_you_use_sleeping_aids_other: info.sleepingAids?.describe || "",
   
       // Exercise: cardio
-      cardio_aerobic: info.cardio?.doYou ? "Yes" : "No",
+      cardio_aerobic: normalizeYesNo(info.cardio?.doYou),
       cardio_aerobic_describe: info.cardio?.type || "",
       cardio_aerobic_number: info.cardio?.timesWeek?.toString() || "",
       cardio_aerobic_time_duration: info.cardio?.duration?.toString() || "",
 
-      sport_participated_in_strength: info.strenght?.doYou ? "Yes" : "No",
+      sport_participated_in_strength: normalizeYesNo(info.strenght?.doYou),
       strength_resistance_describe: info.strenght?.type || "",
       strength_resistance_number: info.strenght?.timesWeek?.toString() || "",
       strength_resistance_time_duration: info.strenght?.duration?.toString() || "",
 
-      sport_participated_in_flexibility: info.flexibility?.doYou ? "Yes" : "No",
+      sport_participated_in_flexibility: normalizeYesNo(info.flexibility?.doYou),
       flexibility_stretching_describe: info.flexibility?.type || "",
       flexibility_stretching_number: info.flexibility?.timesWeek?.toString() || "",
       flexibility_stretching_time_duration: info.flexibility?.duration?.toString() || "",
   
-      sport_participated_in_balance: info.balance?.doYou ? "Yes" : "No",
+      sport_participated_in_balance: normalizeYesNo(info.balance?.doYou),
       sport_participated_describe: info.balance?.type || "",
       sport_participated_number: info.balance?.timesWeek?.toString() || "",
       sport_participated_time_duration: info.balance?.duration?.toString() || "",
   
-      sport_participated_in_others: info.other?.doYou ? "Yes" : "No",
+      sport_participated_in_others: normalizeYesNo(info.other?.doYou),
       sport_participated_in_describe: info.other?.type || "",
       sport_participated_in_number: info.other?.timesWeek?.toString() || "",
       sport_participated_in_time_duration: info.other?.duration?.toString() || "",
 
-      sport_participated_in_leisure: info.sport?.doYou ? "Yes" : "No",
+      sport_participated_in_leisure: normalizeYesNo(info.sport?.doYou),
       sports_leisure_describe: info.sport?.type || "",
       sports_leisure_number: info.sport?.timesWeek?.toString() || "",
       sports_leisure_time_duration: info.sport?.duration?.toString() || "",
   
       motivated_to_exercise: info.motivatedToExercise || "",
   
-      problems_limiting_exercise: info.problemsThatLimitExercise?.yesNo ? "Yes" : "No",
+      problems_limiting_exercise: normalizeYesNo(info.problemsThatLimitExercise?.yesNo),
       problems_limiting_exercise_other: info.problemsThatLimitExercise?.describe || "",
   
-      sore_after_exercise: info.soreAfterExercise?.yesNo ? "Yes" : "No",
+      sore_after_exercise: normalizeYesNo(info.soreAfterExercise?.yesNo),
       sore_after_exercise_other: info.soreAfterExercise?.describe || "",
     };
-  
+
     return {
       answers: answersFromApi,
       concerns: info.ongoingHealth?.map((item, index) => ({
@@ -379,12 +384,12 @@ console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
   useEffect(() => {
     dispatch(getHealthLifestylePatient());
   }, [dispatch]);
-
+  
   useEffect(() => {
-    const savedIndex = parseInt(localStorage.getItem("currentQuestionIndex2"), 10);
-    const savedAnswers = JSON.parse(localStorage.getItem("answers"));
-    const savedConcern = JSON.parse(localStorage.getItem("currentConcern"));
-    const savedAllergies = JSON.parse(localStorage.getItem("currentAllergies"));
+    const savedIndex = parseInt(localStorage.getItem("currentQuestionIndex_LS"), 10);
+    const savedAnswers = JSON.parse(localStorage.getItem("answers_LS")); // changed key
+    const savedConcern = JSON.parse(localStorage.getItem("currentConcern_LS"));
+    const savedAllergies = JSON.parse(localStorage.getItem("currentAllergies_LS"));
   
     const hasApiData = patientHealthLifeStyleInfo && Object.keys(patientHealthLifeStyleInfo).length > 0;
     const mapped = hasApiData ? mapHealthLifestyleInfoToState(patientHealthLifeStyleInfo) : null;
@@ -395,24 +400,23 @@ console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
   
     if (savedAnswers && Object.keys(savedAnswers).length > 0) {
       setAnswers(savedAnswers);
-    } else if (mapped) {
+    } else if (mapped?.answers) {
       setAnswers(mapped.answers);
-      localStorage.setItem("answers", JSON.stringify(mapped.answers));
+      localStorage.setItem("answers_LS", JSON.stringify(mapped.answers));
     }
   
-    // ⚠️ THIS is where the fix happens
-    if (savedConcern && savedConcern.length > 0) {
+    if (Array.isArray(savedConcern) && savedConcern.length > 0) {
       setCurrentConcern(savedConcern);
-    } else if (mapped) {
+    } else if (mapped?.concerns) {
       setCurrentConcern(mapped.concerns);
-      localStorage.setItem("currentConcern", JSON.stringify(mapped.concerns));
+      localStorage.setItem("currentConcern_LS", JSON.stringify(mapped.concerns));
     }
   
-    if (savedAllergies && savedAllergies.length > 0) {
+    if (Array.isArray(savedAllergies) && savedAllergies.length > 0) {
       setCurrentAllergies(savedAllergies);
-    } else if (mapped) {
+    } else if (mapped?.allergies) {
       setCurrentAllergies(mapped.allergies);
-      localStorage.setItem("currentAllergies", JSON.stringify(mapped.allergies));
+      localStorage.setItem("currentAllergies_LS", JSON.stringify(mapped.allergies));
     }
   }, [patientHealthLifeStyleInfo]);
   
@@ -427,27 +431,28 @@ console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
         case "radio": {
           const value = answers[question.name];
         
-          // General validation: answer must exist and be a valid option
-          if (value === undefined || value === "") {
+          // Step 1: Require a radio selection always
+          if (!value || !question.options.includes(value)) {
             return false;
           }
         
-          // For specific fields, if value is 'Yes', check additional input field
-          if (
-            value === "Yes" &&
-            (
-              question.name === "do_you_use_sleeping_aids" ||
-              question.name === "problems_limiting_exercise" ||
-              question.name === "sore_after_exercise"
-            )
-          ) {
+          // Step 2: For specific radios that need extra input when value is "Yes"
+          const needsOther = [
+            "do_you_use_sleeping_aids",
+            "problems_limiting_exercise",
+            "sore_after_exercise",
+          ];
+        
+          if (value === "Yes" && needsOther.includes(question.name)) {
             const inputFieldName = `${question.name}_other`;
             if (!answers[inputFieldName] || answers[inputFieldName].trim() === "") {
               return false;
             }
           }
+        
           return true;
         }
+        
 
       case "long_radio": {
         if (answers[question.name] === undefined) {
@@ -545,10 +550,10 @@ console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
       }
     }
 
-    localStorage.setItem("currentQuestionIndex2", 0);
-    localStorage.setItem("answers", JSON.stringify(answers));
-    localStorage.setItem("currentAllergies", JSON.stringify(currentAllergies));
-    localStorage.setItem("currentConcern", JSON.stringify(currentConcern));
+    localStorage.setItem("currentQuestionIndex_LS", nextQuestionIndex);
+    localStorage.setItem("answers_LS", JSON.stringify(answers));
+    localStorage.setItem("currentConcern_LS", JSON.stringify(currentConcern));
+    localStorage.setItem("currentAllergies_LS", JSON.stringify(currentAllergies));
 
     // If no specific next question was determined, proceed to the next in sequence
     if (
@@ -566,6 +571,12 @@ console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
   };
 
   const addConcern = () => {
+    // Check if there's an unsaved entry being edited
+    if (editingKey !== "") {
+      message.warning("Please save or cancel the current entry before adding a new one.");
+      return;
+    }
+
     const newConcern = {
       key: Date.now().toString(),
       problem: "",
@@ -647,7 +658,7 @@ console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
       render: (text, record) =>
         isEditing(record) ? (
           <>
-            <i>Example: Post Nasal Drip</i>
+            <i>Post Nasal Drip</i>
             <Input
               value={tempConcern.problem || ""}
               onChange={(e) => handleChangeTempConcern("problem", e.target.value)}
@@ -674,6 +685,9 @@ console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
       title: "Severity",
       dataIndex: "severity",
       editable: true,
+      onHeaderCell: () => ({
+        className: "severity-header-cell"
+      }),
       render: (text, record) =>
         isEditing(record) ? (
           <>
@@ -682,6 +696,7 @@ console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
               value={tempConcern.severity || ""}
               onChange={(value) => handleChangeTempConcern("severity", value)}
               placeholder="Select Severity"
+              className="moderate"
               style={{
                 width: "100%",
                 height: 40,
@@ -734,6 +749,9 @@ console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
       title: "Success",
       dataIndex: "success",
       editable: true,
+      onHeaderCell: () => ({
+        className: "severity-header-cell"
+      }),
       render: (text, record) =>
         isEditing(record) ? (
           <>
@@ -743,6 +761,7 @@ console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
               onChange={(value) => handleChangeTempConcern("success", value)}
               placeholder="Select Success"
               data-label="Success"
+              className="success"
               style={{
                 width: "100%",
                 height: 40,
@@ -880,6 +899,12 @@ console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
 
   // Allergy Functions
   const addAllergy = () => {
+    // Check if there's an unsaved entry being edited
+    if (editingAllergies !== null) {
+      message.warning("Please save or cancel the current entry before adding a new one.");
+      return;
+    }
+
     const newAllergy = {
       key: Date.now().toString(),
       food: "",
@@ -894,7 +919,7 @@ console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
     setCurrentAllergies((prev) =>
       prev.filter((allergy) => allergy.key !== key),
     );
-    if (editingAllergies === key) setEditingAllergies("");
+    if (editingAllergies === key) setEditingAllergies(null);
   };
 
   const editAllergy = (record) => {
@@ -906,10 +931,10 @@ console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
   const cancelAllergy = () => {
     if (tempAllergy.food === "" && tempAllergy.reaction === "") {
       setCurrentAllergies((prev) =>
-        prev.filter((allergy) => allergy.key !== editingAllergies),
+        prev.filter((allergy) => allergy.key !== editingAllergies)
       );
     }
-    setEditingAllergies("");
+    setEditingAllergies(null);
     setTempAllergy({});
   };
 
@@ -933,7 +958,7 @@ console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
     if (index > -1) {
       newData[index] = { ...newData[index], ...tempAllergy };
       setCurrentAllergies(newData);
-      setEditingAllergies("");
+      setEditingAllergies(null);
       setTempAllergy({});
     }
   };
@@ -960,21 +985,73 @@ console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
 
   const handleChange = (value, name, field) => {
     setAnswers((prevAnswers) => {
+      const updated = { ...prevAnswers };
+  
       if (field) {
-        return {
-          ...prevAnswers,
-          [name]: {
-            ...prevAnswers[name],
-            [field]: value,
-          },
+        updated[name] = {
+          ...updated[name],
+          [field]: value,
         };
+      } else {
+        updated[name] = value;
+  
+        // Clear `_other` fields for radio + extra input
+        const clearOtherFieldMap = {
+          do_you_use_sleeping_aids: "do_you_use_sleeping_aids_other",
+          problems_limiting_exercise: "problems_limiting_exercise_other",
+          sore_after_exercise: "sore_after_exercise_other",
+        };
+  
+        if (value === "No" && clearOtherFieldMap[name]) {
+          updated[clearOtherFieldMap[name]] = "";
+        }
+  
+        // 🧼 Clear long_radio subquestions when "No" is selected
+        const longRadioSubMap = {
+          cardio_aerobic: [
+            "cardio_aerobic_describe",
+            "cardio_aerobic_number",
+            "cardio_aerobic_time_duration",
+          ],
+          sport_participated_in_strength: [
+            "strength_resistance_describe",
+            "strength_resistance_number",
+            "strength_resistance_time_duration",
+          ],
+          sport_participated_in_flexibility: [
+            "flexibility_stretching_describe",
+            "flexibility_stretching_number",
+            "flexibility_stretching_time_duration",
+          ],
+          sport_participated_in_balance: [
+            "sport_participated_describe",
+            "sport_participated_number",
+            "sport_participated_time_duration",
+          ],
+          sport_participated_in_leisure: [
+            "sports_leisure_describe",
+            "sports_leisure_number",
+            "sports_leisure_time_duration",
+          ],
+          sport_participated_in_others: [
+            "sport_participated_in_describe",
+            "sport_participated_in_number",
+            "sport_participated_in_time_duration",
+          ],
+        };
+  
+        if (value === "No" && longRadioSubMap[name]) {
+          longRadioSubMap[name].forEach((fieldName) => {
+            updated[fieldName] = "";
+          });
+        }
       }
-      return {
-        ...prevAnswers,
-        [name]: value,
-      };
+  
+      return updated;
     });
   };
+  
+  
 
   const handleSubmit = () => {
     if (!validateQuestion()) {
@@ -982,7 +1059,7 @@ console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
       return;
     }
     const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
-    const token = userInfo.obj.token || "";
+    const token = userInfo?.obj?.token || "";
     const transformedData = {
       restedUponAwake: answers["do_you_feel_rested"] === "Yes",
       doYouAllergies: answers["do_you_have_any_allergies"] === "Yes",
@@ -1052,7 +1129,7 @@ console.log("patientHealthLifeStyleInfo--", patientHealthLifeStyleInfo);
     };
 
     fetch(
-      "https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/AddHealthLifestyle",
+      `${baseUrl}Patient/AddHealthLifestyle`,
       {
         method: "POST",
         headers: {

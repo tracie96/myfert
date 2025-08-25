@@ -27,7 +27,7 @@ export const postLogin = createAsyncThunk(
       if (!responseBack && responseBack === undefined) {
         return responseBack;
       }
-      localStorage.setItem("userInfo", JSON.stringify(responseBack));
+      // localStorage.setItem("userInfo", JSON.stringify(responseBack));
       return responseBack;
     } catch (error) {
       handleApiError(error, dispatch);
@@ -58,6 +58,43 @@ export const getUserProfile = createAsyncThunk(
       return rejectWithValue("No response data");
     } catch (error) {
       return rejectWithValue(handleApiError(error, dispatch));
+    }
+  },
+);
+
+//`${baseUrl}Doctor/GetGeneralInformation/${id}`,
+//async (id, { getState }) => {
+export const getMiraInfoDoc = createAsyncThunk(
+  "user/getMiraInfo",
+  async (id , { rejectWithValue, getState, dispatch }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        accept: "text/plain",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+
+    try {
+      const response = await axios.post(
+        `${baseUrl}Doctor/GetMiraInfo/${id}`,
+        {},
+        config,
+      );
+
+      const responseData = response.data;
+      console.log(responseData, "responseData");
+
+      if (responseData) {
+        return responseData;
+      }
+
+      return rejectWithValue("No response data");
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || "Failed to fetch Mira Info",
+        dispatch,
+      );
     }
   },
 );
@@ -113,6 +150,7 @@ export const postRegister = createAsyncThunk(
     formData.append("password", users.password);
     formData.append("confirmPassword", users.cpassword);
     formData.append("email", users.email);
+    formData.append("uli", users?.uli)
     formData.append("phoneNumber", users.phoneNumber);
     formData.append("dob", users.dob);
     formData.append("Height", users.height);
@@ -139,8 +177,10 @@ export const postRegister = createAsyncThunk(
       users.isAcceptTermsAndCondition,
     );
     formData.append("AgreeToUseData", users.AgreeToUseData);
-    formData.append("DigitalSignature", users.DigitalSignature);
+    formData.append("Signature", users.signature);
     formData.append("ExistOnMira", users.ExistOnMira);
+    formData.append("Designation", users.designation);
+    formData.append("LicenceNumber", users.licenseNumber);
     formData.append("isAssessor", users.isAssessor);
     formData.append("licenseDocument", users.licenseDocument);
 
@@ -222,12 +262,35 @@ export const validateEmailOtp = createAsyncThunk(
     }
   },
 );
+
+export const validateLoginOtp = createAsyncThunk(
+  "user/validateLoginOtp",
+  async ({ emailOrUsername, otp, validPeriod }, { rejectWithValue }) => {
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    try {
+      const response = await axios.post(
+        `${baseUrl}Auth/ValidateLoginOtp`,
+        { emailOrUsername, otp, validPeriod },
+        config,
+      );
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  },
+);
 export const updateEmail = createAsyncThunk(
   "auth/updateEmail",
   async ({ email, session, newEmail }, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        "https://myfertilitydevapi-prod.azurewebsites.net/api/Auth/UpdateEmail",
+        `${baseUrl}Auth/UpdateEmail`,
         { email, session, newEmail },
         {
           headers: {
@@ -471,12 +534,14 @@ export const resetPassword = createAsyncThunk(
         data,
         config,
       );
-      getResponse(response, dispatch);
+      const responseBack = getResponse(response, dispatch);
       if (response?.data?.status) {
         toast.success(response?.data?.message);
       }
+      return responseBack;
     } catch (error) {
       handleApiError(error, dispatch);
+      return rejectWithValue(error);
     }
   },
 );
@@ -873,6 +938,30 @@ const authSlices = createSlice({
       state.appErr = action?.payload?.message;
       state.loading = false;
       state.serverErr = undefined;
+      state.appStatus = action?.payload?.status;
+      state.appStatusCode = action?.payload?.statusCode;
+    });
+
+    // Validate Login OTP cases
+    builder.addCase(validateLoginOtp.pending, (state, action) => {
+      state.loading = true;
+      state.appErr = undefined;
+      state.serverErr = undefined;
+      state.appStatus = action?.payload?.status;
+      state.appStatusCode = action?.payload?.statusCode;
+    });
+    builder.addCase(validateLoginOtp.fulfilled, (state, action) => {
+      state.userAuth = action?.payload ? action.payload : state.userAuth;
+      state.appErr = undefined;
+      state.loading = false;
+      state.serverErr = undefined;
+      state.appStatus = action.payload?.status;
+      state.appStatusCode = action.payload?.statusCode;
+    });
+    builder.addCase(validateLoginOtp.rejected, (state, action) => {
+      state.appErr = action?.payload?.message;
+      state.loading = false;
+      state.serverErr = action?.error?.message;
       state.appStatus = action?.payload?.status;
       state.appStatusCode = action?.payload?.statusCode;
     });

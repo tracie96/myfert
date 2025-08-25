@@ -19,7 +19,20 @@ const EmailVerificationModal = ({ visible, onCancel, email }) => {
     setEmail(email);
   }, [email]);
   const handleResendOtp = useCallback(async () => {
-    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+    const userInfoString = localStorage.getItem("userInfo");
+    if (!userInfoString) {
+      message.error("User information not found. Please try again.");
+      return;
+    }
+    
+    let userInfo;
+    try {
+      userInfo = JSON.parse(userInfoString);
+    } catch (error) {
+      message.error("Invalid user information. Please try again.");
+      return;
+    }
+    
     const session = userInfo?.session;
 
     if (!session) {
@@ -96,7 +109,20 @@ const EmailVerificationModal = ({ visible, onCancel, email }) => {
 
   const handleVerify = async () => {
     const otp = otpFields.join("");
-    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+    const userInfoString = localStorage.getItem("userInfo");
+    if (!userInfoString) {
+      message.error("User information not found. Please try again.");
+      return;
+    }
+    
+    let userInfo;
+    try {
+      userInfo = JSON.parse(userInfoString);
+    } catch (error) {
+      message.error("Invalid user information. Please try again.");
+      return;
+    }
+    
     const session = userInfo?.session;
 
     if (!session) {

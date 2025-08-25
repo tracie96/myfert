@@ -17,6 +17,7 @@ import "../assesment.css";
 import { useMediaQuery } from "react-responsive";
 import { backBtnTxt, exitBtnTxt, saveAndContinueBtn, submitBtn } from "../../../../../utils/constant";
 import { getSubstancePatient } from "../../../../redux/AssessmentController";
+import { baseUrl } from "../../../../../utils/envAccess";
 
 const questions = [
   {
@@ -28,7 +29,7 @@ const questions = [
     subQuestions: [
       {
         question: "Packs per day:",
-        type: "inputNumberX",
+        type: "inputNumber",
         name: "packs_per_day",
       },
       {
@@ -40,7 +41,7 @@ const questions = [
         question: "What type?",
         type: "radio",
         name: "smoke_type",
-        options: ["Cigarettes", "Smokeless", "Pipe", "Cigar", "E-cig"],
+        options: ["Cigarettes", "Smokeless", "Pipe", "Cigar", "E-cig", "Other"],
       },
     ],
   },
@@ -129,11 +130,19 @@ const questions = [
   {
     question:
       "Have you ever thought about getting help to control or stop your drinking?",
-    type: "radio",
+    type: "long_radio",
     sub: "Alcohol",
     name: "considered_help_for_alcohol",
     options: ["Yes", "No"],
+    subQuestions: [
+      {
+        question: "If Yes, please explain:",
+        type: "text",
+        name: "considered_help_for_alcohol_describe",
+      },
+    ],
   },
+  
   {
     question: "Are you currently using any recreational drugs?",
     type: "long_radio",
@@ -165,63 +174,89 @@ const SubstanceUse = ({ onComplete }) => {
   const navigate = useNavigate();
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const patientSubstanceInfo = useSelector((state) => state.intake?.patientSubstanceInfo);
+  const hasSubmittedBefore = useSelector((state) => state.intake?.accessDetails?.substanceUse);
 
-  const mapSubstanceInfoToAnswers = (info) => {
-    const normalizeYesNo = (value) => {
-      if (value === true) return "Yes";
-      if (value === false) return "No";
-      return null;
-    };
-    return {
-      smoke_currently: normalizeYesNo(info.smokePresently?.yesNo),
-      packs_per_day: info.smokingCurrently?.packsDay || 0,
-      number_of_years: info.smokingCurrently?.years || 0,
-      smoke_type: info.smokingCurrently?.type || "",
-  
-      attempted_to_quit: normalizeYesNo(info.attempedToQuit?.yesNo),
-      methods_to_stop_smoking: info.attempedToQuit?.describe || "",
-  
-      smoked_previously: normalizeYesNo(info.smokedInPast?.yesNo),
-      packs_per_day_previous: info.smokedInPast?.packsDay || 0,
-      number_of_years_previous: info.smokedInPast?.years || 0,
-  
-      exposed_to_second_hand_smoke: normalizeYesNo(info.exposedTo2ndSmoke?.yesNo),
-  
-      exposed_to_smoke: info.howManyAlcoholWeek || "",
-  
-      previous_alcohol_intake: info.previousAlcoholIntake?.yesNo ? "Yes" : "No",
-      previous_packs_per_day: info.previousAlcoholIntake?.describe || "",
-  
-      alcohol_problem: normalizeYesNo(info.problemAlcohol?.yesNo),
-      packs_per_day_when: info.problemAlcoholWhen || "",
-      packs_per_day_expain: info.problemAlcoholExplain || "",
-  
-      considered_help_for_alcohol: normalizeYesNo(info.getHelpForDrinking?.yesNo),
-  
-      using_recreational_drugs: normalizeYesNo(info.currentlyRecreationalDrugs?.yesNo),
-      recreational_drugs_type: info.currentlyRecreationalDrugsType || "",
-  
-      inhaled_drugs: normalizeYesNo(info.everUsedRecreationalDrugs?.yesNo),
-    };
-  };
-
-  
   useEffect(() => {
     dispatch(getSubstancePatient());
   }, [dispatch]);
   
   useEffect(() => {
+    console.log("Effect triggered. patientSubstanceInfo =", patientSubstanceInfo);
     const savedIndex = parseInt(localStorage.getItem("currentQuestionIndex4"), 10);
-    const savedAnswers = JSON.parse(localStorage.getItem("answers"));
+    const savedAnswersString = localStorage.getItem("answers");
+    let savedAnswers = null;
+    if (savedAnswersString) {
+      try {
+        savedAnswers = JSON.parse(savedAnswersString);
+      } catch (error) {
+        console.warn("Failed to parse answers from localStorage:", error);
+        savedAnswers = null;
+      }
+    }
   
     if (!isNaN(savedIndex) && savedAnswers) {
       setCurrentQuestionIndex(savedIndex);
       setAnswers(savedAnswers);
     } else if (patientSubstanceInfo && Object.keys(patientSubstanceInfo).length > 0) {
+      const mapSubstanceInfoToAnswers = (info) => {
+        const normalizeYesNo = (value) => {
+          if (value === true) return "Yes";
+          if (value === false) return "No";
+          return null;
+        };
+    
+        // Handle smokedInPast type based on previous submission
+        let smokedInPastValue = null;
+        if (info.smokedInPast) {
+          if (info.smokedInPast.type === null && hasSubmittedBefore) {
+            smokedInPastValue = "No";
+          } else {
+            smokedInPastValue = info.smokedInPast.type ? "Yes" : "No";
+          }
+        }
+
+        // Check if smoke type is a standard option or custom
+        const standardSmokeTypes = ["Cigarettes", "Smokeless", "Pipe", "Cigar", "E-cig"];
+        const smokeType = info.smokingCurrently?.type || "";
+        const isCustomSmokeType = smokeType && !standardSmokeTypes.includes(smokeType);
+    
+        return {
+          smoke_currently: normalizeYesNo(info.smokePresently),
+          smoke_type: isCustomSmokeType ? "Other" : smokeType,
+          smoke_type_other: isCustomSmokeType ? smokeType : "",
+          packs_per_day: info.smokingCurrently?.packsDay || 0,
+          number_of_years: info.smokingCurrently?.years || 0,
+    
+          attempted_to_quit: normalizeYesNo(info.attempedToQuit?.yesNo),
+          methods_to_stop_smoking: info.attempedToQuit?.describe || "",
+    
+          smoked_previously: smokedInPastValue,
+          packs_per_day_previous: info.smokedInPast?.packsDay || 0,
+          number_of_years_previous: info.smokedInPast?.years || 0,
+    
+          exposed_to_second_hand_smoke: normalizeYesNo(info.exposedTo2ndSmoke),
+    
+          exposed_to_smoke: info.howManyAlcoholWeek || "",
+    
+          previous_alcohol_intake: info.previousAlcoholIntake?.yesNo ? "Yes" : "No",
+          previous_packs_per_day: info.previousAlcoholIntake?.describe || "",
+    
+          alcohol_problem: normalizeYesNo(info.problemAlcohol),
+          packs_per_day_when: info.problemAlcoholWhen || "",
+          packs_per_day_expain: info.problemAlcoholExplain || "",
+    
+          considered_help_for_alcohol: normalizeYesNo(info.getHelpForDrinking),
+    
+          using_recreational_drugs: normalizeYesNo(info.currentlyRecreationalDrugs),
+          recreational_drugs_type: info.currentlyRecreationalDrugsType || "",
+    
+          inhaled_drugs: normalizeYesNo(info.everUsedRecreationalDrugs),
+        };
+      };
       const prefilled = mapSubstanceInfoToAnswers(patientSubstanceInfo);
       setAnswers(prefilled);
     }
-  }, [patientSubstanceInfo]);
+  }, [patientSubstanceInfo, hasSubmittedBefore]);
   // ToDo: remove this commented code after testing
   // const validateQuestion = () => {
   //   const question = questions[currentQuestionIndex];
@@ -232,24 +267,59 @@ const SubstanceUse = ({ onComplete }) => {
   const validateQuestion = () => {
     const question = questions[currentQuestionIndex];
     const mainAnswer = answers[question.name];
-    const isMainQuestionValid = mainAnswer !== undefined && mainAnswer !== "";
-  
-    // If the main question's answer does not require subquestions, skip their validation
-    if (!question.subQuestions || mainAnswer !== "Yes") {
-      return isMainQuestionValid;
+
+    const isMainValid =
+      mainAnswer !== undefined && mainAnswer !== "" && mainAnswer !== null;
+
+    const isOtherOptionValid = question.options?.includes("Other")
+      ? mainAnswer !== "Other" || !!answers[`${question.name}_other`]
+      : true;
+
+    if (!isMainValid || !isOtherOptionValid) return false;
+
+    // Special validation for "Do you smoke currently?"
+    if (question.name === "smoke_currently" && mainAnswer === "Yes") {
+      const requiredFields = ["packs_per_day", "number_of_years", "smoke_type"];
+      for (const field of requiredFields) {
+        const value = answers[field];
+        if (value === undefined || value === "") {
+          return false;
+        }
+
+        // Handle "Other" option for smoke_type
+        if (
+          field === "smoke_type" &&
+          value === "Other" &&
+          (!answers["smoke_type_other"] || answers["smoke_type_other"].trim() === "")
+        ) {
+          return false;
+        }
+      }
     }
-  
-    // Validate subquestions only if they are required
+
+    // Normal subquestion validation (for all other Yes cases)
+    if (!question.subQuestions || mainAnswer !== "Yes") {
+      return true;
+    }
+
     const areSubQuestionsValid = question.subQuestions.every((sub) => {
       const subAnswer = answers[sub.name];
+
       if (sub.type === "inputNumber") {
-        return subAnswer !== undefined; // Allow default value of 0 for number inputs
+        return subAnswer !== undefined;
       }
-      return subAnswer !== undefined && subAnswer !== ""; // Non-empty validation for other types
+
+      if (sub.type === "radio" && sub.options?.includes("Other")) {
+        const subOtherAnswer = answers[`${sub.name}_other`];
+        return subAnswer !== undefined && (subAnswer !== "Other" || !!subOtherAnswer);
+      }
+
+      return subAnswer !== undefined && subAnswer !== "";
     });
-  
-    return isMainQuestionValid && areSubQuestionsValid;
+
+    return areSubQuestionsValid;
   };
+  
   
   const handleExit = () => {
     navigate("/assessment");
@@ -270,11 +340,12 @@ const SubstanceUse = ({ onComplete }) => {
       }
     } else if (currentQuestionIndex === 1) {
       // After answering "Have you attempted to quit?"
-      if (answers["smoke_currently"] === "Yes") {
+      if (answers["attempted_to_quit"] === "Yes") {
+        console.log("Attempted to quit:");
         // If currently smoking, skip the "smoked previously" question
-        nextQuestionIndex = 3; // Skip to "Are you regularly exposed to second-hand smoke?"
+        nextQuestionIndex = 2; // Skip to "Are you regularly exposed to second-hand smoke?"
       } else {
-        nextQuestionIndex = 2; // Go to "Have you smoked previously"
+        nextQuestionIndex = 3; // Go to "Have you smoked previously"
       }
     } else if (currentQuestionIndex === 2) {
       // After "Have you smoked previously"
@@ -337,39 +408,80 @@ const SubstanceUse = ({ onComplete }) => {
   };
 
   const handleChange = (value, name) => {
-    setAnswers({
+    const updatedAnswers = {
       ...answers,
-      [name]: value,
-    });
+    };
+
+    // If it's a radio input, delete any existing _other value
+    if (name.endsWith('_other')) {
+      updatedAnswers[name] = value;
+    } else {
+      updatedAnswers[name] = value;
+      // Delete the _other field entirely
+      delete updatedAnswers[`${name}_other`];
+    }
+    if (name === "alcohol_problem" && value === "No") {
+      updatedAnswers["packs_per_day_when"] = "";
+      updatedAnswers["packs_per_day_expain"] = "";
+    }
+    if (name === "using_recreational_drugs" && value === "No") {
+      updatedAnswers["recreational_drugs_type"] = "";
+    }
+    
+  
+    // If user answers NO to smoking, clear related fields
+    if (name === "smoke_currently" && value === "No") {
+      const requiredFields = ["packs_per_day", "number_of_years", "smoke_type"];
+      requiredFields.forEach((field) => {
+        updatedAnswers[field] = ""; // Clear the value
+        delete updatedAnswers[`${field}_other`]; // Also clear any _other values
+      });
+    }
+    if (name === "attempted_to_quit" && value === "No") {
+      const requiredFields = ["methods_to_stop_smoking"];
+      requiredFields.forEach((field) => {
+        updatedAnswers[field] = ""; // Clear the value
+        delete updatedAnswers[`${field}_other`]; // Also clear any _other values
+      });
+    }
+    if (name === "smoked_previously" && value === "No") {
+      const fieldsToClear = ["packs_per_day_previous", "number_of_years_previous"];
+      fieldsToClear.forEach((field) => {
+        updatedAnswers[field] = "";
+        delete updatedAnswers[`${field}_other`]; // Also clear any _other values
+      });
+    }
+    
+    setAnswers(updatedAnswers);
   };
 
   const transformAnswers = (answers) => {
     return {
       smokePresently: answers.smoke_currently === "Yes",
+      smokeCurrently: answers.smoke_currently === "Yes" ? (answers.smoke_type === "Other" ? answers.smoke_type_other || "" : "") : "",
       smokingCurrently:
         answers.smoke_currently === "Yes"
           ? {
               packsDay: answers.packs_per_day || 0,
               years: answers.number_of_years || 0,
-              type: answers.smoke_type || "",
+              type: answers.smoke_type === "Other" ? answers.smoke_type_other : answers.smoke_type || "",
             }
           : {},
       attempedToQuit: {
         yesNo: answers.attempted_to_quit === "Yes",
         describe: answers.methods_to_stop_smoking || '',
       },
-      smokedInPast:
-        answers.smoked_previously === "Yes"
-          ? {
-              packsDay: answers.packs_per_day_previous || 0,
-              years: answers.number_of_years_previous || 0,
-              type: "not applicable" || 0,
-            }
-          : {},
+      smokedInPast: {
+        type: answers.smoked_previously === "Yes" ? "Yes" : "No",
+        ...(answers.smoked_previously === "Yes" ? {
+          packsDay: answers.packs_per_day_previous || 0,
+          years: answers.number_of_years_previous || 0,
+        } : {})
+      },
       exposedTo2ndSmoke: answers.exposed_to_second_hand_smoke === "Yes",
       howManyAlcoholWeek: answers.exposed_to_smoke || "",
       previousAlcoholIntake: {
-        yesNo: answers.alcohol_problem === "Yes",
+        yesNo: answers.previous_alcohol_intake === "Yes",
         describe:answers.previous_packs_per_day || "",
       },
       problemAlcohol: answers.alcohol_problem === "Yes",
@@ -393,7 +505,7 @@ const SubstanceUse = ({ onComplete }) => {
     const token = userInfo.obj.token || "";
 
     fetch(
-      "https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/AddSubstanceUse",
+      `${baseUrl}Patient/AddSubstanceUse`,
       {
         method: "POST",
         headers: {
@@ -469,24 +581,50 @@ const SubstanceUse = ({ onComplete }) => {
           />
         )}
 
-        {subQuestion.type === "radio" && (
-          <Radio.Group
-            name={subQuestion.question}
-            onChange={(e) => handleChange(e.target.value, subQuestion.name)}
-            value={answers[subQuestion.name]}
-            style={{ width: isMobile ? "100%" : "50%" }}
-          >
-            {subQuestion.options.map((option, idx) => (
-              <Radio
-                key={idx}
-                value={option}
-                style={{ display: "block", marginBottom: "10px" }}
-              >
-                {option}
-              </Radio>
-            ))}
-          </Radio.Group>
+{subQuestion.type === "radio" && (
+  <Radio.Group
+    name={subQuestion.name}
+    onChange={(e) => handleChange(e.target.value, subQuestion.name)}
+    value={answers[subQuestion.name]}
+    style={{ width: isMobile ? "100%" : "50%" }}
+  >
+    {subQuestion.options.map((option, idx) => (
+      <Radio
+        key={idx}
+        value={option}
+        style={{ display: "block", marginBottom: "10px" }}
+      >
+        {option === "Other" ? (
+          <>
+            {option}
+            {answers[subQuestion.name] === "Other" && (
+              <div style={{ marginTop: "10px", display:"contents", alignItems:"baseline" }}>
+                <Input
+                  className="input_questtionnaire"
+                  placeholder="Please specify"
+                  value={answers[`${subQuestion.name}_other`] || ""}
+                  onChange={(e) =>
+                    handleChange(e.target.value, `${subQuestion.name}_other`)
+                  }
+                  style={{
+                    height: 50,
+                    borderColor: "#00ADEF",
+                    marginTop: 5,
+                    width: isMobile ? "100%" : "50%",
+                    marginLeft:"5px"
+                  }}
+                />
+              </div>
+            )}
+          </>
+        ) : (
+          <span style={{ verticalAlign: "text-bottom" }}>{option}</span>
         )}
+      </Radio>
+    ))}
+  </Radio.Group>
+)}
+
       </div>
     ));
   };
@@ -612,16 +750,13 @@ const SubstanceUse = ({ onComplete }) => {
 
   const progressColor =
     currentQuestionIndex === totalQuestions - 1 ? "#01ACEE" : "#C2E6F8";
-  const progressPercentage =
-    ((currentQuestionIndex + 1) / totalQuestions) * 100;
-
-    const percentProgressBar = Math.round(100/totalQuestions);
+    const progressPercent = Math.round((currentQuestionIndex / (totalQuestions - 1)) * 100);
   return (
     <Row gutter={16} style={{ padding: "0 5%" }}>
       <Col xs={24} sm={24} md={24} lg={24} xl={24}>
         <FormWrapper name="FEMALE INTAKE QUESTIONNAIRE" />
         <Progress
-          percent={Math.round(progressPercentage)- percentProgressBar}
+          percent={progressPercent}
           strokeColor={progressColor}
         />
         <h3 style={{ margin: "20px 0", fontSize:"15px", fontWeight:"600", color: "#F2AA93" }}>

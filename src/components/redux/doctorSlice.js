@@ -1,5 +1,5 @@
 import axios from "axios";
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, createAction } from "@reduxjs/toolkit";
 import { getResponse, handleApiError } from "../Handler/ExceptionHandler";
 import { baseUrl } from "../../utils/envAccess";
 
@@ -18,6 +18,7 @@ export const patientList = createAsyncThunk(
         `${baseUrl}Doctor/GetPatient/${page}/${size}`,
         config,
       );
+      console.log(response, 'responsessss');
       return response;
     } catch (error) {
       handleApiError(error?.response?.data, dispatch, user);
@@ -25,7 +26,57 @@ export const patientList = createAsyncThunk(
   },
 );
 
+export const patientbyDoctor = createAsyncThunk(
+  "doctor/GetPatientByDoctor",
+  async ({ page = 0, size = 100 }, { rejectWithValue, getState, dispatch }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
 
+    try {
+      // Corrected endpoint without placeholder strings
+      const response = await axios.get(
+        `${baseUrl}Doctor/GetPatientByDoctor/${page}/${size}`,
+        config
+      );
+      console.log(response, 'responsessss');
+      return response;
+    } catch (error) {
+      return rejectWithValue(
+        handleApiError(error?.response?.data, dispatch, user)
+      );
+    }
+  }
+);
+
+
+export const fetchCareGivers = createAsyncThunk(
+  "doctor/fetchCareGivers",
+  async ({ page, size }, { rejectWithValue, getState }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+    try {
+      const response = await axios.get(
+        `${baseUrl}Chat/GetCareGiverList/${page}/${size}`,
+        config,
+      );
+      console.log('Care givers API response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Care givers API error:', error);
+      return rejectWithValue(error?.response?.data);
+    }
+  }
+);
 
 export const getPatientBloodWork = createAsyncThunk(
   "doctor/getBloodWork",
@@ -48,7 +99,6 @@ export const getPatientBloodWork = createAsyncThunk(
     }
   }
 );
-
 
 export const downloadBloodWork = createAsyncThunk(
   "doctor/downloadBloodWork",
@@ -79,7 +129,7 @@ export const deletePatientBloodWork = createAsyncThunk(
     const user = getState()?.authentication?.userAuth;
     try {
       const response = await axios.get(
-        `https://myfertilitydevapi-prod.azurewebsites.net/api/Doctor/DeleteDocument/${bloodWorkId}`,
+        `${baseUrl}Doctor/DeleteDocument/${bloodWorkId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -90,6 +140,33 @@ export const deletePatientBloodWork = createAsyncThunk(
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+export const linkDoctorToPatient = createAsyncThunk(
+  "doctor/linkDoctorToPatient",
+  async ({ patientRef, link = true }, { rejectWithValue, getState, dispatch }) => {
+    const user = getState()?.authentication?.userAuth;
+
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+
+    try {
+      const response = await axios.post(
+        `${baseUrl}Doctor/LinkDoctorToPatient`,
+        { patientRef, link }, // now uses dynamic value
+        config
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        handleApiError(error?.response?.data, dispatch, user)
+      );
     }
   }
 );
@@ -152,7 +229,7 @@ export const getPatientMed = createAsyncThunk(
   async (patientId, { rejectWithValue, getState, dispatch }) => {
     const user = getState()?.authentication?.userAuth;
     try {
-      const response = await axios.get(`https://myfertilitydevapi-prod.azurewebsites.net/api/Doctor/GetPatientMed/${patientId}`, {
+      const response = await axios.get(`${baseUrl}Doctor/GetPatientMed/${patientId}`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${user?.obj?.token}`,
@@ -166,8 +243,8 @@ export const getPatientMed = createAsyncThunk(
 );
 export const addPatientMed = createAsyncThunk(
   "doctor/addPatientMed",
-  async ({ drugName, dose, amount, route, frequency, patientRef }, { rejectWithValue, getState, dispatch }) => {
-    console.log(drugName, dose, amount, route, frequency, patientRef);
+  async ({ drugName, dose, amount, route, frequency, strength, duration, refills, patientRef }, { rejectWithValue, getState, dispatch }) => {
+    console.log(drugName, dose, amount, route, frequency, strength, duration, refills, patientRef);
 
     const user = getState()?.authentication?.userAuth;
     const config = {
@@ -180,7 +257,7 @@ export const addPatientMed = createAsyncThunk(
     try {
       const response = await axios.post(
         `${baseUrl}Doctor/AddPatientMed`,
-        { drugName, dose, amount, route, frequency, patientRef },
+        { drugName, dose, amount, route, frequency, strength, duration, refills, patientRef },
         config
       );
       return response.data;
@@ -190,6 +267,52 @@ export const addPatientMed = createAsyncThunk(
   }
 );
 
+export const editPatientMed = createAsyncThunk(
+  "doctor/editPatientMed",
+  async ({ drugName, dose, amount, route, frequency, id, refills, strength, duration }, { rejectWithValue, getState, dispatch }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+    console.log(drugName, dose, amount, route, frequency, id, refills, strength, duration,'editPatientMed')
+    try {
+      const response = await axios.patch(
+        `${baseUrl}Doctor/EditPatientMed`,
+        { drugName, dose, amount, route, frequency, id, refills, strength, duration },
+        config
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(handleApiError(error?.response?.data, dispatch, user));
+    }
+  }
+);
+
+export const deletePatientMed = createAsyncThunk(
+  "doctor/deletePatientMed",
+  async (medId, { rejectWithValue, getState, dispatch }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+
+    try {
+      const response = await axios.get(
+        `${baseUrl}Doctor/DeletePatientMed/${medId}`,
+        config
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(handleApiError(error?.response?.data, dispatch, user));
+    }
+  }
+);
 
 export const submitAvailability = createAsyncThunk(
   "availability/submitAvailability",
@@ -597,13 +720,12 @@ export const fetchPatientNotes = createAsyncThunk(
 
     try {
       const response = await fetch(
-        `https://myfertilitydevapi-prod.azurewebsites.net/api/Doctor/GetPatientNotes/${patientId}`,
+        `${baseUrl}Doctor/GetPatientNotes/${patientId}`,
         {
           method: 'GET',
           headers: {
             'accept': 'text/plain',
             Authorization: `Bearer ${user?.obj?.token}`,
-
           },
         }
       );
@@ -620,7 +742,7 @@ export const fetchPatientNotes = createAsyncThunk(
 
 export const addPatientNotes = createAsyncThunk(
   "doctor/addPatientNotes",
-  async ({ personalNote, subjective, objective, assessment, patientPlan, appointmentType, patientRef }, { rejectWithValue, getState, dispatch }) => {
+  async ({ personalNote, subjective, objective, assessment, patientPlan, appointmentType, isDraft, patientRef }, { rejectWithValue, getState, dispatch }) => {
     const user = getState()?.authentication?.userAuth;
     const config = {
       headers: {
@@ -632,7 +754,7 @@ export const addPatientNotes = createAsyncThunk(
     try {
       const response = await axios.post(
         `${baseUrl}Doctor/AddPatientNotes`,
-        { personalNote, subjective, objective, assessment, patientPlan, appointmentType, patientRef },
+        { personalNote, subjective, objective, assessment, patientPlan, appointmentType, patientRef, isDraft },
         config
       );
       return response.data;
@@ -644,7 +766,7 @@ export const addPatientNotes = createAsyncThunk(
 
 export const editPatientNote = createAsyncThunk(
   "doctor/editPatientNote",
-  async ({ personalNote, subjective, objective, assessment, patientPlan, noteId }, { rejectWithValue, getState, dispatch }) => {
+  async ({ personalNote, subjective, objective, assessment, patientPlan, noteId, isDraft }, { rejectWithValue, getState, dispatch }) => {
     const user = getState()?.authentication?.userAuth;
     console.log(personalNote,subjective,objective,patientPlan ,assessment,'lll')
     const config = {
@@ -657,7 +779,7 @@ export const editPatientNote = createAsyncThunk(
     try {
       const response = await axios.post(
         `${baseUrl}Doctor/EditPatientNote`,
-        { personalNote, subjective, objective, assessment, patientPlan, noteId },
+        { personalNote, subjective, objective, assessment, patientPlan, noteId, isDraft },
         config
       );
       return response.data;
@@ -669,7 +791,7 @@ export const editPatientNote = createAsyncThunk(
 );
 
 export const deletePatientNote = createAsyncThunk(
-  "doctor/deletePatientNote",
+  'doctor/deletePatientNote',
   async (noteId, { rejectWithValue, getState, dispatch }) => {
     const user = getState()?.authentication?.userAuth;
     console.log({noteId})
@@ -692,6 +814,265 @@ export const deletePatientNote = createAsyncThunk(
   }
 );
 
+export const fetchDocumo = createAsyncThunk(
+  "doctor/fetchDocumo",
+  async (_, { rejectWithValue, getState }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        Accept: "text/plain",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+
+    try {
+      const response = await axios.get(
+        `${baseUrl}Doctor/FetchDocumo`,
+        config
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error?.response?.data);
+    }
+  }
+);
+
+export const downloadDocumo = createAsyncThunk(
+  "doctor/downloadDocumo",
+  async (messageNumber, { rejectWithValue, getState }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        Accept: "*/*",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+      responseType: "blob", // Important for handling file downloads
+    };
+
+    try {
+      const response = await axios.get(
+        `${baseUrl}Doctor/DownloadDocumo/${messageNumber}`,
+        config
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error?.response?.data || "Download failed");
+    }
+  }
+);
+
+export const getPatientSupplements = createAsyncThunk(
+  'doctor/getPatientSupplements',
+  async (patientId, { rejectWithValue, getState, dispatch }) => {
+    const user = getState()?.authentication?.userAuth;
+    try {
+      const response = await axios.get(`${baseUrl}Doctor/GetPatientSupplements/${patientId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user?.obj?.token}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+export const addPatientSupplement = createAsyncThunk(
+  "doctor/addPatientSupplement",
+  async ({ supplementName, dose, metric, amount, amountExtra, route, frequency, notes, patientRef }, { rejectWithValue, getState, dispatch }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+
+    try {
+      const response = await axios.post(
+        `${baseUrl}Doctor/AddPatientSupplements`,
+        { supplementName, dose, metric, amount, amountExtra, route, frequency, notes, patientRef },
+        config
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(handleApiError(error?.response?.data, dispatch, user));
+    }
+  }
+);
+
+export const getMessages = createAsyncThunk(
+  "doctor/getMessages",
+  async (userRef, { rejectWithValue, getState }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        accept: "text/plain",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+
+    try {
+      const response = await axios.get(
+        `${baseUrl}Chat/GetMessages/${userRef}`,
+        config
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error?.response?.data);
+    }
+  }
+);
+
+export const sendMessage = createAsyncThunk(
+  "doctor/sendMessage",
+  async ({ userRef, chat, chatRef }, { rejectWithValue, getState }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+
+    try {
+      const response = await axios.post(
+        `${baseUrl}Chat/SendMessage`,
+        { userRef, chat, chatRef },
+        config
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error?.response?.data);
+    }
+  }
+);
+
+export const getChatHeads = createAsyncThunk(
+  "doctor/getChatHeads",
+  async (_, { rejectWithValue, getState }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        "accept": "text/plain",
+        "Authorization": `Bearer ${user?.obj?.token}`,
+      },
+    };
+    try {
+      const response = await axios.get(
+        `${baseUrl}Chat/GetChatsHead`,
+        config
+      );
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error?.response?.data);
+    }
+  }
+);
+
+export const getUnreadMessageCount = createAsyncThunk(
+  "doctor/getUnreadMessageCount",
+  async (_, { rejectWithValue, getState }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        "accept": "text/plain",
+        "Authorization": `Bearer ${user?.obj?.token}`,
+      },
+    };
+    try {
+      const response = await axios.get(
+        `${baseUrl}Chat/GetUnReadMsg`,
+        config
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error?.response?.data);
+    }
+  }
+);
+
+export const markMessagesAsRead = createAsyncThunk(
+  "doctor/markMessagesAsRead",
+  async (userRef, { rejectWithValue, getState }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        "accept": "text/plain",
+        "Authorization": `Bearer ${user?.obj?.token}`,
+      },
+    };
+    try {
+      const response = await axios.post(
+        `${baseUrl}Chat/MarkMessagesAsRead/${userRef}`,
+        {},
+        config
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error?.response?.data);
+    }
+  }
+);
+
+export const markChatsAsRead = createAsyncThunk(
+  "doctor/markChatsAsRead",
+  async (chatRef, { rejectWithValue, getState }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        "accept": "text/plain",
+        "Authorization": `Bearer ${user?.obj?.token}`,
+      },
+    };
+    try {
+      const response = await axios.post(
+        `${baseUrl}Chat/MarkChatsAsRead/${chatRef}`,
+        {},
+        config
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error?.response?.data);
+    }
+  }
+);
+
+// Action creator for optimistic chat read update
+export const markChatAsReadOptimistically = createAction('doctor/markChatAsReadOptimistically');
+
+export const deleteChat = createAsyncThunk(
+  "doctor/deleteChat",
+  async (chatRef, { rejectWithValue, getState }) => {
+    const user = getState()?.authentication?.userAuth;
+    console.log('Delete chat - chatRef:', chatRef);
+    console.log('Delete chat - user token:', user?.obj?.token ? 'Present' : 'Missing');
+    
+    const config = {
+      headers: {
+        "accept": "text/plain",
+        "Authorization": `Bearer ${user?.obj?.token}`,
+      },
+    };
+    
+    const url = `${baseUrl}Chat/DeleteMessages/${chatRef}`;
+    console.log('Delete chat - API URL:', url);
+    
+    try {
+      const response = await axios.get(url, config);
+      console.log('Delete chat - API response:', response);
+      return response.data;
+    } catch (error) {
+      console.error('Delete chat - API error:', error);
+      console.error('Delete chat - Error response:', error?.response);
+      return rejectWithValue(error?.response?.data);
+    }
+  }
+);
+
 const doctorSlices = createSlice({
   name: "doctor",
   initialState: {
@@ -700,6 +1081,9 @@ const doctorSlices = createSlice({
     appStatus: null,
     appStatusCode: null,
     serverErr: null,
+    patientList: [],
+    careGivers: [],
+    chatHeads: [],
     upcomingPatientAppointment: [],
     doctorAvailability: {},
     bloodWork: [],
@@ -712,13 +1096,35 @@ const doctorSlices = createSlice({
     editingNote: false,
     editNoteError: null,
     deletingNote: false,
-    deleteNoteError: null
+    deleteNoteError: null,
+    documoData: [],
+    documoLoading: false,
+    documoError: null,
+    supplements: [],
+    bloodWorkFile1: null,
+    bloodWorkFile2: null,
+    messages: null,
+    chatRef: null,
+    chatLoading: false,
+    chatError: null,
+    unreadMessageCount: 0,
+    chatHeadsLoading: false,
+    unreadCountLoading: false,
+    deleteChatLoading: false,
+    deleteChatError: null,
+  },
+  reducers: {
+    // Add a reducer for optimistic message updates
+    addMessage: (state, action) => {
+      if (state.messages?.chats) {
+        state.messages.chats.push(action.payload.newMessage);
+      }
+    }
   },
   extraReducers: (builder) => {
     builder.addCase(patientList.pending, (state, action) => {
       state.loading = true;
       state.appStatusCode = undefined;
-      state.profileAppErr = undefined;
       state.profileAppErr = undefined;
       state.profileServerErr = undefined;
     });
@@ -728,6 +1134,7 @@ const doctorSlices = createSlice({
       state.appStatusCode = undefined;
       state.profileAppErr = undefined;
       state.profileServerErr = undefined;
+      state.patientList = action.payload?.data || [];
     });
     builder.addCase(patientList.rejected, (state, action) => {
       state.appErr = action?.payload?.message;
@@ -735,6 +1142,7 @@ const doctorSlices = createSlice({
       state.serverErr = undefined;
       state.appStatus = action?.payload?.status;
       state.appStatusCode = action?.payload?.statusCode;
+      state.patientList = [];
     });
     builder.addCase(cancelPatientAppointment.pending, (state, action) => {
       state.loading = true;
@@ -1003,7 +1411,194 @@ const doctorSlices = createSlice({
         state.deletingNote = false;
         state.deleteNoteError = action.payload;
       });
+
+    builder
+      .addCase(fetchDocumo.pending, (state) => {
+        state.documoLoading = true;
+        state.documoError = null;
+      })
+      .addCase(fetchDocumo.fulfilled, (state, action) => {
+        state.documoLoading = false;
+        state.documoData = action.payload;
+        state.documoError = null;
+      })
+      .addCase(fetchDocumo.rejected, (state, action) => {
+        state.documoLoading = false;
+        state.documoError = action.payload;
+      });
+
+    // Get Patient Supplemegnts
+    builder.addCase(getPatientSupplements.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+    builder.addCase(getPatientSupplements.fulfilled, (state, action) => {
+      state.loading = false;
+      state.supplements = action.payload;
+    });
+    builder.addCase(getPatientSupplements.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
+
+    // Add Patient Supplement
+    builder.addCase(addPatientSupplement.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+    builder.addCase(addPatientSupplement.fulfilled, (state, action) => {
+      state.loading = false;
+      if (state.supplements) {
+        state.supplements.push(action.payload);
+      } else {
+        state.supplements = [action.payload];
+      }
+    });
+    builder.addCase(addPatientSupplement.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
+
+    // Add Care Givers
+    builder.addCase(fetchCareGivers.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+    builder.addCase(fetchCareGivers.fulfilled, (state, action) => {
+      console.log('Care givers reducer payload:', action.payload);
+      state.loading = false;
+      state.careGivers = action.payload || [];
+    });
+    builder.addCase(fetchCareGivers.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+      state.careGivers = [];
+    });
+
+    // Get Messages
+    builder.addCase(getMessages.pending, (state) => {
+      state.chatLoading = true;
+      state.chatError = null;
+    });
+    builder.addCase(getMessages.fulfilled, (state, action) => {
+      state.chatLoading = false;
+      state.messages = action.payload;
+      state.chatRef = action.payload.chatReference;
+      state.chatError = null;
+    });
+    builder.addCase(getMessages.rejected, (state, action) => {
+      state.chatLoading = false;
+      state.chatError = action.payload;
+    });
+
+    // Send Message
+    builder.addCase(sendMessage.pending, (state) => {
+      state.chatLoading = true;
+      state.chatError = null;
+    });
+    builder.addCase(sendMessage.fulfilled, (state, action) => {
+      state.chatLoading = false;
+      state.chatError = null;
+      // Message already added optimistically, no need to add again
+    });
+    builder.addCase(sendMessage.rejected, (state, action) => {
+      state.chatLoading = false;
+      state.chatError = action.payload;
+      // Could add logic here to remove the optimistically added message
+    });
+
+    // Get Chat Heads
+    builder.addCase(getChatHeads.pending, (state) => {
+      state.chatHeadsLoading = true;
+      state.error = null;
+    });
+    builder.addCase(getChatHeads.fulfilled, (state, action) => {
+      state.chatHeadsLoading = false;
+
+      state.chatHeads = action.payload.chats || [];
+    });
+    builder.addCase(getChatHeads.rejected, (state, action) => {
+      state.chatHeadsLoading = false;
+      state.error = action.payload;
+    });
+
+    // Get Unread Message Count
+    builder.addCase(getUnreadMessageCount.pending, (state) => {
+      state.unreadCountLoading = true;
+      state.error = null;
+    });
+    builder.addCase(getUnreadMessageCount.fulfilled, (state, action) => {
+      state.unreadCountLoading = false;
+      state.unreadMessageCount = action.payload;
+      state.error = null;
+    });
+    builder.addCase(getUnreadMessageCount.rejected, (state, action) => {
+      state.unreadCountLoading = false;
+      state.error = action.payload;
+    });
+
+    // Mark Messages As Read
+    builder.addCase(markMessagesAsRead.pending, (state) => {
+      state.unreadCountLoading = true;
+      state.error = null;
+    });
+    builder.addCase(markMessagesAsRead.fulfilled, (state, action) => {
+      state.unreadCountLoading = false;
+      // The unread count will be refreshed by the getUnreadMessageCount call
+      state.error = null;
+    });
+    builder.addCase(markMessagesAsRead.rejected, (state, action) => {
+      state.unreadCountLoading = false;
+      state.error = action.payload;
+    });
+
+    // Mark Chats As Read
+    builder.addCase(markChatsAsRead.pending, (state) => {
+      state.unreadCountLoading = true;
+      state.error = null;
+    });
+    builder.addCase(markChatsAsRead.fulfilled, (state, action) => {
+      state.unreadCountLoading = false;
+      // The unread count will be refreshed by the getUnreadMessageCount call
+      state.error = null;
+    });
+    builder.addCase(markChatsAsRead.rejected, (state, action) => {
+      state.unreadCountLoading = false;
+      state.error = action.payload;
+    });
+
+    // Optimistic update for marking chat as read
+    builder.addCase(markChatAsReadOptimistically, (state, action) => {
+      const userRef = action.payload;
+      // Update the specific chat head to remove new message indicator
+      if (state.chatHeads && state.chatHeads.length > 0) {
+        const chatHeadIndex = state.chatHeads.findIndex(chat => chat.userRef === userRef);
+        if (chatHeadIndex !== -1) {
+          state.chatHeads[chatHeadIndex] = {
+            ...state.chatHeads[chatHeadIndex],
+            newMessage: false
+          };
+        }
+      }
+    });
+
+    // Delete Chat
+    builder.addCase(deleteChat.pending, (state) => {
+      state.deleteChatLoading = true;
+      state.deleteChatError = null;
+    });
+    builder.addCase(deleteChat.fulfilled, (state, action) => {
+      state.deleteChatLoading = false;
+      state.deleteChatError = null;
+      // Refresh chat heads after successful deletion
+      // The component will handle refreshing the chat heads
+    });
+    builder.addCase(deleteChat.rejected, (state, action) => {
+      state.deleteChatLoading = false;
+      state.deleteChatError = action.payload;
+    });
   },
 });
 
+export const { addMessage } = doctorSlices.actions;
 export default doctorSlices.reducer;

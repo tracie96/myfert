@@ -57,7 +57,7 @@ function PatientDashboard() {
         >
           <NavLink to="/learn">LEARN</NavLink>
         </Menu.Item>
-        {userAuth && !userAuth.obj.companyName ? (
+        {userAuth && userAuth.obj && !userAuth.obj.companyName ? (
           <Menu.SubMenu
             key="sub1"
             icon={<BankOutlined />}

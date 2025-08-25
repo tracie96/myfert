@@ -85,8 +85,8 @@ const questions = [
 
 const GeneralIntakeForm = ({ onComplete }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [dataLoadedFromAPI, setDataLoadedFromAPI] = useState(false);
   const [answers, setAnswers] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
   const totalQuestions = questions.length;
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -99,56 +99,69 @@ const GeneralIntakeForm = ({ onComplete }) => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (!dataLoadedFromAPI) {
-      const savedAnswers = JSON.parse(localStorage.getItem("answers"));
-      const savedIndex = parseInt(localStorage.getItem("currentQuestionIndex"), 10);
-  
-      if (patientGeneralInfo && Object.keys(patientGeneralInfo).length > 0) {
-        const howDidYouHearOptions = questions.find(
-          (q) => q.name === "how_did_you_hear"
-        )?.options || [];
-  
-        const mappedAnswers = {
-          age: patientGeneralInfo.age || "",
-          geneticBackground: patientGeneralInfo.geneticBackground || "",
-          where_received_medical_care: patientGeneralInfo.whereMedicalCare || "",
-          when_received_medical_care: patientGeneralInfo.whenMedicalCare || "",
-          whom_received_medical_care: patientGeneralInfo.whomMedicalCare || "",
-          emergency_contact: {
-            contact: patientGeneralInfo.emergencyContact || "",
-            relationship: patientGeneralInfo.emergencyRelationship || "",
-            phoneHome: patientGeneralInfo.emergencyPhoneHome || "",
-            phoneCell: patientGeneralInfo.emergencyPhoneCell || "",
-            phoneType: patientGeneralInfo.emergencyPhoneWork || "",
-          },
-          how_did_you_hear: patientGeneralInfo.howDidHearAbout || "",
-        };
-  
-        if (
-          mappedAnswers.how_did_you_hear &&
-          !howDidYouHearOptions.includes(mappedAnswers.how_did_you_hear)
-        ) {
-          mappedAnswers.how_did_you_hear = "Other";
-          mappedAnswers["how_did_you_hear_other"] =
-            patientGeneralInfo.howDidHearAbout;
-        }
-        setAnswers(mappedAnswers);
-        setCurrentQuestionIndex(0);
-        setDataLoadedFromAPI(true);
-      } else if (!patientGeneralInfo && savedAnswers && !isNaN(savedIndex)) {
-        setAnswers(savedAnswers);
-        setCurrentQuestionIndex(savedIndex);
-        setDataLoadedFromAPI(true);
+    if (patientGeneralInfo) {
+      const howDidYouHearOptions = questions.find(
+        (q) => q.name === "how_did_you_hear"
+      )?.options || [];
+
+      const geneticBackgroundOptions = questions.find(
+        (q) => q.name === "geneticBackground"
+      )?.options || [];
+
+      const mappedAnswers = {
+        age: patientGeneralInfo.age || "",
+        geneticBackground: patientGeneralInfo.geneticBackground || "",
+        where_received_medical_care: patientGeneralInfo.whereMedicalCare || "",
+        when_received_medical_care: patientGeneralInfo.whenMedicalCare || "",
+        whom_received_medical_care: patientGeneralInfo.whomMedicalCare || "",
+        emergency_contact: {
+          contact: patientGeneralInfo.emergencyContact || "",
+          relationship: patientGeneralInfo.emergencyRelationship || "",
+          phoneHome: patientGeneralInfo.emergencyPhoneHome || "",
+          phoneCell: patientGeneralInfo.emergencyPhoneCell || "",
+          phoneType: patientGeneralInfo.emergencyPhoneWork || "",
+        },
+        how_did_you_hear: patientGeneralInfo.howDidHearAbout || "",
+      };
+
+      if (
+        mappedAnswers.how_did_you_hear &&
+        !howDidYouHearOptions.includes(mappedAnswers.how_did_you_hear)
+      ) {
+        mappedAnswers.how_did_you_hear = "Other";
+        mappedAnswers["how_did_you_hear_other"] =
+          patientGeneralInfo.howDidHearAbout;
       }
+
+      if (
+        mappedAnswers.geneticBackground &&
+        !geneticBackgroundOptions.includes(mappedAnswers.geneticBackground)
+      ) {
+        mappedAnswers["geneticBackground_other"] = mappedAnswers.geneticBackground;
+        mappedAnswers.geneticBackground = "Other";
+      }
+
+      setAnswers(mappedAnswers);
+      setCurrentQuestionIndex(0);
+      setIsLoading(false);
     }
-  }, [patientGeneralInfo, dataLoadedFromAPI]);
+  }, [patientGeneralInfo]);
 
   useEffect(() => {
     const savedIndex = parseInt(
       localStorage.getItem("currentQuestionIndex"),
       0,
     );
-    const savedAnswers = JSON.parse(localStorage.getItem("answers"));
+    const savedAnswersString = localStorage.getItem("answers");
+    let savedAnswers = null;
+    if (savedAnswersString) {
+      try {
+        savedAnswers = JSON.parse(savedAnswersString);
+      } catch (error) {
+        console.warn("Failed to parse answers from localStorage:", error);
+        savedAnswers = null;
+      }
+    }
 
     if (!isNaN(savedIndex) && savedAnswers) {
       setCurrentQuestionIndex(savedIndex);
@@ -220,8 +233,7 @@ const GeneralIntakeForm = ({ onComplete }) => {
       message.error("Please answer the current question before saving.");
       return;
     }
-    localStorage.setItem("currentQuestionIndex", 0);
-    localStorage.setItem("answers", JSON.stringify(answers));
+
     if (currentQuestionIndex < totalQuestions - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
@@ -234,10 +246,22 @@ const GeneralIntakeForm = ({ onComplete }) => {
   };
 
   const handleChange = (value, name) => {
-    setAnswers({
-      ...answers,
-      [name]: value,
-    });
+    const currentQuestion = questions[currentQuestionIndex];
+    if (currentQuestion.type === 'radio') {
+      // Always remove the _other value when changing selection
+      const newAnswers = {
+        ...answers,
+        [name]: value
+      };
+      // Delete the _other field entirely instead of setting it to empty string
+      delete newAnswers[`${name}_other`];
+      setAnswers(newAnswers);
+    } else {
+      setAnswers({
+        ...answers,
+        [name]: value,
+      });
+    }
   };
 
   const handleSubmit = async () => {
@@ -247,7 +271,7 @@ const GeneralIntakeForm = ({ onComplete }) => {
     }
   
     const transformedData = {
-      geneticBackground: answers["geneticBackground"] || "",
+      geneticBackground: answers["geneticBackground"] === "Other" ? answers["geneticBackground_other"] : answers["geneticBackground"] || "",
       whereMedicalCare: answers["where_received_medical_care"] || "",
       whenMedicalCare: answers["when_received_medical_care"] || "",
       whomMedicalCare: answers["whom_received_medical_care"] || "",
@@ -256,43 +280,29 @@ const GeneralIntakeForm = ({ onComplete }) => {
       emergencyPhoneHome: answers["emergency_contact"]?.phoneHome || "",
       emergencyPhoneCell: answers["emergency_contact"]?.phoneCell || "",
       emergencyPhoneWork: answers["emergency_contact"]?.phoneType || "",
-      howDidHearAbout: answers["how_did_you_hear"] || "",
+      howDidHearAbout: answers["how_did_you_hear"] === "Other" ? answers["how_did_you_hear_other"] : answers["how_did_you_hear"] || "",
       age:answers["age"] || "",
     };
   
-    const encryptedData = 
-      transformedData
-
-      // const encryptedData = CryptoJS.AES.encrypt(
-      //   JSON.stringify(transformedData),
-      //   SECRET_KEY
-      // ).toString();
+    const encryptedData = transformedData;
     
     try {
       const response = await dispatch(
         submitGeneralInformation({ payload: encryptedData }) 
       ).unwrap();
-      console.log(response)
-
 
       if (response.success) {
         message.success("Data saved successfully.");
+        dispatch(completeCard("/questionnaire/1"));
+        navigate("/assessment");
       } else {
         message.error("Failed to save data.");
       }
     } 
     catch (error) {
-      console.log("did i get")
-      console.log(error);
+      console.error("Error submitting data:", error);
       message.error("An error occurred while submitting the data.");
     }
-  
-    dispatch(completeCard("/questionnaire/1"));
-    localStorage.setItem("currentQuestionIndex", "0");
- 
-    localStorage.setItem("answers", JSON.stringify(answers));
-  
-    navigate("/assessment");
   };
   
   const label = (
@@ -372,11 +382,10 @@ const GeneralIntakeForm = ({ onComplete }) => {
                     <span style={{ verticalAlign: 'text-bottom' }}>{option}</span>
                     {answers[question.name] === "Other" && (
                       <>
-                        <br />
                         <Input
                           style={{
                             marginTop: 10,
-                            marginLeft: 50,
+                            marginLeft: 10,
                             borderColor: "#00ADEF",
                             width: "30%",
                           }}
@@ -436,7 +445,11 @@ const GeneralIntakeForm = ({ onComplete }) => {
             </>
           )}
         </h3>{" "}
-        {dataLoadedFromAPI && renderInput(questions[currentQuestionIndex])}
+        {isLoading ? (
+          <p>Loading...</p>
+        ) : (
+          renderInput(questions[currentQuestionIndex])
+        )}
         <div
           style={{ margin: "20px 0", marginTop: isMobile ? 50 : 200 }}
           className="button_group"

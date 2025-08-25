@@ -3,34 +3,65 @@ import * as signalR from "@microsoft/signalr";
 import { notificationURL } from "../../../utils/envAccess";
 import { useDispatch, useSelector } from "react-redux";
 import { truncateText } from "../../../utils/globalFunctions";
-import { Col, Row } from "react-bootstrap";
-import { deleteRecord, markNotiAsRead } from "../../redux/globalSlice";
 import { toast } from "react-toastify";
+import { markNotiAsRead } from "../../redux/globalSlice";
 
 const NotificationPanel = ({
   notifications,
   handleNotificationPanel,
   setUnReadCount,
+  onNotificationUpdate
 }) => {
-  const [hubConnection, setHubConnection] = useState(null);
-  const [messages, setMessages] = useState([]);
-  const [isDisabled, setDisabled] = useState(false);
-  const { userAuth } = useSelector((state) => state?.authentication);
   const dispatch = useDispatch();
-  console.log(hubConnection);
+  const [messages, setMessages] = useState([]);
+  const { userAuth } = useSelector((state) => state?.authentication);
+
+  const getNotificationColor = (type) => {
+    const colors = {
+      'LabRequisition': '#4169E1',
+      'LabWork': '#4169E1',
+      'DrugSupplement': '#2E8B57',
+      'PatientNote': '#9370DB',
+      'LaboratoryDocument': '#4169E1',
+      'default': '#01acee'
+    };
+    return colors[type] || colors.default;
+  };
+
+  const handleNotificationClick = async (message) => {
+    if (message.isRead === 0) {
+      try {
+        const response = await dispatch(markNotiAsRead({ notiOrUser: "Noti", id: message.id })).unwrap();
+        if (response?.status) {
+          // Remove the message from the list
+          setMessages(prevMessages => prevMessages.filter(msg => msg.id !== message.id));
+          // Decrease unread count
+          setUnReadCount(prevCount => Math.max(0, prevCount - 1));
+          // Fetch latest notifications
+          await onNotificationUpdate();
+        }
+      } catch (error) {
+        console.error("Error marking notification as read:", error);
+        toast.error("Failed to mark notification as read");
+      }
+    }
+  };
+
   const initializeSignalR = useCallback(async () => {
     const URL = `${notificationURL}notificationHub`;
     const connection = new signalR.HubConnectionBuilder().withUrl(URL).build();
 
-    connection.on("ReceiveMessage", (message, userId) => {
+    connection.on("ReceiveMessage", async (message, userId) => {
       try {
         if (userId) {
           const userIdsArray = JSON.parse(userId);
           userIdsArray.forEach((item) => {
             if (item === userAuth.id) {
               setMessages((prevMessages) => [...prevMessages, message]);
-              toast.info(message.description);
+              // toast.info(message.description);
               setUnReadCount((prevCount) => prevCount + 1);
+              // Fetch latest notifications when new message arrives
+              onNotificationUpdate();
             }
           });
         }
@@ -41,111 +72,96 @@ const NotificationPanel = ({
 
     try {
       await connection.start();
-      setHubConnection(connection);
     } catch (err) {
       console.error(err.toString());
     }
-  }, [userAuth.id, setUnReadCount]);
+  }, [userAuth.id, setUnReadCount, onNotificationUpdate]);
 
   const setMessagesFromNotifications = useCallback(() => {
-    if (messages.length === 0 && notifications) {
-      if (notifications?.getRecord?.length > 0) {
-        setMessages(notifications.getRecord);
-      }
+    if (notifications?.getRecord?.length > 0) {
+      setMessages(notifications.getRecord);
+    } else {
+      setMessages([]);
     }
-  }, [messages.length, notifications]);
+  }, [notifications]);
 
   useEffect(() => {
     initializeSignalR();
+  }, [initializeSignalR]);
+
+  useEffect(() => {
     setMessagesFromNotifications();
-  }, [initializeSignalR, setMessagesFromNotifications]);
+  }, [setMessagesFromNotifications, notifications]);
 
-  const markAsRead = async (values) => {
-    setDisabled(true);
-    try {
-      const payload = {
-        notiOrUser: "Noti",
-        id: values, // assuming values is an object with an 'id' property
-      };
-      await dispatch(markNotiAsRead(payload));
-      if (values.isRead === 0) {
-        setUnReadCount((prevCount) => (prevCount > 0 ? prevCount - 1 : 0));
-      }
-    } catch (error) {
-    } finally {
-      setDisabled(false);
-      handleNotificationPanel();
-    }
-  };
-
-  const deleteNoti = async (id) => {
-    setDisabled(true);
-    try {
-      const endPoint = `Notification/DeleteNoti?id=${id}`;
-      await dispatch(deleteRecord(endPoint));
-      setUnReadCount((prevCount) => (prevCount > 0 ? prevCount - 1 : 0));
-    } catch (error) {
-    } finally {
-      setDisabled(false);
-      handleNotificationPanel();
-    }
-  };
+  if (messages.length === 0) {
+    return (
+      <div style={{
+        padding: '12px',
+        textAlign: 'center',
+        color: '#666',
+        fontSize: '13px'
+      }}>
+        No notifications available
+      </div>
+    );
+  }
 
   return (
     <>
       {messages.map((message, index) => (
-        <Row
-          key={index}
-          style={
-            message.isRead === 0
-              ? {
-                  backgroundColor: "rgb(226 248 255)",
-                  borderBottom: "1px solid #999",
-                }
-              : {
-                  borderBottom: "1px solid rgb(227 227 227)",
-                }
-          }
+        <div
+          key={message.id || index}
+          onClick={() => handleNotificationClick(message)}
+          style={{
+            padding: '8px 12px',
+            borderBottom: '1px solid #eee',
+            backgroundColor: message.isRead === 0 ? '#f8fbff' : '#fff',
+            transition: 'background-color 0.2s ease',
+            cursor: 'pointer'
+          }}
         >
-          <Col md={10}>
-            <a
-              href="##"
-              className="dropdown-item align-items-center py-3 pe-1"
-              style={{
-                border: "1px solid transparent",
-              }}
-            >
-              <h6 className="m-0 font-weight-bold text-primary">
-                {message.title}
-              </h6>
-              <p className="text-gray-500" title={message.description}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '6px',
+                marginBottom: '4px'
+              }}>
+                <span style={{ 
+                  color: getNotificationColor(message.title),
+                  fontWeight: 600,
+                  fontSize: '14px'
+                }}>
+                  {message.title}
+                </span>
+                {message.isRead === 0 && (
+                  <span style={{ 
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    backgroundColor: '#01acee',
+                    display: 'inline-block'
+                  }}/>
+                )}
+              </div>
+              <p style={{ 
+                margin: '0 0 4px',
+                color: '#666',
+                fontSize: '13px',
+                lineHeight: '1.4'
+              }}>
                 {truncateText(message.description, 10)}
               </p>
-            </a>
-          </Col>
-          <Col md={2} className="my-3">
-            {message.isRead === 0 ? (
-              <a
-                href="##"
-                title="Mark as read"
-                disabled={isDisabled}
-                onClick={() => markAsRead(message.id)}
-              >
-                <i className="fa fa-circle fa-solid fa-sm text-primary"></i>
-              </a>
-            ) : null}
-            <a
-              href="##"
-              title="Delete"
-              className="me-3"
-              disabled={isDisabled}
-              onClick={() => deleteNoti(message.id)}
-            >
-              <i className="fa fa-trash fa-solid fa-sm text-danger"></i>
-            </a>
-            <br />
-          </Col>
-        </Row>
+              <div style={{ 
+                fontSize: '12px',
+                color: '#999'
+              }}>
+                {new Date(message.createdAt).toLocaleDateString()}
+              </div>
+            </div>
+          </div>
+        </div>
       ))}
     </>
   );

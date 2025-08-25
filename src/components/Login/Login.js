@@ -25,6 +25,7 @@ import "./Login.css";
 import ForgotPassword from "../ForgotPassword/ForgotPassword";
 import EmailInputModal from "../Register/SignUpPages/UpdateEmailModal";
 import EmailVerificationModal from "../Register/SignUpPages/OTPModal";
+import LoginOTPModal from "./LoginOTPModal";
 
 const { Text } = Typography;
 
@@ -45,7 +46,10 @@ function Login() {
   const [showEmailInputModal, setShowEmailInputModal] = useState(false);
   const [showEmailVerificationModal, setShowEmailVerificationModal] =
     useState(false);
+  const [showLoginOTPModal, setShowLoginOTPModal] = useState(false);
   const [resendEmail, setResendEmail] = useState("");
+  const [pendingLoginData, setPendingLoginData] = useState(null);
+
   const { values, handleBlur, handleChange, handleSubmit, errors } = useFormik({
     initialValues,
     validationSchema: validateLogin,
@@ -54,19 +58,27 @@ function Login() {
         const resultAction = await dispatch(postLogin(values)).unwrap();
         if (resultAction?.status) {
           console.log(resultAction, "result");
-
-          if (resultAction.obj.role === "Patient") {
-            navigate("/patient");
-          } else if (resultAction.obj.role === "SuperAdmin") {
-            navigate("/users");
-          } else if (resultAction.obj.role === "Nurse") {
-            navigate("/nurse");}
-           else if (resultAction.obj.role) {
-            navigate("/doctor");
+          
+          // Check if OTP verification is required (status code 410)
+          if (resultAction.statusCode === "410") {
+            // Store the login data and show OTP modal
+            setPendingLoginData(resultAction);
+            setShowLoginOTPModal(true);
+            message.success(resultAction.message || 'Please enter the verification code sent to your email/phone');
+          } else if (resultAction.statusCode === "200" || !resultAction.statusCode) {
+            // Show success message and navigate directly (only for successful login without OTP)
+            message.success('Login successful!');
+            handleSuccessfulLogin(resultAction);
           }
+        } else {
+          // Handle unsuccessful login (status: false)
+          console.log("Login unsuccessful:", resultAction);
+          message.error(resultAction.message || 'Login failed. Please check your credentials and try again.');
         }
       } catch (error) {
         console.log("login-page api call error: " + error);
+        // Show error message
+        message.error('Login failed. Please check your credentials and try again.');
       }
     },
   });
@@ -82,8 +94,52 @@ function Login() {
     setShowForgotPasswordModal(false);
   };
 
+  const handleSuccessfulLogin = (resultAction) => {
+    // Check if resultAction has the user object with role
+    if (resultAction?.obj?.role) {
+      if (resultAction.obj.role === "Patient") {
+        navigate("/patient");
+      } else if (resultAction.obj.role === "SuperAdmin") {
+        navigate("/users");
+      } else if (resultAction.obj.role === "Nurse") {
+        navigate("/nurse");
+      } else if (resultAction.obj.role) {
+        navigate("/doctor");
+      }
+    } else {
+      // Fallback navigation if role is not available
+      navigate("/patient");
+    }
+  };
+
+  const handleOTPSuccess = (otpResult) => {
+    // Handle successful OTP verification
+    message.success('Login successful!');
+    // The OTP verification response should contain the user data with role
+    if (otpResult?.obj?.role) {
+      handleSuccessfulLogin(otpResult);
+    } else {
+      // If OTP response doesn't have role, try to use pending data or navigate to default
+      handleSuccessfulLogin(pendingLoginData || otpResult);
+    }
+  };
+
   const handleEmailInputSubmit = async (email) => {
-    const session = JSON.parse(localStorage.getItem("userInfo"))?.session;
+    const userInfoString = localStorage.getItem("userInfo");
+    if (!userInfoString) {
+      message.error("User information not found. Please try again.");
+      return;
+    }
+    
+    let userInfo;
+    try {
+      userInfo = JSON.parse(userInfoString);
+    } catch (error) {
+      message.error("Invalid user information. Please try again.");
+      return;
+    }
+    
+    const session = userInfo?.session;
 
     if (!session) {
       message.error("Session not found. Please try again.");
@@ -195,7 +251,7 @@ function Login() {
               </Text>
               {/* <Text onClick={handleResendOtp} style={{ cursor: 'pointer', color: '#01ADF0' }}>Resend OTP?</Text> */}
               <Text className="sign-up-link">
-                Don't have an account? <NavLink to="/clinicianRegister">Sign Up</NavLink>
+                Don't have an account? <NavLink to="/patientSignup">Sign Up</NavLink>
               </Text>
             </div>
           </Form>
@@ -224,6 +280,13 @@ function Login() {
         onCancel={() => setShowEmailVerificationModal(false)}
         onVerify={() => setShowEmailVerificationModal(false)}
         email={resendEmail}
+      />
+
+      <LoginOTPModal
+        visible={showLoginOTPModal}
+        onCancel={() => setShowLoginOTPModal(false)}
+        emailOrUsername={values.email}
+        onSuccess={handleOTPSuccess}
       />
     </Row>
   );

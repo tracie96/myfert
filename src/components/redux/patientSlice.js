@@ -4,6 +4,33 @@ import { handleApiError, getResponse } from "../Handler/ExceptionHandler";
 import { toast } from "react-toastify";
 import { baseUrl } from "../../utils/envAccess";
 
+export const addDocuments = createAsyncThunk(
+  "patient/addDocument",
+  async ({ patientRef, bloodWork }, { rejectWithValue, getState, dispatch }) => {
+
+    const user = getState()?.authentication?.userAuth; 
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+    try {
+      const response = await axios.post(
+        `${baseUrl}patient/addDocument`, 
+        { ...bloodWork }, 
+        config
+      );
+      console.log("API Response:", response.data); 
+      return response.data;
+
+    } catch (error) {
+      console.error("API Error:", error); 
+      return rejectWithValue(handleApiError(error?.response?.data, dispatch, user)); 
+    }
+  }
+);
+
 export const getDoctorListDropdownForAppointment = createAsyncThunk(
   "patient/getDoctorListDropdownForAppointment",
   async (_, { rejectWithValue, getState, dispatch }) => {
@@ -351,6 +378,30 @@ export const getPatientNotes = createAsyncThunk(
   }
 );
 
+export const getPatientSupplements = createAsyncThunk(
+  "patient/getPatientSupplements",
+  async (_, { rejectWithValue, getState, dispatch }) => {
+    const user = getState()?.authentication?.userAuth;
+    const config = {
+      headers: {
+        "accept": "text/plain",
+        Authorization: `Bearer ${user?.obj?.token}`,
+      },
+    };
+    try {
+      const response = await axios.get(
+        `${baseUrl}Patient/GetPatientSupplements`,
+        config
+      );
+      console.log(response);
+      return response.data;
+    } catch (error) {
+      handleApiError(error?.response?.data, dispatch, user);
+      return rejectWithValue(error?.response?.data || "An error occurred");
+    }
+  }
+);
+
 const patientSlices = createSlice({
   name: "patient",
   initialState: {
@@ -361,6 +412,7 @@ const patientSlices = createSlice({
     patientServerErr: null,
     bloodWork: [],
     medication: [],
+    supplements: [],
     notes: []
   },
   extraReducers: (builder) => {
@@ -556,6 +608,19 @@ const patientSlices = createSlice({
         state.notes = action.payload;
       })
       .addCase(getPatientNotes.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload;
+      });
+
+    builder
+      .addCase(getPatientSupplements.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(getPatientSupplements.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.supplements = action.payload;
+      })
+      .addCase(getPatientSupplements.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload;
       });

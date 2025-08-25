@@ -22,8 +22,16 @@ import "../assesment.css";
 import moment from "moment";
 import { useMediaQuery } from "react-responsive";
 import { backBtnTxt, exitBtnTxt, saveAndContinueBtn, submitBtn } from "../../../../../utils/constant";
+import dayjs from 'dayjs';
+import { baseUrl } from "../../../../../utils/envAccess";
 
 const { Option } = Select;
+
+//const startYear = 2025;
+
+const disableFutureDates = (current) => {
+  return current && current > dayjs().endOf('day');
+};
 
 const questions = [
   {
@@ -169,7 +177,7 @@ const questions = [
     options: Array.from({ length: 48 }, (_, i) => 1 + i),
   },
   {
-    question: "Age of introduction of: Diary",
+    question: "Age of introduction of: Dairy",
     type: "select",
     name: "age_of_diary_food_intro",
     options: Array.from({ length: 48 }, (_, i) => 1 + i),
@@ -255,7 +263,7 @@ const questions = [
     question: "How many fillings did you have as a kid?",
     type: "select",
     name: "fillings_removed",
-    options: Array.from({ length: 48 }, (_, i) => 1 + i),
+    options: Array.from({ length: 49 }, (_, i) => i)
   },
   {
     question: "Do you brush regularly?",
@@ -277,6 +285,7 @@ const questions = [
       "Cigarette smoke",
       "Perfume/colognes",
       "Auto exhaust fumes",
+      "N/A",
       "Other",
     ],
   },
@@ -364,21 +373,66 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
   useEffect(() => {
     if (patientHealthMedicalInfo) {
       const lifestyle = patientHealthMedicalInfo;
+      const normalizeYesNo = (value) => {
+        if (value === true) return "Yes";
+        if (value === false) return "No";
+        return null;
+      };
+
+      const smokeIrritantsOptions = questions.find(
+        (q) => q.name === "smoke_irritants"
+      )?.options || [];
+
+      const workEnvIrritantsOptions = questions.find(
+        (q) => q.name === "work_env_smoke_irritants"
+      )?.options || [];
+
+      let smokeIrritants = lifestyle.environmentEffect || [];
+      let smokeIrritantsOther = "";
+      let workEnvIrritants = lifestyle.environmentExposed || [];
+      let workEnvIrritantsOther = "";
+
+      // Handle smoke irritants
+      const customValue = smokeIrritants.find(value => !smokeIrritantsOptions.includes(value));
+      if (customValue) {
+        smokeIrritantsOther = customValue;
+        smokeIrritants = smokeIrritants.filter(value => value !== customValue);
+        smokeIrritants.push("Other");
+      }
+
+      // Handle work environment irritants
+      const customWorkValue = workEnvIrritants.find(value => !workEnvIrritantsOptions.includes(value));
+      if (customWorkValue) {
+        workEnvIrritantsOther = customWorkValue;
+        workEnvIrritants = workEnvIrritants.filter(value => value !== customWorkValue);
+        workEnvIrritants.push("Other");
+      }
 
       const prefillAnswers = {
-        overll_wellbeing: lifestyle.howWellThingsGoingOverall || 1,
+        overll_wellbeing: lifestyle.howWellThingsGoingOverall ?? 1,
+        overll_wellbeing_na: lifestyle.howWellThingsGoingOverall === 0, 
         school_wellbeing: lifestyle.howWellThingsGoingSchool || 1,
+        school_wellbeing_na: lifestyle.howWellThingsGoingSchool === 0,
         job_wellbeing: lifestyle.howWellThingsGoingJob || 1,
+        job_wellbeing_na: lifestyle.howWellThingsGoingJob === 0,  
         social_life_wellbeing: lifestyle.howWellThingsGoingSocialLife || 1,
+        social_life_wellbeing_na: lifestyle.howWellThingsGoingSocialLife === 0,
         close_friends_wellbeing: lifestyle.howWellThingsGoingCloseFriends || 1,
+        close_friends_wellbeing_na: lifestyle.howWellThingsGoingCloseFriends === 0,
         sex_wellbeing: lifestyle.howWellThingsGoingSex || 1,
+        sex_wellbeing_na: lifestyle.howWellThingsGoingSex === 0,
         attitude_wellbeing: lifestyle.howWellThingsGoingAttitude || 1,
+        attitude_wellbeing_na: lifestyle.howWellThingsGoingAttitude === 0,
         relationship_wellbeing: lifestyle.howWellThingsGoingPartner || 1,
+        relationship_wellbeing_na: lifestyle.howWellThingsGoingPartner === 0,
         children_wellbeing: lifestyle.howWellThingsGoingKids || 1,
+        children_wellbeing_na: lifestyle.howWellThingsGoingKids === 0,
         parents_wellbeing: lifestyle.howWellThingsGoingParents || 1,
+        parents_wellbeing_na: lifestyle.howWellThingsGoingParents === 0,
         spouse_wellbeing: lifestyle.howWellThingsGoingSpouse || 1,
+        spouse_wellbeing_na: lifestyle.howWellThingsGoingSpouse === 0,
         mode_of_own_birth: lifestyle.howWereYouBorn,
-        birth_complications: lifestyle.wereYouBornWithComplication?.yesNo ? "Yes" : "No",
+        birth_complications: normalizeYesNo(lifestyle.wereYouBornWithComplication?.yesNo),
         birth_complications_details: lifestyle.wereYouBornWithComplication?.describe || "",
         breast_fed_duration: lifestyle.breastFedHowLong || "",
         bottle_fed_type: lifestyle.breastFedFormula || "",
@@ -386,26 +440,32 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
         age_of_solid_food_intro: lifestyle.ageIntroductionSolidFood || "",
         age_of_wheat_food_intro: lifestyle.ageIntroductionWheat || "",
         age_of_diary_food_intro: lifestyle.ageIntroductionDiary || "",
-        allergic_food: lifestyle.foodsAvoided ? "Yes" : "No",
+        allergic_food: normalizeYesNo(lifestyle.foodsAvoided),
         food_avoided: lifestyle.foodsAvoidTypeSymptoms || "",
-        eat_sugar_as_a_child: lifestyle.alotSugar ? "Yes" : "No",
-        mercury_filings: lifestyle.mercuryFillingRemoved ? "Yes" : "No",
+        eat_sugar_as_a_child: normalizeYesNo(lifestyle.alotSugar),
+        mercury_filings: normalizeYesNo(lifestyle.mercuryFillingRemoved),
         mercury_fillings_removed: lifestyle.mercuryFillingRemovedWhen || "",
         fillings_removed: lifestyle.fillingsAsKid || "",
   
-        do_you_brush_regularly: lifestyle.brushRegularly ? "Yes" : "No",
-        do_you_floss_regularly: lifestyle.flossRegularly ? "Yes" : "No",
+        do_you_brush_regularly: normalizeYesNo(lifestyle.brushRegularly),
+        do_you_floss_regularly: normalizeYesNo(lifestyle.flossRegularly),
   
-        smoke_irritants: lifestyle.environmentEffect || [],
-        work_env_smoke_irritants: lifestyle.environmentExposed || [],
+        smoke_irritants: smokeIrritants,
+        smoke_irritants_other: smokeIrritantsOther,
+        work_env_smoke_irritants: workEnvIrritants,
+        work_env_smoke_irritants_other: workEnvIrritantsOther,
   
-        harmful_chemicals: lifestyle.exposedHarmfulChemical ? "Yes" : "No",
+        harmful_chemicals: normalizeYesNo(lifestyle.exposedHarmfulChemical),
         harmful_chemical_exposure: lifestyle.whenExposedHarmfulChemical?.chemicalName || "",
         harmful_chemical_exposure_length: lifestyle.whenExposedHarmfulChemical?.lenghtExposure || "",
         harmful_chemical_exposure_date: lifestyle.whenExposedHarmfulChemical?.dateExposure || "",
   
-        pets_or_animal: lifestyle.petsFarmAnimal ? "Yes" : "No",
+        pets_or_animal: normalizeYesNo(lifestyle.petsFarmAnimal),
         where_they_live: lifestyle.petsAnimalLiveWhere || "",
+        age_of_solid_food_intro_unsure: lifestyle.ageIntroductionSolidFood === 0,
+        age_of_wheat_food_intro_unsure: lifestyle.ageIntroductionWheat === 0,
+        age_of_diary_food_intro_unsure: lifestyle.ageIntroductionDiary === 0,
+        fillings_removed_unsure: lifestyle.fillingsAsKid === 0,
       };
   
       setAnswers(prefillAnswers);
@@ -541,7 +601,7 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
       Object.keys(patientHealthMedicalInfo.obj).length > 0
     ) {
       const transformedAnswers = transformApiDataToAnswers(patientHealthMedicalInfo);
-      console.log("Prefilling from API:", transformedAnswers);
+
       setAnswers(transformedAnswers);
       setCurrentQuestionIndex(0);
       // Clear localStorage to avoid confusion
@@ -564,8 +624,18 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
   };
   const validateQuestion = () => {
     const question = questions[currentQuestionIndex];
-  
+    if (question.name === "work_env_smoke_irritants") {
+      return true;
+    }
     switch (question.type) { 
+      case "rating_scale": {
+        const value = answers[question.name];
+        if (value === undefined || value === null) {
+          return false;
+        }
+        return true;
+      }
+
       case "checkbox_with_select":
         return question.options.every((option) => {
           const checkboxChecked = answers[option.name];
@@ -576,15 +646,26 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
           return !checkboxChecked || selectValid;
         });
   
-      case "checkbox_with_input":
-        return question.options.every((option) => {
-          const checkboxChecked = answers[option.name];
-          const inputValid = option.inputName
-            ? (answers[option.inputName] !== undefined && answers[option.inputName] !== "")
-            : true; 
-  
-          return !checkboxChecked || inputValid;
-        });
+        case "checkbox_with_input": {
+          const anySelected = question.options.some((option) => answers[option.name]);
+        
+          if (!anySelected) {
+            return false;
+          }
+        
+          for (const option of question.options) {
+            if (option.inputName && answers[option.name]) {
+              const inputValue = answers[option.inputName];
+              if (!inputValue || inputValue.trim() === "") {
+                message.error(`Please fill in the field for "${option.label}".`);
+                return false;
+              }
+            }
+          }
+        
+          return true;
+        }
+        
   
         case "checkbox": {
             if (!answers[question.name] || answers[question.name].length === 0) {
@@ -603,7 +684,8 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
           }
   
       case "radio": {
-        if (answers[question.name] === undefined) {
+        if (answers[question.name] === undefined || answers[question.name] === null || answers[question.name] === "") {
+          console.log(`Validation failed: '${question.name}' radio question not answered.`);
           return false;
         }
   
@@ -645,13 +727,26 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
   
       case "long_textarea":
         return (
-          answers[question.name] !== undefined && answers[question.name] !== ""
+          answers[question.name] !== undefined && answers[question.name] !== null && answers[question.name] !== ""
         );
   
-      default:
-            return (
-              answers[question.name] !== undefined && answers[question.name] !== ""
-            );
+        default: {
+          const unsureFields = [
+            "age_of_solid_food_intro",
+            "age_of_wheat_food_intro",
+            "age_of_diary_food_intro",
+            "fillings_removed"
+          ];
+        
+          if (unsureFields.includes(question.name) && answers[`${question.name}_unsure`]) {
+            return true; // skip validation if unsure is selected
+          }
+        
+          return (
+            answers[question.name] !== undefined && answers[question.name] !== null && answers[question.name] !== ""
+          );
+        }
+        
     }
   };
   
@@ -674,11 +769,113 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
   };
 
   const handleChange = (value, name) => {
-    setAnswers({
-      ...answers,
-      [name]: value,
-    });
+    // Find the question object by name
+    const question = questions.find(q => q.name === name);
+    const updatedAnswers = { ...answers };
+  
+    // --- NEW: special handling for checkbox groups like 'smoke_irritants' ---
+    if (question && question.type === "checkbox") {
+      // Handle the "Do any of these significantly affect you?" question (N/A exclusivity)
+      if (name === "smoke_irritants") {
+        const values = Array.isArray(value) ? value : [];
+        if (values.includes("N/A")) {
+          // If N/A selected -> set only N/A and clear 'Other' input
+          updatedAnswers[name] = ["N/A"];
+          updatedAnswers[`${name}_other`] = "";
+        } else {
+          // Otherwise, ensure N/A removed and keep other selections
+          updatedAnswers[name] = values.filter(v => v !== "N/A");
+          // If Other is no longer selected, clear the other text field
+          if (!updatedAnswers[name].includes("Other")) {
+            updatedAnswers[`${name}_other`] = "";
+          }
+        }
+        setAnswers(updatedAnswers);
+        return;
+      }
+    }
+    // --- END special-case ---
+  
+    if (question && (question.type === "radio" || question.type === "long_radio")) {
+      // For radio buttons, clear all related fields when selection changes
+      updatedAnswers[name] = value;
+      
+      // Clear any _other fields
+      delete updatedAnswers[`${name}_other`];
+      
+      // Clear subquestion answers if they exist
+      if (question.subQuestions) {
+        question.subQuestions.forEach(subQ => {
+          delete updatedAnswers[subQ.name];
+          delete updatedAnswers[`${subQ.name}_other`];
+        });
+      }
+  
+      // Special handling for specific questions
+      if (name === "pets_or_animal") {
+        delete updatedAnswers.where_they_live;
+      } else if (name === "harmful_chemicals") {
+        delete updatedAnswers.harmful_chemical_exposure;
+        delete updatedAnswers.harmful_chemical_exposure_length;
+        delete updatedAnswers.harmful_chemical_exposure_date;
+      }
+    } else if (name.endsWith("_unsure")) {
+      const fieldName = name.replace("_unsure", "");
+  
+      if (value) {
+        updatedAnswers[fieldName] = ""; // Clear select value
+      }
+  
+      updatedAnswers[name] = value;
+    } else {
+      updatedAnswers[name] = value;
+    
+      // 🧼 Clear sub-question values when "No" is selected
+      const clearMap = {
+        birth_complications: "birth_complications_details",
+        allergic_food: "food_avoided",
+        mercury_filings: "mercury_fillings_removed",
+        harmful_chemicals: [
+          "harmful_chemical_exposure",
+          "harmful_chemical_exposure_length",
+          "harmful_chemical_exposure_date"
+        ],
+        pets_or_animal: "where_they_live"
+      };
+    
+      if (clearMap[name] && value === "No") {
+        const fieldsToClear = Array.isArray(clearMap[name])
+          ? clearMap[name]
+          : [clearMap[name]];
+    
+        fieldsToClear.forEach((field) => {
+          updatedAnswers[field] = "";
+        });
+      }
+    }
+  
+    // Handle future date validation
+    if (
+      value &&
+      (name.includes("date") ||
+        (questions[currentQuestionIndex]?.type === "long_radio" &&
+          questions[currentQuestionIndex]?.subQuestions?.some(
+            (sq) => sq.type === "date" && sq.name === name
+          )))
+    ) {
+      const selectedDate = moment(value);
+      const today = moment().endOf("day");
+  
+      if (selectedDate.isAfter(today)) {
+        message.error("Future dates are not allowed");
+        return;
+      }
+    }
+  
+    setAnswers(updatedAnswers);
   };
+  
+
 
   const handleSubmit = async () => {
     if (!validateQuestion()) {
@@ -723,8 +920,22 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
         fillingsAsKid: answers.fillings_removed || 0,
         brushRegularly: answers.do_you_brush_regularly === "Yes",
         flossRegularly: answers.do_you_floss_regularly === "Yes",
-        environmentEffect: answers.smoke_irritants || ["Not answered"],
-        environmentExposed: answers.work_env_smoke_irritants || ["Not answered"],
+        environmentEffect: (() => {
+          let irritants = [...(answers.smoke_irritants || [])];
+          if (irritants.includes("Other") && answers.smoke_irritants_other) {
+            irritants = irritants.filter(item => item !== "Other");
+            irritants.push(answers.smoke_irritants_other);
+          }
+          return irritants;
+        })(),
+        environmentExposed: (() => {
+          let irritants = [...(answers.work_env_smoke_irritants || [])];
+          if (irritants.includes("Other") && answers.work_env_smoke_irritants_other) {
+            irritants = irritants.filter(item => item !== "Other");
+            irritants.push(answers.work_env_smoke_irritants_other);
+          }
+          return irritants;
+        })(),
         exposedHarmfulChemical: answers.harmful_chemicals === "Yes",
         whenExposedHarmfulChemical: {
           chemicalName: answers.harmful_chemical_exposure || "Not answered",
@@ -737,14 +948,13 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
       const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
       const token = userInfo.obj.token || "";
       const response = await fetch(
-        "https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/AddHealthMedicalHistory",
+        `${baseUrl}Patient/AddHealthMedicalHistory`,
         {
           method: "POST",
           headers: {
             "Accept": "text/plain",
             "Content-Type": "application/json",
             Authorization: `${token}`,
-
           },
           body: JSON.stringify(payload),
         }
@@ -767,33 +977,45 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
   };
 
 
-  const handleSelectInputChange = (
-    checked,
-    name,
-    inputName = null,
-    options = [],
-  ) => {
+  const handleSelectInputChange = (checked, name, inputName = null, options = []) => {
     const newAnswers = { ...answers };
-
-    if (inputName) {
+  
+    if (inputName && typeof checked === "boolean") {
       newAnswers[inputName] = checked ? answers[inputName] : "";
     }
-
-    if (checked) {
-      options.forEach((option) => {
-        if (option.name !== name) {
-          newAnswers[option.name] = false;
-          if (option.inputName) {
-            newAnswers[option.inputName] = "";
+  
+    // Special case for breast_fed group
+    if (options.some(opt => opt.name === "breast_fed")) {
+      if (name === "dont_know" && checked) {
+        // If Don't know is selected -> uncheck others & clear inputs
+        options.forEach(option => {
+          if (option.name !== "dont_know") {
+            newAnswers[option.name] = false;
+            if (option.inputName) newAnswers[option.inputName] = "";
           }
-        }
-      });
+        });
+      } else if (name !== "dont_know" && checked) {
+        // If selecting breast_fed or bottle_fed -> uncheck Don't know
+        newAnswers["dont_know"] = false;
+      }
+    } else {
+      // Default behaviour for other checkbox_with_input questions
+      if (checked) {
+        options.forEach(option => {
+          if (option.name !== name) {
+            newAnswers[option.name] = false;
+            if (option.inputName) {
+              newAnswers[option.inputName] = "";
+            }
+          }
+        });
+      }
     }
-
+  
     newAnswers[name] = checked;
-
     setAnswers(newAnswers);
   };
+  
   const handleSelectCheckChange = (checked, checkboxName, selectName) => {
     setAnswers((prevAnswers) => {
       const updatedAnswers = { ...prevAnswers };
@@ -828,6 +1050,11 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
             value={answers[subQuestion.name] || ""}
             onChange={(e) => handleChange(e.target.value, subQuestion.name)}
             className="input_questtionnaire"
+            style={{
+              width: isMobile ? "100%" : "50%",
+              height: "42px",
+              borderColor: "#ccc"
+            }}
           />
         )}
         {subQuestion.type === "inputNumber" && (
@@ -836,6 +1063,11 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
             value={answers[subQuestion.name] || 0}
             onChange={(value) => handleChange(value, subQuestion.name)}
             className="input_questtionnaire"
+            style={{
+              width: isMobile ? "100%" : "50%",
+              height: "42px",
+              borderColor: "#ccc"
+            }}
           />
         )}
         {subQuestion.type === "radio" && (
@@ -861,7 +1093,11 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
             placeholder="Select an option"
             value={answers[subQuestion.name] || ""}
             onChange={(value) => handleChange(value, subQuestion.name)}
-            style={{ width: isMobile ? "100%" : "50%" }}
+            style={{
+              width: isMobile ? "100%" : "50%",
+              height: "42px",
+              borderColor: "#ccc"
+            }}
           >
             {subQuestion.options.map((option, idx) => (
               <Option key={idx} value={option}>
@@ -870,22 +1106,21 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
             ))}
           </Select>
         )}
+        {subQuestion.name === "harmful_chemical_exposure_length" && (
+          <span style={{ color: "#000" }}> days</span>
+        )}
         {subQuestion.type === "date" && (
           <DatePicker
-            format="YYYY-MM-DD"
-            value={
-              answers[subQuestion.name]
-                ? moment(answers[subQuestion.name])
-                : null
-            }
-            onChange={(date) =>
-              handleChange(
-                date ? date.format("YYYY-MM-DD") : "",
-                subQuestion.name,
-              )
-            }
-            style={{ width: isMobile ? "100%" : "50%" }}
-          />
+          disabledDate={disableFutureDates}
+          value={answers[subQuestion.name] ? dayjs(answers[subQuestion.name]) : null}
+          format="YYYY-MM-DD"
+          style={{
+            width: isMobile ? "100%" : "50%",
+            height: "42px",
+            borderColor: "#000"
+          }}
+          onChange={(date, dateString) => handleChange(dateString, subQuestion.name)}
+        />
         )}
         {subQuestion.type === "checkbox" && (
           <Checkbox.Group
@@ -894,12 +1129,13 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
               handleChange(checkedValues, subQuestion.name)
             }
             value={answers[subQuestion.name] || []}
+            style={{ width: isMobile ? "100%" : "50%" }}
           >
             {subQuestion.options.map((option, idx) => (
               <Checkbox
                 key={idx}
                 value={option}
-                style={{ display: "block", marginBottom: "10px" }}
+                style={{ display: "flex", marginBottom: "10px",width: "calc(9% - 10px)" }}
               >
                 {option}
                 {option === "Other" &&
@@ -916,6 +1152,11 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
                             `${subQuestion.name}_other`,
                           )
                         }
+                        style={{
+                          width: isMobile ? "100%" : "50%",
+                          height: "42px",
+                          borderColor: "#000"
+                        }}
                       />
                     </>
                   )}
@@ -931,18 +1172,37 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
     switch (question.type) {
       case "select":
         return (
-          <Select
-            className="select_questtionnaire"
-            name={question.name}
-            value={answers[question.name] || ""}
-            onChange={(value) => handleChange(value, question.name)}
-          >
+          <div>
+            <Select
+              className="select_questtionnaire"
+              name={question.name}
+              value={answers[question.name] ?? undefined}
+              onChange={(value) => handleChange(value, question.name)}
+              disabled={!!answers[`${question.name}_unsure`]}
+            >
+
             {question.options.map((option, index) => (
               <Option key={index} value={option}>
                 {option}
               </Option>
             ))}
           </Select>
+           {(question.name === "age_of_solid_food_intro" || question.name === "age_of_wheat_food_intro" || question.name === "age_of_diary_food_intro") && (
+            <span style={{ color: "#000" }}> Months</span>
+           )}
+          {(question.name === "age_of_solid_food_intro" || question.name === "age_of_wheat_food_intro" || question.name === "age_of_diary_food_intro" || question.name === "fillings_removed") && (
+            <div>
+              <Checkbox
+                name={`${question.name}_unsure`}
+                checked={answers[`${question.name}_unsure`] || false}
+                onChange={(e) => handleChange(e.target.checked, `${question.name}_unsure`)}
+              >
+                Unsure
+              </Checkbox>
+            </div>
+          )}
+
+          </div>
         );
       case "radio":
         return (
@@ -1026,7 +1286,7 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
               <Row gutter={[16, 16]}>
                 <Col span={12}>
                   <Slider
-                    min={1}
+                    min={0}
                     max={10}
                     dots
                     value={answers[question.name] || 1}
@@ -1203,43 +1463,40 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
   
       case "checkbox":
         return (
-          <Checkbox.Group
-            name={question.name}
-            onChange={(checkedValues) =>
-              handleChange(checkedValues, question.name)
-            }
-            value={answers[question.name] || []}
-            className="checkbox-group"
-          >
-            {question.options.map((option, index) => (
-              <Checkbox key={index} value={option} className="checkbox-item">
-                {option === "Other" ? (
-                  <>
-                    {option}
-                    {answers[question.name] &&
-                      answers[question.name].includes("Other") && (
-                        <>
-                          <br />
-                          <Input
-                            className="input_questtionnaire"
-                            placeholder="Please specify"
-                            value={answers[`${question.name}_other`] || ""}
-                            onChange={(e) =>
-                              handleChange(
-                                e.target.value,
-                                `${question.name}_other`,
-                              )
-                            }
-                          />
-                        </>
-                      )}
-                  </>
-                ) : (
-                  option
-                )}
-              </Checkbox>
-            ))}
-          </Checkbox.Group>
+          <div className="checkbox-group" style={{position:"relative"}}>
+            <Checkbox.Group
+              name={question.name}
+              onChange={(checkedValues) =>
+                handleChange(checkedValues, question.name)
+              }
+              value={answers[question.name] || []}
+            >
+              {question.options.map((option, index) => (
+                <Checkbox
+                  key={index}
+                  value={option}
+                  className="checkbox-item"
+                  disabled={answers[question.name]?.includes("N/A") && option !== "N/A"}
+                >
+                  {option}
+                </Checkbox>
+              ))}
+            </Checkbox.Group>
+
+            {answers[question.name]?.includes("Other") && (
+              <div style={{ marginTop: "10px", marginLeft: "24px", position:"absolute", width:"100%", bottom:"-7px", left:"54px" }}>
+                <Input
+                  className="input_questtionnaire"
+                  placeholder="Please specify"
+                  value={answers[`${question.name}_other`] || ""}
+                  onChange={(e) =>
+                    handleChange(e.target.value, `${question.name}_other`)
+                  }
+                  style={{ width: isMobile ? "100%" : "50%" }}
+                />
+              </div>
+            )}
+          </div>
         );
       case "long_radio":
         return (
@@ -1274,11 +1531,10 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
       <span style={{ color: "red" }}>* </span>
     </span>
   );
-  const HighlightedQuestion = ({ question }) => {
-    console.log({ question })
+  const HighlightedQuestion = ({ question, name }) => {
     const highlightWords = ['poorly', 'fine', 'very well', 'N/A'];
     const regex = new RegExp(`\\b(${highlightWords.join('|')})\\b`, 'gi');
-
+  
     const highlightedQuestion = question.split(regex).map((part, index) => {
       if (highlightWords.includes(part.toLowerCase())) {
         return (
@@ -1289,14 +1545,15 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
       }
       return part;
     });
+  
     return (
       <p>
-        {!question?.includes("1-10") && label}
+        {name !== "work_env_smoke_irritants" && !question?.includes("1-10") && label}
         {highlightedQuestion}
       </p>
     );
-
   };
+  
 
 
   const progressColor =
@@ -1321,18 +1578,21 @@ const HealthAndMedicalHistory = ({ onComplete }) => {
         <h3 style={{ margin: "20px 0", color: "#000", fontWeight: "600", fontSize: "15px" }}>
           {questions[currentQuestionIndex]?.sub && (
             <span>
-              {label}
+              {questions[currentQuestionIndex]?.name !== "work_env_smoke_irritants" && label}
               {questions[currentQuestionIndex]?.sub && (
                 <span style={{ color: "#335CAD", fontWeight: "bold" }}>
                   {questions[currentQuestionIndex]?.sub}
                 </span>
               )}
-
               <br />
             </span>
           )}
-          <HighlightedQuestion question={questions[currentQuestionIndex].question} />
+          <HighlightedQuestion
+            question={questions[currentQuestionIndex].question}
+            name={questions[currentQuestionIndex].name}
+          />
         </h3>
+
 
         {renderInput(questions[currentQuestionIndex])}
 

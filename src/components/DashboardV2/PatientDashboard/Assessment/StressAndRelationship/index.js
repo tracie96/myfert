@@ -22,6 +22,7 @@ import { useMediaQuery } from "react-responsive";
 import { backBtnTxt, exitBtnTxt, saveAndContinueBtn, submitBtn } from "../../../../../utils/constant";
 import Paragraph from "antd/es/typography/Paragraph";
 import Title from "antd/es/typography/Title";
+import { baseUrl } from "../../../../../utils/envAccess";
 
 const { Option } = Select;
 
@@ -81,6 +82,13 @@ const questions = [
     type: "rating_scale",
     sub: "Other",
     name: "health_stress_other",
+    subQuestions: [
+      {
+        type: "long_textarea",
+        name: "health_stress_other_input",
+      },
+    ],
+    
   },
   {
     question: "Do you use relaxation techniques?",
@@ -99,7 +107,7 @@ const questions = [
     question: "Which techniques do you use? (Check all that apply)",
     type: "checkbox",
     name: "special_nutritional_program",
-    options: ["Meditation", "Breathing", "Tai Chi", "Yoga", "Prayer", "Other"],
+    options: ["Meditation", "Breathing", "Tai Chi", "Yoga", "Prayer", "N/A", "Other"],
   },
   {
     question: "Have you ever sought counseling?",
@@ -165,29 +173,29 @@ const questions = [
     name: "current_occupation",
   },
 
-  {
-    question: "Describe the duration and severity of pain during menstrual bleeding.",
-    type: "number_with_radio",
-    title: "Cycle Information",
-    name: "duration_per_cycle",
-    sub_question: "Duration per Cycle",
-    question_description: "Period Pain: ",
-    question_description_answer: "PELVIC PAIN/ CRAMPS",
-    subQuestions: [
-      {
-        type: "number_with_radio_sub",
-        name: "duration_per_cycle_pelvic_pain",
-      },
+  // {
+  //   question: "Describe the duration and severity of pain during menstrual bleeding.",
+  //   type: "number_with_radio",
+  //   title: "Cycle Information",
+  //   name: "duration_per_cycle",
+  //   sub_question: "Duration per Cycle",
+  //   question_description: "Period Pain: ",
+  //   question_description_answer: "PELVIC PAIN/ CRAMPS",
+  //   subQuestions: [
+  //     {
+  //       type: "number_with_radio_sub",
+  //       name: "duration_per_cycle_pelvic_pain",
+  //     },
      
-      {
-        question: "Severity",
-        type: "radio",
-        label: "Severity",
-        options: ["Mild", "Moderate", "Severe","None"],
-        name: "duration_per_cycle_severity_pelvic_pain",
-      },
-    ],
-  },
+  //     {
+  //       question: "Severity",
+  //       type: "radio",
+  //       label: "Severity",
+  //       options: ["Mild", "Moderate", "Severe"],
+  //       name: "duration_per_cycle_severity_pelvic_pain",
+  //     },
+  //   ],
+  // },
  
 
   {
@@ -208,6 +216,7 @@ const questions = [
       "Friends",
       "Religious/Spiritual",
       "Pets",
+      "N/A",
       "Other",
     ],
   },
@@ -277,11 +286,17 @@ const StressAndRelationship = ({ onComplete }) => {
   // Function to map API response to form format
   const mapApiToFormData = (apiData) => {
     if (!apiData) return {};
-
+    const normalizeYesNo = (value) => {
+      if (value === true) return "Yes";
+      if (value === false) return "No";
+      return null;
+    };
     const formData = {
       // Map boolean values back to "Yes"/"No"
-      do_you_feel_stress: apiData.excessStress ? "Yes" : "No",
-      can_you_handle_stress: apiData.easyToHandleStress ? "Yes" : "No",
+      duration_per_cycle_pelvic_pain: apiData.durationMenstral || 0,
+      duration_per_cycle_severity_pelvic_pain: apiData.severityMenstral || "",
+      do_you_feel_stress: normalizeYesNo(apiData.excessStress),
+      can_you_handle_stress: normalizeYesNo(apiData.easyToHandleStress),
       
       // Map stress ratings
       health_stress_work: apiData.stressFromWork || 0,
@@ -290,9 +305,10 @@ const StressAndRelationship = ({ onComplete }) => {
       health_stress_financies: apiData.stressFromFinances || 0,
       health_stress_health: apiData.stressFromHealth || 0,
       health_stress_other: apiData.stressFromOther || 0,
+      health_stress_other_input: apiData.stressFromOtherName || "",
       
       // Map relaxation techniques
-      relaxation_techniques: apiData.relaxationTechniques ? "Yes" : "No",
+      relaxation_techniques: normalizeYesNo(apiData.relaxationTechniques),
       how_often_relaxation: apiData.oftenRelaxationTechniques !== "N/A" ? apiData.oftenRelaxationTechniques : "",
       
       // Map technique types (convert string back to array)
@@ -301,12 +317,12 @@ const StressAndRelationship = ({ onComplete }) => {
         : [],
       
       // Map counseling and therapy
-      have_you_sought_counselling: apiData.soughtCounselling ? "Yes" : "No",
-      current_therapy: apiData.currentlyInTherapy ? "Yes" : "No",
+      have_you_sought_counselling: normalizeYesNo(apiData.soughtCounselling),
+      current_therapy: normalizeYesNo(apiData.currentlyInTherapy),
       therapy_description: apiData.describeTherapy !== "N/A" ? apiData.describeTherapy : "",
       
       // Map abuse question
-      been_abused: apiData.abused ? "Yes" : "No",
+      been_abused: normalizeYesNo(apiData.abused),
       
       // Map hobbies (this field seems to be missing in the API mapping, using a default)
       hobbies_and_leisure_activities: apiData.hobbiesLeisure !== "N/A" ? apiData.hobbiesLeisure : "",
@@ -319,9 +335,10 @@ const StressAndRelationship = ({ onComplete }) => {
       
       // Map emotional support
       resourcces_for_emotional_support: Array.isArray(apiData.emotionalSupport) ? apiData.emotionalSupport : [],
+      resourcces_for_emotional_support_other: apiData.resourcesEmotionalSupport || "",
       
       // Map spiritual practice
-      spiritual_practice: apiData.religiousPractice ? "Yes" : "No",
+      spiritual_practice: normalizeYesNo(apiData.religiousPractice),
       spiritual_practice_desciption: apiData.typeReligiousPractice !== "N/A" ? apiData.typeReligiousPractice : "",
     };
 
@@ -402,68 +419,175 @@ const StressAndRelationship = ({ onComplete }) => {
   
     switch (question.type) {
       case "checkbox": {
-        if (!answers[question.name] || answers[question.name].length === 0) {
-          return false; 
+        const value = answers[question.name];
+      
+        // ✅ Must be an array AND contain at least one non-null, non-empty value
+        if (
+          !Array.isArray(value) ||
+          value.length === 0 ||
+          value.every((v) => v === null || v === undefined || String(v).trim() === "")
+        ) {
+          //console.warn(`❌ Invalid checkbox value for ${question.name}:`, value);
+         // message.error(`Please select at least one option for "${question.question}".`);
+          return false;
         }
-  
-        if (answers[question.name].includes("Other")) {
-          const otherInputName = `${question.name}_other`;
-          if (!answers[otherInputName] || answers[otherInputName] === "") {
-            console.log("Validation Failed: Other is checked, but input field is empty.");
+      
+        // ✅ Validate "Other" field if selected
+        if (value.includes("Other")) {
+          const otherValue = answers[`${question.name}_other`];
+          if (!otherValue || otherValue.trim() === "") {
+           // message.error("Please specify your 'Other' selection.");
+
             return false;
           }
         }
-  
+      
         return true;
       }
+      
+      
+      case "long_radio": {
+        const value = answers[question.name];
+      
+        // Check if main radio question is answered
+        if (!value) {
+          console.warn(`Validation failed: '${question.name}' not answered.`);
+          return false;
+        }
+      
+        // If "Yes", validate all subQuestions
+        if (value === "Yes" && question.subQuestions?.length) {
+          for (const sub of question.subQuestions) {
+            const subValue = answers[sub.name];
+            if (
+              subValue === undefined ||
+              subValue === null ||
+              (typeof subValue === "string" && subValue.trim() === "")
+            ) {
+              console.warn(`Validation failed: '${sub.name}' is required.`);
+
+              return false;
+            }
+          }
+        }
+      
+        return true;
+      }
+      
+      
+      case "number_with_radio": {
+        // Check main question subQuestions
+        if (!question.subQuestions || !Array.isArray(question.subQuestions)) {
+          return false;
+        }
+      
+        for (const subQ of question.subQuestions) {
+          if (subQ.type === "number_with_radio_sub") {
+            const val = answers[subQ.name];
+            if (val === undefined || val === null || val === "") {
+              message.error("Please enter a number value");
+              return false;
+            }
+          }
+      
+          if (subQ.type === "radio") {
+            const val = answers[subQ.name];
+            if (!val || val === "") {
+              message.error("Please select an option");
+              return false;
+            }
+          }
+        }
+      
+        return true;
+      }
+      
       case "checkbox_with_select":
         break;
   
       case "radio": {
-        if (answers[question.name] === undefined) {
+        const value = answers[question.name];
+      
+        // Check if a value was selected
+        if (value === undefined || value === null || value === "") {
+          message.error("Please select an option");
           return false;
         }
-  
-        if (answers[question.name] === "Yes" && (
-          question.name === "do_you_use_sleeping_aids" ||
-          question.name === "problems_limiting_exercise" ||
-          question.name === "sore_after_exercise"
-        )) {
+      
+        // If "Yes" is selected, and this radio has a corresponding input field, validate it
+        const requiresFollowUp = [
+          "do_you_use_sleeping_aids",
+          "problems_limiting_exercise",
+          "sore_after_exercise"
+        ];
+      
+        if (value === "Yes" && requiresFollowUp.includes(question.name)) {
           const inputFieldName = `${question.name}_other`;
-          if (!answers[inputFieldName] || answers[inputFieldName] === "") {
-            console.log(`Validation Failed: ${question.name} is Yes, but input field is empty.`);
+          if (!answers[inputFieldName] || answers[inputFieldName].trim() === "") {
+            message.error("Please provide additional information");
             return false;
           }
         }
-  
+      
         return true;
       }
-  
-      case "long_radio": {
-        if (answers[question.name] === undefined) {
-          return false; 
+      
+      case "rating_scale": {
+        const value = answers[question.name];
+      
+        // ✅ Allow 0 as valid input
+        if (value === undefined || value === null) {
+          message.error("Please rate on the scale");
+          return false;
         }
-  
-        if (answers[question.name] === "Yes") {
-          if (!question.subQuestions) return true; 
-  
-          for (const subQuestion of question.subQuestions) {
-            if (answers[subQuestion.name] === undefined || answers[subQuestion.name] === "") {
-              console.log(
-                `Validation Failed: Sub-question ${subQuestion.name} is not answered.`
-              );
-              return false; 
-            }
+      
+        // ✅ For "Other", only require text if value > 0
+        if (question.name === "health_stress_other" && value > 0) {
+          const textareaValue = answers["health_stress_other_input"];
+          if (!textareaValue || textareaValue.trim() === "") {
+            message.error("Please specify what 'Other' stress you are rating");
+            return false;
           }
         }
-  
-        return true; 
+      
+        return true;
       }
+      
   
-      case "long_textarea":
-        return (
-          answers[question.name] !== undefined && answers[question.name] !== ""
-        );
+      // case "long_radio": {
+      //   if (answers[question.name] === undefined) {
+      //     return false; 
+      //   }
+  
+      //   if (answers[question.name] === "Yes") {
+      //     if (!question.subQuestions) return true; 
+  
+      //     for (const subQuestion of question.subQuestions) {
+      //       if (answers[subQuestion.name] === undefined || answers[subQuestion.name] === "") {
+      //         console.log(
+      //           `Validation Failed: Sub-question ${subQuestion.name} is not answered.`
+      //         );
+      //         return false; 
+      //       }
+      //     }
+      //   }
+  
+      //   return true; 
+      // }
+  
+      case "long_textarea": {
+        const value = answers[question.name];
+      
+        if (
+          value === undefined ||
+          value === null ||
+          (typeof value === "string" && value.trim() === "")
+        ) {
+          return false;
+        }
+      
+        return true;
+      }
   
       default:
         return true;
@@ -506,11 +630,57 @@ const StressAndRelationship = ({ onComplete }) => {
   };
 
   const handleChange = (value, name) => {
-    setAnswers({
-      ...answers,
-      [name]: value,
-    });
+    const question = questions.find(q => q.name === name);
+    const updatedAnswers = { ...answers };
+
+    if (question && (question.type === "radio" || question.type === "long_radio")) {
+      // For radio buttons, clear all related fields when selection changes
+      updatedAnswers[name] = value;
+      
+      // Clear any _other fields
+      delete updatedAnswers[`${name}_other`];
+      
+      // Clear subquestion answers if they exist
+      if (question.subQuestions) {
+        question.subQuestions.forEach(subQ => {
+          delete updatedAnswers[subQ.name];
+          delete updatedAnswers[`${subQ.name}_other`];
+        });
+      }
+
+      // Special handling for specific questions
+      if (name === "relaxation_techniques") {
+        delete updatedAnswers.how_often_relaxation;
+      } else if (name === "current_therapy") {
+        delete updatedAnswers.therapy_description;
+      } else if (name === "spiritual_practice") {
+        delete updatedAnswers.spiritual_practice_desciption;
+      }
+    } else if (question && question.type === "checkbox") {
+      let updatedValue = value;
+
+      // If "N/A" is selected, override other selections
+      if (Array.isArray(value) && value.includes("N/A")) {
+        updatedValue = ["N/A"];
+      } else if (Array.isArray(value) && value.length > 0) {
+        updatedValue = value.filter((v) => v !== "N/A");
+      }
+
+      updatedAnswers[name] = updatedValue;
+
+      // If "Other" is not selected, clear its text input
+      if (!updatedValue.includes("Other")) {
+        delete updatedAnswers[`${name}_other`];
+      }
+    }
+     else {
+      // Default behavior for other types
+      updatedAnswers[name] = value;
+    }
+
+    setAnswers(updatedAnswers);
   };
+
   const handleExit = () => {
     navigate("/assessment");
   };
@@ -534,8 +704,10 @@ const StressAndRelationship = ({ onComplete }) => {
         message.error("Authentication failed. Please log in again.");
         return;
       }
-      
       const mappedData = {
+        durationMenstral: `${answers.duration_per_cycle_pelvic_pain || 0}`,
+        severityMenstral: answers.duration_per_cycle_severity_pelvic_pain || "",
+        resourcesEmotionalSupport: answers.resourcces_for_emotional_support_other || "",
         excessStress: answers.do_you_feel_stress === "Yes",
         easyToHandleStress: answers.can_you_handle_stress === "Yes",
         stressFromWork: answers.health_stress_work || 0,
@@ -544,6 +716,7 @@ const StressAndRelationship = ({ onComplete }) => {
         stressFromFinances: answers.health_stress_financies || 0,
         stressFromHealth: answers.health_stress_health || 0,
         stressFromOther: answers.health_stress_other || 0,
+        stressFromOtherName: answers.health_stress_other_input || "",
         relaxationTechniques: answers.relaxation_techniques === "Yes",
         oftenRelaxationTechniques: answers.how_often_relaxation || "N/A",
         typeRelaxationTechniques: answers.special_nutritional_program?.join(", ") || "N/A",
@@ -562,7 +735,7 @@ const StressAndRelationship = ({ onComplete }) => {
       };
   
       // Send data to API
-      fetch("https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/AddStress", {
+      fetch(`${baseUrl}Patient/AddStress`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -694,7 +867,6 @@ const StressAndRelationship = ({ onComplete }) => {
                     {option}
                     {answers[question.name] === "Other" && (
                       <>
-                        <br />
                         <Input
                           className="input_questtionnaire"
                           placeholder="Please specify"
@@ -774,8 +946,9 @@ const StressAndRelationship = ({ onComplete }) => {
         );
       case "rating_scale":
         return (
-          <div style={{ padding: "0 10px" }}>
-            <div style={{ marginTop: "10px" }}>
+          <div style={{ padding: "0 10px", marginBottom: "30px" }}>
+            {/* Slider Section */}
+            <div style={{ marginTop: "10px", marginBottom: "20px" }}>
               <Slider
                 min={0}
                 max={10}
@@ -797,8 +970,41 @@ const StressAndRelationship = ({ onComplete }) => {
                 style={{ width: isMobile ? "100%" : "50%" }}
               />
             </div>
+
+            {/* Subquestions: long_textarea */}
+            {question.subQuestions &&
+              question.subQuestions.length > 0 &&
+              question.subQuestions.map((subQuestion, index) => (
+                <div key={index} style={{ marginBottom: "20px" }}>
+                  <label
+                    style={{
+                      fontWeight: "bold",
+                      display: "block",
+                      marginTop: "5%",
+                      color: "#000",
+                    }}
+                  >
+                    {subQuestion.question}
+                  </label>
+                  {subQuestion.type === "long_textarea" && (
+                    <Input.TextArea
+                      className="input_questtionnaire"
+                      name={subQuestion.name}
+                      value={answers[subQuestion.name] || ""}
+                      onChange={(e) => handleChange(e.target.value, subQuestion.name)}
+                      rows={5}
+                      style={{
+                        width: isMobile ? "100%" : "40%",
+                        resize: "vertical",
+                        minHeight: "100px",
+                        borderColor: "#00ADEF",
+                      }}
+                    />
+                  )}
+                </div>
+              ))}
           </div>
-        );
+        );    
 
       case "long_textarea":
         return (
@@ -856,8 +1062,8 @@ const StressAndRelationship = ({ onComplete }) => {
                     {answers[question.name] &&
                       answers[question.name].includes("Other") && (
                         <>
-                          <br />
                           <Input
+                            style={{ marginLeft: "5px"}}
                             className="input_questtionnaire"
                             placeholder="Please specify"
                             value={answers[`${question.name}_other`] || ""}

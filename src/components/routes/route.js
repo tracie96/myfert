@@ -84,6 +84,7 @@ import NewHormoneChart from "../DashboardV2/PatientDashboard/NewChart";
 import LabScreen from "../DashboardV2/PatientDashboard/Lab";
 import PatientAppointmentList from "../DashboardV2/PatientDashboard/AppontmentList";
 import LabsAndRequisitions from "../DashboardV2/DoctorDashboard/Lab";
+import Chart from "../DashboardV2/DoctorDashboard/Chart";
 import MedicationTable from "../DashboardV2/DoctorDashboard/Medications";
 import MedScreen from "../DashboardV2/PatientDashboard/Meds";
 import MenstrualCycleQuiz from "../DashboardV2/PatientDashboard/Learning/MenstrualCycleQuiz";
@@ -94,6 +95,12 @@ import PrivacyPolicy from "../../pages/PrivacyPolicy";
 import ConfidentialityAgreement from "../../pages/ConfidentialityAgreement";
 import Note from "../DashboardV2/DoctorDashboard/Note";
 import PatientNote from "../DashboardV2/PatientDashboard/Note";
+import Fax from "../DashboardV2/DoctorDashboard/Fax";
+import AssignmentOfCare from  "../Admin/AssignmentOfCare";
+import Log from  "../Admin/Log";
+import SupplementScreen from "../DashboardV2/PatientDashboard/Supplement";
+import Intercom from "../DashboardV2/DoctorDashboard/Intercoms";
+import PatientIntercom from "../DashboardV2/PatientDashboard/Intercoms";
 
 //#endregion
 
@@ -101,15 +108,16 @@ const allowedDoctorRoles = ['Nurse', 'Doctor', 'PharmacistClinician', 'Nutrition
 const RoleProtectedRoute = ({ element, allowedRoles }) => {
   const userAuth = useSelector((state) => state?.authentication?.userAuth);
 
-  if (userAuth && Object.keys(userAuth).length > 0 && userAuth.obj.role === 'Patient') {
-    return <><Navigate to="/patient" replace /><PatDash /></>;
-  }
-
-  if (!userAuth || Object.keys(userAuth).length === 0) {
+  // Check if userAuth exists and has the required structure
+  if (!userAuth || Object.keys(userAuth).length === 0 || !userAuth.obj) {
     return <Navigate to="/" replace />;
   }
 
   const userRole = userAuth.obj.role;
+
+  if (userRole === 'Patient') {
+    return <><Navigate to="/patient" replace /><PatDash /></>;
+  }
 
   if (allowedRoles.includes(userRole)) {
     return element;
@@ -122,28 +130,35 @@ const ProtectedRoute = ({ allowedRoles }) => {
   console.log('allowedRoles', allowedRoles)
   const userAuth = useSelector((state) => state?.authentication?.userAuth);
 
-  if (userAuth && Object.keys(userAuth).length > 0 && userAuth.obj.role === 'Patient') {
+  // Check if userAuth exists and has the required structure
+  if (!userAuth || Object.keys(userAuth).length === 0 || !userAuth.obj) {
+    return <Login />;
+  }
+
+  const userRole = userAuth.obj.role;
+
+  if (userRole === 'Patient') {
     return <><Navigate to="/patient" replace /><PatDash /></>;
   }
-  if (userAuth && Object.keys(userAuth).length > 0 && userAuth.obj.role === 'Admin') {
+  if (userRole === 'Admin') {
     return <><Navigate to="/admin" replace /><UserManagement /></>;
   }
-  if (userAuth && Object.keys(userAuth).length > 0 && userAuth.obj.role === 'Nurse') {
+  if (userRole === 'Nurse') {
     return <><Navigate to="/nurse" replace /><DoctorDash /></>;
   }
-  if (userAuth && Object.keys(userAuth).length > 0 && userAuth.obj.role === 'Pharmacist') {
+  if (userRole === 'Pharmacist') {
     return <><Navigate to="/pharmacist" replace /><DoctorDash /></>;
   }
-  if (userAuth && Object.keys(userAuth).length > 0 && userAuth.obj.role === 'Nutritionist') {
+  if (userRole === 'Nutritionist') {
     return <><Navigate to="/nutritionist" replace /><DoctorDash /></>;
   }
-  if (userAuth && Object.keys(userAuth).length > 0 && userAuth.obj.role === 'FertilitySupport') {
+  if (userRole === 'FertilitySupport') {
     return <><Navigate to="/fertility-support" replace /><DoctorDash /></>;
   }
-  if (userAuth && Object.keys(userAuth).length > 0 && userAuth.obj.role === 'FertilityEducator') {
+  if (userRole === 'FertilityEducator') {
     return <><Navigate to="/fertility-educator" replace /><DoctorDash /></>;
   }
-  if (userAuth && Object.keys(userAuth).length > 0 && (allowedRoles.includes(userAuth.obj.role))) {
+  if (allowedRoles.includes(userRole)) {
     return <><Navigate to="/doctor" replace /><DoctorDash /></>;
   }
   return <Login />;
@@ -235,10 +250,19 @@ const getRouter = createBrowserRouter(
         <Route path="patient/services" element={<Services />} />
         <Route path="patient/appointment" element={<PatientAppointmentList />} />
         <Route path="patient/notes" element={<PatientNote />} />
-
+        <Route path="patient/supplements" element={<SupplementScreen />} />
+        <Route path="patient/intercoms" element={<PatientIntercom />} />
 
         <Route path="doctor/appointments" element={<AppointmentList />} />
         <Route path="doctor/labs" element={<LabsAndRequisitions />} />
+        <Route path="doctor/chart" element={<Chart />} />
+        <Route path="doctor/fax" element={<Fax />} />
+        <Route path="admin/fax" element={<Fax />} />
+        <Route path="/assignment" element={<AssignmentOfCare />} />
+        <Route path="/log" element={<Log />} />
+
+        <Route path="doctor/intercom" element={<Intercom />} />
+
         <Route path="doctor/meds" element={<MedicationTable />} />
         
         <Route path="doctor/notes" element={<Note />} />

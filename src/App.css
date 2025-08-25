@@ -122,6 +122,99 @@ body {
   outline: 0 !important;
 }
 
+
+/* chart Css here */
+.chartHeader{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.chartHeader span{
+  border-radius: 6px;
+  min-width: 100px;
+  text-align: center;
+  font-weight: 600;
+}
+.chartHeader .py-1{
+  padding-bottom: 0.1rem !important;
+  padding-top: 0.1rem !important;
+}
+.chartHeader span:first-child{
+  background: #ccedfe;
+  border: #93d7fa 1px solid;
+  color: #72b7da;
+}
+
+.chartHeader span:nth-child(2){
+  background: #f2bbff;
+  border: #e25bff 1px solid;
+  color: #e25bff;
+}
+.chartHeader span:nth-child(3){
+  background: #e6e3d2;
+  border: #bcb283 1px solid;
+  color: #bcb283;
+}
+.chartHeader span:nth-child(4){
+  background: #f6f1d1;
+  border: #e1ca57 1px solid;
+  color: #e1ca57;
+}
+.chartHeader span:nth-child(5){
+  color: #009003;
+}
+.btn-primary{
+  padding: 6px 12px;
+  background-color: #1890ff !important;
+  color: rgb(255, 255, 255) !important;
+  border: 1px solid rgb(217, 217, 217);
+  border-radius: 4px;
+  cursor: pointer;
+}
+/* your-styles.css */
+.isAssignBtn {
+  min-width: 100px;
+  padding: 4px 12px;
+  border-radius: 7px;
+  font-weight: 500;
+  font-size: 14px;
+  border: none;
+  color: #fff;
+  background-color: rgb(0, 173, 239);
+  cursor: pointer;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.status-indicators {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-dot.approved {
+  background-color: green;
+}
+
+.status-dot.pending {
+  background-color: red;
+}
+
 hr {
   box-sizing: content-box;
   height: 0;
@@ -650,7 +743,7 @@ pre code {
     /* color: #00ADEF; */
     width: 80px;
     height: 32px;
-    font-size: 14px;
+    font-size: 12px !important;
     padding: 4px 12px;
     margin-left: 0;
     flex-shrink: 0;
@@ -661,13 +754,14 @@ pre code {
   gap: 16px;
   width: 400px
 }
+
 .learnButton {
   background-color: #C2E6F8;
   border-color: none;
   /* color: #00ADEF; */
   width: 80px;
   height: 32px;
-  font-size: 14px;
+  font-size: 12px !important;
   padding: 4px 12px;
   margin-left: 0;
   flex-shrink: 0
@@ -2065,10 +2159,10 @@ pre code {
     }
     .assessButton {
       background-color: #C2E6F8;
-      color: #00ADEF;
+      /* color: #00ADEF; */
       width: auto;
       height: auto;
-      font-size: 11px;
+      font-size: 0.7rem !important;
       padding: 3px 3px;
       margin-left: auto;
       flex-shrink: 0;
@@ -2082,10 +2176,10 @@ pre code {
     }
     .learnButton {
       background-color: #C2E6F8;
-      color: #00ADEF;
+      /* color: #00ADEF; */
       width: auto;
       height: auto;
-      font-size: 11px;
+      font-size: 0.7rem !important;
       padding: 3px 3px;
       margin-left: auto;
       flex-shrink: 0;
@@ -4545,6 +4639,7 @@ input[type="button"].btn-block {
   pointer-events: none;
   cursor: default;
 }
+
 
 .nav-tabs {
   border-bottom: 1px solid #dddfeb;
@@ -12102,3 +12197,6 @@ body.sidebar-toggled footer.sticky-footer {
 .b-r-100 {
   border-radius: 100px;
 }
+.select-supplement{
+  width: 100% !important;
+  }

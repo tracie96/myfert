@@ -1,0 +1,61 @@
+.medication-card {
+  display: flex;
+  align-items: stretch;
+  gap: 40px 45px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  padding: 13px 28px;
+  border-radius: 5px;
+  border-right: 1px solid rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  border-left: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.medication-card-info {
+  display: flex;
+  align-items: stretch;
+  gap: 15px;
+  font-size: 13px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.medication-card-indicator {
+  width: 2px;
+  flex-shrink: 0;
+  height: 24px;
+  border: 2px solid;
+}
+
+.medication-card-icon {
+  aspect-ratio: 1;
+  object-fit: contain;
+  width: 20px;
+  flex-shrink: 0;
+}
+
+.medication-card-name {
+  color: black;
+  margin: auto 0;
+}
+
+.medication-card-dosage {
+  color: black;
+  font-size: 12px;
+  font-weight: normal;
+  flex-grow: 1;
+  flex-shrink: 1;
+  width: 412px;
+  flex-basis: auto;
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  .medication-card {
+    padding: 13px 20px;
+  }
+  
+  .medication-card-dosage {
+    max-width: 100%;
+  }
+} 

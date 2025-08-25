@@ -8,6 +8,8 @@ import "../assesment.css";
 import { useMediaQuery } from "react-responsive";
 import { backBtnTxt, exitBtnTxt, saveAndContinueBtn, submitBtn } from "../../../../../utils/constant";
 import { getReadinessPatient } from "../../../../redux/AssessmentController";
+import { baseUrl } from "../../../../../utils/envAccess";
+import { useApiErrorHandler } from '../../../../../utils/useApiErrorHandler';
 
 const questions = [
   {
@@ -28,7 +30,6 @@ const questions = [
     question: "Rate on a scale of 5 (very willing), to 1 (not willing):",
     type: "rating_scale",
     title: "In order to improve your health, how willing are you to:",
-
     sub: "Keep a record of everything you eat each day",
     name: "keep_record_meal",
   },
@@ -98,7 +99,6 @@ const questions = [
     type: "long_textarea",
     name: "feel_better"
   },
-  
   {
     title: "What makes you feel worse?",
     type: "long_textarea",
@@ -129,6 +129,7 @@ const Readiness = ({ onComplete }) => {
   const navigate = useNavigate();
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const patientReadinessInfo = useSelector((state) => state.intake?.patientReadinessInfo);
+  const { handleApiError } = useApiErrorHandler();
 
   const mapReadinessInfoToAnswers = (info) => {
     return {
@@ -180,21 +181,36 @@ const Readiness = ({ onComplete }) => {
   const validateQuestion = () => {
     const question = questions[currentQuestionIndex];
 
-    return (
-      answers[question.name] !== undefined && answers[question.name] !== ""
-    );
+    if (question.type === "rating_scale") {
+      // For rating scale, ensure a value between 1-5 is selected
+      return typeof answers[question.name] === 'number' && answers[question.name] >= 1 && answers[question.name] <= 5;
+    } else if (question.type === "confidence_scale_with_textarea") {
+      // For confidence scale with textarea, validate both the scale and the text
+      const scaleValid = typeof answers[question.name] === 'number' && answers[question.name] >= 1 && answers[question.name] <= 5;
+      const textValid = answers[`${question.name}_details`] && answers[`${question.name}_details`].trim() !== "";
+      return scaleValid && textValid;
+    } else if (question.type === "long_textarea") {
+      // For long textarea, ensure there is some text and it's not just whitespace
+      return answers[question.name] && answers[question.name].trim() !== "";
+    }
+
+    return false;
   };
 
   const handleSave = () => {
     if (!validateQuestion()) {
-      message.error("Please answer the current question before saving.");
+      message.error("Please answer the current question before proceeding.");
       return;
     }
-    localStorage.setItem("currentQuestionIndex10", 0);
-    localStorage.setItem("answers", JSON.stringify(answers));
-    if (currentQuestionIndex < totalQuestions - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    
+    if (currentQuestionIndex >= totalQuestions - 1) {
+      message.info("You're at the last question. Please use the Submit button to complete the assessment.");
+      return;
     }
+    
+    localStorage.setItem("currentQuestionIndex10", currentQuestionIndex + 1);
+    localStorage.setItem("answers", JSON.stringify(answers));
+    setCurrentQuestionIndex(currentQuestionIndex + 1);
   };
   const handlePrevious = () => {
     if (currentQuestionIndex > 0) {
@@ -236,41 +252,39 @@ const Readiness = ({ onComplete }) => {
     };
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!validateQuestion()) {
       message.error("Please answer the current question before Submitting.");
       return;
     }
-    localStorage.setItem("currentQuestionIndex10", 0);
-    localStorage.setItem("answers-readiness", JSON.stringify(answers));
-    const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
-    const token = userInfo.obj.token || "";
-      const transformedData = transformReadinessData(answers)
 
-    fetch(
-      "https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/AddReadiness",
-      {
-        method: "POST",
-        headers: {
-          accept: "text/plain",
-          "Content-Type": "application/json",
-          Authorization: `${token}`,
-        },
-        body: JSON.stringify(transformedData),
-      },
-    )
-    .then((response)=>response.json())
-    .then((data)=>{
-      console.log("Transformed Readiness Data:", transformedData);
+    try {
+      localStorage.setItem("currentQuestionIndex10", 0);
+      localStorage.setItem("answers-readiness", JSON.stringify(answers));
+      const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
+      const token = userInfo.obj.token || "";
+      const transformedData = transformReadinessData(answers);
+
+      await handleApiError(
+        fetch(`${baseUrl}Patient/AddReadiness`, {
+          method: "POST",
+          headers: {
+            accept: "text/plain",
+            "Content-Type": "application/json",
+            Authorization: `${token}`,
+          },
+          body: JSON.stringify(transformedData),
+        })
+      );
+
       dispatch(completeCard("/questionnaire/10"));
       localStorage.setItem("currentQuestionIndex10", 0);
       localStorage.setItem("answers", JSON.stringify(answers));
       navigate("/assessment");
-      console.log("Readiness Success:", data);
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
+    } catch (error) {
+      console.error("Submit failed:", error);
+      // Error message already shown by handleApiError
+    }
   };
   const label = (
     <span>

@@ -3,7 +3,7 @@ import { Row, Col } from "antd";
 import SubscriptionBanner from "../../../../assets/images/bg/subscription_home-logo.svg";
 
 import "../../../../screens/Subscription/subscription.css"
-import { CiShare1 } from "react-icons/ci";
+import { MailOutlined, PhoneOutlined } from "@ant-design/icons";
 
 const Services = () => {
   const [showInfo, setShowInfo] = useState(true);
@@ -14,10 +14,12 @@ const Services = () => {
       <Row gutter={16} >
         <Col xs={20} sm={16}>
           <p style={{ color: "#335CAD", fontWeight: 600, fontSize: 20, marginBottom: 12 }}>SUBSCRIPTION PLANS</p>
-          <p style={{ padding: "5% 0", fontSize: 16 }}>
-            Explore all our available plans for exclusive access to personalized
-            support tailored to your preferences, needs and goals.
+          <p>
+          Schedule an appointment with our care providers to receive personalized support, thoughtfully tailored to your unique needs, preferences, and goals.
+          {/* <br>Our team is here to guide you every step of the way.</br> */}
           </p>
+          <span>Our team is here to guide you every step of the way.</span>
+          
           <div style={{ background: "#335CAD", display: "none" }}>
             <div style={{ padding: "3% 5%" }}>
               <p>Don't forget to purchase Mira!</p>
@@ -83,37 +85,92 @@ const Services = () => {
       {/* Book Your Appointment Section */}
       <div style={{ display: 'flex', gap: 32, alignItems: 'flex-start', marginBottom: 40, flexWrap: 'wrap' }}>
         {/* Left Side */}
-        <div style={{ flex: 1, minWidth: 320 }}>
-          <p style={{ color: '#335CAD', fontWeight: 600, marginBottom: 12 }}>Book Your Appointment</p>
-          <p style={{ marginBottom: 18 }}>
-            To book your appointments, please create a separate account for our booking system.
-          </p>
-          <p style={{ marginBottom: 10 }}>
-            Start by booking your <b>Initial Assessments</b>. You can book single appointments or purchase an <b>Intro Package</b> which comes with a free Mira Starter Kit.
-          </p>
-          <p style={{ marginBottom: 24 }}>
-            For follow-up care, you will need a <b>6-Month Access</b> membership and then you can purchase any appointments as needed.
-          </p>
-          <button
-            style={{
-              background: '#3BA9F4',
-              color: '#fff',
-              border: 'none',
-              borderRadius: 8,
-              padding: '12px 36px',
-              fontWeight: 600,
-              boxShadow: '0 4px 10px #3ba9f422',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-            }}
-            onClick={() => window.open('https://myfertilitylabs.simplybook.me/v2', '_blank')}
-          >
-            Book Now
-            <CiShare1/>
-          </button>
-        </div>
+        <div
+                          style={{
+                            background: '#fff',
+                            borderRadius: 10,
+                            border: '1px solid #C2E6F8',
+                            marginBottom: 24,
+                            overflow: 'hidden',
+                            flex: 1,
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+                          }}
+                        >
+                          {/* Dark Blue Header */}
+                          <div
+                            style={{
+                              background: '#335CAD',
+                              padding: '16px 20px',
+                              borderRadius: '10px 10px 0 0',
+                            }}
+                          >
+                            <h3
+                              style={{
+                                margin: 0,
+                                color: '#fff',
+                                fontSize: '14px',
+                                fontWeight: 'bold',
+                                textTransform: 'uppercase',
+                              }}
+                            >
+                              HOW TO BOOK AN APPOINTMENT
+                            </h3>
+                          </div>
+                          
+                          {/* White Content Area */}
+                          <div
+                            style={{
+                              padding: '20px',
+                              borderRadius: '0 0 10px 10px',
+                            }}
+                          >
+                            <p style={{ 
+                              marginBottom: '16px', 
+                              color: '#222',
+                              fontSize: '14px'
+                            }}>
+                              Schedule your appointment by contacting us:
+                            </p>
+                            
+                            {/* Phone Contact */}
+                            <div style={{ 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              marginBottom: '12px',
+                              gap: '12px'
+                            }}>
+                              <PhoneOutlined style={{ 
+                                color: '#335CAD', 
+                                fontSize: '16px' 
+                              }} />
+                              <span style={{ color: '#222', fontSize: '14px' }}>
+                                (403) 760-7017
+                              </span>
+                            </div>
+                            
+                            {/* Email Contact */}
+                            <div style={{ 
+                              display: 'flex', 
+                              alignItems: 'center',
+                              gap: '12px'
+                            }}>
+                              <MailOutlined style={{ 
+                                color: '#335CAD', 
+                                fontSize: '16px' 
+                              }} />
+                              <a 
+                                href="mailto:book@myfertilitylabs.com"
+                                style={{ 
+                                  color: '#335CAD', 
+                                  fontSize: '14px',
+                                  textDecoration: 'underline'
+                                }}
+                              >
+                                book@myfertilitylabs.com
+                              </a>
+                            </div>
+                          </div>
+                        </div>
         {/* Right Side */}
         <div style={{
           flex: 1,

@@ -2,8 +2,20 @@ import { Link } from "react-router-dom";
 
 export default function UnderDevelopment() {
 
-    const currentUserInfo = JSON.parse(localStorage.getItem("userInfo"));
-    if(!currentUserInfo) return;
+    const userInfoString = localStorage.getItem("userInfo");
+    if (!userInfoString) {
+        return null;
+    }
+    
+    let currentUserInfo;
+    try {
+        currentUserInfo = JSON.parse(userInfoString);
+    } catch (error) {
+        console.warn("Failed to parse userInfo from localStorage:", error);
+        return null;
+    }
+    
+    if(!currentUserInfo) return null;
 
   return (
     <>

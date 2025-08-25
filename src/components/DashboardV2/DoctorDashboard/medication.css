@@ -1,0 +1,37 @@
+/* Force all selects in medication modal to be 100% width */
+.medication-modal .ant-select {
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+}
+
+.medication-modal .ant-form-item-control-input-content .ant-select {
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Force all inputs to be consistent */
+.medication-modal .ant-input,
+.medication-modal .ant-input-number {
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Override any flex or inline styles */
+.medication-modal .ant-form-item-control-input-content {
+  width: 100% !important;
+}
+
+.medication-modal .ant-form-item-control-input-content > * {
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+}
+.rc-virtual-list-holder-inner{
+  width: 400px !important;
+}
+.ant-select .ant-select-outlined .ant-select-in-form-item {
+  width: 800px !important;
+}

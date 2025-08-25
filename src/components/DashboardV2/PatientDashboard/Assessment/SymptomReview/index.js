@@ -9,6 +9,7 @@ import { DeleteOutlined } from "@ant-design/icons";
 import { useMediaQuery } from "react-responsive";
 import { backBtnTxt, exitBtnTxt, saveAndContinueBtn, submitBtn } from "../../../../../utils/constant";
 import { getSymptomsPatient } from "../../../../redux/AssessmentController";
+import { baseUrl } from "../../../../../utils/envAccess";
 
 const questions = [
   {
@@ -445,7 +446,7 @@ const questions = [
   },
   {
     type: "multi_yes_no",
-    name: "premenstrual",
+    name: "preMenstrual",
     sub: "Premenstrual",
     question:
       "Please check if these symptoms occur presently or have occurred in the last 6 months",
@@ -670,11 +671,13 @@ const SymptomReview = ({ onComplete }) => {
       }
     };
 
+
+
     const symptomCategories = [
       'general', 'headEyesEars', 'musco', 'moodNerves', 'cardio', 
       'urinary', 'digestion', 'digestionCont', 'eating', 'itchingSkin', 'respiratory', 
       'nails', 'lymph', 'skin', 'skinProblems', 'skinProblemsContr', 
-      'femaleReproductive', 'menstrual', 'premenstrual'
+      'femaleReproductive', 'menstrual', 'preMenstrual'
     ];
 
     symptomCategories.forEach(category => {
@@ -839,10 +842,49 @@ const SymptomReview = ({ onComplete }) => {
   };
 
   const handleChange = (value, name) => {
-    setAnswers((prevAnswers) => ({
-      ...prevAnswers,
-      [name]: value,
-    }));
+    // Find the question object by name
+    const question = questions.find(q => q.name === name);
+    const updatedAnswers = { ...answers };
+
+    if (question && (question.type === "radio" || question.type === "long_radio")) {
+      // For radio buttons, clear all related fields when selection changes
+      updatedAnswers[name] = value;
+      
+      // Clear any _other fields
+      delete updatedAnswers[`${name}_other`];
+      
+      // Clear subquestion answers if they exist
+      if (question.subQuestions) {
+        question.subQuestions.forEach(subQ => {
+          delete updatedAnswers[subQ.name];
+          delete updatedAnswers[`${subQ.name}_other`];
+        });
+      }
+
+      // Special handling for specific questions
+      if (name === "side_effects_problems") {
+        delete updatedAnswers.side_effects_details;
+      } else if (name === "antibiotics_usage") {
+        delete updatedAnswers.antibiotics_reason;
+      } else if (name === "antibiotics_usage_teen") {
+        delete updatedAnswers.antibiotics_reason_teen;
+      } else if (name === "antibiotics_usage_adulthood") {
+        delete updatedAnswers.antibiotics_reason_adulthood;
+      } else if (name === "long_term_antibiotics") {
+        delete updatedAnswers.long_term_antibiotics_reason;
+      } else if (name === "oral_steroids_usage_infancy") {
+        delete updatedAnswers.oral_steroids_reason_infancy;
+      } else if (name === "oral_steroids_usage_teen") {
+        delete updatedAnswers.oral_steroids_reason_teen;
+      } else if (name === "oral_steroids_usage_adulthood") {
+        delete updatedAnswers.oral_steroids_reason_adulthood;
+      }
+    } else {
+      // Default behavior for other types
+      updatedAnswers[name] = value;
+    }
+
+    setAnswers(updatedAnswers);
   };
 
   const handleSubmit = async () => {
@@ -870,7 +912,7 @@ const SymptomReview = ({ onComplete }) => {
       itchingSkin: [],
       femaleReproductive: [],
       menstrual: [],
-      premenstrual: [],
+      preMenstrual: [],
       currentMedication: [],
       nutritionalSupplements: [],
       femaleReproductiveCont:[]
@@ -1373,8 +1415,8 @@ const SymptomReview = ({ onComplete }) => {
 
     premenstrualQuestions.forEach((question) => {
       if (answers[question]) {
-        apiFormat.premenstrual = apiFormat.premenstrual || [];
-        apiFormat.premenstrual.push({
+        apiFormat.preMenstrual = apiFormat.preMenstrual || [];
+        apiFormat.preMenstrual.push({
           level: getLevel(answers[question]),
           name: question,
         });
@@ -1410,7 +1452,7 @@ const SymptomReview = ({ onComplete }) => {
       skinProblemsContr: apiFormat.skinProblemsContr,
       femaleReproductive: apiFormat.femaleReproductive,
       menstrual: apiFormat.menstrual,
-      premenstrual: apiFormat.premenstrual,
+      preMenstrual: apiFormat.preMenstrual,
       currentMedication: answers.current_medication
         ? answers.current_medication.map((med) => ({
           medication: med.medication || "",
@@ -1472,7 +1514,7 @@ const SymptomReview = ({ onComplete }) => {
       const token = userInfo.obj.token || "";
 
       fetch(
-        "https://myfertilitydevapi-prod.azurewebsites.net/api/Patient/AddSymptoms",
+        `${baseUrl}Patient/AddSymptoms`,
         {
           method: "POST",
           headers: {
@@ -1623,10 +1665,19 @@ const SymptomReview = ({ onComplete }) => {
       case "radio":
         return (
           <>
-            <Button
+            <div
               type="primary"
-              style={{ background: "#335CAD", padding: 20, marginBottom: 10, overflowX:"auto"}}
-            ><span>{question?.sub ? question.sub : ''}</span></Button>
+              style={{
+                background: "#335CAD",
+                padding: "10px 20px",
+                marginBottom: 10,
+                display: "inline-block",
+                borderRadius: "4px",
+                color: "#fff",
+              }}
+            >
+              <span>{question?.sub ? question.sub : ''}</span>
+            </div>
 
             <Radio.Group
               name={question.name}
@@ -1778,22 +1829,22 @@ const SymptomReview = ({ onComplete }) => {
       case "multi_yes_no":
         return (
           <div style={{ marginTop: "20px" }}>
-            <Button
-              type="primary"
+            <div
               style={{
                 background: "#335CAD",
                 padding: isMobile ? "10px" : "20px",
                 fontSize: isMobile ? "14px" : "15px",
                 fontWeight: "bold",
                 width: "100%",
-                textAlign: "left",
                 whiteSpace: "normal",
                 height: "auto",
-                lineHeight: "1.4"
+                lineHeight: "1.4",
+                textAlign: "center",
+                color: "#fff",
               }}
             >
               {question.sub}
-            </Button>
+            </div>
 
             {question.subQuestions.map((subQuestion) => (
               <div 
@@ -1884,10 +1935,16 @@ const SymptomReview = ({ onComplete }) => {
       case "long_radio":
         return (
           <div style={{ flexDirection: "column" }}>
-           {question?.sub?  <Button
-              type="primary"
-              style={{ background: "#335CAD", padding: 20, marginBottom: 10 }}
-            > {question.sub}</Button>:''}
+           {question?.sub?  <div
+              style={{
+                background: "#335CAD",
+                padding: "10px 20px",
+                marginBottom: 10,
+                display: "inline-block",
+                borderRadius: "4px",
+                color: "#fff",
+              }}
+            > {question.sub}</div>:''}
             <Radio.Group
               name={question.name}
               onChange={(e) => handleChange(e.target.value, question.name)}

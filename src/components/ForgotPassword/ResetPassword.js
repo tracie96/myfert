@@ -2,12 +2,12 @@ import { NavLink } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import Spinner from "react-bootstrap/Spinner";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { resetPassword } from "../redux/AuthController";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import forgot_password from "../../assets/images/auth/forgotPassword.svg";
-import { Divider, Card, Form, Input } from "antd";
+import { Divider, Card, Form, Input, Alert } from "antd";
 
 const initialValues = {
   password: "",
@@ -22,7 +22,10 @@ const validateResetPassword = Yup.object({
 
 function ResetPassword() {
   const [showSpinner, setShowSpinner] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const location = useLocation();
   const { Item: FormItem } = Form;
   const [password, setPassword] = useState("");
@@ -35,6 +38,8 @@ function ResetPassword() {
     specialChar: false,
   });
 
+  const { appErr, serverErr } = useSelector((state) => state.authentication);
+
   const session = new URLSearchParams(location.search).get("Token");
 
   const { values, handleBlur, handleChange, handleSubmit, errors } = useFormik({
@@ -45,6 +50,10 @@ function ResetPassword() {
       console.log("Password:", values.password);
       console.log("Token:", session);
 
+      // Clear previous messages
+      setSuccessMessage("");
+      setErrorMessage("");
+
       try {
         setShowSpinner(true);
         const payload = {
@@ -54,17 +63,39 @@ function ResetPassword() {
 
         const response = await dispatch(resetPassword(payload));
 
-        if (response) {
+        // Check if the action was fulfilled (successful)
+        if (response.meta && response.meta.requestStatus === 'fulfilled') {
+          setSuccessMessage("Password reset successful! Redirecting to login...");
           setShowSpinner(false);
           console.log("Password reset successful: ", response);
+          
+          // Redirect to login after 2 seconds
+          setTimeout(() => {
+            navigate("/");
+          }, 2000);
+        } else {
+          setErrorMessage("Password reset failed. Please try again.");
+          setShowSpinner(false);
         }
       } catch (error) {
         console.error("Error resetting password:", error);
-      } finally {
+        setErrorMessage("An error occurred while resetting your password. Please try again.");
         setShowSpinner(false);
       }
     },
   });
+
+  // Handle Redux errors
+  useEffect(() => {
+    if (appErr) {
+      setErrorMessage(appErr);
+      setShowSpinner(false);
+    }
+    if (serverErr) {
+      setErrorMessage(serverErr);
+      setShowSpinner(false);
+    }
+  }, [appErr, serverErr]);
 
   useEffect(() => {
     const validatePassword = (password) => {
@@ -104,6 +135,29 @@ function ResetPassword() {
                     <p className="mb-4">
                       Enter your new password to regain access to your account!
                     </p>
+
+                    {/* Success Message */}
+                    {successMessage && (
+                      <Alert
+                        message="Success"
+                        description={successMessage}
+                        type="success"
+                        showIcon
+                        className="mb-3"
+                      />
+                    )}
+
+                    {/* Error Message */}
+                    {errorMessage && (
+                      <Alert
+                        message="Error"
+                        description={errorMessage}
+                        type="error"
+                        showIcon
+                        className="mb-3"
+                      />
+                    )}
+
                     <form onSubmit={handleSubmit}>
                       <FormItem
                         name="password"

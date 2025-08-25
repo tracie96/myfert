@@ -1,33 +1,214 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import fertilityImage from "../../assets/images/auth/fertilityImage.svg";
-import { useSelector } from "react-redux";
-import { Menu, Button, Drawer, Layout, Modal } from "antd";
+import { useSelector, useDispatch } from "react-redux";
+import { Menu, Button, Drawer, Layout, Modal, Badge } from "antd";
 import { useMediaQuery } from "react-responsive";
+import { getUnreadMessageCount } from "../../components/redux/doctorSlice";
+import { getNotifications, markNotiAsRead } from "../../components/redux/globalSlice";
 // Import React Icons
-import { 
-  FaQrcode, 
-  FaPills, 
-  FaChartPie, 
-  FaFileAlt, 
-  FaFlask, 
-  FaInbox, 
-  FaLink, 
-  FaListOl, 
-  FaBars, 
+import {
+  FaQrcode,
+  FaPills,
+  FaChartPie,
+  FaFileAlt,
+  FaFlask,
+  FaInbox,
+  FaListOl,
+  FaBars,
   FaServicestack,
   FaBook,
   FaSignOutAlt,
+  FaStickyNote,
 } from "react-icons/fa";
+
 import { FaNotesMedical } from "react-icons/fa";
 export const GetSideBar = () => {
+  const dispatch = useDispatch();
+  const unreadCount = useSelector((state) => state.doctor.unreadMessageCount);
   const { userAuth } = useSelector((state) => state.authentication);
   const accessDetails = useSelector((state) => state.intake.accessDetails);
+  const [notifications, setNotifications] = useState(null);
+
+  // Add CSS for notification badge animation
+ 
   const [visible, setVisible] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [notificationBadges, setNotificationBadges] = useState({
+    labs: 0,
+    meds: 0,
+    supplements: 0,
+    notes: 0,
+    appointments: 0
+  });
   const { Sider } = Layout;
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const location = useLocation();
+
+  // Function to categorize notifications by type
+  const categorizeNotifications = (notifications) => {
+    // Check both possible data structures
+    const notificationRecords = notifications?.data?.getRecord || notifications?.getRecord;
+    if (!notificationRecords) return { labs: 0, meds: 0, supplements: 0, notes: 0, appointments: 0 };
+    
+    const badges = { labs: 0, meds: 0, supplements: 0, notes: 0, appointments: 0 };
+    
+  
+    notificationRecords.forEach((notification, index) => {
+     
+      if (notification.isRead === 0) { // Only count unread notifications
+        const title = notification.title;
+        const description = notification.description || '';
+                
+        // Lab notifications - use title
+        if (title === "LabWork" || title === "LabRequisition") {
+          badges.labs++;
+          console.log('✅ Categorized as LABS');
+        }
+        // Medication notifications - use description for "Drug Medications" and title for "Prescription"
+        else if (description === "Drug Medications has been prescribed to you") {
+          badges.meds++;
+          console.log('✅ Categorized as MEDS');
+        }
+        // Supplement notifications - use description
+        else if (description.includes("Drug Supplements has been prescribed")) {
+          badges.supplements++;
+          console.log('✅ Categorized as SUPPLEMENTS');
+        }
+        // Patient note notifications - use title
+        else if (title === "PatientNote") {
+          badges.notes++;
+          console.log('✅ Categorized as NOTES');
+        }
+        // Appointment notifications
+        else if (title === "Appointment" || description.includes("appointment") || description.includes("schedule")) {
+          badges.appointments++;
+          console.log('✅ Categorized as APPOINTMENTS');
+        }
+        else {
+          console.log('❌ No category matched for unread notification');
+        }
+      } else {
+        console.log(`📋 Skipping read notification: ${notification.title}`);
+      }
+    });
+    
+    console.log('🏷️ Final badge counts:', badges);
+    return badges;
+  };
+
+  // Function to clear badge when menu item is clicked
+  const clearBadge = async (badgeType) => {
+    setNotificationBadges(prev => ({
+      ...prev,
+      [badgeType]: 0
+    }));
+
+    // Mark notifications as read based on type
+    const notificationRecords = notifications?.data?.getRecord || notifications?.getRecord;
+    if (notificationRecords) {
+      const notificationsToMark = notificationRecords.filter(notification => {
+        if (notification.isRead === 0) {
+          const title = notification.title;
+          const description = notification.description || '';
+          
+          switch (badgeType) {
+            case 'labs':
+              return title === "LabWork" || title === "LabRequisition";
+            case 'meds':
+              return description === "Drug Medications has been prescribed to you";
+            case 'supplements':
+              return description.includes("Drug Supplements has been prescribed");
+            case 'notes':
+              return title === "PatientNote";
+            case 'appointments':
+              return title === "Appointment" || description.includes("appointment") || description.includes("schedule");
+            default:
+              return false;
+          }
+        }
+        return false;
+      });
+
+      // Mark each notification as read
+      for (const notification of notificationsToMark) {
+        try {
+          await dispatch(markNotiAsRead({ notiOrUser: "Noti", id: notification.id }));
+        } catch (error) {
+          console.error('Error marking notification as read:', error);
+        }
+      }
+
+      // Refresh notifications after marking as read
+      await fetchNotifications();
+    }
+  };
+
+  useEffect(() => {
+    if (notifications) {
+      console.log('🔄 Notifications changed:', notifications);
+      const badges = categorizeNotifications(notifications);
+      console.log('🎯 Setting notification badges:', badges);
+      setNotificationBadges(badges);
+    } else {
+      console.log('❌ No notifications available');
+    }
+  }, [notifications]);
+
+  // Fetch notifications
+  const fetchNotifications = useCallback(async () => {
+    try {
+      console.log('🔄 Fetching notifications...');
+      const response = await dispatch(getNotifications());
+      if (getNotifications.fulfilled.match(response)) {
+        console.log('📥 Fetched notifications:', response.payload);
+        setNotifications(response.payload);
+      } else {
+        console.log('❌ Failed to fetch notifications:', response);
+      }
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+    }
+  }, [dispatch]);
+
+
+  // Fetch unread message count
+  const fetchUnreadCount = useCallback(async () => {
+    try {
+      await dispatch(getUnreadMessageCount());
+    } catch (error) {
+      console.error('Error fetching unread count:', error);
+    }
+  }, [dispatch]);
+
+  useEffect(() => {
+    let isMounted = true;
+    
+    // Initial fetches
+    const initialFetch = async () => {
+      if (isMounted) {
+        await fetchUnreadCount();
+        await fetchNotifications();
+      }
+    };
+    
+    initialFetch();
+    
+    // Set up interval to fetch notifications and unread count every 10 seconds (temporarily reduced for testing)
+    const pollingInterval = setInterval(() => {
+      if (isMounted) {
+        fetchUnreadCount();
+        fetchNotifications(); 
+      }
+    }, 10000);
+
+    // Cleanup function
+    return () => {
+      isMounted = false;
+      clearInterval(pollingInterval);
+    };
+  }, [fetchNotifications, fetchUnreadCount]);
+
   const showDrawer = () => {
     setVisible(true);
   };
@@ -55,16 +236,19 @@ export const GetSideBar = () => {
       case "/chart":
         return "3";
       case "/patient/meds":
-          return "5";
+        return "5";
       case "/learn":
         return "8";
       case "/patient/labs":
         return "9";
       case "/patient/services":
         return "6";
+      case "/patient/supplements":
+        return "11";
       case "/patient/notes":
         return "10"
-     
+      case "/patient/intercoms":
+        return "12"
       default:
         return "1";
     }
@@ -78,12 +262,18 @@ export const GetSideBar = () => {
         return "2";
       case "/doctor/appointments":
         return "3";
+        case "/doctor/chart":
+        return "12";
       case "/doctor/labs":
         return "4";
       case "/doctor/meds":
         return "5";
       case "/doctor/notes":
         return "6";
+      case "/doctor/fax":
+        return "8";
+      case "/doctor/intercom":
+        return "9";
       default:
         return "1";
     }
@@ -91,13 +281,16 @@ export const GetSideBar = () => {
 
   const getSelectedAdminKey = () => {
     switch (location.pathname) {
-      case "/admin":
+      case "/users":
         return "1";
-      case "/preview-link":
+      case "/logs":
         return "2";
-      case "/inbox":
+      case "/statistics":
         return "3";
-
+      case "/ticketing":
+        return "4";
+      case "/assignment":
+        return "6";
       default:
         return "1";
     }
@@ -115,6 +308,7 @@ export const GetSideBar = () => {
       mode="inline"
       onClick={onClose}
     >
+      {console.log('🎨 Rendering menu with badges:', notificationBadges)}
       <Menu.Item key="1" icon={<FaQrcode style={{ color: "#00ADEF" }} />}>
         <NavLink to="/patient" style={{ textDecoration: "none" }}>
           <span>HOME</span>
@@ -132,30 +326,157 @@ export const GetSideBar = () => {
       </Menu.Item>
 
       <Menu.Item key="5" icon={<FaPills style={{ color: "#00ADEF" }} />}>
-        <NavLink to="/patient/meds" style={{ textDecoration: "none" }}>
-          <span>MEDS</span>
+        <NavLink to="/patient/meds" style={{ textDecoration: "none" }} onClick={async (e) => {
+          if (notificationBadges.meds > 0) {
+            e.preventDefault();
+            await clearBadge('meds');
+            // Navigate after clearing the badge
+            window.location.href = "/patient/meds";
+          }
+        }}>
+          {notificationBadges.meds > 0 ? (
+            <Badge 
+              count={notificationBadges.meds} 
+              offset={[10, 0]} 
+              className="notification-badge"
+              style={{ 
+                backgroundColor: '#ff4d4f',
+                fontSize: '8px',
+                minWidth: '12px',
+                height: '12px',
+                lineHeight: '12px',
+                padding: '0 4px'
+              }}
+            >
+              <span>MEDS</span>
+            </Badge>
+          ) : (
+            <span>MEDS</span>
+          )}
         </NavLink>
+     
       </Menu.Item>
       <Menu.Item key="9" icon={<FaFlask style={{ color: "#00ADEF" }} />}>
-        <NavLink to="/patient/labs" style={{ textDecoration: "none" }}>
-          <span>LABS</span>
+        <NavLink to="/patient/labs" style={{ textDecoration: "none" }} onClick={async (e) => {
+          if (notificationBadges.labs > 0) {
+            e.preventDefault();
+            await clearBadge('labs');
+            // Navigate after clearing the badge
+            window.location.href = "/patient/labs";
+          }
+        }}>
+          {notificationBadges.labs > 0 ? (
+            <Badge 
+              count={notificationBadges.labs} 
+              offset={[10, 0]} 
+              className="notification-badge"
+              style={{ 
+                backgroundColor: '#ff4d4f',
+                fontSize: '8px',
+                minWidth: '12px',
+                height: '12px',
+                lineHeight: '12px',
+                padding: '0 4px'
+              }}
+            >
+              <span>LABS</span>
+            </Badge>
+          ) : (
+            <span>LABS</span>
+          )}
         </NavLink>
       </Menu.Item>
 
       <Menu.Item key="10" icon={<FaNotesMedical style={{ color: "#00ADEF" }} />}>
-        <NavLink to="/patient/notes" style={{ textDecoration: "none" }}>
-          <span>NOTES</span>
+        <NavLink to="/patient/notes" style={{ textDecoration: "none" }} onClick={async (e) => {
+          if (notificationBadges.notes > 0) {
+            e.preventDefault();
+            await clearBadge('notes');
+            // Navigate after clearing the badge
+            window.location.href = "/patient/notes";
+          }
+        }}>
+          {notificationBadges.notes > 0 ? (
+            <Badge 
+              count={notificationBadges.notes} 
+              offset={[10, 0]} 
+              className="notification-badge"
+              style={{ 
+                backgroundColor: '#ff4d4f',
+                fontSize: '8px',
+                minWidth: '12px',
+                height: '12px',
+                lineHeight: '12px',
+                padding: '0 4px'
+              }}
+            >
+              <span>NOTES</span>
+            </Badge>
+          ) : (
+            <span>NOTES</span>
+          )}
         </NavLink>
       </Menu.Item>
-
+      <Menu.Item key="11" icon={<FaPills style={{ color: "#00ADEF" }} />}>
+        <NavLink to="/patient/supplements" style={{ textDecoration: "none" }} onClick={async (e) => {
+          if (notificationBadges.supplements > 0) {
+            e.preventDefault();
+            await clearBadge('supplements');
+            // Navigate after clearing the badge
+            window.location.href = "/patient/supplements";
+          }
+        }}>
+          {notificationBadges.supplements > 0 ? (
+            <Badge 
+              count={notificationBadges.supplements} 
+              offset={[10, 0]} 
+              className="notification-badge"
+              style={{ 
+                backgroundColor: '#ff4d4f',
+                  fontSize: '8px',
+                minWidth: '12px',
+                height: '12px',
+                lineHeight: '12px',
+                padding: '0 4px'
+              }}
+            >
+              <span>SUPPLEMENTS</span>
+            </Badge>
+          ) : (
+            <span>SUPPLEMENTS</span>
+          )}
+        </NavLink>
+      </Menu.Item>
       {getAccessDetailsStatus() && userAuth?.obj?.videoWatched && (
         <Menu.Item key="6" icon={<FaServicestack style={{ color: "#00ADEF" }} />}>
           <NavLink to="/patient/services" style={{ textDecoration: "none" }}>
-            <span className="no-underline">SERVICES</span>
+            <span className="no-underline">BOOKING</span>
           </NavLink>
         </Menu.Item>
       )}
-
+      <Menu.Item key="12" icon={<FaStickyNote style={{ color: "#00ADEF" }} />}>
+        <NavLink to="/patient/intercoms" style={{ textDecoration: "none" }}>
+          {unreadCount ? (
+            <Badge 
+              dot 
+              offset={[3, 0]} 
+              className="notification-badge"
+              style={{ 
+                backgroundColor: '#ff4d4f',
+                fontSize: '8px',
+                minWidth: '12px',
+                height: '12px',
+                lineHeight: '12px',
+                padding: '0 4px'
+              }}
+            >
+              <span className="no-underline">INTERCOMS</span>
+            </Badge>
+          ) : (
+            <span className="no-underline">INTERCOMS</span>
+          )}
+        </NavLink>
+      </Menu.Item>
       <Menu.Item key="8" icon={<FaBook style={{ color: "#00ADEF" }} />}>
         <NavLink to="/learn" style={{ textDecoration: "none" }}>
           <span className="no-underline">LEARN</span>
@@ -175,14 +496,21 @@ export const GetSideBar = () => {
           <span>PATIENT LIST</span>
         </NavLink>
       </Menu.Item>
+      <Menu.Item key="12" icon={<FaFlask style={{ color: "#00ADEF" }} />}>
+        <NavLink to="/doctor/chart" style={{ textDecoration: "none" }}>
+          <span>CHART</span>
+        </NavLink>
+      </Menu.Item>
       <Menu.Item key="4" icon={<FaFlask style={{ color: "#00ADEF" }} />}>
-        <NavLink to="/doctor/labs" style={{ textDecoration: "none" }}>
-          <span>LABS</span>
+        <NavLink to="/doctor/labs" style={{ textDecoration: "none" }} >
+         
+            <span>LABS</span>
+     
         </NavLink>
       </Menu.Item>
       <Menu.Item key="5" icon={<FaPills style={{ color: "#00ADEF" }} />}>
         <NavLink to="/doctor/meds" style={{ textDecoration: "none" }}>
-          <span>MEDS</span>
+            <span>MEDS</span>
         </NavLink>
       </Menu.Item>
       <Menu.Item key="6" icon={<FaNotesMedical style={{ color: "#00ADEF" }} />}>
@@ -190,8 +518,24 @@ export const GetSideBar = () => {
           <span>NOTES</span>
         </NavLink>
       </Menu.Item>
-      <Menu.Item 
-        key="7" 
+      {/* <Menu.Item key="8" icon={<FaStickyNote style={{ color: "#00ADEF" }} />}>
+        <NavLink to="/doctor/fax" style={{ textDecoration: "none" }}>
+          <span>FAX</span>
+        </NavLink>
+      </Menu.Item> */}
+      <Menu.Item key="9" icon={<FaStickyNote style={{ color: "#00ADEF" }} />}>
+        <NavLink to="/doctor/intercom" style={{ textDecoration: "none" }}>
+          {unreadCount ? (
+            <Badge dot offset={[5, 0]} style={{ backgroundColor: '#ff4d4f' }}>
+              <span className="no-underline">INTERCOMS</span>
+            </Badge>
+          ) : (
+            <span className="no-underline">INTERCOMS</span>
+          )}
+        </NavLink>
+      </Menu.Item>
+        <Menu.Item
+        key="7"
         icon={<FaSignOutAlt style={{ color: "#00ADEF" }} />}
         onClick={() => setShowLogoutModal(true)}
       >
@@ -207,30 +551,46 @@ export const GetSideBar = () => {
       selectedKeys={[getSelectedAdminKey()]}
       mode="inline"
       onClick={onClose}
+      style={{ fontSize: '14px' }}
     >
       <Menu.Item key="1" icon={<FaListOl style={{ color: "#00ADEF" }} />}>
         <NavLink to="/users" style={{ textDecoration: "none" }}>
-          <span>PATIENT LIST</span>
+          <span style={{ whiteSpace: 'normal', lineHeight: '1.2' }}>USER MANAGEMENT</span>
         </NavLink>
       </Menu.Item>
-      <Menu.Item key="2" icon={<FaLink style={{ color: "#00ADEF" }} />}>
-        <NavLink to="/preview-link" style={{ textDecoration: "none" }}>
-          <span className="no-underline">PREVIEW LINKS</span>
+      {/* <Menu.Item key="2" icon={<FaFileAlt style={{ color: "#00ADEF" }} />}>
+        <NavLink to="/log" style={{ textDecoration: "none" }}>
+          <span style={{ whiteSpace: 'normal', lineHeight: '1.2' }}>LOGS</span>
+        </NavLink>
+      </Menu.Item> */}
+      <Menu.Item key="3" icon={<FaChartPie style={{ color: "#00ADEF" }} />}>
+        <NavLink to="/statistics" style={{ textDecoration: "none" }}>
+          <span style={{ whiteSpace: 'normal', lineHeight: '1.2' }}>STATISTICS</span>
         </NavLink>
       </Menu.Item>
-      <Menu.Item key="3" icon={<FaInbox style={{ color: "#00ADEF" }} />}>
-        <NavLink to="/inbox" style={{ textDecoration: "none" }}>
-          <span className="no-underline">INBOX</span>
+      <Menu.Item key="4" icon={<FaInbox style={{ color: "#00ADEF" }} />}>
+        <NavLink to="/ticketing" style={{ textDecoration: "none" }}>
+          <span style={{ whiteSpace: 'normal', lineHeight: '1.2' }}>TICKETING SYSTEM</span>
+        </NavLink>
+      </Menu.Item>
+      <Menu.Item key="5" icon={<FaNotesMedical style={{ color: "#00ADEF" }} />}>
+        <NavLink to="/admin/fax" style={{ textDecoration: "none" }}>
+          <span style={{ whiteSpace: 'normal', lineHeight: '1.2' }}>FAX</span>
+        </NavLink>
+      </Menu.Item>
+      <Menu.Item key="6" icon={<FaServicestack style={{ color: "#00ADEF" }} />}>
+        <NavLink to="/assignment" style={{ textDecoration: "none" }}>
+          <span style={{ whiteSpace: 'normal', lineHeight: '1.2' }}>ASSIGNMENT OF CARE</span>
         </NavLink>
       </Menu.Item>
     </Menu>
   );
 
 
-  if (userAuth.obj.role === "SuperAdmin") {
+  if (userAuth?.obj?.role === "SuperAdmin") {
     return (
       <>
-         <div>
+        <div>
           {isMobile ? (
             <>
               <Button
@@ -255,7 +615,7 @@ export const GetSideBar = () => {
                 onClose={onClose}
                 visible={visible}
                 bodyStyle={{ padding: 0 }}
-                width={250} 
+                width={280}
               >
                 <NavLink
                   className="sidebar-brand d-flex align-items-center justify-content-center"
@@ -284,6 +644,7 @@ export const GetSideBar = () => {
               theme="light"
               className="navbar-nav sidebar sidebar-light accordion"
               id="accordionSidebar"
+              width={280}
             >
               <NavLink
                 className="sidebar-brand d-flex align-items-center justify-content-center"
@@ -306,7 +667,7 @@ export const GetSideBar = () => {
       </>
     );
   }
-   else if (userAuth.obj.role === "Doctor" || userAuth.obj.role === "FertilityEducator") {
+  else if (userAuth?.obj?.role === "Doctor" || userAuth?.obj?.role === "FertilityEducator") {
     return (
       <>
         <div>
@@ -451,9 +812,9 @@ export const GetSideBar = () => {
         </div>
       </>
     );
-  } 
+  }
 
-  else if (userAuth.obj.role === "Patient") {
+  else if (userAuth?.obj?.role === "Patient") {
     return (
       <div>
         {isMobile ? (
@@ -529,7 +890,7 @@ export const GetSideBar = () => {
         )}
       </div>
     );
-  } 
+  }
   else {
     return (
       <>
